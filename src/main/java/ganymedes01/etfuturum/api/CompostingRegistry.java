@@ -44,6 +44,7 @@ public class CompostingRegistry {
 				ModBlocks.PINK_PETALS.newItemStack(),
 				ModBlocks.MANGROVE_ROOTS.newItemStack(),
 				ModBlocks.HANGING_ROOTS.newItemStack(),
+				ModBlocks.SMALL_DRIPLEAF.newItemStack(),
 				ModBlocks.AZALEA_LEAVES.newItemStack(1, 0)
 		), 30);
 
@@ -60,6 +61,7 @@ public class CompostingRegistry {
 				ModBlocks.NETHER_SPROUTS.newItemStack(1, OreDictionary.WILDCARD_VALUE),
 				ModBlocks.TWISTING_VINES.newItemStack(),
 				ModBlocks.WEEPING_VINES.newItemStack(),
+				ModBlocks.BIG_DRIPLEAF.newItemStack(),
 				ModBlocks.AZALEA_LEAVES.newItemStack(1, 1)
 		), 50);
 

@@ -81,14 +81,73 @@ blocks = require("src/main/java/ganymedes01/etfuturum/ModBlocks.java")
 for registry in (
     "ROOTED_DIRT(ConfigBlocksItems.enableLushCaveBlocks, new BlockRootedDirt())",
     "HANGING_ROOTS(ConfigBlocksItems.enableLushCaveBlocks, new BlockHangingRoots())",
+    "SMALL_DRIPLEAF(ConfigBlocksItems.enableLushCaveBlocks, new BlockSmallDripleaf())",
+    "BIG_DRIPLEAF_STEM(ConfigBlocksItems.enableLushCaveBlocks, new BlockBigDripleafStem(), null)",
+    "BIG_DRIPLEAF(ConfigBlocksItems.enableLushCaveBlocks, new BlockBigDripleaf())",
 ):
     if registry not in blocks:
         failures.append(f"missing modern registry entry: {registry}")
 
 require("src/main/java/ganymedes01/etfuturum/blocks/BlockRootedDirt.java", 'setNames("rooted_dirt")')
 require("src/main/java/ganymedes01/etfuturum/blocks/BlockHangingRoots.java", 'Utils.getUnlocalisedName("hanging_roots")')
-require_png("src/main/resources/assets/minecraft/textures/blocks/rooted_dirt.png")
-require_png("src/main/resources/assets/minecraft/textures/blocks/hanging_roots.png")
+small = require("src/main/java/ganymedes01/etfuturum/blocks/BlockSmallDripleaf.java", 'Utils.getUnlocalisedName("small_dripleaf")')
+big = require("src/main/java/ganymedes01/etfuturum/blocks/BlockBigDripleaf.java", 'Utils.getUnlocalisedName("big_dripleaf")')
+stem = require("src/main/java/ganymedes01/etfuturum/blocks/BlockBigDripleafStem.java", 'Utils.getUnlocalisedName("big_dripleaf_stem")')
+for expected in ("UPPER_BIT = 4", "implements IGrowable", "BIG_DRIPLEAF_STEM.get()", "BIG_DRIPLEAF.get()"):
+    if expected not in small:
+        failures.append(f"small dripleaf implementation missing: {expected}")
+for expected in ("TILT_NONE = 0", "TILT_UNSTABLE = 1", "TILT_PARTIAL = 2", "TILT_FULL = 3",
+                 "world.scheduleBlockUpdate(x, y, z, this, 10)", "world.scheduleBlockUpdate(x, y, z, this, 100)",
+                 "world.isBlockIndirectlyGettingPowered", "instanceof IProjectile", "growOne"):
+    if expected not in big:
+        failures.append(f"big dripleaf implementation missing: {expected}")
+if "implements IGrowable" not in stem or "Item.getItemFromBlock(ModBlocks.BIG_DRIPLEAF.get())" not in stem:
+    failures.append("big dripleaf stem is missing non-item/growth/drop support behaviour")
+
+render_ids = require("src/main/java/ganymedes01/etfuturum/lib/RenderIDs.java")
+client_proxy = require("src/main/java/ganymedes01/etfuturum/core/proxy/ClientProxy.java")
+for expected in ("SMALL_DRIPLEAF", "BIG_DRIPLEAF"):
+    if expected not in render_ids:
+        failures.append(f"missing dripleaf render ID: {expected}")
+for expected in ("BlockSmallDripleafRenderer(RenderIDs.SMALL_DRIPLEAF)", "BlockBigDripleafRenderer(RenderIDs.BIG_DRIPLEAF)"):
+    if expected not in client_proxy:
+        failures.append(f"missing dripleaf renderer registration: {expected}")
+small_renderer = require("src/main/java/ganymedes01/etfuturum/client/renderer/block/BlockSmallDripleafRenderer.java", "class BlockSmallDripleafRenderer")
+big_renderer = require("src/main/java/ganymedes01/etfuturum/client/renderer/block/BlockBigDripleafRenderer.java", "class BlockBigDripleafRenderer")
+for expected in ("2.99D * P", "renderLeafPlate", "renderSmallStem", "uvPixels"):
+    if expected not in small_renderer:
+        failures.append(f"small dripleaf fidelity renderer missing: {expected}")
+for expected in ("angle = -22.5D", "angle = -45.0D", "renderStem", "uvRect(leaf.getTipIcon(), 0, 4, 16, 0)",
+                 "uvRect(leaf.getSideIcon(), 0, 4, 16, 0)", "Vanilla's UNSTABLE state deliberately uses the upright model"):
+    if expected not in big_renderer:
+        failures.append(f"big dripleaf fidelity renderer missing: {expected}")
+if "if (tilt == TILT_FULL)" not in big:
+    failures.append("big dripleaf full-only non-solid collision gate is missing")
+projectile_pos = big.find("if (entity instanceof IProjectile)")
+power_pos = big.find("if (world.isBlockIndirectlyGettingPowered(x, y, z))", projectile_pos)
+if projectile_pos < 0 or power_pos < 0 or projectile_pos > power_pos:
+    failures.append("big dripleaf projectile tilt must bypass the normal redstone hold gate")
+
+for texture in (
+    "rooted_dirt.png", "hanging_roots.png",
+    "small_dripleaf_top.png", "small_dripleaf_side.png", "small_dripleaf_stem_top.png", "small_dripleaf_stem_bottom.png",
+    "big_dripleaf_top.png", "big_dripleaf_side.png", "big_dripleaf_tip.png", "big_dripleaf_stem.png",
+):
+    require_png(f"src/main/resources/assets/minecraft/textures/blocks/{texture}")
+
+lang = require("src/main/resources/assets/etfuturum/lang/en_US.lang")
+for expected in (
+    "tile.etfuturum.small_dripleaf.name=Small Dripleaf",
+    "tile.etfuturum.big_dripleaf.name=Big Dripleaf",
+    "tile.etfuturum.big_dripleaf_stem.name=Big Dripleaf Stem",
+):
+    if expected not in lang:
+        failures.append(f"missing dripleaf language entry: {expected}")
+
+compost = require("src/main/java/ganymedes01/etfuturum/api/CompostingRegistry.java")
+for expected in ("ModBlocks.SMALL_DRIPLEAF.newItemStack()", "ModBlocks.BIG_DRIPLEAF.newItemStack()"):
+    if expected not in compost:
+        failures.append(f"missing dripleaf composting entry: {expected}")
 
 # Licence boundary: Campfire Backport is reference-only. Existing optional compatibility strings
 # mentioning the external mod are legitimate, but its package/source must not be vendored here.
@@ -111,5 +170,5 @@ print("Et Futurum Requiem Plus map-compat static validation PASSED")
 print(" - mapCompatibilityMode default remains false")
 print(" - RTG/world-generation hard gates present")
 print(" - progression/raw-ore/spawn gates present")
-print(" - rooted_dirt and hanging_roots registrations/assets present")
+print(" - rooted dirt, hanging roots, and dripleaf registrations/assets present")
 print(" - no Campfire Backport GPL package source vendored")

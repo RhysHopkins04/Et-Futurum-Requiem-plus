@@ -538,7 +538,10 @@ public enum ModBlocks {
 	CAVE_VINE_PLANT(ConfigBlocksItems.enableGlowBerries, new BlockCaveVinesPlant()),
 	CAVE_VINE(ConfigBlocksItems.enableGlowBerries, new BlockCaveVines()),
 	ROOTED_DIRT(ConfigBlocksItems.enableLushCaveBlocks, new BlockRootedDirt()),
-	HANGING_ROOTS(ConfigBlocksItems.enableLushCaveBlocks, new BlockHangingRoots())
+	HANGING_ROOTS(ConfigBlocksItems.enableLushCaveBlocks, new BlockHangingRoots()),
+	SMALL_DRIPLEAF(ConfigBlocksItems.enableLushCaveBlocks, new BlockSmallDripleaf()),
+	BIG_DRIPLEAF_STEM(ConfigBlocksItems.enableLushCaveBlocks, new BlockBigDripleafStem(), null),
+	BIG_DRIPLEAF(ConfigBlocksItems.enableLushCaveBlocks, new BlockBigDripleaf())
 	;
 
 	public static final ModBlocks[] DOORS = new ModBlocks[]{DOOR_SPRUCE, DOOR_BIRCH, DOOR_JUNGLE, DOOR_ACACIA, DOOR_DARK_OAK, CRIMSON_DOOR, WARPED_DOOR, MANGROVE_DOOR, CHERRY_DOOR, BAMBOO_DOOR};

@@ -122,6 +122,8 @@ public class ModSounds {
 	public static final SoundType soundAzaleaLeaves = new CustomSound("azalea_leaves").setDisabledSound(Block.soundTypeGrass);
 	public static final SoundType soundHangingRoots = new CustomSound("hanging_roots").setDisabledSound(Block.soundTypeGrass);
 	public static final SoundType soundRootedDirt = new CustomSound("rooted_dirt").setDisabledSound(Block.soundTypeGrass);
+	public static final SoundType soundSmallDripleaf = new CustomSound("small_dripleaf").setDisabledSound(Block.soundTypeGrass);
+	public static final SoundType soundBigDripleaf = new CustomSound("big_dripleaf").setDisabledSound(Block.soundTypeGrass);
 	public static final SoundType soundMoss = new CustomSound("moss").setDisabledSound(Block.soundTypeGrass);
 	public static final SoundType soundMossCarpet = new CustomSound("moss_carpet").setDisabledSound(Block.soundTypeGrass);
 

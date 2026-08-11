@@ -750,6 +750,9 @@ tile.etfuturum.mud_brick_wall.name=Mud Brick Wall
 tile.etfuturum.moss_block.name=Moss Block
 tile.etfuturum.rooted_dirt.name=Rooted Dirt
 tile.etfuturum.hanging_roots.name=Hanging Roots
+tile.etfuturum.small_dripleaf.name=Small Dripleaf
+tile.etfuturum.big_dripleaf.name=Big Dripleaf
+tile.etfuturum.big_dripleaf_stem.name=Big Dripleaf Stem
 tile.etfuturum.moss_carpet.name=Moss Carpet
 
 tile.etfuturum.shroomlight.name=Shroomlight

@@ -339,7 +339,9 @@ public class EtFuturumEarlyMixins implements IFMLLoadingPlugin, IEarlyMixinLoade
 		}
 		mixins.add("blocks.MixinTileEntitySkull");
 
-		mixins.add("deepslateores.MixinChunk");
+		if (!ConfigMapCompatibility.isEnabled()) {
+			mixins.add("deepslateores.MixinChunk");
+		}
 
 		return mixins;
 	}

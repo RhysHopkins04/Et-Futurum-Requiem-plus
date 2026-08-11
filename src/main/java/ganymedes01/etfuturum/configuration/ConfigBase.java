@@ -24,6 +24,7 @@ public abstract class ConfigBase extends Configuration {
 	public static final String configDir = "config" + File.separator + Tags.MOD_ID + File.separator;
 
 	public static final ConfigBase EXPERIMENTS = new ConfigExperiments(createConfigFile("experiments"));
+	public static final ConfigBase MAP_COMPAT = new ConfigMapCompatibility(createConfigFile("mapcompat"));
 
 	public static final ConfigBase BLOCKS_ITEMS = new ConfigBlocksItems(createConfigFile("blocksitems"));
 	public static final ConfigBase ENCHANTS_POTIONS = new ConfigEnchantsPotions(createConfigFile("enchantspotions"));
@@ -49,6 +50,7 @@ public abstract class ConfigBase extends Configuration {
 		for (ConfigBase config : CONFIGS) {
 			config.syncConfig();
 		}
+		ConfigMapCompatibility.applyCompatibilityOverrides();
 	}
 
 	private void syncConfig() {
@@ -85,6 +87,7 @@ public abstract class ConfigBase extends Configuration {
 		for (ConfigBase config : CONFIGS) {
 			config.initValues();
 		}
+		ConfigMapCompatibility.applyCompatibilityOverrides();
 	}
 
 	/**
@@ -97,11 +100,14 @@ public abstract class ConfigBase extends Configuration {
 		for (ConfigBase config : CONFIGS) {
 			config.onConstructingValues();
 		}
+		ConfigMapCompatibility.applyCompatibilityOverrides();
 	}
 
 	@SubscribeEvent
 	public void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent eventArgs) {
-		if (Tags.MOD_ID.equals(eventArgs.modID))
+		if (Tags.MOD_ID.equals(eventArgs.modID)) {
 			syncConfig();
+			ConfigMapCompatibility.applyCompatibilityOverrides();
+		}
 	}
 }

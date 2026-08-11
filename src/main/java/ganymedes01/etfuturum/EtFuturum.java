@@ -185,17 +185,19 @@ public class EtFuturum {
 		if(ModsList.IRON_CHEST.isLoaded()) {
 			CompatIronChests.init();
 		}
-		try {
-			Field chestInfo = ChestGenHooks.class.getDeclaredField("chestInfo");
-			chestInfo.setAccessible(true);
-			if (!((HashMap<String, ChestGenHooks>) chestInfo.get(null)).containsKey(NETHER_FORTRESS)) {
-				fortressWeightedField = Class.forName("net.minecraft.world.gen.structure.StructureNetherBridgePieces$Piece").getDeclaredField("field_111019_a");
-				fortressWeightedField.setAccessible(true);
-				((HashMap<String, ChestGenHooks>) chestInfo.get(null)).put(NETHER_FORTRESS, new ChestGenHooks(NETHER_FORTRESS, (WeightedRandomChestContent[]) fortressWeightedField.get(null), 2, 5));
+		if (!ConfigMapCompatibility.isEnabled()) {
+			try {
+				Field chestInfo = ChestGenHooks.class.getDeclaredField("chestInfo");
+				chestInfo.setAccessible(true);
+				if (!((HashMap<String, ChestGenHooks>) chestInfo.get(null)).containsKey(NETHER_FORTRESS)) {
+					fortressWeightedField = Class.forName("net.minecraft.world.gen.structure.StructureNetherBridgePieces$Piece").getDeclaredField("field_111019_a");
+					fortressWeightedField.setAccessible(true);
+					((HashMap<String, ChestGenHooks>) chestInfo.get(null)).put(NETHER_FORTRESS, new ChestGenHooks(NETHER_FORTRESS, (WeightedRandomChestContent[]) fortressWeightedField.get(null), 2, 5));
+				}
+			} catch (Exception e) {
+				System.out.println("Failed to get Nether fortress loot table:");
+				e.printStackTrace();
 			}
-		} catch (Exception e) {
-			System.out.println("Failed to get Nether fortress loot table:");
-			e.printStackTrace();
 		}
 
 		ModBlocks.init();
@@ -230,9 +232,11 @@ public class EtFuturum {
 			NetherBiomeManager.init();
 		}
 
-		GameRegistry.registerWorldGenerator(EtFuturumEarlyWorldGenerator.INSTANCE, Integer.MIN_VALUE);
-		GameRegistry.registerWorldGenerator(EtFuturumWorldGenerator.INSTANCE, 0);
-		GameRegistry.registerWorldGenerator(EtFuturumLateWorldGenerator.INSTANCE, Integer.MAX_VALUE);
+		if (!ConfigMapCompatibility.isEnabled()) {
+			GameRegistry.registerWorldGenerator(EtFuturumEarlyWorldGenerator.INSTANCE, Integer.MIN_VALUE);
+			GameRegistry.registerWorldGenerator(EtFuturumWorldGenerator.INSTANCE, 0);
+			GameRegistry.registerWorldGenerator(EtFuturumLateWorldGenerator.INSTANCE, Integer.MAX_VALUE);
+		}
 
 		OceanMonument.makeMap();
 
@@ -318,32 +322,32 @@ public class EtFuturum {
 		Items.blaze_rod.setFull3D();
 		Blocks.trapped_chest.setCreativeTab(CreativeTabs.tabRedstone);
 
-		if (ConfigBlocksItems.enableOtherside) {
+		if (!ConfigMapCompatibility.isEnabled() && ConfigBlocksItems.enableOtherside) {
 			ChestGenHooks.addItem(ChestGenHooks.STRONGHOLD_CORRIDOR, new WeightedRandomChestContent(ModItems.OTHERSIDE_RECORD.get(), 0, 1, 1, 1));
 			ChestGenHooks.addItem(ChestGenHooks.DUNGEON_CHEST, new WeightedRandomChestContent(ModItems.OTHERSIDE_RECORD.get(), 0, 1, 1, 1));
 		}
 
-		if (ConfigBlocksItems.enablePrecipice) {
+		if (!ConfigMapCompatibility.isEnabled() && ConfigBlocksItems.enablePrecipice) {
 			ChestGenHooks.addItem(ChestGenHooks.STRONGHOLD_CORRIDOR, new WeightedRandomChestContent(ModItems.PRECIPICE_RECORD.get(), 0, 1, 1, 1));
 			ChestGenHooks.addItem(ChestGenHooks.DUNGEON_CHEST, new WeightedRandomChestContent(ModItems.PRECIPICE_RECORD.get(), 0, 1, 1, 1));
 		}
 
-		if (ConfigBlocksItems.enableCreatorMusicBox) {
+		if (!ConfigMapCompatibility.isEnabled() && ConfigBlocksItems.enableCreatorMusicBox) {
 			ChestGenHooks.addItem(ChestGenHooks.STRONGHOLD_CORRIDOR, new WeightedRandomChestContent(ModItems.CREATOR_MUSIC_BOX_RECORD.get(), 0, 1, 1, 1));
 			ChestGenHooks.addItem(ChestGenHooks.DUNGEON_CHEST, new WeightedRandomChestContent(ModItems.CREATOR_MUSIC_BOX_RECORD.get(), 0, 1, 1, 1));
 		}
 
-		if (ConfigBlocksItems.enableCreator) {
+		if (!ConfigMapCompatibility.isEnabled() && ConfigBlocksItems.enableCreator) {
 			ChestGenHooks.addItem(ChestGenHooks.STRONGHOLD_CORRIDOR, new WeightedRandomChestContent(ModItems.CREATOR_RECORD.get(), 0, 1, 1, 1));
 			ChestGenHooks.addItem(ChestGenHooks.DUNGEON_CHEST, new WeightedRandomChestContent(ModItems.CREATOR_RECORD.get(), 0, 1, 1, 1));
 		}
 
-		if (ConfigBlocksItems.enable5) {
+		if (!ConfigMapCompatibility.isEnabled() && ConfigBlocksItems.enable5) {
 			ChestGenHooks.addItem(ChestGenHooks.STRONGHOLD_CORRIDOR, new WeightedRandomChestContent(ModItems.DISC_FRAGMENT_5.get(), 0, 1, 1, 1));
 			ChestGenHooks.addItem(ChestGenHooks.DUNGEON_CHEST, new WeightedRandomChestContent(ModItems.DISC_FRAGMENT_5.get(), 0, 1, 1, 1));
 		}
 
-		if (ConfigBlocksItems.enablePigstep) {
+		if (!ConfigMapCompatibility.isEnabled() && ConfigBlocksItems.enablePigstep) {
 			ChestGenHooks.addItem(NETHER_FORTRESS, new WeightedRandomChestContent(ModItems.PIGSTEP_RECORD.get(), 0, 1, 1, 5));
 
 			if (fortressWeightedField != null) {
@@ -387,10 +391,12 @@ public class EtFuturum {
 			MapGenStructureIO.func_143031_a(EndCityPieces.EndCityPiece.class, "ECP");
 		}
 		ModRecipes.init();
-		DeepslateOreRegistry.init();
+		if (!ConfigMapCompatibility.isEnabled()) {
+			DeepslateOreRegistry.init();
+			RawOreRegistry.init();
+			SmithingTableRecipes.init();
+		}
 		StrippedLogRegistry.init();
-		RawOreRegistry.init();
-		SmithingTableRecipes.init();
 		CompostingRegistry.init();
 		BeePlantRegistry.init();
 		PistonBehaviorRegistry.init();
@@ -414,8 +420,10 @@ public class EtFuturum {
 			}
 		}
 
-		EtFuturumWorldGenerator.INSTANCE.postInit();
-		WorldEventHandler.INSTANCE.postInit();
+		if (!ConfigMapCompatibility.isEnabled()) {
+			EtFuturumWorldGenerator.INSTANCE.postInit();
+			WorldEventHandler.INSTANCE.postInit();
+		}
 
 		if (ConfigSounds.newBlockSounds) {
 			Blocks.jukebox.setStepSound(Block.soundTypeWood);

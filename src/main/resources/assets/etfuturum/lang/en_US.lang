@@ -748,6 +748,8 @@ tile.etfuturum.mud_brick_slab.name=Mud Brick Slab
 tile.etfuturum.mud_brick_wall.name=Mud Brick Wall
 
 tile.etfuturum.moss_block.name=Moss Block
+tile.etfuturum.rooted_dirt.name=Rooted Dirt
+tile.etfuturum.hanging_roots.name=Hanging Roots
 tile.etfuturum.moss_carpet.name=Moss Carpet
 
 tile.etfuturum.shroomlight.name=Shroomlight

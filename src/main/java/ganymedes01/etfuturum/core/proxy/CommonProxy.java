@@ -47,8 +47,10 @@ public class CommonProxy implements IGuiHandler {
 		FMLCommonHandler.instance().bus().register(ServerEventHandler.INSTANCE);
 		MinecraftForge.EVENT_BUS.register(ServerEventHandler.INSTANCE);
 
-		FMLCommonHandler.instance().bus().register(WorldEventHandler.INSTANCE);
-		MinecraftForge.TERRAIN_GEN_BUS.register(WorldEventHandler.INSTANCE);
+		if (!ConfigMapCompatibility.isEnabled()) {
+			FMLCommonHandler.instance().bus().register(WorldEventHandler.INSTANCE);
+			MinecraftForge.TERRAIN_GEN_BUS.register(WorldEventHandler.INSTANCE);
+		}
 
 		if (ModBlocks.SCULK_CATALYST.isEnabled()) {
 			FMLCommonHandler.instance().bus().register(SculkEventHandler.INSTANCE);
@@ -110,16 +112,18 @@ public class CommonProxy implements IGuiHandler {
 		if (ConfigEntities.enableRabbit) {
 			ModEntityList.registerEntity(EntityRabbit.class, "rabbit", 3, EtFuturum.instance, 80, 3, true, 0x995F40, 0x734831);
 
-			EntityRegistry.addSpawn(EntityRabbit.class, 3, 1, 3, EnumCreatureType.creature, BiomeDictionary.getBiomesForType(Type.SANDY));
-			BiomeGenBase[] array = BiomeDictionary.getBiomesForType(Type.SNOWY);
-			array = ArrayUtils.addAll(array, BiomeDictionary.getBiomesForType(Type.PLAINS));
-			array = ArrayUtils.addAll(array, BiomeDictionary.getBiomesForType(Type.FOREST));
-			for (BiomeGenBase biome : ArrayUtils.clone(array)) {
-				if (biome.getClass().getName().toLowerCase().contains("divinerpg")) {
-					ArrayUtils.removeElement(array, biome);
+			if (!ConfigMapCompatibility.isEnabled()) {
+				EntityRegistry.addSpawn(EntityRabbit.class, 3, 1, 3, EnumCreatureType.creature, BiomeDictionary.getBiomesForType(Type.SANDY));
+				BiomeGenBase[] array = BiomeDictionary.getBiomesForType(Type.SNOWY);
+				array = ArrayUtils.addAll(array, BiomeDictionary.getBiomesForType(Type.PLAINS));
+				array = ArrayUtils.addAll(array, BiomeDictionary.getBiomesForType(Type.FOREST));
+				for (BiomeGenBase biome : ArrayUtils.clone(array)) {
+					if (biome.getClass().getName().toLowerCase().contains("divinerpg")) {
+						ArrayUtils.removeElement(array, biome);
+					}
 				}
+				EntityRegistry.addSpawn(EntityRabbit.class, 6, 1, 3, EnumCreatureType.creature, array);
 			}
-			EntityRegistry.addSpawn(EntityRabbit.class, 6, 1, 3, EnumCreatureType.creature, array);
 		}
 
 		if (ConfigBlocksItems.enableArmourStand) {
@@ -152,7 +156,7 @@ public class CommonProxy implements IGuiHandler {
 		if (ConfigEntities.enableHusk) {
 			ModEntityList.registerEntity(EntityHusk.class, "husk", 4, EtFuturum.instance, 80, 3, true, 0x777561, 0xE0D991);
 
-			if (ConfigWorld.oldHuskSpawning) {
+			if (!ConfigMapCompatibility.isEnabled() && ConfigWorld.oldHuskSpawning) {
 				List<BiomeGenBase> biomes = new ArrayList<>(Arrays.asList(BiomeDictionary.getBiomesForType(Type.SANDY)));
 				biomes.retainAll(Arrays.asList(BiomeDictionary.getBiomesForType(Type.DRY)));
 				biomes.retainAll(Arrays.asList(BiomeDictionary.getBiomesForType(Type.HOT)));
@@ -169,7 +173,7 @@ public class CommonProxy implements IGuiHandler {
 		if (ConfigEntities.enableStray) {
 			ModEntityList.registerEntity(EntityStray.class, "stray", 5, EtFuturum.instance, 80, 3, true, 0x617778, 0xE6EAEA);
 
-			if (ConfigWorld.oldStraySpawning) {
+			if (!ConfigMapCompatibility.isEnabled() && ConfigWorld.oldStraySpawning) {
 				//change spawn weights
 				EntityRegistry.removeSpawn(EntitySkeleton.class, EnumCreatureType.monster, BiomeDictionary.getBiomesForType(Type.SNOWY));
 
@@ -178,7 +182,7 @@ public class CommonProxy implements IGuiHandler {
 			}
 		}
 
-		if (ConfigEntities.enableNetherEndermen) {
+		if (!ConfigMapCompatibility.isEnabled() && ConfigEntities.enableNetherEndermen) {
 			EntityRegistry.addSpawn(EntityEnderman.class, 1, 4, 4, EnumCreatureType.monster, BiomeGenBase.hell);
 //			if (ModBlocks.NYLIUM.isEnabled()) {
 //				EntityEnderman.setCarriable(ModBlocks.NYLIUM.get(), true);
@@ -210,7 +214,7 @@ public class CommonProxy implements IGuiHandler {
 			ModEntityList.registerEntity(EntityShulker.class, "shulker", 16, EtFuturum.instance, 80, 1, false, 0x946794, 0x4D3852);
 			ModEntityList.registerEntity(EntityShulkerBullet.class, "shulker_candy", 17, EtFuturum.instance, 64, 1, true);
 
-			if (ConfigTweaks.shulkersSpawnAnywhere) {
+			if (!ConfigMapCompatibility.isEnabled() && ConfigTweaks.shulkersSpawnAnywhere) {
 				EntityRegistry.addSpawn(EntityShulker.class, 1, 1, 2, EnumCreatureType.monster, BiomeDictionary.getBiomesForType(Type.END));
 			}
 		}
@@ -235,26 +239,34 @@ public class CommonProxy implements IGuiHandler {
 
 		if (ConfigEntities.enableFoxes) {
 			ModEntityList.registerEntity(EntityFox.class, "fox", 22, EtFuturum.instance, 64, 1, true, 0xD5B69F, 0xCC6920);
-			EntityRegistry.addSpawn(EntityFox.class, 8, 2, 4, EnumCreatureType.creature, BiomeDictionary.getBiomesForType(Type.CONIFEROUS));
+			if (!ConfigMapCompatibility.isEnabled()) {
+				EntityRegistry.addSpawn(EntityFox.class, 8, 2, 4, EnumCreatureType.creature, BiomeDictionary.getBiomesForType(Type.CONIFEROUS));
+			}
 		}
 
 		if (ConfigEntities.enablePolarBears) {
 			ModEntityList.registerEntity(EntityPolarBear.class, "polar_bear", 23, EtFuturum.instance, 80, 3, true, 0xF2F2F2, 0x959590);
-			EntityRegistry.addSpawn(EntityPolarBear.class, 1, 1, 2, EnumCreatureType.creature, BiomeDictionary.getBiomesForType(Type.SNOWY));
+			if (!ConfigMapCompatibility.isEnabled()) {
+				EntityRegistry.addSpawn(EntityPolarBear.class, 1, 1, 2, EnumCreatureType.creature, BiomeDictionary.getBiomesForType(Type.SNOWY));
+			}
 		}
 
 		if (ConfigEntities.enableGoats) {
 			ModEntityList.registerEntity(EntityGoat.class, "goat", 24, EtFuturum.instance, 80, 3, true, 0xA5947C, 0x55493E);
-			List<BiomeGenBase> goatBiomes = new ArrayList<>(Arrays.asList(BiomeDictionary.getBiomesForType(Type.MOUNTAIN)));
-			goatBiomes.retainAll(Arrays.asList(BiomeDictionary.getBiomesForType(Type.SNOWY)));
-			if (!goatBiomes.isEmpty()) {
-				EntityRegistry.addSpawn(EntityGoat.class, 5, 1, 3, EnumCreatureType.creature, goatBiomes.toArray(new BiomeGenBase[goatBiomes.size()]));
+			if (!ConfigMapCompatibility.isEnabled()) {
+				List<BiomeGenBase> goatBiomes = new ArrayList<>(Arrays.asList(BiomeDictionary.getBiomesForType(Type.MOUNTAIN)));
+				goatBiomes.retainAll(Arrays.asList(BiomeDictionary.getBiomesForType(Type.SNOWY)));
+				if (!goatBiomes.isEmpty()) {
+					EntityRegistry.addSpawn(EntityGoat.class, 5, 1, 3, EnumCreatureType.creature, goatBiomes.toArray(new BiomeGenBase[goatBiomes.size()]));
+				}
 			}
 		}
 
-		//make magmas slightly more common, hopefully.
-		EntityRegistry.removeSpawn(EntityMagmaCube.class, EnumCreatureType.monster, BiomeGenBase.hell);
-		EntityRegistry.addSpawn(EntityMagmaCube.class, 2, 4, 4, EnumCreatureType.monster, BiomeGenBase.hell);
+		if (!ConfigMapCompatibility.isEnabled()) {
+			//make magmas slightly more common, hopefully.
+			EntityRegistry.removeSpawn(EntityMagmaCube.class, EnumCreatureType.monster, BiomeGenBase.hell);
+			EntityRegistry.addSpawn(EntityMagmaCube.class, 2, 4, 4, EnumCreatureType.monster, BiomeGenBase.hell);
+		}
 	}
 
 	@Override

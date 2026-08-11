@@ -225,7 +225,7 @@ public class ServerEventHandler {
 		}
 
 
-		if (ConfigBlocksItems.enableNewBoats && ConfigBlocksItems.replaceOldBoats) {
+		if (!ConfigMapCompatibility.isEnabled() && ConfigBlocksItems.enableNewBoats && ConfigBlocksItems.replaceOldBoats) {
 			if (event.entity.getClass() == EntityBoat.class) {
 				EntityNewBoat boat = new EntityNewBoat(event.world);
 				event.entity.rotationYaw += 90;
@@ -236,13 +236,13 @@ public class ServerEventHandler {
 			}
 		}
 
-		if (ConfigEntities.enableVillagerZombies && event.entity.getClass() == EntityZombie.class && ((EntityZombie) event.entity).isVillager()) {
+		if (!ConfigMapCompatibility.isEnabled() && ConfigEntities.enableVillagerZombies && event.entity.getClass() == EntityZombie.class && ((EntityZombie) event.entity).isVillager()) {
 			replaceEntity(event.entity, new EntityZombieVillager(event.world), event.world, chunk);
 			event.setCanceled(true);
 			return;
 		}
 
-		if (ConfigEntities.enableShearableSnowGolems && event.entity.getClass() == EntitySnowman.class) {
+		if (!ConfigMapCompatibility.isEnabled() && ConfigEntities.enableShearableSnowGolems && event.entity.getClass() == EntitySnowman.class) {
 			Entity entity = new EntityNewSnowGolem(event.world);
 			replaceEntity(event.entity, entity, event.world, chunk);
 			entity.getDataWatcher().updateObject(12, (byte) 1);
@@ -1218,6 +1218,9 @@ public class ServerEventHandler {
 
 	@SubscribeEvent
 	public void naturalSpawnEvent(SpecialSpawn event) {
+		if (ConfigMapCompatibility.isEnabled()) {
+			return;
+		}
 		if (!(event.entity instanceof EntityLiving)) {
 			return;
 		}
@@ -1281,6 +1284,9 @@ public class ServerEventHandler {
 
 	@SubscribeEvent
 	public void naturalSpawnEvent(LivingPackSizeEvent event) {
+		if (ConfigMapCompatibility.isEnabled()) {
+			return;
+		}
 		//Handles logic for preventing wither skeletons from appearing in soul sand valleys unless they're in a Nether fortress.
 		int x = MathHelper.floor_double(event.entityLiving.posX);
 		int y = MathHelper.floor_double(event.entityLiving.posY);

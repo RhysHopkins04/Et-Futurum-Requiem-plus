@@ -128,6 +128,7 @@ public class ConfigBlocksItems extends ConfigBase {
 	public static boolean enableBasalt;
 	public static boolean enableGlowLichen;
 	public static boolean enableGlowBerries;
+	public static boolean enableLushCaveBlocks;
 	public static boolean enableSoulSoil;
 	public static boolean enableSoulLighting;
 
@@ -215,6 +216,8 @@ public class ConfigBlocksItems extends ConfigBase {
 		enableBasalt = getBoolean("enableBasalt", catBlockNatural, true, "This must be on for the basalt deltas biome to generate unless Netherlicious is installed.");
 		enableGlowLichen = getBoolean("enableGlowLichen", catBlockNatural, true, "");
 		enableGlowBerries = getBoolean("enableGlowBerries", catBlockNatural, true, "");
+		enableLushCaveBlocks = getBoolean("enableLushCaveBlocks", catBlockNatural, true,
+				"Enables Et Futurum Requiem Plus lush-cave content such as rooted dirt and hanging roots. This option does not enable natural lush-cave generation.");
 		if (ConfigExperiments.enableCrimsonBlocks) {
 			enableNetherwartBlock = true;
 		}

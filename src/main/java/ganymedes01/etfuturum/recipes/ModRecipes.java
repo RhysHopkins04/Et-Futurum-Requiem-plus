@@ -74,6 +74,11 @@ public class ModRecipes {
 
 		ModTagging.registerOreDictionary();
 		ModTagging.registerHogTags();
+
+		if (ConfigMapCompatibility.isEnabled()) {
+			return;
+		}
+
 		registerRecipes();
 		tweakRecipes();
 		registerLoot();

@@ -43,6 +43,7 @@ public class CompostingRegistry {
 				ModBlocks.MOSS_CARPET.newItemStack(),
 				ModBlocks.PINK_PETALS.newItemStack(),
 				ModBlocks.MANGROVE_ROOTS.newItemStack(),
+				ModBlocks.HANGING_ROOTS.newItemStack(),
 				ModBlocks.AZALEA_LEAVES.newItemStack(1, 0)
 		), 30);
 

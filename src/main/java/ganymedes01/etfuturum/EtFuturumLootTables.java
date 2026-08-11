@@ -1,5 +1,6 @@
 package ganymedes01.etfuturum;
 
+import ganymedes01.etfuturum.configuration.configs.ConfigMapCompatibility;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.WeightedRandomChestContent;
@@ -17,6 +18,10 @@ public class EtFuturumLootTables {
 		COMPOSTER_LOOT.setMax(1);
 		addLoot(COMPOSTER_LOOT, new ItemStack(Items.dye, 1, 15), 1, 1, 10);
 		//For some reason it is min count, max count and weight, yes weight is the last arg not the first....
+
+		if (ConfigMapCompatibility.isEnabled()) {
+			return;
+		}
 
 		END_CITY_TREASURE.setMin(2);
 		END_CITY_TREASURE.setMax(6);

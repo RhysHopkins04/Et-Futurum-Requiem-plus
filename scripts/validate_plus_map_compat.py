@@ -224,6 +224,73 @@ if "ModBlocks.SPORE_BLOSSOM.newItemStack()" not in compost:
 if 'ModBlocks.MOSS_CARPET.newItemStack(3)' not in recipes or 'ModBlocks.MOSS_BLOCK.newItemStack()' not in recipes:
     failures.append("modern 2 moss blocks -> 3 moss carpet recipe is missing")
 
+# P004 -- natural Lush Cave world generation. Minecraft 1.7.10 has no vertical/3D
+# biome storage, so the backport must use deterministic underground regions while leaving the
+# surface biome untouched. The entire generator is disabled by Map Compatibility Mode.
+world_config = require("src/main/java/ganymedes01/etfuturum/configuration/configs/ConfigWorld.java")
+for expected in (
+    'lushCavesWorldgen = getBoolean("lushCavesWorldgen", catGeneration, true',
+    'lushCaveRarity = getInt("lushCaveRarity", catGeneration, 64',
+    'lushCaveRegionRadiusChunks = getInt("lushCaveRegionRadiusChunks", catGeneration, 2',
+    'lushCaveMinY = getInt("lushCaveMinY", catGeneration, 10',
+    'lushCaveMaxY = getInt("lushCaveMaxY", catGeneration, 60',
+):
+    if expected not in world_config:
+        failures.append(f"lush-cave worldgen config/default missing: {expected}")
+
+if "ConfigWorld.lushCavesWorldgen = false;" not in config:
+    failures.append("Map Compatibility Mode does not explicitly suppress Plus Lush Cave worldgen")
+
+main_worldgen = require("src/main/java/ganymedes01/etfuturum/world/EtFuturumWorldGenerator.java")
+for expected in (
+    "protected WorldGenLushCaves lushCaveGen;",
+    "lushCaveGen = new WorldGenLushCaves();",
+    "lushCaveGen.generateChunk(world, chunkX, chunkZ);",
+):
+    if expected not in main_worldgen:
+        failures.append(f"main world generator is missing Lush Cave integration: {expected}")
+if "caveVineGen.generate(world" in main_worldgen or "protected WorldGenerator caveVineGen" in main_worldgen:
+    failures.append("legacy global Cave Vine generation still exists outside Lush Cave regions")
+
+lush_worldgen = require(
+    "src/main/java/ganymedes01/etfuturum/world/generate/feature/WorldGenLushCaves.java",
+    "class WorldGenLushCaves",
+)
+for expected in (
+    "ConfigMapCompatibility.isEnabled()",
+    "world.provider.dimensionId != 0",
+    "findRegionAnchor",
+    "mixSeed(world.getSeed() ^ DECORATION_SALT",
+    "generateSurfaceMarkerAndRoots",
+    "new WorldGenAzaleaTree(false)",
+    "generateRootSystem",
+    "startY - 100",
+    "for (int i = 0; i < 20; i++)",
+    "decorateMossFloors",
+    "decorateMossCeilings",
+    "decorateCaveVines",
+    "decorateSporeBlossoms",
+    "decorateClassicVines",
+    "decorateClayAndDripleaf",
+    "Blocks.clay",
+    "Blocks.water",
+    "BlockSmallDripleaf.makeMeta",
+    "BlockBigDripleaf.makeMeta",
+    "ModBlocks.MOSS_CARPET",
+    "ModBlocks.AZALEA",
+    "ModBlocks.HANGING_ROOTS",
+    "isInsideChunkInner",
+):
+    if expected not in lush_worldgen:
+        failures.append(f"Lush Cave generator implementation missing: {expected}")
+
+# Generation must decorate existing 1.7 cave systems rather than pretending an underground
+# region is a normal surface BiomeGenBase. This prevents corrupt/incorrect 2D biome maps.
+if "BiomeGenBase" in lush_worldgen or "BiomeDictionary" in lush_worldgen:
+    failures.append("Lush Cave generator must not register/treat Lush Caves as a 1.7 surface biome")
+if "getChunkFromChunkCoords" in lush_worldgen or "provideChunk(" in lush_worldgen:
+    failures.append("Lush Cave population path must not explicitly load/provide neighbouring chunks")
+
 # Licence boundary: Campfire Backport is reference-only. Existing optional compatibility strings
 # mentioning the external mod are legitimate, but its package/source must not be vendored here.
 for path in (ROOT / "src").rglob("*.java"):
@@ -247,4 +314,5 @@ print(" - RTG/world-generation hard gates present")
 print(" - progression/raw-ore/spawn gates present")
 print(" - rooted dirt, hanging roots, dripleaf, moss/azalea, and spore blossom content present")
 print(" - azalea tree growth and moss bonemeal vegetation checks present")
+print(" - deterministic Lush Cave regions, marker roots, vegetation, clay pools, and Dripleaf worldgen checks present")
 print(" - no Campfire Backport GPL package source vendored")

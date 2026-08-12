@@ -15,8 +15,8 @@ import java.util.Random;
  *
  * Modern azalea trees use oak logs, a short bending trunk, irregular azalea foliage
  * with a 3:1 normal-to-flowering leaf ratio, and rooted dirt at the tree base.
- * This generator intentionally provides only the tree feature itself; natural lush-cave
- * placement and the long root-system marker are handled by the later lush-cave worldgen pass.
+ * This generator provides the tree feature itself. Natural Lush Cave placement and the long
+ * surface-marker root system are orchestrated by WorldGenLushCaves.
  */
 public class WorldGenAzaleaTree extends WorldGenAbstractTree {
 

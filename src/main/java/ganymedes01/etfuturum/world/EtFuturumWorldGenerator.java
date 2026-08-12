@@ -9,12 +9,12 @@ import ganymedes01.etfuturum.core.utils.Utils;
 import ganymedes01.etfuturum.world.end.dimension.WorldProviderEFREnd;
 import ganymedes01.etfuturum.world.generate.WorldGenMinableCustom;
 import ganymedes01.etfuturum.world.generate.decorate.WorldGenBamboo;
-import ganymedes01.etfuturum.world.generate.decorate.WorldGenCaveVines;
 import ganymedes01.etfuturum.world.generate.decorate.WorldGenCherryTrees;
 import ganymedes01.etfuturum.world.generate.decorate.WorldGenGlowLichen;
 import ganymedes01.etfuturum.world.generate.decorate.WorldGenPinkPetals;
 import ganymedes01.etfuturum.world.generate.feature.WorldGenFossil;
 import ganymedes01.etfuturum.world.generate.feature.WorldGenGeode;
+import ganymedes01.etfuturum.world.generate.feature.WorldGenLushCaves;
 import ganymedes01.etfuturum.world.structure.OceanMonument;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
@@ -59,7 +59,7 @@ public class EtFuturumWorldGenerator implements IWorldGenerator {
 	protected WorldGenerator pinkPetalsGen;
 	protected WorldGenerator bambooGen;
 	protected WorldGenerator glowLichenGen;
-	protected WorldGenerator caveVineGen;
+	protected WorldGenLushCaves lushCaveGen;
 	protected WorldGenerator mudGen;
 
 	//trees
@@ -138,9 +138,11 @@ public class EtFuturumWorldGenerator implements IWorldGenerator {
 			glowLichenGen = new WorldGenGlowLichen(ModBlocks.GLOW_LICHEN.get());
 		}
 
-		if (ModBlocks.CAVE_VINE.isEnabled())
-		{
-			caveVineGen = new WorldGenCaveVines(ModBlocks.CAVE_VINE.get());
+		if (ConfigWorld.lushCavesWorldgen
+				&& ModBlocks.MOSS_BLOCK.isEnabled()
+				&& ModBlocks.AZALEA.isEnabled()
+				&& ModBlocks.ROOTED_DIRT.isEnabled()) {
+			lushCaveGen = new WorldGenLushCaves();
 		}
         
 		if (ModBlocks.CHERRY_LOG.isEnabled() && ModBlocks.LEAVES.isEnabled()) {
@@ -256,16 +258,8 @@ public class EtFuturumWorldGenerator implements IWorldGenerator {
                 }
 			}
 
-			if (caveVineGen != null && world.provider.dimensionId == 0)
-			{
-				x = (chunkX << 4) + rand.nextInt(16) + 8;
-				z = (chunkZ << 4) + rand.nextInt(16) + 8;
-                for (int tries = 0; tries < 20; tries++) {
-                    int xoff = x + rand.nextInt(10) - rand.nextInt(10);
-                    int yoff = rand.nextInt(128);
-                    int zoff = z + rand.nextInt(10) - rand.nextInt(10);
-                    caveVineGen.generate(world, rand, xoff, yoff, zoff);
-                }
+			if (lushCaveGen != null && world.provider.dimensionId == 0) {
+				lushCaveGen.generateChunk(world, chunkX, chunkZ);
 			}
 
 			if (cherryTreeGen != null && ConfigWorld.cherryTreeRarity > 0) {

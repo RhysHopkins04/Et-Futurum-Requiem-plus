@@ -28,8 +28,8 @@ import java.util.Random;
 /**
  * Two-block small dripleaf. Metadata layout: bits 0-1 facing, bit 2 upper half.
  *
- * Natural lush-cave generation is deliberately not part of this fork profile; this class only
- * supplies the placeable block and vanilla-style growth bridge into the big-dripleaf family.
+ * Natural Lush Cave placement is handled by WorldGenLushCaves; this class supplies the
+ * placeable two-block plant and vanilla-style growth bridge into the big-dripleaf family.
  */
 public class BlockSmallDripleaf extends Block implements IGrowable {
 

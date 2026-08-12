@@ -56,6 +56,11 @@ public class ConfigWorld extends ConfigBase {
 	public static boolean amethystDimensionBlacklistAsWhitelist;
 	public static int cherryTreeRarity;
 	public static boolean bambooWorldgen;
+	public static boolean lushCavesWorldgen;
+	public static int lushCaveRarity;
+	public static int lushCaveRegionRadiusChunks;
+	public static int lushCaveMinY;
+	public static int lushCaveMaxY;
 
 	public static int crimsonForestID;
 	public static int warpedForestID;
@@ -174,6 +179,19 @@ public class ConfigWorld extends ConfigBase {
 		amethystMaxY = getInt("amethystMaxY", catGeneration, 46, 6, 245, "Max Y level amethyst geodes should attempt to generate at");
 		cherryTreeRarity = getInt("cherryTreeRarity", catGeneration, 72, 0, Byte.MAX_VALUE, "How rare should cherry trees be? 1/x chance per chunk, 1 means a tree attempts to appear every chunk. 0 = no cherry trees. They will spawn in mountain-type biomes.");
 		bambooWorldgen = getBoolean("bambooWorldgen", catGeneration, true, "Whether bamboo should naturally spawn in the overworld. Turning this off allows you to use bamboo based blocks without bamboo world gen for mod compatability.");
+		lushCavesWorldgen = getBoolean("lushCavesWorldgen", catGeneration, true,
+				"Generate the Et Futurum Requiem Plus Lush Cave backport in the Overworld. " +
+				"Because Minecraft 1.7.10 has no 3D biome system, this decorates deterministic underground cave regions rather than registering a fake surface biome. " +
+				"Map Compatibility Mode suppresses this generator regardless of this saved value.");
+		lushCaveRarity = getInt("lushCaveRarity", catGeneration, 64, 1, 4096,
+				"Region-anchor rarity for Lush Caves. 1/x candidate chunks becomes an anchor; nearby chunks within lushCaveRegionRadiusChunks share that underground region. " +
+				"Lower values make Lush Caves more common.");
+		lushCaveRegionRadiusChunks = getInt("lushCaveRegionRadiusChunks", catGeneration, 2, 1, 4,
+				"Radius in chunks around each deterministic Lush Cave anchor. Default 2 produces connected underground areas without turning Lush Caves into a surface biome.");
+		lushCaveMinY = getInt("lushCaveMinY", catGeneration, 10, 4, 120,
+				"Lowest Y level sampled when decorating existing cave cavities as Lush Caves.");
+		lushCaveMaxY = getInt("lushCaveMaxY", catGeneration, 60, 8, 160,
+				"Highest Y level sampled when decorating existing cave cavities as Lush Caves. Values are normalized at runtime if min/max are reversed.");
 
 		crimsonForestID = getInt("crimsonForestID", catBiomes, 200, -1, 65536, "Set to -1 to disable the generation of Crimson Forests. To use an ID above 255, EndlessIDs is required.");
 		warpedForestID = getInt("warpedForestID", catBiomes, 201, -1, 65536, "Set to -1 to disable the generation of Warped Forests. To use an ID above 255, EndlessIDs is required.");

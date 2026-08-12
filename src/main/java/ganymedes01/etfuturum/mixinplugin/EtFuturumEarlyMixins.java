@@ -375,6 +375,8 @@ public class EtFuturumEarlyMixins implements IFMLLoadingPlugin, IEarlyMixinLoade
 		// used independently while the modern terrain generator is developed.
 		if (ConfigWorld.extendedWorldHeight && ConfigWorld.modernOverworldGeneration && !ConfigMapCompatibility.isEnabled()) {
 			mixins.add("modernoverworld.MixinWorldProvider");
+			mixins.add("modernoverworld.MixinChunkProviderGenerate");
+			mixins.add("modernoverworld.MixinMapGenScatteredFeatureStart");
 		}
 
 		return mixins;

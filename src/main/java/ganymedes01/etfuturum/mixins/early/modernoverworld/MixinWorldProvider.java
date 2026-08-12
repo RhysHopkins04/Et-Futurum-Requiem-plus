@@ -2,11 +2,15 @@ package ganymedes01.etfuturum.mixins.early.modernoverworld;
 
 import ganymedes01.etfuturum.configuration.configs.ConfigWorld;
 import ganymedes01.etfuturum.core.utils.WorldHeightCompat;
+import ganymedes01.etfuturum.world.generate.terrain.ModernOverworldWorldChunkManager;
+import net.minecraft.world.World;
 import net.minecraft.world.WorldProvider;
+import net.minecraft.world.biome.WorldChunkManager;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 /**
@@ -20,9 +24,20 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class MixinWorldProvider {
 
     @Shadow public int dimensionId;
+    @Shadow public World worldObj;
+    @Shadow public WorldChunkManager worldChunkMgr;
 
     private boolean etfu$isModernOverworld() {
         return this.dimensionId == 0 && ConfigWorld.modernOverworldGeneration;
+    }
+
+
+    /** Replace only dimension 0's legacy GenLayer biome map with the terrain-aligned modern source. */
+    @Inject(method = "registerWorldChunkManager", at = @At("RETURN"))
+    private void etfu$modernBiomeSource(CallbackInfo ci) {
+        if (etfu$isModernOverworld() && this.worldObj != null) {
+            this.worldChunkMgr = new ModernOverworldWorldChunkManager(this.worldObj);
+        }
     }
 
     /** Forge-added literal method; cloud Y 192 modern -> physical Y 256. */

@@ -39,7 +39,13 @@ public class WorldGenLushCaves {
 
     /** Decorates one already-generated Overworld chunk if it belongs to a lush region. */
     public boolean generateChunk(World world, int chunkX, int chunkZ) {
-        if (world.provider.dimensionId != 0 || ConfigMapCompatibility.isEnabled() || !ConfigWorld.lushCavesWorldgen) {
+        if (world.provider.dimensionId != 0
+                || ConfigMapCompatibility.isEnabled()
+                || !ConfigWorld.lushCavesWorldgen
+                || ConfigWorld.modernOverworldGeneration) {
+            // The modern Overworld path intentionally has no cave field until P008. Do not let
+            // the P004 legacy-cavity decorator mistake geodes, mineshafts or lake pockets for a
+            // Lush Cave. P008 re-enables Lush decoration against the translated cave/aquifer field.
             return false;
         }
 

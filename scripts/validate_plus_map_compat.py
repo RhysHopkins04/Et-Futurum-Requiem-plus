@@ -525,6 +525,304 @@ for expected in (
 if modern_provider.count("remap = false") < 2:
     failures.append("Forge-added cloud/horizon hooks must use literal non-remapped names")
 
+# P007 -- actual modern Overworld base-terrain foundation. Keep the vanilla ChunkProviderGenerate
+# pipeline/structure/light flow, but feed it a 384-high terrain buffer shaped by broad modern-style
+# continentalness/erosion/ridge fields. Legacy 256-high cave/ravine carvers are deliberately no-op
+# until P008 replaces them with the dedicated modern cave/aquifer stage.
+if 'mixins.add("modernoverworld.MixinChunkProviderGenerate")' not in mixins:
+    failures.append("P007 modern ChunkProviderGenerate mixin is not selected by the modern Overworld gate")
+
+modern_chunk_provider = require(
+    "src/main/java/ganymedes01/etfuturum/mixins/early/modernoverworld/MixinChunkProviderGenerate.java",
+    "class MixinChunkProviderGenerate",
+)
+for expected in (
+    'method = "provideChunk"',
+    "256 * WorldHeightCompat.EXTENDED_HEIGHT",
+    '@At(value = "NEW", target = "net/minecraft/world/chunk/Chunk")',
+    "(localX * 16 + localZ) * height",
+    "sourceIndex = columnBase + y",
+    "new ExtendedBlockStorage(sectionIndex << 4, hasSky)",
+    'method = "func_147424_a"',
+    "generateBaseTerrain",
+    'method = "replaceBlocksForBiome"',
+    "ChunkProviderEvent.ReplaceBiomeBlocks",
+    "applyTranslatedBiomeSurface",
+    "NoopModernCarver",
+    "worldObj.provider.dimensionId == 0",
+    "ConfigWorld.modernOverworldGeneration",
+    "ConfigMapCompatibility.isEnabled()",
+):
+    if expected not in modern_chunk_provider:
+        failures.append(f"P007 modern chunk-provider bridge missing: {expected}")
+
+modern_terrain = require(
+    "src/main/java/ganymedes01/etfuturum/world/generate/terrain/ModernOverworldTerrainGenerator.java",
+    "class ModernOverworldTerrainGenerator",
+)
+for expected in (
+    "WorldHeightCompat.EXTENDED_HEIGHT",
+    "WorldHeightCompat.MODERN_SEA_LEVEL",
+    "WorldHeightCompat.PHYSICAL_ZERO_Y",
+    "continentalness",
+    "erosion",
+    "weirdness",
+    "peaksAndValleys",
+    "continentalBaseHeight",
+    "ModBlocks.DEEPSLATE",
+    "logicalY <= 0",
+    "logicalY >= 8",
+    "isBedrock",
+    "SURFACE_WINDOW_MIN_PHYSICAL_Y",
+    "biome.genTerrainBlocks",
+    "preservedZeroBand",
+    "MAX_TERRAIN_Y = 250",
+):
+    if expected not in modern_terrain:
+        failures.append(f"P007 modern terrain foundation missing: {expected}")
+
+early_worldgen = require(
+    "src/main/java/ganymedes01/etfuturum/world/EtFuturumEarlyWorldGenerator.java",
+    "ConfigWorld.modernOverworldGeneration",
+)
+if "world.provider.dimensionId == 0 && ConfigWorld.modernOverworldGeneration" not in early_worldgen:
+    failures.append("legacy EFR deepslate/tuff pass is not suppressed for the P007 modern Overworld")
+
+for expected in (
+    "translated Y63 sea level",
+    "modern-style continentalness/erosion/ridge mountain shaping",
+    "Noise caves/aquifers",
+):
+    if expected not in world_config:
+        failures.append(f"P007 modernOverworldGeneration config description missing: {expected}")
+
+# P007b -- runtime terrain/feature staging correction. Elevation must not be hard-clamped by
+# discrete legacy biome IDs. Legacy lake generators and P004 cavity-based Lush decoration are
+# staged out until P008/P009 provide translated caves, aquifers and underground feature heights.
+for forbidden in (
+    "BiomeDictionary.Type.OCEAN",
+    "BiomeDictionary.Type.RIVER",
+    "BiomeDictionary.Type.SWAMP",
+    "BiomeDictionary.Type.BEACH",
+    "biome == BiomeGenBase.deepOcean",
+):
+    if forbidden in modern_terrain:
+        failures.append(f"P007b legacy biome height shaping still present: {forbidden}")
+if "sampleSurfaceLogicalY(worldX, worldZ, amplified)" not in modern_terrain:
+    failures.append("P007b base terrain is still coupled to legacy biome IDs")
+for expected in (
+    'method = "populate"',
+    "TerrainGen.populate(provider, world, rand, chunkX, chunkZ, hasVillageGenerated, type)",
+    "PopulateChunkEvent.Populate.EventType.LAKE",
+    "PopulateChunkEvent.Populate.EventType.LAVA",
+    "return false;",
+):
+    if expected not in modern_chunk_provider:
+        failures.append(f"P007b legacy lake staging gate missing: {expected}")
+
+lush_worldgen_p007b = require(
+    "src/main/java/ganymedes01/etfuturum/world/generate/feature/WorldGenLushCaves.java",
+    "ConfigWorld.modernOverworldGeneration",
+)
+if "|| ConfigWorld.modernOverworldGeneration" not in lush_worldgen_p007b:
+    failures.append("P007b does not stage P004 Lush cavity decoration out of the modern path")
+
+
+# P007c -- terrain-aligned modern biome source and structure/surface integration. The legacy
+# GenLayer biome map cannot remain authoritative once P007 terrain shape is independent: doing so
+# labels water as Desert/Plains, land as Deep Ocean/Beach, and lets structures spawn against the
+# wrong ecology. Dimension 0 gets a dedicated climate/terrain resolver; other dimensions remain
+# untouched. Also correct the temporary biome-surface buffer's X/Z convention and translate the
+# one legacy scattered feature (DesertPyramid) that hard-anchors itself to Y64.
+if 'mixins.add("modernoverworld.MixinMapGenScatteredFeatureStart")' not in mixins:
+    failures.append("P007c desert-pyramid grounding mixin is not selected by the modern Overworld gate")
+for expected in (
+    'method = "registerWorldChunkManager"',
+    "new ModernOverworldWorldChunkManager(this.worldObj)",
+    "this.dimensionId == 0",
+):
+    if expected not in modern_provider:
+        failures.append(f"P007c modern Overworld biome-manager bridge missing: {expected}")
+
+modern_biome_manager = require(
+    "src/main/java/ganymedes01/etfuturum/world/generate/terrain/ModernOverworldWorldChunkManager.java",
+    "class ModernOverworldWorldChunkManager",
+)
+for expected in (
+    "extends WorldChunkManager",
+    "terrain.sampleSurfaceLogicalY",
+    "terrain.sampleContinentalness",
+    "terrain.sampleErosion",
+    "terrain.sampleWeirdness",
+    "BiomeGenBase.deepOcean",
+    "BiomeGenBase.ocean",
+    "BiomeGenBase.beach",
+    "BiomeGenBase.coldBeach",
+    "BiomeGenBase.stoneBeach",
+    "BiomeGenBase.icePlains",
+    "BiomeGenBase.desert",
+    "BiomeGenBase.savanna",
+    "BiomeGenBase.jungle",
+    "BiomeGenBase.swampland",
+    "areBiomesViable",
+    "findBiomePosition",
+):
+    if expected not in modern_biome_manager:
+        failures.append(f"P007c terrain-aligned biome source missing: {expected}")
+for forbidden in ("BiomeGenBase.desertHills", "BiomeGenBase.forestHills", "BiomeGenBase.taigaHills"):
+    if forbidden in modern_biome_manager:
+        failures.append(f"P007c shape-only legacy hill biome is still emitted: {forbidden}")
+
+# P007d -- retain the broad climate-field frequencies and Forge population remap correction. P007f
+# deliberately supersedes P007d's per-column nearest-climate resolver with a regional parameter
+# topology source, so the retired selectMacroClimateBiome/climateDistance helpers must not return.
+for expected in (
+    "TEMPERATURE_SCALE = 1.0D / 4096.0D",
+    "HUMIDITY_SCALE = 1.0D / 3584.0D",
+    "VARIANT_SCALE = 1.0D / 2048.0D",
+    "new FractalNoise(seed ^ SALT_TEMPERATURE, 3, 0.42D)",
+    "new FractalNoise(seed ^ SALT_HUMIDITY, 3, 0.42D)",
+    "new FractalNoise(seed ^ SALT_VARIANT, 2, 0.48D)",
+):
+    if expected not in modern_biome_manager:
+        failures.append(f"P007d broad climate field missing: {expected}")
+if "remap = false))" not in modern_chunk_provider:
+    failures.append("P007d Forge TerrainGen.populate redirect is missing remap=false")
+
+# P007e -- preserve the validated continuous terrain/coast geometry and shared ridge signal. P007f
+# changes biome topology only; it must never restore the old hard terrain-detail coast switch.
+for expected in (
+    "inlandDetailAmplitude = 4.0D + roughness * 7.0D + mountain * 9.0D",
+    "landDetailBlend = smoothstep(-0.16D, 0.10D, continent)",
+    "lerp(3.0D, inlandDetailAmplitude, landDetailBlend)",
+    "sampleMountainStrength",
+    "return mountainStrength(continent, erosionValue, weirdnessValue)",
+):
+    if expected not in modern_terrain:
+        failures.append(f"P007e continuous coast/mountain terrain signal missing: {expected}")
+if "final boolean oceanTerrain = continent < -0.04D" in modern_terrain:
+    failures.append("P007e still contains the hard -0.04 coast detail-amplitude switch")
+
+# P007f -- regional modern biome-source / climate-topology rework. Land ecology must be owned by a
+# deterministic jittered macro-climate lattice and a multi-parameter target table; ocean/shore
+# identity is a separate continental-topology decision. This is intentionally not old GenLayer and
+# not a return to direct per-column threshold selection.
+for expected in (
+    "NORMAL_CLIMATE_CELL_SIZE = 64",
+    "LARGE_CLIMATE_CELL_SIZE = 256",
+    "CLIMATE_CELL_JITTER = 0.22D",
+    "ClimateTarget[] LAND_TARGETS",
+    "selectClimateSite",
+    "Math.floorDiv(x, climateCellSize)",
+    "ParameterSpan",
+    "selectParameterizedLandBiome",
+    "WEIGHT_TEMPERATURE",
+    "WEIGHT_HUMIDITY",
+    "WEIGHT_CONTINENT",
+    "terrain.sampleContinentalness(sampleX, sampleZ)",
+    "terrain.sampleErosion(sampleX, sampleZ)",
+    "terrain.sampleWeirdness(sampleX, sampleZ)",
+    "terrain.sampleMountainStrength(sampleX, sampleZ)",
+    "OCEAN_CORE_CONTINENT_MAX = -0.060D",
+    "COAST_TOPOLOGY_CONTINENT_MAX = 0.14D",
+    "SHORE_LAND_CONTINENT_MAX = 0.020D",
+    "DEEP_OCEAN_CONTINENT_MAX = -0.34D",
+    "STONY_SHORE_RUGGEDNESS_MIN = 0.30D",
+    "STONY_SHORE_TEMPERATURE_MAX = 0.12D",
+    "isCoastalTopology",
+    "hasOceanCorridor",
+    "offsetX / 2",
+    "surface < sea && coastalTopology",
+    "surface >= sea",
+    "localContinent <= SHORE_LAND_CONTINENT_MAX",
+    "selectShoreBiome(inlandBiome, climate)",
+    "isFrozenClimate",
+    "climate.temperature <= -0.30D",
+    "isAridBiome(inlandBiome)",
+    "BiomeGenBase.roofedForest",
+    "BiomeGenBase.coldTaiga",
+    "BiomeGenBase.icePlains",
+):
+    if expected not in modern_biome_manager:
+        failures.append(f"P007f regional biome/climate topology missing: {expected}")
+
+for forbidden in (
+    "selectMacroClimateBiome",
+    "climateDistance",
+    "SHORE_MAX_ABOVE_SEA",
+    "MOUNTAIN_MIN_ABOVE_SEA",
+    "MOUNTAIN_STRENGTH_MIN",
+    "surface <= sea + SHORE_MAX_ABOVE_SEA",
+    "surface < sea && continent < OCEAN_CONTINENT_MAX",
+    "localSlope",
+    "COAST_MAX_ABOVE_SEA",
+):
+    if forbidden in modern_biome_manager:
+        failures.append(f"P007f retired per-column biome threshold rule returned: {forbidden}")
+
+# P007g -- retain P007f's coherent macro regions but soften only their shared boundary. The two
+# nearest regional sites are blended in a bounded band, and hot/arid-to-temperate boundaries receive
+# a Savanna ecotone rather than a one-block sand/grass seam. Transitional submerged coast columns
+# additionally need a short open-water ray toward lower continentalness before receiving Ocean.
+for expected in (
+    "CLIMATE_TRANSITION_WIDTH_FRACTION = 0.30D",
+    "ECOTONE_SECONDARY_INFLUENCE_MIN = 0.16D",
+    "ClimateSiteSelection",
+    "Math.sqrt(selection.secondary.distanceSquared)",
+    "secondaryInfluence = 0.5D * (1.0D - smoothstep01(edgeDistance))",
+    "distanceGap >= transitionWidth",
+    "ClimatePoint.lerp(primary, secondary, secondaryInfluence)",
+    "selectTransitionLandBiome",
+    "isAridBiome(primaryBiome) != isAridBiome(secondaryBiome)",
+    "return BiomeGenBase.savanna;",
+    "OPEN_WATER_NEAR_RADIUS = 12",
+    "OPEN_WATER_FAR_RADIUS = 40",
+    "OPEN_WATER_CONTINENT_DROP_MIN = 0.010D",
+    "isOpenCoastalWater",
+    "hasOpenWaterRay",
+    "surface < sea && coastalTopology && isOpenCoastalWater",
+    "farContinent <= localContinent - OPEN_WATER_CONTINENT_DROP_MIN",
+):
+    if expected not in modern_biome_manager:
+        failures.append(f"P007g biome-boundary/coastal-pool polish missing: {expected}")
+
+# The cold fallback spans the whole frozen temperature range regardless of humidity. This prevents
+# a dry point inside a snowy macro climate from falling through to green Plains. Shore selection
+# tests frozen climate before ruggedness and arid climate before Stone Beach, keeping snow semantics
+# consistent on cold coasts and preventing Stone Beach from manufacturing snow beside Desert/Mesa.
+if not all(token in modern_biome_manager for token in (
+        "target(BiomeGenBase.icePlains,",
+        "span(-1.0D, -0.30D), ANY, ANY, ANY, ANY, ANY",
+        "if (isFrozenClimate(climate, inlandBiome))",
+        "if (isAridBiome(inlandBiome))",
+        "return BiomeGenBase.beach;")):
+    failures.append("P007f cold fallback / climate-consistent shore invariants are incomplete")
+
+for expected in (
+    "physicalColumn = localX * 16 + localZ",
+    "surfaceColumn = localZ * 16 + localX",
+    "biomeIndex = localX + localZ * 16",
+    "sampleSurfacePhysicalY",
+):
+    if expected not in modern_terrain:
+        failures.append(f"P007c translated surface/terrain sampler bridge missing: {expected}")
+
+modern_scattered_start = require(
+    "src/main/java/ganymedes01/etfuturum/mixins/early/modernoverworld/MixinMapGenScatteredFeatureStart.java",
+    "class MixinMapGenScatteredFeatureStart",
+)
+for expected in (
+    "ComponentScatteredFeaturePieces.DesertPyramid",
+    "terrain.sampleSurfacePhysicalY",
+    "targetBaseY",
+    "box.offset(0, deltaY, 0)",
+    "start.getBoundingBox().offset(0, deltaY, 0)",
+    "world.provider.dimensionId != 0",
+    "ConfigMapCompatibility.isEnabled()",
+):
+    if expected not in modern_scattered_start:
+        failures.append(f"P007c translated desert-pyramid grounding missing: {expected}")
+
 # Licence boundary: Campfire Backport is reference-only. Existing optional compatibility strings
 # mentioning the external mod are legitimate, but its package/source must not be vendored here.
 for path in (ROOT / "src").rglob("*.java"):
@@ -551,4 +849,12 @@ print(" - azalea tree growth and moss bonemeal vegetation checks present")
 print(" - deterministic Lush Cave regions, marker roots, vegetation, clay pools, and Dripleaf worldgen checks present")
 print(" - opt-in 384-block positive-Y height foundation, +64 modern offset, storage/protocol/render/placement gates present")
 print(" - P006 modern Overworld logical -64..319 coordinate contract and translated sea/horizon/cloud references present")
+print(" - P007 modern Overworld 384-high base terrain, Y127 physical sea, translated biome surfaces, and legacy-carver safety gate present")
+print(" - P007a 384-stride Chunk construction bypass prevents vanilla bitwise-OR column aliasing")
+print(" - P007b continuous biome-independent terrain shaping and legacy lake/Lush staging gates present")
+print(" - P007c terrain-aligned modern biomes, X/Z-correct surface bridge, and translated desert-pyramid grounding present")
+print(" - P007d broad climate frequencies and Forge lake-hook remap cleanup remain present")
+print(" - P007e continuous coast terrain and ridge-aligned terrain signal remain preserved")
+print(" - P007f jittered macro-climate cells, parameter-space land biomes, and continental coast topology present")
+print(" - P007g blended macro-boundary ecotones and open-water coastal-pool filtering present")
 print(" - no Campfire Backport GPL package source vendored")

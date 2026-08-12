@@ -188,9 +188,10 @@ public class ConfigWorld extends ConfigBase {
 				"It is intentionally opt-in until the extended-height foundation has completed runtime validation. " +
 				"Map Compatibility Mode always forces it off regardless of this saved value.");
 		modernOverworldGeneration = getBoolean("modernOverworldGeneration", catGeneration, false,
-				"EXPERIMENTAL PLUS OVERWORLD ARCHITECTURE. Establish the modern -64..319 logical vertical coordinate model " +
-				"inside the positive 0..383 physical world, including translated sea/horizon, average-ground and cloud reference heights. " +
-				"The actual modern terrain density/cave generator is implemented in subsequent patches, so leave this disabled unless testing the Plus modern-worldgen development path. " +
+				"EXPERIMENTAL PLUS OVERWORLD GENERATION. Use the modern -64..319 logical vertical coordinate model " +
+				"inside the positive 0..383 physical world and enable the Plus modern base-terrain path: translated Y63 sea level, " +
+				"deep terrain through logical Y-64, modern-style continentalness/erosion/ridge mountain shaping, and translated biome surfaces. " +
+				"Noise caves/aquifers, modern ore/feature distributions, and later biome-placement work are implemented in follow-up stages. " +
 				"Enabling this option also enables extendedWorldHeight at runtime and REQUIRES A FULL GAME RESTART. " +
 				"Map Compatibility Mode always forces it off regardless of this saved value.");
 		if (modernOverworldGeneration) {

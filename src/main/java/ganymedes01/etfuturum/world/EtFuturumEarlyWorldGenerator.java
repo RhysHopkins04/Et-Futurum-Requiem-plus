@@ -42,6 +42,12 @@ public class EtFuturumEarlyWorldGenerator extends EtFuturumWorldGenerator {
 
 	@Override
 	public void generate(Random random, int chunkX, int chunkZ, World world, IChunkProvider chunkGenerator, IChunkProvider chunkProvider) {
+		// P007 owns the Overworld stone/deepslate foundation directly in the modern terrain buffer.
+		// Do not run the legacy low-Y deepslate/tuff pass on top of that translated world.
+		if (world.provider != null && world.provider.dimensionId == 0 && ConfigWorld.modernOverworldGeneration) {
+			return;
+		}
+
 		boolean flatWorld = EtFuturumWorldGenerator.isFlatWorld(chunkGenerator);
 		if (!flatWorld || world.getWorldInfo().getGeneratorOptions().contains("decoration")) {
 			if (world.provider instanceof WorldProviderSurface) {

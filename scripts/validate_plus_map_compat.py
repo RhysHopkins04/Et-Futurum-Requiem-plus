@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Static regression checks for the first Et Futurum Requiem Plus map-compatibility patch."""
+"""Cumulative static regression checks for Et Futurum Requiem Plus content/map-compat patches."""
 
 from pathlib import Path
 import sys
@@ -84,6 +84,11 @@ for registry in (
     "SMALL_DRIPLEAF(ConfigBlocksItems.enableLushCaveBlocks, new BlockSmallDripleaf())",
     "BIG_DRIPLEAF_STEM(ConfigBlocksItems.enableLushCaveBlocks, new BlockBigDripleafStem(), null)",
     "BIG_DRIPLEAF(ConfigBlocksItems.enableLushCaveBlocks, new BlockBigDripleaf())",
+    "MOSS_BLOCK(ConfigBlocksItems.enableLushCaveBlocks, new BlockMoss())",
+    "MOSS_CARPET(ConfigBlocksItems.enableLushCaveBlocks, new BlockMossCarpet())",
+    "AZALEA(ConfigBlocksItems.enableLushCaveBlocks, new BlockAzalea())",
+    "AZALEA_LEAVES(ConfigBlocksItems.enableLushCaveBlocks, new BlockAzaleaLeaves())",
+    "SPORE_BLOSSOM(ConfigBlocksItems.enableLushCaveBlocks, new BlockSporeBlossom())",
 ):
     if registry not in blocks:
         failures.append(f"missing modern registry entry: {registry}")
@@ -128,6 +133,66 @@ power_pos = big.find("if (world.isBlockIndirectlyGettingPowered(x, y, z))", proj
 if projectile_pos < 0 or power_pos < 0 or projectile_pos > power_pos:
     failures.append("big dripleaf projectile tilt must bypass the normal redstone hold gate")
 
+# P003 -- lush-cave content completion. Moss/azalea are no longer experimental and
+# are owned by the default-enabled lush-cave content family. Natural lush-cave generation
+# remains intentionally deferred to the dedicated world-generation patch.
+lush_config = require("src/main/java/ganymedes01/etfuturum/configuration/configs/ConfigBlocksItems.java")
+if 'enableLushCaveBlocks = getBoolean("enableLushCaveBlocks", catBlockNatural, true' not in lush_config:
+    failures.append("lush-cave content family is not enabled by default")
+
+experiments = require("src/main/java/ganymedes01/etfuturum/configuration/configs/ConfigExperiments.java")
+if "public static boolean enableMossAzalea" in experiments:
+    failures.append("legacy experimental enableMossAzalea field still exists")
+if 'getCategory(catExperiments).remove("enableMossAzalea")' not in experiments:
+    failures.append("legacy enableMossAzalea config migration/removal is missing")
+if "ConfigExperiments.enableMossAzalea" in blocks:
+    failures.append("moss/azalea registry entries are still gated by the experimental toggle")
+
+azalea = require("src/main/java/ganymedes01/etfuturum/blocks/BlockAzalea.java", "implements ISubBlocksBlock, IGrowable")
+for expected in ("rand.nextFloat() < 0.45F", "new WorldGenAzaleaTree(true)", "ModBlocks.MOSS_BLOCK", "ModBlocks.ROOTED_DIRT"):
+    if expected not in azalea:
+        failures.append(f"azalea growth/support implementation missing: {expected}")
+
+azalea_tree = require("src/main/java/ganymedes01/etfuturum/world/generate/decorate/WorldGenAzaleaTree.java", "class WorldGenAzaleaTree")
+for expected in ("4 + rand.nextInt(3)", "Blocks.log, 0", "ModBlocks.ROOTED_DIRT", "ModBlocks.AZALEA_LEAVES", "rand.nextInt(4) == 0 ? 1 : 0"):
+    if expected not in azalea_tree:
+        failures.append(f"azalea tree implementation missing: {expected}")
+
+moss = require("src/main/java/ganymedes01/etfuturum/blocks/BlockMoss.java", "implements IGrowable")
+for expected in ("dx = -3", "dz = -3", "Math.abs(dx) == 3 && Math.abs(dz) == 3", "originY + 5", "originY - 5",
+                 "rand.nextFloat() < 0.60F", "rand.nextInt(96)", "roll < 50", "roll < 60", "roll < 85", "roll < 92"):
+    if expected not in moss:
+        failures.append(f"moss spreading/vegetation implementation missing: {expected}")
+
+moss_carpet = require("src/main/java/ganymedes01/etfuturum/blocks/BlockMossCarpet.java")
+if "(double) y + 0.0625D" not in moss_carpet:
+    failures.append("moss carpet is missing its 1/16-block collision height")
+
+spore = require("src/main/java/ganymedes01/etfuturum/blocks/BlockSporeBlossom.java", "class BlockSporeBlossom")
+for expected in ("RenderIDs.SPORE_BLOSSOM", "ForgeDirection.DOWN", "getCollisionBoundingBoxFromPool",
+                 "randomDisplayTick", "spawnSporeBlossomParticle", 'reg.registerIcon("spore_blossom")',
+                 'reg.registerIcon("spore_blossom_base")'):
+    if expected not in spore:
+        failures.append(f"spore blossom implementation missing: {expected}")
+
+spore_fx = require("src/main/java/ganymedes01/etfuturum/client/particle/SporeBlossomFX.java", "class SporeBlossomFX")
+for expected in ("ambientHorizontalMotion", "ambientVerticalMotion", 'minecraft:textures/particle/drip_fall.png'):
+    if expected not in spore_fx:
+        failures.append(f"spore blossom particle implementation missing: {expected}")
+
+spore_renderer = require("src/main/java/ganymedes01/etfuturum/client/renderer/block/BlockSporeBlossomRenderer.java", "class BlockSporeBlossomRenderer")
+for expected in ("15.9 * P", "15.7 * P", "24 * P", "-8 * P", "-22.5D", "22.5D", "emitDoubleSided"):
+    if expected not in spore_renderer:
+        failures.append(f"spore blossom fidelity renderer missing: {expected}")
+if "SPORE_BLOSSOM" not in render_ids:
+    failures.append("missing spore blossom render ID")
+if "BlockSporeBlossomRenderer(RenderIDs.SPORE_BLOSSOM)" not in client_proxy:
+    failures.append("missing spore blossom renderer registration")
+
+particles = require("src/main/java/ganymedes01/etfuturum/client/particle/CustomParticles.java")
+if "spawnSporeBlossomParticle" not in particles:
+    failures.append("spore blossom particle factory is not registered")
+
 for texture in (
     "rooted_dirt.png", "hanging_roots.png",
     "small_dripleaf_top.png", "small_dripleaf_side.png", "small_dripleaf_stem_top.png", "small_dripleaf_stem_bottom.png",
@@ -135,11 +200,16 @@ for texture in (
 ):
     require_png(f"src/main/resources/assets/minecraft/textures/blocks/{texture}")
 
+for texture in ("spore_blossom.png", "spore_blossom_base.png"):
+    require_png(f"src/main/resources/assets/minecraft/textures/blocks/{texture}")
+require_png("src/main/resources/assets/minecraft/textures/particle/drip_fall.png")
+
 lang = require("src/main/resources/assets/etfuturum/lang/en_US.lang")
 for expected in (
     "tile.etfuturum.small_dripleaf.name=Small Dripleaf",
     "tile.etfuturum.big_dripleaf.name=Big Dripleaf",
     "tile.etfuturum.big_dripleaf_stem.name=Big Dripleaf Stem",
+    "tile.etfuturum.spore_blossom.name=Spore Blossom",
 ):
     if expected not in lang:
         failures.append(f"missing dripleaf language entry: {expected}")
@@ -148,6 +218,11 @@ compost = require("src/main/java/ganymedes01/etfuturum/api/CompostingRegistry.ja
 for expected in ("ModBlocks.SMALL_DRIPLEAF.newItemStack()", "ModBlocks.BIG_DRIPLEAF.newItemStack()"):
     if expected not in compost:
         failures.append(f"missing dripleaf composting entry: {expected}")
+if "ModBlocks.SPORE_BLOSSOM.newItemStack()" not in compost:
+    failures.append("missing spore blossom composting entry")
+
+if 'ModBlocks.MOSS_CARPET.newItemStack(3)' not in recipes or 'ModBlocks.MOSS_BLOCK.newItemStack()' not in recipes:
+    failures.append("modern 2 moss blocks -> 3 moss carpet recipe is missing")
 
 # Licence boundary: Campfire Backport is reference-only. Existing optional compatibility strings
 # mentioning the external mod are legitimate, but its package/source must not be vendored here.
@@ -170,5 +245,6 @@ print("Et Futurum Requiem Plus map-compat static validation PASSED")
 print(" - mapCompatibilityMode default remains false")
 print(" - RTG/world-generation hard gates present")
 print(" - progression/raw-ore/spawn gates present")
-print(" - rooted dirt, hanging roots, and dripleaf registrations/assets present")
+print(" - rooted dirt, hanging roots, dripleaf, moss/azalea, and spore blossom content present")
+print(" - azalea tree growth and moss bonemeal vegetation checks present")
 print(" - no Campfire Backport GPL package source vendored")

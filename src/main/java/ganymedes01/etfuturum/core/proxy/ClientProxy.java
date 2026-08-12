@@ -140,6 +140,7 @@ public class ClientProxy extends CommonProxy {
 		RenderingRegistry.registerBlockHandler(new BlockGlowLichenRenderer(RenderIDs.GLOW_LICHEN));
 		RenderingRegistry.registerBlockHandler(new BlockSmallDripleafRenderer(RenderIDs.SMALL_DRIPLEAF));
 		RenderingRegistry.registerBlockHandler(new BlockBigDripleafRenderer(RenderIDs.BIG_DRIPLEAF));
+		RenderingRegistry.registerBlockHandler(new BlockSporeBlossomRenderer(RenderIDs.SPORE_BLOSSOM));
 		if(ModsList.APPLIED_ENERGISTICS_2.isLoaded()) {
 			RenderingRegistry.registerBlockHandler(new BlockDeepslateCertusQuartzRenderer());
 		}

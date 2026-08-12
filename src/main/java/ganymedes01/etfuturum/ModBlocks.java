@@ -123,10 +123,11 @@ public enum ModBlocks {
 	MANGROVE_ROOTS(ConfigExperiments.enableMangroveBlocks, new BlockMangroveRoots()),
 	MUDDY_MANGROVE_ROOTS(ConfigExperiments.enableMangroveBlocks, new BlockMuddyMangroveRoots()),
 
-	MOSS_BLOCK(ConfigExperiments.enableMossAzalea, new BlockMoss()),
-	MOSS_CARPET(ConfigExperiments.enableMossAzalea, new BlockMossCarpet()),
-	AZALEA(ConfigExperiments.enableMossAzalea, new BlockAzalea()),
-	AZALEA_LEAVES(ConfigExperiments.enableMossAzalea, new BlockAzaleaLeaves()),
+	MOSS_BLOCK(ConfigBlocksItems.enableLushCaveBlocks, new BlockMoss()),
+	MOSS_CARPET(ConfigBlocksItems.enableLushCaveBlocks, new BlockMossCarpet()),
+	AZALEA(ConfigBlocksItems.enableLushCaveBlocks, new BlockAzalea()),
+	AZALEA_LEAVES(ConfigBlocksItems.enableLushCaveBlocks, new BlockAzaleaLeaves()),
+	SPORE_BLOSSOM(ConfigBlocksItems.enableLushCaveBlocks, new BlockSporeBlossom()),
 
 	DEEPSLATE_COAL_ORE(ConfigBlocksItems.enableDeepslate && ConfigBlocksItems.enableDeepslateOres, new BlockDeepslateOre(Blocks.coal_ore)),
 	DEEPSLATE_IRON_ORE(ConfigBlocksItems.enableDeepslate && ConfigBlocksItems.enableDeepslateOres, new BlockDeepslateOre(Blocks.iron_ore)),

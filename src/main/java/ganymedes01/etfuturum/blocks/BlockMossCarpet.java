@@ -45,9 +45,8 @@ public class BlockMossCarpet extends BaseBlock {
 
 	@Override
 	public AxisAlignedBB getCollisionBoundingBoxFromPool(World worldIn, int x, int y, int z) {
-		byte b0 = 0;
-		float f = 0.0625F;
-		return AxisAlignedBB.getBoundingBox((double) x + this.minX, (double) y + this.minY, (double) z + this.minZ, (double) x + this.maxX, (float) y + (float) b0 * f, (double) z + this.maxZ);
+		return AxisAlignedBB.getBoundingBox((double) x + this.minX, (double) y + this.minY, (double) z + this.minZ,
+				(double) x + this.maxX, (double) y + 0.0625D, (double) z + this.maxZ);
 	}
 
 	@Override

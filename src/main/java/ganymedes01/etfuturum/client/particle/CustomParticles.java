@@ -70,6 +70,11 @@ public class CustomParticles {
 		return spawnParticle(world, particle);
 	}
 
+	public static EntityFX spawnSporeBlossomParticle(World world, double x, double y, double z, boolean falling) {
+		EntityFX particle = new SporeBlossomFX(world, x, y, z, falling);
+		return spawnParticle(world, particle);
+	}
+
 	public static EntityFX spawnCrimsonSpore(World world, double x, double y, double z) {
 		double d0 = rand.nextFloat() * 0.5D * rand.nextFloat() * 0.1D * 5.0D;
 		EntityFX particle = new BiomeFX(world, x, y, z, rand.nextGaussian() * 0.05D, d0, rand.nextGaussian() * 0.05D, 0.02F);

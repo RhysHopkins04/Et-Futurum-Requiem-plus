@@ -3,15 +3,20 @@ package ganymedes01.etfuturum.blocks;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import ganymedes01.etfuturum.EtFuturum;
+import ganymedes01.etfuturum.ModBlocks;
 import ganymedes01.etfuturum.client.sound.ModSounds;
 import ganymedes01.etfuturum.core.utils.Utils;
 import ganymedes01.etfuturum.lib.RenderIDs;
+import ganymedes01.etfuturum.world.generate.decorate.WorldGenAzaleaTree;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockBush;
+import net.minecraft.block.IGrowable;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.AxisAlignedBB;
@@ -19,10 +24,12 @@ import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.EnumPlantType;
+import net.minecraftforge.event.terraingen.TerrainGen;
 
 import java.util.List;
+import java.util.Random;
 
-public class BlockAzalea extends BlockBush implements ISubBlocksBlock {
+public class BlockAzalea extends BlockBush implements ISubBlocksBlock, IGrowable {
 
 	public IIcon[] sideIcons;
 	public IIcon[] topIcons;
@@ -53,7 +60,19 @@ public class BlockAzalea extends BlockBush implements ISubBlocksBlock {
 
 	@Override
 	public boolean canBlockStay(World world, int x, int y, int z) {
-		return world.getBlock(x, y - 1, z).getMaterial() == Material.clay || super.canBlockStay(world, x, y, z);
+		Block ground = world.getBlock(x, y - 1, z);
+		return ground == Blocks.dirt
+				|| ground == Blocks.grass
+				|| ground == Blocks.mycelium
+				|| ground == Blocks.sand
+				|| ground == Blocks.hardened_clay
+				|| ground == Blocks.stained_hardened_clay
+				|| ground == Blocks.snow
+				|| (ModBlocks.COARSE_DIRT.isEnabled() && ground == ModBlocks.COARSE_DIRT.get())
+				|| (ModBlocks.MOSS_BLOCK.isEnabled() && ground == ModBlocks.MOSS_BLOCK.get())
+				|| (ModBlocks.ROOTED_DIRT.isEnabled() && ground == ModBlocks.ROOTED_DIRT.get())
+				|| (ModBlocks.MUD.isEnabled() && ground == ModBlocks.MUD.get())
+				|| (ModBlocks.MUDDY_MANGROVE_ROOTS.isEnabled() && ground == ModBlocks.MUDDY_MANGROVE_ROOTS.get());
 	}
 
 	@Override
@@ -140,6 +159,33 @@ public class BlockAzalea extends BlockBush implements ISubBlocksBlock {
 	@Override
 	public String getNameFor(ItemStack stack) {
 		return getTypes()[stack.getItemDamage() % types.length];
+	}
+
+	/** MCP name: canFertilize. */
+	@Override
+	public boolean func_149851_a(World world, int x, int y, int z, boolean isClient) {
+		return true;
+	}
+
+	/** MCP name: shouldFertilize. Java Edition azaleas succeed on roughly 45% of bone-meal attempts. */
+	@Override
+	public boolean func_149852_a(World world, Random rand, int x, int y, int z) {
+		return rand.nextFloat() < 0.45F;
+	}
+
+	/** MCP name: fertilize. */
+	@Override
+	public void func_149853_b(World world, Random rand, int x, int y, int z) {
+		if (world.isRemote || !TerrainGen.saplingGrowTree(world, rand, x, y, z)) {
+			return;
+		}
+
+		int meta = world.getBlockMetadata(x, y, z);
+		world.setBlockToAir(x, y, z);
+		WorldGenAzaleaTree tree = new WorldGenAzaleaTree(true);
+		if (!tree.generate(world, rand, x, y, z)) {
+			world.setBlock(x, y, z, this, meta, 2);
+		}
 	}
 
 	@Override

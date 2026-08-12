@@ -35,6 +35,7 @@ public class RenderIDs {
 	public static final int GLOW_LICHEN = RenderingRegistry.getNextAvailableRenderId();
 	public static final int SMALL_DRIPLEAF = RenderingRegistry.getNextAvailableRenderId();
 	public static final int BIG_DRIPLEAF = RenderingRegistry.getNextAvailableRenderId();
+	public static final int SPORE_BLOSSOM = RenderingRegistry.getNextAvailableRenderId();
 	public static final int DEEPSLATE_CERTUS_QUARTZ_ORE = RenderingRegistry.getNextAvailableRenderId();
 
 	public static final int EXTENDED_CROSSED_SQUARES = RenderingRegistry.getNextAvailableRenderId();

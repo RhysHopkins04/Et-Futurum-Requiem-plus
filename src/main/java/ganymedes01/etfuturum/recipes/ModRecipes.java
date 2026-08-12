@@ -1527,6 +1527,9 @@ public class ModRecipes {
 		Object[] objects21 = new Object[]{"xxx", "xyx", "xxx", 'x', new ItemStack(Blocks.vine, 1), 'y', new ItemStack(Blocks.dirt, 1)};
 		RecipeHelper.addShapedRecipe(RecipeHelper.Priority.HIGH, output53, objects21);
 
+		ItemStack mossCarpet = ModBlocks.MOSS_CARPET.newItemStack(3);
+		RecipeHelper.addShapedRecipe(RecipeHelper.Priority.HIGH, mossCarpet, "xx", 'x', ModBlocks.MOSS_BLOCK.newItemStack());
+
 		for (int i = 0; i < getStewFlowers().size(); i++) {
 			ItemStack stew = ModItems.SUSPICIOUS_STEW.newItemStack();
 

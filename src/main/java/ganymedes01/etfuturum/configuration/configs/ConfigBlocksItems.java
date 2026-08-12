@@ -217,7 +217,7 @@ public class ConfigBlocksItems extends ConfigBase {
 		enableGlowLichen = getBoolean("enableGlowLichen", catBlockNatural, true, "");
 		enableGlowBerries = getBoolean("enableGlowBerries", catBlockNatural, true, "");
 		enableLushCaveBlocks = getBoolean("enableLushCaveBlocks", catBlockNatural, true,
-				"Enables Et Futurum Requiem Plus lush-cave content such as rooted dirt, hanging roots, and dripleaf. This option does not enable natural lush-cave generation.");
+				"Enables the Et Futurum Requiem Plus lush-cave content family: moss, moss carpet, azalea, azalea leaves, rooted dirt, hanging roots, dripleaf, and spore blossom. This option is enabled by default and does not itself enable natural lush-cave generation.");
 		if (ConfigExperiments.enableCrimsonBlocks) {
 			enableNetherwartBlock = true;
 		}

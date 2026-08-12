@@ -93,7 +93,8 @@ public class CompostingRegistry {
 				ModBlocks.NETHER_FUNGUS.newItemStack(1, OreDictionary.WILDCARD_VALUE),
 				ModBlocks.SHROOMLIGHT.newItemStack(),
 				ModBlocks.AZALEA.newItemStack(1, 0),
-				ModBlocks.MOSS_BLOCK.newItemStack()
+				ModBlocks.MOSS_BLOCK.newItemStack(),
+				ModBlocks.SPORE_BLOSSOM.newItemStack()
 		), 65);
 
 		registerCompostable(ImmutableList.of(

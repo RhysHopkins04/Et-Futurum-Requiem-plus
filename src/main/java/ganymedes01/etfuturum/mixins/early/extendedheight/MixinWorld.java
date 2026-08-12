@@ -3,6 +3,7 @@ package ganymedes01.etfuturum.mixins.early.extendedheight;
 import ganymedes01.etfuturum.core.utils.WorldHeightCompat;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldProvider;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -16,7 +17,7 @@ import org.spongepowered.asm.mixin.injection.ModifyConstant;
 @Mixin(World.class)
 public class MixinWorld {
 
-    @Shadow public WorldProvider provider;
+    @Shadow @Final public WorldProvider provider;
 
     @ModifyConstant(
             method = {

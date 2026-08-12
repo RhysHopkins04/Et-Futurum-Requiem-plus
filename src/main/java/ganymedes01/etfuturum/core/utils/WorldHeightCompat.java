@@ -26,6 +26,22 @@ public final class WorldHeightCompat {
     public static final int EXTENDED_SECTION_COUNT = EXTENDED_HEIGHT / 16;
 
     public static final int MODERN_Y_OFFSET = 64;
+
+    // Logical modern Overworld coordinate contract (1.18+ style vertical range).
+    public static final int MODERN_MIN_Y = -64;
+    public static final int MODERN_MAX_Y = 319;
+    public static final int MODERN_HEIGHT = MODERN_MAX_Y - MODERN_MIN_Y + 1;
+    public static final int MODERN_SEA_LEVEL = 63;
+    public static final int MODERN_CLOUD_HEIGHT = 192;
+    public static final int MODERN_AVERAGE_GROUND_LEVEL = 64;
+
+    // Positive physical coordinates used by the 1.7.10 engine.
+    public static final int PHYSICAL_MIN_Y = 0;
+    public static final int PHYSICAL_ZERO_Y = MODERN_Y_OFFSET;
+    public static final int PHYSICAL_SEA_LEVEL = MODERN_SEA_LEVEL + MODERN_Y_OFFSET;
+    public static final int PHYSICAL_CLOUD_HEIGHT = MODERN_CLOUD_HEIGHT + MODERN_Y_OFFSET;
+    public static final int PHYSICAL_AVERAGE_GROUND_LEVEL = MODERN_AVERAGE_GROUND_LEVEL + MODERN_Y_OFFSET;
+
     public static final int FULL_SECTION_MASK = (1 << EXTENDED_SECTION_COUNT) - 1;
 
     /**
@@ -42,5 +58,13 @@ public final class WorldHeightCompat {
 
     public static int physicalToModernY(int physicalY) {
         return physicalY - MODERN_Y_OFFSET;
+    }
+
+    public static boolean isModernYInRange(int modernY) {
+        return modernY >= MODERN_MIN_Y && modernY <= MODERN_MAX_Y;
+    }
+
+    public static boolean isPhysicalYInRange(int physicalY) {
+        return physicalY >= PHYSICAL_MIN_Y && physicalY <= EXTENDED_MAX_Y;
     }
 }

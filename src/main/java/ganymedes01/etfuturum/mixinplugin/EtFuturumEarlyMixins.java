@@ -360,14 +360,21 @@ public class EtFuturumEarlyMixins implements IFMLLoadingPlugin, IEarlyMixinLoade
 			mixins.add("extendedheight.MixinItemBlock");
 			mixins.add("extendedheight.MixinEntityPlayerMP");
 			mixins.add("extendedheight.MixinPlayerInstance");
-			mixins.add("extendedheight.MixinIntegratedServer");
-			mixins.add("extendedheight.MixinDedicatedServer");
-
 			if (side == MixinEnvironment.Side.CLIENT) {
+				mixins.add("extendedheight.MixinIntegratedServer");
 				mixins.add("extendedheight.client.MixinRenderGlobal");
 				mixins.add("extendedheight.client.MixinWorldClient");
 				mixins.add("extendedheight.client.MixinNetHandlerPlayClient");
+			} else {
+				mixins.add("extendedheight.MixinDedicatedServer");
 			}
+		}
+
+		// P006: modern Overworld vertical-reference architecture. This is deliberately a separate
+		// opt-in group from the 384-block engine foundation so extended height can be validated or
+		// used independently while the modern terrain generator is developed.
+		if (ConfigWorld.extendedWorldHeight && ConfigWorld.modernOverworldGeneration && !ConfigMapCompatibility.isEnabled()) {
+			mixins.add("modernoverworld.MixinWorldProvider");
 		}
 
 		return mixins;

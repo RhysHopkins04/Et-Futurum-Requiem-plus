@@ -469,6 +469,62 @@ require(
     'method = {"handleChunkData", "handleMapChunkBulk"}',
 )
 
+# P006 -- modern Overworld vertical-coordinate architecture. The actual terrain-density replacement
+# is intentionally deferred, but every subsequent generator now has a single canonical logical/physical
+# contract and a master config gate. Map Compatibility Mode must hard-disable it.
+for expected in (
+    "MODERN_MIN_Y = -64",
+    "MODERN_MAX_Y = 319",
+    "MODERN_SEA_LEVEL = 63",
+    "MODERN_CLOUD_HEIGHT = 192",
+    "PHYSICAL_ZERO_Y = MODERN_Y_OFFSET",
+    "PHYSICAL_SEA_LEVEL = MODERN_SEA_LEVEL + MODERN_Y_OFFSET",
+    "PHYSICAL_CLOUD_HEIGHT = MODERN_CLOUD_HEIGHT + MODERN_Y_OFFSET",
+    "PHYSICAL_AVERAGE_GROUND_LEVEL = MODERN_AVERAGE_GROUND_LEVEL + MODERN_Y_OFFSET",
+    "isModernYInRange",
+    "isPhysicalYInRange",
+):
+    if expected not in height_helper:
+        failures.append(f"modern Overworld coordinate contract missing: {expected}")
+
+if 'modernOverworldGeneration = getBoolean("modernOverworldGeneration", catGeneration, false' not in world_config:
+    failures.append("modernOverworldGeneration master switch/default missing")
+if "if (modernOverworldGeneration)" not in world_config or "extendedWorldHeight = true;" not in world_config:
+    failures.append("modern Overworld generation does not require/enable the 384-block engine foundation")
+if "ConfigWorld.modernOverworldGeneration = false;" not in config:
+    failures.append("Map Compatibility Mode does not force modern Overworld generation off")
+
+modern_gate = 'if (ConfigWorld.extendedWorldHeight && ConfigWorld.modernOverworldGeneration && !ConfigMapCompatibility.isEnabled()) {'
+if modern_gate not in mixins or 'mixins.add("modernoverworld.MixinWorldProvider")' not in mixins:
+    failures.append("modern Overworld vertical-reference mixin is not correctly config/mapcompat gated")
+
+# IntegratedServer is client-only and DedicatedServer is server-only. Keep the P005 height mixins
+# side-correct so enabling the new architecture does not produce known invalid-side target warnings.
+if 'if (side == MixinEnvironment.Side.CLIENT) {\n\t\t\t\tmixins.add("extendedheight.MixinIntegratedServer")' not in mixins:
+    failures.append("extended-height IntegratedServer mixin is not client-side gated")
+if '} else {\n\t\t\t\tmixins.add("extendedheight.MixinDedicatedServer")' not in mixins:
+    failures.append("extended-height DedicatedServer mixin is not server-side gated")
+if "@Shadow @Final public WorldProvider provider;" not in world_height_mixin:
+    failures.append("extended-height World provider shadow is missing @Final")
+
+modern_provider = require(
+    "src/main/java/ganymedes01/etfuturum/mixins/early/modernoverworld/MixinWorldProvider.java",
+    "WorldHeightCompat.PHYSICAL_SEA_LEVEL",
+)
+for expected in (
+    'method = "getCloudHeight"',
+    "WorldHeightCompat.PHYSICAL_CLOUD_HEIGHT",
+    'method = "getAverageGroundLevel"',
+    "WorldHeightCompat.PHYSICAL_AVERAGE_GROUND_LEVEL",
+    'method = "getHorizon"',
+    "WorldHeightCompat.PHYSICAL_SEA_LEVEL",
+    "ConfigWorld.modernOverworldGeneration",
+):
+    if expected not in modern_provider:
+        failures.append(f"modern Overworld reference-height mixin missing: {expected}")
+if modern_provider.count("remap = false") < 2:
+    failures.append("Forge-added cloud/horizon hooks must use literal non-remapped names")
+
 # Licence boundary: Campfire Backport is reference-only. Existing optional compatibility strings
 # mentioning the external mod are legitimate, but its package/source must not be vendored here.
 for path in (ROOT / "src").rglob("*.java"):
@@ -494,4 +550,5 @@ print(" - rooted dirt, hanging roots, dripleaf, moss/azalea, and spore blossom c
 print(" - azalea tree growth and moss bonemeal vegetation checks present")
 print(" - deterministic Lush Cave regions, marker roots, vegetation, clay pools, and Dripleaf worldgen checks present")
 print(" - opt-in 384-block positive-Y height foundation, +64 modern offset, storage/protocol/render/placement gates present")
+print(" - P006 modern Overworld logical -64..319 coordinate contract and translated sea/horizon/cloud references present")
 print(" - no Campfire Backport GPL package source vendored")

@@ -58,6 +58,7 @@ public class ConfigWorld extends ConfigBase {
 	public static boolean bambooWorldgen;
 	public static boolean lushCavesWorldgen;
 	public static boolean extendedWorldHeight;
+	public static boolean modernOverworldGeneration;
 	public static int lushCaveRarity;
 	public static int lushCaveRegionRadiusChunks;
 	public static int lushCaveMinY;
@@ -186,6 +187,15 @@ public class ConfigWorld extends ConfigBase {
 				"This option changes core chunk storage/network/render behaviour and REQUIRES A FULL GAME RESTART. " +
 				"It is intentionally opt-in until the extended-height foundation has completed runtime validation. " +
 				"Map Compatibility Mode always forces it off regardless of this saved value.");
+		modernOverworldGeneration = getBoolean("modernOverworldGeneration", catGeneration, false,
+				"EXPERIMENTAL PLUS OVERWORLD ARCHITECTURE. Establish the modern -64..319 logical vertical coordinate model " +
+				"inside the positive 0..383 physical world, including translated sea/horizon, average-ground and cloud reference heights. " +
+				"The actual modern terrain density/cave generator is implemented in subsequent patches, so leave this disabled unless testing the Plus modern-worldgen development path. " +
+				"Enabling this option also enables extendedWorldHeight at runtime and REQUIRES A FULL GAME RESTART. " +
+				"Map Compatibility Mode always forces it off regardless of this saved value.");
+		if (modernOverworldGeneration) {
+			extendedWorldHeight = true;
+		}
 		lushCavesWorldgen = getBoolean("lushCavesWorldgen", catGeneration, true,
 				"Generate the Et Futurum Requiem Plus Lush Cave backport in the Overworld. " +
 				"Because Minecraft 1.7.10 has no 3D biome system, this decorates deterministic underground cave regions rather than registering a fake surface biome. " +

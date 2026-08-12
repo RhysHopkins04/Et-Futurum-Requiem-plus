@@ -343,6 +343,33 @@ public class EtFuturumEarlyMixins implements IFMLLoadingPlugin, IEarlyMixinLoade
 			mixins.add("deepslateores.MixinChunk");
 		}
 
+		// Extended height is selected before Minecraft core classes are transformed. When disabled -
+		// including the Map Compatibility Mode runtime override - none of these engine/protocol mixins
+		// are applied, leaving ordinary 1.7.10 world architecture untouched.
+		if (ConfigWorld.extendedWorldHeight && !ConfigMapCompatibility.isEnabled()) {
+			mixins.add("extendedheight.MixinWorldProvider");
+			mixins.add("extendedheight.MixinWorld");
+			mixins.add("extendedheight.MixinChunk");
+			mixins.add("extendedheight.MixinChunkCache");
+			mixins.add("extendedheight.MixinAnvilChunkLoader");
+			mixins.add("extendedheight.MixinS21PacketChunkData");
+			mixins.add("extendedheight.MixinS26PacketMapChunkBulk");
+			mixins.add("extendedheight.MixinC07PacketPlayerDigging");
+			mixins.add("extendedheight.MixinC08PacketPlayerBlockPlacement");
+			mixins.add("extendedheight.MixinS23PacketBlockChange");
+			mixins.add("extendedheight.MixinItemBlock");
+			mixins.add("extendedheight.MixinEntityPlayerMP");
+			mixins.add("extendedheight.MixinPlayerInstance");
+			mixins.add("extendedheight.MixinIntegratedServer");
+			mixins.add("extendedheight.MixinDedicatedServer");
+
+			if (side == MixinEnvironment.Side.CLIENT) {
+				mixins.add("extendedheight.client.MixinRenderGlobal");
+				mixins.add("extendedheight.client.MixinWorldClient");
+				mixins.add("extendedheight.client.MixinNetHandlerPlayClient");
+			}
+		}
+
 		return mixins;
 	}
 

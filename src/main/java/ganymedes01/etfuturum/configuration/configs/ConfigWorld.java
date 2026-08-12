@@ -57,6 +57,7 @@ public class ConfigWorld extends ConfigBase {
 	public static int cherryTreeRarity;
 	public static boolean bambooWorldgen;
 	public static boolean lushCavesWorldgen;
+	public static boolean extendedWorldHeight;
 	public static int lushCaveRarity;
 	public static int lushCaveRegionRadiusChunks;
 	public static int lushCaveMinY;
@@ -179,6 +180,12 @@ public class ConfigWorld extends ConfigBase {
 		amethystMaxY = getInt("amethystMaxY", catGeneration, 46, 6, 245, "Max Y level amethyst geodes should attempt to generate at");
 		cherryTreeRarity = getInt("cherryTreeRarity", catGeneration, 72, 0, Byte.MAX_VALUE, "How rare should cherry trees be? 1/x chance per chunk, 1 means a tree attempts to appear every chunk. 0 = no cherry trees. They will spawn in mountain-type biomes.");
 		bambooWorldgen = getBoolean("bambooWorldgen", catGeneration, true, "Whether bamboo should naturally spawn in the overworld. Turning this off allows you to use bamboo based blocks without bamboo world gen for mod compatability.");
+		extendedWorldHeight = getBoolean("extendedWorldHeight", catGeneration, false,
+				"EXPERIMENTAL PLUS ENGINE FOUNDATION. Extend only the Overworld from the legacy 0..255 physical range to 0..383 (24 chunk sections). " +
+				"Future modern terrain/map conversion uses a fixed +64 vertical offset, so modern -64..319 maps to physical 0..383. " +
+				"This option changes core chunk storage/network/render behaviour and REQUIRES A FULL GAME RESTART. " +
+				"It is intentionally opt-in until the extended-height foundation has completed runtime validation. " +
+				"Map Compatibility Mode always forces it off regardless of this saved value.");
 		lushCavesWorldgen = getBoolean("lushCavesWorldgen", catGeneration, true,
 				"Generate the Et Futurum Requiem Plus Lush Cave backport in the Overworld. " +
 				"Because Minecraft 1.7.10 has no 3D biome system, this decorates deterministic underground cave regions rather than registering a fake surface biome. " +

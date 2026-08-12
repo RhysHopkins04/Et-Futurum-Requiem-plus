@@ -66,6 +66,10 @@ public class ConfigMapCompatibility extends ConfigBase {
         // Prevent chunk-load replacement/retrofit behaviour from mutating imported terrain.
         ConfigWorld.tileReplacementMode = -1;
 
+        // Extended world height is an early engine/core protocol change, not a content feature.
+        // Compatibility Mode must leave the 1.7.10/RTG world architecture entirely untouched.
+        ConfigWorld.extendedWorldHeight = false;
+
         // Explicit belt-and-braces gate for the Plus Lush Cave backport. The three IWorldGenerator
         // registrations are already skipped in this profile, but keeping the feature flag false at
         // runtime also prevents accidental/direct invocation by integration code.

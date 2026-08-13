@@ -527,8 +527,8 @@ if modern_provider.count("remap = false") < 2:
 
 # P007 -- actual modern Overworld base-terrain foundation. Keep the vanilla ChunkProviderGenerate
 # pipeline/structure/light flow, but feed it a 384-high terrain buffer shaped by broad modern-style
-# continentalness/erosion/ridge fields. Legacy 256-high cave/ravine carvers are deliberately no-op
-# until P008 replaces them with the dedicated modern cave/aquifer stage.
+# continentalness/erosion/ridge fields. P008a replaces the old 256-high cave carver; the legacy
+# ravine path stays no-op until a translated modern underground stage owns it.
 if 'mixins.add("modernoverworld.MixinChunkProviderGenerate")' not in mixins:
     failures.append("P007 modern ChunkProviderGenerate mixin is not selected by the modern Overworld gate")
 
@@ -548,7 +548,9 @@ for expected in (
     'method = "replaceBlocksForBiome"',
     "ChunkProviderEvent.ReplaceBiomeBlocks",
     "applyTranslatedBiomeSurface",
-    "NoopModernCarver",
+    "ModernOverworldCaveGenerator",
+    "new ModernOverworldCaveGenerator(seed)",
+    "ModernOverworldRavineGenerator",
     "worldObj.provider.dimensionId == 0",
     "ConfigWorld.modernOverworldGeneration",
     "ConfigMapCompatibility.isEnabled()",
@@ -562,7 +564,6 @@ modern_terrain = require(
 )
 for expected in (
     "WorldHeightCompat.EXTENDED_HEIGHT",
-    "WorldHeightCompat.MODERN_SEA_LEVEL",
     "WorldHeightCompat.PHYSICAL_ZERO_Y",
     "continentalness",
     "erosion",
@@ -591,7 +592,7 @@ if "world.provider.dimensionId == 0 && ConfigWorld.modernOverworldGeneration" no
 for expected in (
     "translated Y63 sea level",
     "modern-style continentalness/erosion/ridge mountain shaping",
-    "Noise caves/aquifers",
+    "P008b-c modern cheese/spaghetti/noodle noise caves, translated ravines, regional cave-density variation, and deterministic local water/lava aquifers",
 ):
     if expected not in world_config:
         failures.append(f"P007 modernOverworldGeneration config description missing: {expected}")
@@ -627,6 +628,137 @@ lush_worldgen_p007b = require(
 if "|| ConfigWorld.modernOverworldGeneration" not in lush_worldgen_p007b:
     failures.append("P007b does not stage P004 Lush cavity decoration out of the modern path")
 
+
+
+# P008b-c -- compare the P008 noise foundation against a real 1.21 reference world: keep roughly
+# comparable total open volume, but add broad regional rarity so cave-poor and cave-rich zones do
+# not collapse into one world-spanning component. Broaden cheese chambers, reduce connector density,
+# restore a translated 384-safe ravine/canyon family, and make the lowest carved band a geometry-
+# owned lava shelf while retaining P008b-a's contained water basins and surface safety.
+modern_caves = require(
+    "src/main/java/ganymedes01/etfuturum/world/generate/terrain/ModernOverworldCaveGenerator.java",
+    "class ModernOverworldCaveGenerator",
+)
+for expected in (
+    "extends MapGenBase",
+    "HEIGHT = WorldHeightCompat.EXTENDED_HEIGHT",
+    "GRID_STEP = 4",
+    "Y_SAMPLES = HEIGHT / GRID_STEP + 1",
+    "MIN_CARVE_PHYSICAL_Y = 1",
+    "DEEP_FLOOR_FADE_END_PHYSICAL_Y = 1",
+    "DEEP_FLOOR_FADE_START_PHYSICAL_Y = 18",
+    "deepFloorScale",
+    "TUNNEL_SURFACE_ROOF = 9",
+    "WorldHeightCompat.physicalToModernY",
+    "terrain.sampleSurfacePhysicalY",
+    "(localX * 16 + localZ) * HEIGHT",
+    "fillNoiseFields",
+    "cheeseNoise",
+    "spaghettiNoiseA",
+    "spaghettiNoiseB",
+    "noodleNoiseA",
+    "noodleNoiseB",
+    "pillarNoiseA",
+    "pillarNoiseB",
+    "entranceNoise",
+    "regionNoise",
+    "regionField",
+    "124.0D, 92.0D, 124.0D",
+    "336.0D, 208.0D, 336.0D",
+    "regionClamped",
+    "noodleToggle > 0.30D",
+    "isCavernPillar",
+    "isSurfaceEntrance",
+    "dilateTraversablePassages",
+    "MASK_ENTRANCE",
+    "new ModernOverworldAquifer(seed, terrain)",
+    "aquifer.sampleColumn",
+    "aquifer.resolve",
+    "hasLooseSurfaceCover",
+    "!surfaceWaterColumn",
+    "Blocks.water",
+    "Blocks.lava",
+    "FractalNoise3D",
+    "NoiseGeneratorImproved",
+    "startX * scaleX",
+):
+    if expected not in modern_caves:
+        failures.append(f"P008b-c modern cave/aquifer bridge missing: {expected}")
+
+modern_aquifer = require(
+    "src/main/java/ganymedes01/etfuturum/world/generate/terrain/ModernOverworldAquifer.java",
+    "class ModernOverworldAquifer",
+)
+for expected in (
+    "CELL_SIZE = 96",
+    "SITE_JITTER = 0.28D",
+    "WET_SITE_THRESHOLD = 0.55D",
+    "DEEP_LAVA_SHELF_MAX_Y = -55",
+    "LAVA_SITE_CHANCE = 0.100D",
+    "LAVA_POD_LEVEL_MIN = -36",
+    "LAVA_POD_LEVEL_MAX = -24",
+    "LAVA_POD_BOTTOM_MIN = -53",
+    "logicalY <= DEEP_LAVA_SHELF_MAX_Y",
+    "PRESSURE_BARRIER_WIDTH",
+    "PRESSURE_LEVEL_DIFFERENCE",
+    "BASIN_SHELL_WIDTH",
+    "sampleColumn",
+    "resolve(Column column",
+    "needsPressureBarrier",
+    "bottomLogicalY",
+    "site.radius",
+    "Decision.WATER",
+    "Decision.LAVA",
+    "Decision.PRESERVE",
+):
+    if expected not in modern_aquifer:
+        failures.append(f"P008b-c contained aquifer/deep-lava implementation missing: {expected}")
+
+modern_ravines = require(
+    "src/main/java/ganymedes01/etfuturum/world/generate/terrain/ModernOverworldRavineGenerator.java",
+    "class ModernOverworldRavineGenerator",
+)
+for expected in (
+    "extends MapGenBase",
+    "HEIGHT = WorldHeightCompat.EXTENDED_HEIGHT",
+    "BLOCK_COUNT = 256 * HEIGHT",
+    "START_CHANCE = 85",
+    "terrain.sampleSurfacePhysicalY",
+    "WorldHeightCompat.physicalToModernY",
+    "columnIndex * HEIGHT",
+    "aquifer.sampleColumn",
+    "aquifer.resolve",
+    "WATER_SURFACE_GUARD",
+    "LOOSE_SURFACE_GUARD",
+    "deepFloorScale",
+):
+    if expected not in modern_ravines:
+        failures.append(f"P008b-c translated ravine/canyon implementation missing: {expected}")
+
+for forbidden in (
+    "x * 16 + z << 8",
+    "<< 8 |",
+    "* 256 +",
+):
+    if forbidden in modern_caves or forbidden in modern_aquifer or forbidden in modern_ravines:
+        failures.append(f"P008b-c must not reintroduce legacy 256-high carver indexing: {forbidden}")
+
+if "applyMagmaFloors" in modern_caves or "ModBlocks.MAGMA" in modern_aquifer:
+    failures.append("P008b-c must stage aquifer magma-floor decoration out until the later cave decorator pass")
+if "surfaceAquifer" in modern_aquifer or "resolve(Column column, int physicalY, boolean entrance)" in modern_aquifer:
+    failures.append("P008b-c must not force underwater cave mouths to become static aquifer source columns")
+if "width *= deepFloorScale(physicalY)" not in modern_caves or "threshold += (1.0D - deepFloorScale)" not in modern_caves:
+    failures.append("P008b-c must taper all noise-cave families before the seeded bedrock floor")
+
+if "this.caveGenerator = new ModernOverworldCaveGenerator(seed);" not in modern_chunk_provider:
+    failures.append("P008b-c modern cave generator is not installed into ChunkProviderGenerate")
+if "this.ravineGenerator = new ModernOverworldRavineGenerator(seed);" not in modern_chunk_provider:
+    failures.append("P008b-c translated ravine generator is not installed into ChunkProviderGenerate")
+if "NoopModernCarver" in modern_chunk_provider:
+    failures.append("P008b-c still suppresses the ravine slot instead of installing the translated canyon carver")
+if "type == PopulateChunkEvent.Populate.EventType.LAKE" not in modern_chunk_provider or \
+        "type == PopulateChunkEvent.Populate.EventType.LAVA" not in modern_chunk_provider:
+    failures.append("P008b-c must keep legacy water/lava lake population suppressed while aquifers own fluids")
 
 # P007c -- terrain-aligned modern biome source and structure/surface integration. The legacy
 # GenLayer biome map cannot remain authoritative once P007 terrain shape is independent: doing so
@@ -857,4 +989,5 @@ print(" - P007d broad climate frequencies and Forge lake-hook remap cleanup rema
 print(" - P007e continuous coast terrain and ridge-aligned terrain signal remain preserved")
 print(" - P007f jittered macro-climate cells, parameter-space land biomes, and continental coast topology present")
 print(" - P007g blended macro-boundary ecotones and open-water coastal-pool filtering present")
+print(" - P008b-c region-varied larger noise caves, translated 384-safe ravines, deep Y-55 lava shelf/pods, contained water aquifers, and safe land mouths present")
 print(" - no Campfire Backport GPL package source vendored")

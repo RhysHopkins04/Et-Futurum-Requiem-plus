@@ -191,7 +191,7 @@ public class ConfigWorld extends ConfigBase {
 				"EXPERIMENTAL PLUS OVERWORLD GENERATION. Use the modern -64..319 logical vertical coordinate model " +
 				"inside the positive 0..383 physical world and enable the Plus modern base-terrain path: translated Y63 sea level, " +
 				"deep terrain through logical Y-64, modern-style continentalness/erosion/ridge mountain shaping, and translated biome surfaces. " +
-				"Noise caves/aquifers, modern ore/feature distributions, and later biome-placement work are implemented in follow-up stages. " +
+				"P008b-c modern cheese/spaghetti/noodle noise caves, translated ravines, regional cave-density variation, and deterministic local water/lava aquifers are active on this path; modern underground biome decoration is implemented in follow-up stages. " +
 				"Enabling this option also enables extendedWorldHeight at runtime and REQUIRES A FULL GAME RESTART. " +
 				"Map Compatibility Mode always forces it off regardless of this saved value.");
 		if (modernOverworldGeneration) {

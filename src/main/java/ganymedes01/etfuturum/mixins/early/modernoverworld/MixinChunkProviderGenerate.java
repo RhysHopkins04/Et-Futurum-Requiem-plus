@@ -4,6 +4,8 @@ import cpw.mods.fml.common.eventhandler.Event;
 import ganymedes01.etfuturum.configuration.configs.ConfigMapCompatibility;
 import ganymedes01.etfuturum.configuration.configs.ConfigWorld;
 import ganymedes01.etfuturum.core.utils.WorldHeightCompat;
+import ganymedes01.etfuturum.world.generate.terrain.ModernOverworldCaveGenerator;
+import ganymedes01.etfuturum.world.generate.terrain.ModernOverworldRavineGenerator;
 import ganymedes01.etfuturum.world.generate.terrain.ModernOverworldTerrainGenerator;
 import net.minecraft.block.Block;
 import net.minecraft.world.World;
@@ -168,8 +170,8 @@ public abstract class MixinChunkProviderGenerate {
     /**
      * Modern Java removed the legacy water-lake population feature in favour of aquifers, and the
      * old 1.7 lava-lake call also samples the legacy physical-Y range. Keep firing Forge's populate
-     * event for compatibility, but suppress both old lake generators until P008/P009 own their
-     * translated replacements. This removes elevated Y128+ ponds and misleading mini lava cavities.
+     * event for compatibility, but suppress both old lake generators because P008b local aquifers now
+     * own modern underground water/lava bodies. This also prevents duplicate elevated legacy ponds.
      */
     @Redirect(method = "populate", at = @At(value = "INVOKE",
             target = "Lnet/minecraftforge/event/terraingen/TerrainGen;populate(Lnet/minecraft/world/chunk/IChunkProvider;Lnet/minecraft/world/World;Ljava/util/Random;IIZLnet/minecraftforge/event/terraingen/PopulateChunkEvent$Populate$EventType;)Z",
@@ -186,26 +188,17 @@ public abstract class MixinChunkProviderGenerate {
     }
 
     /**
-     * Legacy cave/ravine carvers assume a 256-high block buffer. Keep their invocation sites alive
-     * (including existing loading-stage hooks) but make them no-op until the dedicated P008 modern
-     * noise-cave/aquifer stage replaces them.
+     * P008b-c installs both the 384-height noise cave field and its translated canyon/ravine
+     * companion. Legacy and Map Compatibility worlds retain the original 1.7 carvers unchanged.
      */
     @Inject(method = "<init>", at = @At("RETURN"))
-    private void etfu$disableLegacyCarversForModernWorld(World world, long seed, boolean mapFeatures, CallbackInfo ci) {
+    private void etfu$installModernCarvers(World world, long seed, boolean mapFeatures, CallbackInfo ci) {
         if (world.provider != null
                 && world.provider.dimensionId == 0
                 && ConfigWorld.modernOverworldGeneration
                 && !ConfigMapCompatibility.isEnabled()) {
-            this.caveGenerator = new NoopModernCarver();
-            this.ravineGenerator = new NoopModernCarver();
-        }
-    }
-
-    @Unique
-    private static final class NoopModernCarver extends MapGenBase {
-        @Override
-        public void func_151539_a(IChunkProvider provider, World world, int chunkX, int chunkZ, Block[] blocks) {
-            // Intentionally empty until P008. Do not let 256-high legacy carvers index a 384-high buffer.
+            this.caveGenerator = new ModernOverworldCaveGenerator(seed);
+            this.ravineGenerator = new ModernOverworldRavineGenerator(seed);
         }
     }
 }

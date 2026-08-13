@@ -19,8 +19,8 @@ import java.util.Random;
  * architecture in the 1.7.10 engine: terrain shape is driven by broad continentalness, erosion
  * and ridge/peak fields independently of the legacy 2D biome ID map; logical sea level
  * remains Y63 (physical Y127); the world extends down through logical Y-64; and mountains can use
- * the expanded upper range. Noise caves/aquifers and modern feature distributions are separate
- * follow-up stages.</p>
+ * the expanded upper range. P008b owns modern noise-cave geometry and local aquifers; modern feature distributions
+ * remain separate follow-up stages.</p>
  *
  * <p>The implementation is an original legacy-engine adaptation. It deliberately uses the existing
  * 1.7.10 biome surface pass after translating physical Y64..319 back into a temporary logical

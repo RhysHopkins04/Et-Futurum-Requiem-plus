@@ -234,6 +234,8 @@ for expected in (
     'lushCaveRegionRadiusChunks = getInt("lushCaveRegionRadiusChunks", catGeneration, 2',
     'lushCaveMinY = getInt("lushCaveMinY", catGeneration, 10',
     'lushCaveMaxY = getInt("lushCaveMaxY", catGeneration, 60',
+    'modernLushCaveMinY = getInt("modernLushCaveMinY", catGeneration, -56',
+    'modernLushCaveMaxY = getInt("modernLushCaveMaxY", catGeneration, 64',
 ):
     if expected not in world_config:
         failures.append(f"lush-cave worldgen config/default missing: {expected}")
@@ -625,10 +627,6 @@ lush_worldgen_p007b = require(
     "src/main/java/ganymedes01/etfuturum/world/generate/feature/WorldGenLushCaves.java",
     "ConfigWorld.modernOverworldGeneration",
 )
-if "|| ConfigWorld.modernOverworldGeneration" not in lush_worldgen_p007b:
-    failures.append("P007b does not stage P004 Lush cavity decoration out of the modern path")
-
-
 
 # P008b-c -- compare the P008 noise foundation against a real 1.21 reference world: keep roughly
 # comparable total open volume, but add broad regional rarity so cave-poor and cave-rich zones do
@@ -759,6 +757,133 @@ if "NoopModernCarver" in modern_chunk_provider:
 if "type == PopulateChunkEvent.Populate.EventType.LAKE" not in modern_chunk_provider or \
         "type == PopulateChunkEvent.Populate.EventType.LAVA" not in modern_chunk_provider:
     failures.append("P008b-c must keep legacy water/lava lake population suppressed while aquifers own fluids")
+
+# P008c -- 1.7.10 cannot store vertical cave biomes in Chunk#getBiomeArray(), so modern cave
+# ecology uses a separate deterministic 3D region source. P008c activates LUSH ownership and routes
+# the existing moss/azalea/vine/spore/clay/dripleaf feature set through that (x,y,z) field while
+# preserving the older P004 anchor implementation for non-modern Overworlds.
+modern_cave_regions = require(
+    "src/main/java/ganymedes01/etfuturum/world/generate/terrain/ModernOverworldCaveRegionSource.java",
+    "class ModernOverworldCaveRegionSource",
+)
+for expected in (
+    "enum RegionType",
+    "NORMAL",
+    "LUSH",
+    "DRIPSTONE",
+    "WorldHeightCompat.physicalToModernY",
+    "WET_XZ_SCALE = 1.0D / 256.0D",
+    "WET_Y_SCALE = 1.0D / 128.0D",
+    "REGION_XZ_SCALE = 1.0D / 160.0D",
+    "REGION_Y_SCALE = 1.0D / 96.0D",
+    "BASE_LUSH_THRESHOLD = 0.24D",
+    "fractalValueNoise",
+    "valueNoise",
+    "lushStrength",
+    "verticalPenalty",
+    "score - (BASE_LUSH_THRESHOLD + verticalPenalty)",
+):
+    if expected not in modern_cave_regions:
+        failures.append(f"P008c 3D cave-region source missing: {expected}")
+
+for forbidden in (
+    "BiomeGenBase",
+    "BiomeDictionary",
+    ".getBiomeArray(",
+    ".setBiome",
+):
+    if forbidden in modern_cave_regions:
+        failures.append(f"P008c cave-region source must not mutate/register 2D surface biomes: {forbidden}")
+
+for expected in (
+    "return generateModernChunk(world, chunkX, chunkZ);",
+    "new ModernOverworldCaveRegionSource(seed, minY, maxY)",
+    "chunkHasModernLushRegion",
+    "shouldAttemptModernSurfaceMarker",
+    "isLushDecorationPosition",
+    "WorldHeightCompat.modernToPhysicalY",
+    "ConfigWorld.modernLushCaveMinY",
+    "ConfigWorld.modernLushCaveMaxY",
+    "isLushGroundReplaceable(below) && isLushDecorationPosition",
+    "isLushDecorationPosition(world, px, groundY + 1, pz)",
+):
+    if expected not in lush_worldgen_p007b:
+        failures.append(f"P008c Lush Cave 3D-region integration missing: {expected}")
+
+if "|| ConfigWorld.modernOverworldGeneration" in lush_worldgen_p007b:
+    failures.append("P008c still stages Lush Cave decoration out of the modern Overworld path")
+if "findRegionAnchor(world, chunkX, chunkZ)" not in lush_worldgen_p007b:
+    failures.append("P008c removed the legacy P004 Lush anchor path instead of preserving it for non-modern worlds")
+if "modernLushCaveMinY" not in world_config or "modernLushCaveMaxY" not in world_config:
+    failures.append("P008c modern Lush logical-Y configuration is missing")
+if "P008d enables deterministic 3D underground-region ownership with surface-driven dense Lush Cave ecology" not in world_config:
+    failures.append("P008d modernOverworldGeneration config description does not advertise dense 3D Lush Cave ecology")
+
+# P008d/P008d-a/P008d-b -- modern Lush decoration must be surface-driven rather than reusing the
+# old random-Y P004 attempts. P008d-b keeps the dense ecology and spaced surface markers, increases
+# the recurrence/variety of contained clay wetlands, adds dotted one/two-cell water pockets and
+# makes clay a low-density floor/wall/ceiling accent without changing cave geometry or aquifers.
+for expected in (
+    "decorateModernLushSurfaces",
+    "decorateModernClayBasins",
+    "decorateModernClayAccents",
+    "findStrongestModernFloor",
+    "growModernClayFloorPatch",
+    "carveModernTerracedWaterLobe",
+    "scatterModernClayWaterPockets",
+    "canCarveModernTerraceCell",
+    "decorateModernDripleafShore",
+    "hasAdjacentRecessedWater",
+    "shouldAttemptModernClayBasin",
+    "lushCoreFactor",
+    "coordinateChance",
+    "MODERN_FLOOR_MOSS_SALT",
+    "MODERN_CEILING_MOSS_SALT",
+    "MODERN_VEGETATION_SALT",
+    "MODERN_CAVE_VINE_SALT",
+    "MODERN_BASIN_SALT",
+    "MODERN_BASIN_SHAPE_SALT",
+    "MODERN_CLAY_ACCENT_SALT",
+    "MODERN_WATER_POCKET_SALT",
+    "MODERN_MARKER_PRIORITY_SALT",
+    "MODERN_MARKER_SPACING_RADIUS_CHUNKS = 4",
+    "modernMarkerPriority",
+    "0.62D + core * 0.30D",
+    "0.30D + core * 0.42D",
+    "0.10D + core * 0.22D",
+    "0.68D + core * 0.28D",
+    "% 2L == 0L",
+    "18 + rand.nextInt(15)",
+    "Blocks.water",
+    "same-height retaining sides",
+):
+    if expected not in lush_worldgen_p007b:
+        failures.append(f"P008d-b dense/wetland Lush Cave ecology missing: {expected}")
+
+for forbidden in (
+    "canMakeModernRecessedPool",
+    "carveModernClayPool",
+    "waterRadius = core > 0.58D",
+    "% 10L == 0L",
+):
+    if forbidden in lush_worldgen_p007b:
+        failures.append(f"P008d-b still contains superseded square-pool/marker logic: {forbidden}")
+
+modern_chunk_signature = "private boolean generateModernChunk(World world, int chunkX, int chunkZ)"
+modern_chunk_end = "private ModernOverworldCaveRegionSource modernRegionSource"
+if modern_chunk_signature in lush_worldgen_p007b and modern_chunk_end in lush_worldgen_p007b:
+    modern_chunk_body = lush_worldgen_p007b.split(modern_chunk_signature, 1)[1].split(modern_chunk_end, 1)[0]
+    for forbidden in (
+        "decorateMossFloors(world, rand",
+        "decorateMossCeilings(world, rand",
+        "decorateCaveVines(world, rand",
+        "decorateSporeBlossoms(world, rand",
+        "decorateClayAndDripleaf(world, rand",
+    ):
+        if forbidden in modern_chunk_body:
+            failures.append(f"P008d modern Lush path still uses sparse legacy random-Y decorator: {forbidden}")
+else:
+    failures.append("P008d could not locate generateModernChunk for sparse-decorator validation")
 
 # P007c -- terrain-aligned modern biome source and structure/surface integration. The legacy
 # GenLayer biome map cannot remain authoritative once P007 terrain shape is independent: doing so
@@ -990,4 +1115,6 @@ print(" - P007e continuous coast terrain and ridge-aligned terrain signal remain
 print(" - P007f jittered macro-climate cells, parameter-space land biomes, and continental coast topology present")
 print(" - P007g blended macro-boundary ecotones and open-water coastal-pool filtering present")
 print(" - P008b-c region-varied larger noise caves, translated 384-safe ravines, deep Y-55 lava shelf/pods, contained water aquifers, and safe land mouths present")
+print(" - P008c deterministic 3D underground-region ownership remains present")
+print(" - P008d-b dense Lush ecology, recurring terraced/dotted clay-water wetlands, clay accents, and spaced Azalea markers present")
 print(" - no Campfire Backport GPL package source vendored")

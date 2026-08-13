@@ -63,6 +63,8 @@ public class ConfigWorld extends ConfigBase {
 	public static int lushCaveRegionRadiusChunks;
 	public static int lushCaveMinY;
 	public static int lushCaveMaxY;
+	public static int modernLushCaveMinY;
+	public static int modernLushCaveMaxY;
 
 	public static int crimsonForestID;
 	public static int warpedForestID;
@@ -191,7 +193,8 @@ public class ConfigWorld extends ConfigBase {
 				"EXPERIMENTAL PLUS OVERWORLD GENERATION. Use the modern -64..319 logical vertical coordinate model " +
 				"inside the positive 0..383 physical world and enable the Plus modern base-terrain path: translated Y63 sea level, " +
 				"deep terrain through logical Y-64, modern-style continentalness/erosion/ridge mountain shaping, and translated biome surfaces. " +
-				"P008b-c modern cheese/spaghetti/noodle noise caves, translated ravines, regional cave-density variation, and deterministic local water/lava aquifers are active on this path; modern underground biome decoration is implemented in follow-up stages. " +
+				"P008b-c modern cheese/spaghetti/noodle noise caves, translated ravines, regional cave-density variation, and deterministic local water/lava aquifers are active on this path. " +
+				"P008d enables deterministic 3D underground-region ownership with surface-driven dense Lush Cave ecology, clay basins, and recessed water pools without changing the 2D surface biome map. " +
 				"Enabling this option also enables extendedWorldHeight at runtime and REQUIRES A FULL GAME RESTART. " +
 				"Map Compatibility Mode always forces it off regardless of this saved value.");
 		if (modernOverworldGeneration) {
@@ -202,14 +205,18 @@ public class ConfigWorld extends ConfigBase {
 				"Because Minecraft 1.7.10 has no 3D biome system, this decorates deterministic underground cave regions rather than registering a fake surface biome. " +
 				"Map Compatibility Mode suppresses this generator regardless of this saved value.");
 		lushCaveRarity = getInt("lushCaveRarity", catGeneration, 64, 1, 4096,
-				"Region-anchor rarity for Lush Caves. 1/x candidate chunks becomes an anchor; nearby chunks within lushCaveRegionRadiusChunks share that underground region. " +
-				"Lower values make Lush Caves more common.");
+				"LEGACY/NON-MODERN Lush Cave region-anchor rarity. 1/x candidate chunks becomes an anchor; nearby chunks within lushCaveRegionRadiusChunks share that underground region. " +
+				"Ignored by modernOverworldGeneration, where P008d uses a continuous 3D underground region field and surface-driven decoration.");
 		lushCaveRegionRadiusChunks = getInt("lushCaveRegionRadiusChunks", catGeneration, 2, 1, 4,
-				"Radius in chunks around each deterministic Lush Cave anchor. Default 2 produces connected underground areas without turning Lush Caves into a surface biome.");
+				"LEGACY/NON-MODERN radius in chunks around each deterministic Lush Cave anchor. Ignored by modernOverworldGeneration, which uses P008d 3D region ownership.");
 		lushCaveMinY = getInt("lushCaveMinY", catGeneration, 10, 4, 120,
-				"Lowest Y level sampled when decorating existing cave cavities as Lush Caves.");
+				"LEGACY/NON-MODERN physical Y minimum sampled when decorating existing cave cavities as Lush Caves.");
 		lushCaveMaxY = getInt("lushCaveMaxY", catGeneration, 60, 8, 160,
-				"Highest Y level sampled when decorating existing cave cavities as Lush Caves. Values are normalized at runtime if min/max are reversed.");
+				"LEGACY/NON-MODERN physical Y maximum sampled when decorating existing cave cavities as Lush Caves. Values are normalized at runtime if min/max are reversed.");
+		modernLushCaveMinY = getInt("modernLushCaveMinY", catGeneration, -56, -64, 319,
+				"Lowest LOGICAL modern Y eligible for P008d Lush Cave region ownership. This setting is used only when modernOverworldGeneration is enabled; physical engine Y is logical Y + 64.");
+		modernLushCaveMaxY = getInt("modernLushCaveMaxY", catGeneration, 64, -64, 319,
+				"Highest LOGICAL modern Y eligible for P008d Lush Cave region ownership. The 3D region field is most common below this ceiling and tapers strongly with height. Values are normalized at runtime if min/max are reversed.");
 
 		crimsonForestID = getInt("crimsonForestID", catBiomes, 200, -1, 65536, "Set to -1 to disable the generation of Crimson Forests. To use an ID above 255, EndlessIDs is required.");
 		warpedForestID = getInt("warpedForestID", catBiomes, 201, -1, 65536, "Set to -1 to disable the generation of Warped Forests. To use an ID above 255, EndlessIDs is required.");

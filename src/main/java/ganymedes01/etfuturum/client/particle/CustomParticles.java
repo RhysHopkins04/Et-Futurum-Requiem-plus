@@ -52,6 +52,12 @@ public class CustomParticles {
 		return spawnDrippingParticleWithSound(world, x, y, z, null, color, false);
 	}
 
+	/** Pointed-dripstone droplet using the vanilla 1.7 drip particle's 40-tick hanging phase. */
+	public static EntityFX spawnDripstoneDrippingParticle(World world, double x, double y, double z, int color) {
+		EntityFX particle = new CustomDripFX(world, x, y, z, null, color, false, 40);
+		return spawnParticle(world, particle);
+	}
+
 	public static EntityFX spawnDrippingParticle(World world, double x, double y, double z, int color, boolean splashes) {
 		return spawnDrippingParticleWithSound(world, x, y, z, null, color, splashes);
 	}

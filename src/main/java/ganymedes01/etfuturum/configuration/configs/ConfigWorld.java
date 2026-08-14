@@ -65,6 +65,9 @@ public class ConfigWorld extends ConfigBase {
 	public static int lushCaveMaxY;
 	public static int modernLushCaveMinY;
 	public static int modernLushCaveMaxY;
+	public static boolean dripstoneCavesWorldgen;
+	public static int modernDripstoneCaveMinY;
+	public static int modernDripstoneCaveMaxY;
 
 	public static int crimsonForestID;
 	public static int warpedForestID;
@@ -195,6 +198,7 @@ public class ConfigWorld extends ConfigBase {
 				"deep terrain through logical Y-64, modern-style continentalness/erosion/ridge mountain shaping, and translated biome surfaces. " +
 				"P008b-c modern cheese/spaghetti/noodle noise caves, translated ravines, regional cave-density variation, and deterministic local water/lava aquifers are active on this path. " +
 				"P008d enables deterministic 3D underground-region ownership with surface-driven dense Lush Cave ecology, clay basins, and recessed water pools without changing the 2D surface biome map. " +
+				"P008e activates separate 3D Dripstone Cave regions with dripstone-block crusts, stalactites, stalagmites and large formations. " +
 				"Enabling this option also enables extendedWorldHeight at runtime and REQUIRES A FULL GAME RESTART. " +
 				"Map Compatibility Mode always forces it off regardless of this saved value.");
 		if (modernOverworldGeneration) {
@@ -217,6 +221,12 @@ public class ConfigWorld extends ConfigBase {
 				"Lowest LOGICAL modern Y eligible for P008d Lush Cave region ownership. This setting is used only when modernOverworldGeneration is enabled; physical engine Y is logical Y + 64.");
 		modernLushCaveMaxY = getInt("modernLushCaveMaxY", catGeneration, 64, -64, 319,
 				"Highest LOGICAL modern Y eligible for P008d Lush Cave region ownership. The 3D region field is most common below this ceiling and tapers strongly with height. Values are normalized at runtime if min/max are reversed.");
+		dripstoneCavesWorldgen = getBoolean("dripstoneCavesWorldgen", catGeneration, true,
+				"Generate P008e Dripstone Cave regions in the modern Overworld. This uses the independent 3D underground-region field and never changes the 2D surface biome array. Map Compatibility Mode suppresses this generator.");
+		modernDripstoneCaveMinY = getInt("modernDripstoneCaveMinY", catGeneration, -56, -64, 319,
+				"Lowest LOGICAL modern Y eligible for P008e Dripstone Cave region ownership. P008e-a defaults to -56 and strongly tapers below logical -24; physical engine Y is logical Y + 64.");
+		modernDripstoneCaveMaxY = getInt("modernDripstoneCaveMaxY", catGeneration, 72, -64, 319,
+				"Highest LOGICAL modern Y eligible for P008e Dripstone Cave region ownership. P008e-a defaults to 72 and strongly tapers above logical 32 so Dripstone does not form a near-continuous surface-to-floor band. Values are normalized at runtime if min/max are reversed.");
 
 		crimsonForestID = getInt("crimsonForestID", catBiomes, 200, -1, 65536, "Set to -1 to disable the generation of Crimson Forests. To use an ID above 255, EndlessIDs is required.");
 		warpedForestID = getInt("warpedForestID", catBiomes, 201, -1, 65536, "Set to -1 to disable the generation of Warped Forests. To use an ID above 255, EndlessIDs is required.");

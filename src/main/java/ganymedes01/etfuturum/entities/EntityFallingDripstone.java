@@ -1,122 +1,146 @@
 package ganymedes01.etfuturum.entities;
 
+import java.util.List;
+
+import cpw.mods.fml.common.registry.IEntityAdditionalSpawnData;
 import ganymedes01.etfuturum.ModBlocks;
 import ganymedes01.etfuturum.blocks.BlockPointedDripstone;
+import io.netty.buffer.ByteBuf;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityFallingBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.DamageSource;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 
-import java.util.ArrayList;
-import java.util.Iterator;
+/** A whole unsupported stalactite column falling as one entity. */
+public class EntityFallingDripstone extends EntityFallingBlock implements IEntityAdditionalSpawnData {
 
-public class EntityFallingDripstone extends EntityFallingBlock {
+    private int fallHurtMax = 40;
+    private float fallHurtAmount = 6.0F;
+    private boolean hurtEntities = true;
+    private int count = 1;
 
-	private int fallHurtMax;
-	private float fallHurtAmount;
-	private boolean hurtEntities;
+    public EntityFallingDripstone(World world) {
+        super(world);
+    }
 
-	public EntityFallingDripstone(World p_i45318_1_) {
-		super(p_i45318_1_);
-		this.fallHurtMax = 40;
-		this.fallHurtAmount = 4.0F;
-		hurtEntities = true;
-	}
+    public EntityFallingDripstone(World world, double x, double y, double z, int meta, int count) {
+        super(world, x, y, z, ModBlocks.POINTED_DRIPSTONE.get(), meta);
+        this.count = Math.max(1, count);
+        this.fallHurtAmount = Math.max(this.count, 6);
+        resizeForColumn();
+        this.setPosition(x, y, z);
+    }
 
-	public EntityFallingDripstone(World p_i45318_1_, double p_i45318_2_, double p_i45318_4_, double p_i45318_6_) {
-		super(p_i45318_1_, p_i45318_2_, p_i45318_4_, p_i45318_6_, ModBlocks.POINTED_DRIPSTONE.get());
-		this.fallHurtMax = 40;
-		this.fallHurtAmount = 4.0F;
-		hurtEntities = true;
-	}
+    private void resizeForColumn() {
+        this.yOffset = this.count - 0.5F;
+        this.setSize(0.98F, this.count);
+    }
 
-	@Override
-	public void onUpdate() {
+    public int getCount() {
+        return count;
+    }
 
-		Block block = ModBlocks.POINTED_DRIPSTONE.get();
+    @Override
+    public void onUpdate() {
+        this.prevPosX = this.posX;
+        this.prevPosY = this.posY;
+        this.prevPosZ = this.posZ;
+        ++this.field_145812_b;
+        this.motionY -= 0.04D;
+        this.moveEntity(this.motionX, this.motionY, this.motionZ);
+        this.motionX *= 0.98D;
+        this.motionY *= 0.98D;
+        this.motionZ *= 0.98D;
 
-		this.prevPosX = this.posX;
-		this.prevPosY = this.posY;
-		this.prevPosZ = this.posZ;
-		++this.field_145812_b; // fallTime
-		this.motionY -= 0.03999999910593033D;
-		this.moveEntity(this.motionX, this.motionY, this.motionZ);
-		this.motionX *= 0.9800000190734863D;
-		this.motionY *= 0.9800000190734863D;
-		this.motionZ *= 0.9800000190734863D;
+        if (this.worldObj.isRemote) {
+            return;
+        }
 
-		int i = MathHelper.floor_double(this.posX);
-		int j = MathHelper.floor_double(this.posY);
-		int k = MathHelper.floor_double(this.posZ);
-		if (this.field_145812_b == 1) { // fallTime
-			field_145814_a/*metadata*/ = worldObj.getBlockMetadata(i, j, k);
-		}
+        int y = MathHelper.floor_double(this.posY);
+        if (this.onGround) {
+            this.motionX *= 0.7D;
+            this.motionZ *= 0.7D;
+            this.motionY *= -0.5D;
+            dropColumnItems();
+            this.setDead();
+            return;
+        }
 
-		if (!this.worldObj.isRemote) {
+        int maxHeight = Math.max(256, this.worldObj.getActualHeight());
+        if ((this.field_145812_b > 100 && (y < -32 || y > maxHeight + 32)) || this.field_145812_b > 600) {
+            dropColumnItems();
+            this.setDead();
+        }
+    }
 
-			if (this.field_145812_b == 1) { // fallTime
-				if (this.worldObj.getBlock(i, j, k) != block) {
-					this.setDead();
-					return;
-				}
+    private void dropColumnItems() {
+        if (!this.field_145813_c || !ModBlocks.POINTED_DRIPSTONE.isEnabled()) {
+            return;
+        }
+        Block block = ModBlocks.POINTED_DRIPSTONE.get();
+        this.entityDropItem(new ItemStack(block, this.count, 0), 0.5F);
+    }
 
-				this.worldObj.setBlockToAir(i, j, k);
-			}
+    @Override
+    protected void fall(float distance) {
+        if (!this.hurtEntities) {
+            return;
+        }
+        int blocksFallen = MathHelper.ceiling_float_int(distance - 1.0F);
+        if (blocksFallen <= 0) {
+            return;
+        }
 
-			if (this.onGround && worldObj.getBlock(i, j - 1, k) != block) {
-				this.motionX *= 0.699999988079071D;
-				this.motionZ *= 0.699999988079071D;
-				this.motionY *= -0.5D;
-				this.setDead();
+        float baseDamage = Math.min(blocksFallen * this.fallHurtAmount, this.fallHurtMax);
+        @SuppressWarnings("unchecked")
+        List<Entity> entities = this.worldObj.getEntitiesWithinAABBExcludingEntity(this, this.boundingBox);
+        for (Entity entity : entities) {
+            float damage = baseDamage;
+            if (entity instanceof EntityLivingBase) {
+                EntityLivingBase living = (EntityLivingBase) entity;
+                ItemStack helmet = living.getEquipmentInSlot(4);
+                if (helmet != null) {
+                    damage *= 0.75F;
+                    helmet.damageItem(2, living);
+                }
+            }
+            entity.attackEntityFrom(BlockPointedDripstone.STALACTITE_DAMAGE, damage);
+        }
+    }
 
-				if (this.field_145813_c) { // shouldDropItem
-					this.entityDropItem(new ItemStack(block, 1, block.damageDropped(this.field_145814_a/*metadata*/)), 0.0F);
-				}
-			} else if (this.field_145812_b/*fallTime*/ > 100 && !this.worldObj.isRemote && (j < 1 || j > 256) || this.field_145812_b/*fallTime*/ > 600) {
-				if (this.field_145813_c) { // shouldDropItem
-					this.entityDropItem(new ItemStack(block, 1, block.damageDropped(this.field_145814_a/*metadata*/)), 0.0F);
-				}
+    @Override
+    public void writeSpawnData(ByteBuf data) {
+        data.writeInt(this.count);
+        data.writeInt(this.field_145814_a);
+    }
 
-				this.setDead();
-			}
-		}
-	}
+    @Override
+    public void readSpawnData(ByteBuf data) {
+        this.count = Math.max(1, data.readInt());
+        this.field_145814_a = data.readInt();
+        resizeForColumn();
+    }
 
-	@Override
-	protected void fall(float distance) {
-		if (this.hurtEntities) {
-			int i = MathHelper.ceiling_float_int(distance - 1.0F);
+    @Override
+    protected void writeEntityToNBT(NBTTagCompound tag) {
+        super.writeEntityToNBT(tag);
+        tag.setBoolean("HurtEntities", this.hurtEntities);
+        tag.setFloat("FallHurtAmount", this.fallHurtAmount);
+        tag.setInteger("FallHurtMax", this.fallHurtMax);
+        tag.setInteger("Count", this.count);
+    }
 
-			if (i > 0) {
-				ArrayList<Entity> arraylist = new ArrayList<>(this.worldObj.getEntitiesWithinAABBExcludingEntity(this, this.boundingBox));
-				DamageSource damagesource = BlockPointedDripstone.STALACTITE_DAMAGE;
-				Iterator<Entity> iterator = arraylist.iterator();
-
-				while (iterator.hasNext()) {
-					Entity entity = iterator.next();
-					entity.attackEntityFrom(damagesource, (float) Math.min(MathHelper.floor_float((float) i * this.fallHurtAmount), this.fallHurtMax));
-				}
-			}
-		}
-	}
-
-	@Override
-	protected void writeEntityToNBT(NBTTagCompound tagCompound) {
-		super.writeEntityToNBT(tagCompound);
-		tagCompound.setBoolean("HurtEntities", this.hurtEntities);
-		tagCompound.setFloat("FallHurtAmount", this.fallHurtAmount);
-		tagCompound.setInteger("FallHurtMax", this.fallHurtMax);
-	}
-
-	@Override
-	protected void readEntityFromNBT(NBTTagCompound tagCompund) {
-		super.readEntityFromNBT(tagCompund);
-		this.hurtEntities = tagCompund.getBoolean("HurtEntities");
-		this.fallHurtAmount = tagCompund.getFloat("FallHurtAmount");
-		this.fallHurtMax = tagCompund.getInteger("FallHurtMax");
-	}
+    @Override
+    protected void readEntityFromNBT(NBTTagCompound tag) {
+        super.readEntityFromNBT(tag);
+        this.hurtEntities = !tag.hasKey("HurtEntities") || tag.getBoolean("HurtEntities");
+        this.fallHurtMax = tag.hasKey("FallHurtMax") ? tag.getInteger("FallHurtMax") : 40;
+        this.count = tag.hasKey("Count") ? Math.max(1, tag.getInteger("Count")) : 1;
+        this.fallHurtAmount = Math.max(this.count, 6);
+        resizeForColumn();
+    }
 }

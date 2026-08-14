@@ -885,6 +885,307 @@ if modern_chunk_signature in lush_worldgen_p007b and modern_chunk_end in lush_wo
 else:
     failures.append("P008d could not locate generateModernChunk for sparse-decorator validation")
 
+# P008e -- activate the reserved DRIPSTONE 3D cave-region type and complete pointed-dripstone
+# mechanics without taking a dependency on newer/unreleased GTNHLib BlockState/noise APIs. Worldgen
+# must be surface-driven inside real P008 cave cavities and remain separate from the 2D surface biome.
+drips_blocks = require("src/main/java/ganymedes01/etfuturum/configuration/configs/ConfigBlocksItems.java")
+drips_experiments = require("src/main/java/ganymedes01/etfuturum/configuration/configs/ConfigExperiments.java")
+drips_worldgen = require(
+    "src/main/java/ganymedes01/etfuturum/world/generate/feature/WorldGenDripstoneCaves.java",
+    "class WorldGenDripstoneCaves",
+)
+drips_block = require(
+    "src/main/java/ganymedes01/etfuturum/blocks/BlockPointedDripstone.java",
+    "class BlockPointedDripstone",
+)
+drips_entity = require(
+    "src/main/java/ganymedes01/etfuturum/entities/EntityFallingDripstone.java",
+    "class EntityFallingDripstone",
+)
+drips_renderer = require(
+    "src/main/java/ganymedes01/etfuturum/client/renderer/entity/FallingDripstoneRenderer.java",
+    "class FallingDripstoneRenderer",
+)
+world_generator_p008e = require(
+    "src/main/java/ganymedes01/etfuturum/world/EtFuturumWorldGenerator.java",
+    "WorldGenDripstoneCaves",
+)
+common_proxy_p008e = require(
+    "src/main/java/ganymedes01/etfuturum/core/proxy/CommonProxy.java",
+    "falling_dripstone",
+)
+client_proxy_p008e = require(
+    "src/main/java/ganymedes01/etfuturum/core/proxy/ClientProxy.java",
+    "FallingDripstoneRenderer",
+)
+recipes_p008e = require(
+    "src/main/java/ganymedes01/etfuturum/recipes/ModRecipes.java",
+    "DRIPSTONE_BLOCK.newItemStack",
+)
+
+for expected in (
+    'enableDripstone = getBoolean("enableDripstone", catBlockNatural, true',
+    'enableDripstone now owns the content family',
+):
+    if expected not in drips_blocks and expected not in drips_experiments:
+        failures.append(f"P008e dripstone graduation/config missing: {expected}")
+if 'getCategory(catExperiments).remove("enableDripstone")' not in drips_experiments:
+    failures.append("P008e did not remove the old experimental dripstone property")
+for expected in (
+    'dripstoneCavesWorldgen = getBoolean("dripstoneCavesWorldgen", catGeneration, true',
+    'modernDripstoneCaveMinY = getInt("modernDripstoneCaveMinY", catGeneration, -56',
+    'modernDripstoneCaveMaxY = getInt("modernDripstoneCaveMaxY", catGeneration, 72',
+    'P008e activates separate 3D Dripstone Cave regions',
+):
+    if expected not in world_config:
+        failures.append(f"P008e Dripstone Cave world config missing: {expected}")
+if "ConfigWorld.dripstoneCavesWorldgen = false;" not in config:
+    failures.append("Map Compatibility Mode does not hard-disable P008e Dripstone Cave generation")
+
+for expected in (
+    "SALT_DRIPSTONE",
+    "SALT_DRIP_DETAIL",
+    "DRIP_XZ_SCALE = 1.0D / 288.0D",
+    "DRIP_Y_SCALE = 1.0D / 128.0D",
+    "DRIP_DETAIL_XZ_SCALE = 1.0D / 176.0D",
+    "DRIP_DETAIL_Y_SCALE = 1.0D / 80.0D",
+    "BASE_DRIPSTONE_THRESHOLD = 0.38D",
+    "DRIPSTONE_CORE_MARGIN = 0.030D",
+    "DRIPSTONE_STRENGTH_GAIN = 4.0D",
+    "rawStrength - DRIPSTONE_CORE_MARGIN",
+    "dripstoneStrength",
+    "isDripstone",
+    "return RegionType.DRIPSTONE",
+    "lushStrength(worldX, physicalY, worldZ) <= 0.0D",
+):
+    if expected not in modern_cave_regions:
+        failures.append(f"P008e 3D Dripstone ownership missing: {expected}")
+
+for expected in (
+    "ConfigWorld.modernOverworldGeneration",
+    "ConfigWorld.dripstoneCavesWorldgen",
+    "ConfigMapCompatibility.isEnabled()",
+    "source.isDripstone",
+    "source.dripstoneStrength",
+    "decorateSurfaces",
+    "decorateLargeFormations",
+    "decorateWaterBasins",
+    "placeLargeCone",
+    "growSupportPatch",
+    "placeColumn",
+    "metadataForGeneratedColumn",
+    "ModBlocks.DRIPSTONE_BLOCK",
+    "ModBlocks.POINTED_DRIPSTONE",
+    "WorldHeightCompat.modernToPhysicalY",
+):
+    if expected not in drips_worldgen:
+        failures.append(f"P008e surface-driven Dripstone Cave worldgen missing: {expected}")
+for expected in (
+    "one in six eligible chunks gets a basin attempt",
+    "source.isDripstone(x, y, z)",
+    "tall formation to continue vertically into an adjacent Lush volume",
+    "block-built stalagmites/stalactites",
+):
+    if expected not in drips_worldgen:
+        failures.append(f"P008e-a Dripstone generation rebalance missing: {expected}")
+
+for expected in (
+    "MIN_DECORATION_STRENGTH = 0.015D",
+    "strength < MIN_DECORATION_STRENGTH",
+):
+    if expected not in drips_worldgen:
+        failures.append(f"P008e-b concentrated Dripstone core generation missing: {expected}")
+
+for expected in (
+    "MIN_POINTED_CAVITY_HEIGHT = 5",
+    "MIN_LARGE_CAVITY_HEIGHT = 12",
+    "CHAMBER_PROBE_RADIUS = 5",
+    "MIN_POINTED_CHAMBER_FACTOR = 0.28D",
+    "MIN_LARGE_CHAMBER_FACTOR = 0.50D",
+    "chamberFactor(world, x, y, z)",
+    "contiguousAirHeight",
+    "hasReplaceableWall",
+    "decorateWallPatch",
+    "chamberBlockBias = 0.58D + chamber * 0.52D",
+    "core * 0.23D + chamber * 0.40D",
+    "core * 0.24D + chamber * 0.42D",
+    "cavity.chamberFactor < MIN_LARGE_CHAMBER_FACTOR",
+    "More search attempts, but a substantially stricter chamber gate",
+    "growSupportPatch(world, source",
+    "formationScore()",
+):
+    if expected not in drips_worldgen:
+        failures.append(f"P008e-c chamber-biased Dripstone generation missing: {expected}")
+
+# P008e-d -- generated pointed columns must always be physically attached to the actual cone/crust
+# that survived region clipping, and spectator overlay rendering must tolerate a transient null ray hit.
+for expected in (
+    "requestedBlockLayers",
+    "builtCenterLayers",
+    "Attach the pointed cap to the actual connected cone",
+    "supportY = startY - step",
+    "world.isSideSolid(x, supportY, z, supportFace)",
+    "floating generated columns impossible",
+):
+    if expected not in drips_worldgen:
+        failures.append(f"P008e-d generated Dripstone support integrity missing: {expected}")
+
+spectator_client_p008ed = require(
+    "src/main/java/ganymedes01/etfuturum/core/handlers/client/SpectatorEventHandlerClient.java",
+    "onOverlayRenderPre",
+)
+for expected in (
+    "if (mop == null)",
+    "event.setCanceled(true);",
+    "event.target != null",
+    "getWorldClient() == null",
+):
+    if expected not in spectator_client_p008ed:
+        failures.append(f"P008e-d spectator overlay null-safety missing: {expected}")
+
+# P008e-e -- finish runtime drip behavior without touching accepted cave generation. Actual
+# water/lava sources may drip through any solid stalactite support, natural growth remains
+# Dripstone-Block-only, source-fed particles must be visible, and lava cauldrons must be reversible.
+lava_cauldron_p008ee = require(
+    "src/main/java/ganymedes01/etfuturum/blocks/BlockLavaCauldron.java",
+    "class BlockLavaCauldron",
+)
+custom_drip_fx_p008ee = require(
+    "src/main/java/ganymedes01/etfuturum/client/particle/CustomDripFX.java",
+    "class CustomDripFX",
+)
+for expected in (
+    "drippingFluidSourceType",
+    "world.isSideSolid(x, supportY, z, ForgeDirection.DOWN)",
+    "natural pointed-dripstone growth remains intentionally stricter",
+    "drippingFluidSourceType(world, x, baseY, z) != 1",
+    "spawnDripstoneDrippingParticle",
+):
+    if expected not in drips_block:
+        failures.append(f"P008e-e pointed-dripstone drip/growth completion missing: {expected}")
+for expected in (
+    "spawnDripstoneDrippingParticle",
+):
+    if expected not in particles:
+        failures.append(f"P008e-e visible dripstone particle factory missing: {expected}")
+for expected in (
+    "int bobTicks",
+    "this.bobTimer = Math.max(0, bobTicks)",
+):
+    if expected not in custom_drip_fx_p008ee:
+        failures.append(f"P008e-e dripstone droplet release timing missing: {expected}")
+for expected in (
+    "held.getItem() == Items.bucket",
+    "new ItemStack(Items.lava_bucket)",
+    "worldIn.setBlock(x, y, z, Blocks.cauldron, 0, 3)",
+    'Tags.MC_ASSET_VER + ":item.bucket.fill_lava"',
+    "Do not delegate to vanilla BlockCauldron",
+):
+    if expected not in lava_cauldron_p008ee:
+        failures.append(f"P008e-e lava-cauldron extraction missing: {expected}")
+if "world.setBlock(x, y, z, ModBlocks.LAVA_CAULDRON.get(), 3, 3);" not in server:
+    failures.append("P008e-e bucket-filled lava cauldron is missing its full metadata state")
+
+# P008e-f -- visible pointed-dripstone droplets must use the real collision shape rather than
+# treating the entire pointed-dripstone block cell as a solid cube and dying before rendering.
+for expected in (
+    "this.setPosition(this.posX, this.posY, this.posZ)",
+    "block.setBlockBoundsBasedOnState(worldObj, blockX, blockY, blockZ)",
+    "collision.isVecInside(Vec3.createVectorHelper(this.posX, this.posY, this.posZ))",
+    "Do not treat every solid material as a full 1x1x1 cube",
+):
+    if expected not in custom_drip_fx_p008ee:
+        failures.append(f"P008e-f pointed-dripstone particle collision fix missing: {expected}")
+if "if (rand.nextBoolean())" in drips_block:
+    failures.append("P008e-f source-fed dripstone particles still have the redundant 1-in-2 display gate")
+
+# P008e-g/h -- visible source-fed droplets keep vanilla 1.7 liquid-through-block cadence, but
+# P008e-h deliberately removes the synthetic no-source cave-moisture fallback. Visual water/lava
+# now requires a real source above the stalactite support; server growth/cauldron mechanics stay put.
+for expected in (
+    "SOURCE_DRIP_DISPLAY_INTERVAL = 10",
+    "fluid == 0 || rand.nextInt(SOURCE_DRIP_DISPLAY_INTERVAL) != 0",
+    "strict source-only visuals",
+    "must have an actual water/lava source above its solid support",
+    "Mud drying is not a \"droplet lands on Mud\" interaction",
+):
+    if expected not in drips_block:
+        failures.append(f"P008e-h source-only drip/Mud semantics missing: {expected}")
+for forbidden in (
+    "AMBIENT_DRIP_DISPLAY_INTERVAL",
+    "world.provider.isHellWorld ? 2 : 1",
+):
+    if forbidden in drips_block:
+        failures.append(f"P008e-h no-source decorative drip fallback remains: {forbidden}")
+if "new CustomDripFX(world, x, y, z, null, color, false, 40)" not in particles:
+    failures.append("P008e-h pointed-dripstone droplet does not use the vanilla 40-tick hanging phase")
+
+for forbidden in (
+    "BiomeGenBase",
+    "BiomeDictionary",
+    "rootHeight",
+    "rainfall",
+    "com.gtnewhorizon.gtnhlib.noise",
+):
+    if forbidden in drips_worldgen:
+        failures.append(f"P008e Dripstone worldgen reintroduced legacy/GTNHLib dependency: {forbidden}")
+
+for expected in (
+    "STATE_TIP = 0",
+    "STATE_FRUSTUM = 1",
+    "STATE_MIDDLE = 2",
+    "STATE_BASE = 3",
+    "STATE_TIP_MERGE = 4",
+    "composeMeta",
+    "computeState",
+    "refreshColumn",
+    "collapseHangingColumn",
+    "EntityFallingDripstone",
+    "STALAGMITE_DAMAGE",
+    "onFallenUpon",
+    "tryGrow",
+    "tryMudToClay",
+    "tryFillCauldron",
+    "findCauldronY",
+    "randomDisplayTick",
+    "setTickRandomly(true)",
+):
+    if expected not in drips_block:
+        failures.append(f"P008e pointed-dripstone mechanics missing: {expected}")
+for forbidden in (
+    "com.gtnewhorizon.gtnhlib.blockstate",
+    "BlockPropertyRegistry",
+    "BlockStatePool",
+):
+    if forbidden in drips_block:
+        failures.append(f"P008e pointed dripstone still requires newer GTNHLib BlockState API: {forbidden}")
+
+for expected in (
+    "IEntityAdditionalSpawnData",
+    "getCount()",
+    "worldObj.getActualHeight()",
+    "BlockPointedDripstone.STALACTITE_DAMAGE",
+    "helmet.damageItem(2",
+    'tag.setInteger("Count"',
+):
+    if expected not in drips_entity:
+        failures.append(f"P008e falling-dripstone entity missing: {expected}")
+if "entity.getCount()" not in drips_renderer or "metadataForGeneratedColumn" not in drips_renderer:
+    failures.append("P008e falling-dripstone renderer does not render the whole collapsed column")
+if 'ModEntityList.registerEntity(EntityFallingDripstone.class, "falling_dripstone", 18' not in common_proxy_p008e:
+    failures.append("P008e falling-dripstone entity is not registered")
+if "RenderingRegistry.registerEntityRenderingHandler(EntityFallingDripstone.class, new FallingDripstoneRenderer())" not in client_proxy_p008e:
+    failures.append("P008e falling-dripstone renderer is not registered")
+for expected in (
+    "protected WorldGenDripstoneCaves dripstoneCaveGen;",
+    "dripstoneCaveGen = new WorldGenDripstoneCaves();",
+    "dripstoneCaveGen.generateChunk(world, chunkX, chunkZ);",
+):
+    if expected not in world_generator_p008e:
+        failures.append(f"P008e Dripstone Cave generator bridge missing: {expected}")
+if "\"xx\", \"xx\", 'x', ModBlocks.POINTED_DRIPSTONE.newItemStack()" not in recipes_p008e:
+    failures.append("P008e 4-pointed-dripstone to dripstone-block recipe missing")
+
 # P007c -- terrain-aligned modern biome source and structure/surface integration. The legacy
 # GenLayer biome map cannot remain authoritative once P007 terrain shape is independent: doing so
 # labels water as Desert/Plains, land as Deep Ocean/Beach, and lets structures spawn against the
@@ -1117,4 +1418,6 @@ print(" - P007g blended macro-boundary ecotones and open-water coastal-pool filt
 print(" - P008b-c region-varied larger noise caves, translated 384-safe ravines, deep Y-55 lava shelf/pods, contained water aquifers, and safe land mouths present")
 print(" - P008c deterministic 3D underground-region ownership remains present")
 print(" - P008d-b dense Lush ecology, recurring terraced/dotted clay-water wetlands, clay accents, and spaced Azalea markers present")
+print(" - P008e-d chamber-biased Dripstone cores remain present with connected-support generation guards and spectator overlay null-safety")
+print(" - P008e-h strict source-only water/lava tip droplets at vanilla-style cadence, modern Mud-above-support drying semantics, preserved Dripstone-Block-only growth, and reversible lava cauldrons present")
 print(" - no Campfire Backport GPL package source vendored")

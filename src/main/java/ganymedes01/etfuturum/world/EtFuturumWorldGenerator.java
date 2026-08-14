@@ -15,6 +15,7 @@ import ganymedes01.etfuturum.world.generate.decorate.WorldGenPinkPetals;
 import ganymedes01.etfuturum.world.generate.feature.WorldGenFossil;
 import ganymedes01.etfuturum.world.generate.feature.WorldGenGeode;
 import ganymedes01.etfuturum.world.generate.feature.WorldGenLushCaves;
+import ganymedes01.etfuturum.world.generate.feature.WorldGenDripstoneCaves;
 import ganymedes01.etfuturum.world.structure.OceanMonument;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
@@ -60,6 +61,7 @@ public class EtFuturumWorldGenerator implements IWorldGenerator {
 	protected WorldGenerator bambooGen;
 	protected WorldGenerator glowLichenGen;
 	protected WorldGenLushCaves lushCaveGen;
+	protected WorldGenDripstoneCaves dripstoneCaveGen;
 	protected WorldGenerator mudGen;
 
 	//trees
@@ -143,6 +145,12 @@ public class EtFuturumWorldGenerator implements IWorldGenerator {
 				&& ModBlocks.AZALEA.isEnabled()
 				&& ModBlocks.ROOTED_DIRT.isEnabled()) {
 			lushCaveGen = new WorldGenLushCaves();
+		}
+
+		if (ConfigWorld.dripstoneCavesWorldgen
+				&& ModBlocks.DRIPSTONE_BLOCK.isEnabled()
+				&& ModBlocks.POINTED_DRIPSTONE.isEnabled()) {
+			dripstoneCaveGen = new WorldGenDripstoneCaves();
 		}
         
 		if (ModBlocks.CHERRY_LOG.isEnabled() && ModBlocks.LEAVES.isEnabled()) {
@@ -260,6 +268,10 @@ public class EtFuturumWorldGenerator implements IWorldGenerator {
 
 			if (lushCaveGen != null && world.provider.dimensionId == 0) {
 				lushCaveGen.generateChunk(world, chunkX, chunkZ);
+			}
+
+			if (dripstoneCaveGen != null && world.provider.dimensionId == 0) {
+				dripstoneCaveGen.generateChunk(world, chunkX, chunkZ);
 			}
 
 			if (cherryTreeGen != null && ConfigWorld.cherryTreeRarity > 0) {

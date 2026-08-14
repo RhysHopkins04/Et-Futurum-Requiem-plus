@@ -15,7 +15,6 @@ public class ConfigExperiments extends ConfigBase {
 	public static boolean enableCrimsonBlocks;
 	public static boolean enableWarpedBlocks;
 	public static boolean enableMangroveBlocks;
-	public static boolean enableDripstone;
 	public static boolean enableLightningRod;
 
 	public static boolean netherDimensionProvider;
@@ -44,7 +43,9 @@ public class ConfigExperiments extends ConfigBase {
 		enableWarpedBlocks = getBoolean("enableWarpedBlocks", catExperiments, false, "Enables the warped nylium, wood, and plants. This must be on for the warped forest biome to generate unless Netherlicious is installed. Requires newNether to be enabled without Netherlicious.");
 		enableMangroveBlocks = getBoolean("enableMangroveBlocks", catExperiments, false, "Enables mangrove wood and all of its wood subtypes, and the roots (+ muddy versions).");
 		enableSculk = getBoolean("enableSculk", catExperiments, false, "Enables sculk-related blocks.");
-		enableDripstone = getBoolean("enableDripstone", catExperiments, false, "Partially functional. Does not naturally generate.");
+		// Dripstone graduated from experiments in Et Futurum Requiem Plus P008e.
+		// Remove the legacy property; blocksitems.cfg:enableDripstone now owns the content family.
+		getCategory(catExperiments).remove("enableDripstone");
 		// Moss and azalea graduated from experiments in Et Futurum Requiem Plus P003.
 		// Remove the legacy property from existing configs; blocksitems.cfg:enableLushCaveBlocks now owns this family.
 		getCategory(catExperiments).remove("enableMossAzalea");

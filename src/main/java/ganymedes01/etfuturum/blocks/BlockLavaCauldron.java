@@ -2,7 +2,9 @@ package ganymedes01.etfuturum.blocks;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import ganymedes01.etfuturum.configuration.configs.ConfigSounds;
 import ganymedes01.etfuturum.core.utils.Utils;
+import ganymedes01.etfuturum.Tags;
 import ganymedes01.etfuturum.lib.RenderIDs;
 import net.minecraft.block.BlockCauldron;
 import net.minecraft.client.renderer.texture.IIconRegister;
@@ -10,6 +12,8 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
@@ -29,15 +33,23 @@ public class BlockLavaCauldron extends BlockCauldron {
 
 	@Override
 	public boolean onBlockActivated(World worldIn, int x, int y, int z, EntityPlayer player, int side, float subX, float subY, float subZ) {
-//      ItemStack item;
-//      if (player.getCurrentEquippedItem() != null) {
-//          item = player.getCurrentEquippedItem();
-//          if (item.getItem() instanceof ItemBucket) {
-//              // TODO Bucketing lava out of the cauldron
-//          }
-//      }
-//      return true;
-		return super.onBlockActivated(worldIn, x, y, z, player, side, subX, subY, subZ);
+		ItemStack held = player.getCurrentEquippedItem();
+		if (held != null && held.getItem() == Items.bucket) {
+			if (!worldIn.isRemote) {
+				worldIn.setBlock(x, y, z, Blocks.cauldron, 0, 3);
+				if (!player.capabilities.isCreativeMode) {
+					player.inventory.setInventorySlotContents(player.inventory.currentItem, new ItemStack(Items.lava_bucket));
+				}
+				if (ConfigSounds.fluidInteract) {
+					worldIn.playSoundEffect(x + 0.5D, y + 0.5D, z + 0.5D, Tags.MC_ASSET_VER + ":item.bucket.fill_lava", 1.0F, 1.0F);
+				}
+			}
+			return true;
+		}
+
+		// Do not delegate to vanilla BlockCauldron: its water-bottle/leather logic would treat the
+		// lava contents as ordinary water. Unsupported items simply do not consume the interaction.
+		return false;
 	}
 
 	@Override

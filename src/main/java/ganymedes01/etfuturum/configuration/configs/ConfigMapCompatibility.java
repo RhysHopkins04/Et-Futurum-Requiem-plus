@@ -75,5 +75,6 @@ public class ConfigMapCompatibility extends ConfigBase {
         // registrations are already skipped in this profile, but keeping the feature flag false at
         // runtime also prevents accidental/direct invocation by integration code.
         ConfigWorld.lushCavesWorldgen = false;
+        ConfigWorld.dripstoneCavesWorldgen = false;
     }
 }

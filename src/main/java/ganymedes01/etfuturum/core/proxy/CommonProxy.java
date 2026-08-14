@@ -219,9 +219,9 @@ public class CommonProxy implements IGuiHandler {
 			}
 		}
 
-//      {
-//          ModEntityList.registerEntity(EntityFallingDripstone.class, "falling_dripstone", 18, EtFuturum.instance, 64, 1, true);
-//      }
+		if (ModBlocks.POINTED_DRIPSTONE.isEnabled()) {
+			ModEntityList.registerEntity(EntityFallingDripstone.class, "falling_dripstone", 18, EtFuturum.instance, 64, 1, true);
+		}
 
 		if (ConfigBlocksItems.enableNewBoats) {
 			ModEntityList.registerEntity(EntityNewBoat.class, "new_boat", 13, EtFuturum.instance, 64, 1, true);

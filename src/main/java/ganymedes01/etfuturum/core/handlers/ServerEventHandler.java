@@ -842,7 +842,7 @@ public class ServerEventHandler {
 							if (ConfigBlocksItems.enableLavaCauldrons && item instanceof ItemBucket && ((ItemBucket) item).isFull == Blocks.flowing_lava && meta == 0) {
 								event.setResult(Result.DENY);
 								player.swingItem();
-								world.setBlock(x, y, z, ModBlocks.LAVA_CAULDRON.get());
+								world.setBlock(x, y, z, ModBlocks.LAVA_CAULDRON.get(), 3, 3);
 								if (ConfigSounds.fluidInteract) {
 									world.playSoundEffect(x, y, z, Tags.MC_ASSET_VER + ":item.bucket.empty_lava", 1, 1);
 								}

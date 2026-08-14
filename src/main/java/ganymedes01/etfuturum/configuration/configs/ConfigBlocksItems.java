@@ -129,6 +129,7 @@ public class ConfigBlocksItems extends ConfigBase {
 	public static boolean enableGlowLichen;
 	public static boolean enableGlowBerries;
 	public static boolean enableLushCaveBlocks;
+	public static boolean enableDripstone;
 	public static boolean enableSoulSoil;
 	public static boolean enableSoulLighting;
 
@@ -218,6 +219,8 @@ public class ConfigBlocksItems extends ConfigBase {
 		enableGlowBerries = getBoolean("enableGlowBerries", catBlockNatural, true, "");
 		enableLushCaveBlocks = getBoolean("enableLushCaveBlocks", catBlockNatural, true,
 				"Enables the Et Futurum Requiem Plus lush-cave content family: moss, moss carpet, azalea, azalea leaves, rooted dirt, hanging roots, dripleaf, and spore blossom. This option is enabled by default and does not itself enable natural lush-cave generation.");
+		enableDripstone = getBoolean("enableDripstone", catBlockNatural, true,
+				"Enables dripstone blocks and pointed dripstone. P008e completes pointed-dripstone mechanics and allows modern Dripstone Cave regions to generate when enabled in world.cfg.");
 		if (ConfigExperiments.enableCrimsonBlocks) {
 			enableNetherwartBlock = true;
 		}

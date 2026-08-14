@@ -47,7 +47,18 @@ public abstract class SpectatorEventHandlerClient {
                 event.setCanceled(true);
             } else if(event.type == RenderGameOverlayEvent.ElementType.CROSSHAIRS && SpectatorUtils.getSpectatingEntity(player) == null) {
                 MovingObjectPosition mop = FMLClientHandler.instance().getClient().objectMouseOver;
+                // objectMouseOver can legitimately be null for a frame while spectator flight passes
+                // through non-collidable/transient geometry (for example snow layers) or during chunk
+                // transitions. A spectator crosshair with no target should simply be hidden.
+                if (mop == null) {
+                    event.setCanceled(true);
+                    return;
+                }
                 if(mop.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
+                    if (FMLClientHandler.instance().getWorldClient() == null) {
+                        event.setCanceled(true);
+                        return;
+                    }
                     TileEntity te = FMLClientHandler.instance().getWorldClient().getTileEntity(mop.blockX, mop.blockY, mop.blockZ);
                     if (!SpectatorUtils.canSpectatorSelectTileEntity(te)) {
                         event.setCanceled(true);
@@ -89,7 +100,12 @@ public abstract class SpectatorEventHandlerClient {
 
     @SubscribeEvent
     public static void onBlockHighlight(DrawBlockHighlightEvent event) {
-        if (SpectatorUtils.isSpectator(event.player) && event.target.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
+        if (SpectatorUtils.isSpectator(event.player) && event.target != null
+                && event.target.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
+            if (FMLClientHandler.instance().getWorldClient() == null) {
+                event.setCanceled(true);
+                return;
+            }
             TileEntity te = FMLClientHandler.instance().getWorldClient().getTileEntity(event.target.blockX, event.target.blockY, event.target.blockZ);
             if (!SpectatorUtils.canSpectatorSelectTileEntity(te)) {
                 event.setCanceled(true);

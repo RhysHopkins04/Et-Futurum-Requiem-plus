@@ -163,6 +163,11 @@ public class ModRecipes {
 	}
 
 	private static void registerRecipes() {
+		if (ModBlocks.DRIPSTONE_BLOCK.isEnabled() && ModBlocks.POINTED_DRIPSTONE.isEnabled()) {
+			RecipeHelper.addShapedRecipe(RecipeHelper.Priority.HIGH, ModBlocks.DRIPSTONE_BLOCK.newItemStack(),
+					"xx", "xx", 'x', ModBlocks.POINTED_DRIPSTONE.newItemStack());
+		}
+
 		if (!ModsList.GTNH.isLoaded()) {
 			ItemStack output = ModBlocks.OLD_GRAVEL.newItemStack(4);
 			RecipeHelper.addShapedRecipe(RecipeHelper.Priority.HIGH, output, "xy", "yx", 'x', ModBlocks.COARSE_DIRT.get(), 'y', Blocks.gravel);

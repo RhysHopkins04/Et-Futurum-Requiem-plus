@@ -18,7 +18,10 @@ expanded container code for Iron Shulker Boxes, and CI + nomixin to the gradle a
 contributed some incredibly large-scale backports like the Backlytra port and spectator mode, the F3 gamemode switcher
 and other really good contributions.
 
-The mod uses MCLib's AssetDirector module to download assets from Mojang's servers.
+The mod uses MCLib's AssetDirector module to download modern Mojang assets from Mojang's servers at runtime.
+Et Futurum Requiem Plus also uses an AssetDirector-backed resource bridge for modern vanilla textures rather than
+shipping unchanged Mojang texture files in the mod jar. New backports should prefer AssetDirector for vanilla assets;
+locally bundled resources should be original/compatibility artwork or otherwise have a documented reason to remain.
 Check [its wiki page](https://github.com/makamys/MCLib/wiki/AssetDirector) for more information.
 
 ![JProfiler](https://www.ej-technologies.com/images/product_banners/jprofiler_large.png)  

@@ -5,6 +5,8 @@ import ganymedes01.etfuturum.ModBlocks;
 import ganymedes01.etfuturum.configuration.configs.ConfigBlocksItems;
 import ganymedes01.etfuturum.configuration.configs.ConfigModCompat;
 import ganymedes01.etfuturum.configuration.configs.ConfigWorld;
+import ganymedes01.etfuturum.configuration.configs.ConfigMapCompatibility;
+import ganymedes01.etfuturum.core.utils.WorldHeightCompat;
 import ganymedes01.etfuturum.core.utils.Logger;
 import ganymedes01.etfuturum.world.EtFuturumWorldGenerator;
 import net.minecraft.block.Block;
@@ -276,6 +278,16 @@ public class DeepslateOreRegistry {
 
 	@ApiStatus.AvailableSince("3.0.0")
 	public static int getDeepslateHeight(World world) {
+		if (world != null && world.provider != null && world.provider.dimensionId == 0
+				&& ConfigWorld.extendedWorldHeight && ConfigWorld.modernOverworldGeneration
+				&& !ConfigMapCompatibility.isEnabled()) {
+			// P009b: modern base terrain uses a gradual Deepslate blend through logical Y0..8.
+			// The legacy default cap (physical Y22) left ordinary/modded ores generated in the
+			// physical 23..71 portion of that Deepslate layer as stone-textured ores. Cover the
+			// complete transition band; the placement hook still only converts when the actual
+			// host block is tagged as a Deepslate ore-replaceable.
+			return Math.min(WorldHeightCompat.modernToPhysicalY(8), world.getHeight() - 1);
+		}
 		return Math.min(ArrayUtils.contains(ConfigWorld.replaceAllStoneWithDeepslateDimensionWhitelist, world.provider.dimensionId) ? Integer.MAX_VALUE : ConfigWorld.deepslateMaxY, world.getHeight());
 	}
 }

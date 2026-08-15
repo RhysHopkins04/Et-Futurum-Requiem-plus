@@ -193,16 +193,31 @@ particles = require("src/main/java/ganymedes01/etfuturum/client/particle/CustomP
 if "spawnSporeBlossomParticle" not in particles:
     failures.append("spore blossom particle factory is not registered")
 
-for texture in (
-    "rooted_dirt.png", "hanging_roots.png",
-    "small_dripleaf_top.png", "small_dripleaf_side.png", "small_dripleaf_stem_top.png", "small_dripleaf_stem_bottom.png",
-    "big_dripleaf_top.png", "big_dripleaf_side.png", "big_dripleaf_tip.png", "big_dripleaf_stem.png",
+asset_bridge = require(
+    "src/main/java/ganymedes01/etfuturum/client/ModernAssetResourcePack.java",
+    "class ModernAssetResourcePack",
+)
+for expected in (
+    '"textures/blocks/rooted_dirt.png"', '"textures/blocks/hanging_roots.png"',
+    '"textures/blocks/small_dripleaf_top.png"', '"textures/blocks/big_dripleaf_top.png"',
+    '"textures/blocks/spore_blossom.png"', '"textures/particle/drip_fall.png"',
+    '"textures/blocks/dripstone_block.png"', '"textures/blocks/pointed_dripstone_down_tip.png"',
+    '"textures/blocks/deepslate_top.png"', '"textures/blocks/amethyst_block.png"',
+    '"textures/items/glow_lichen.png"',
 ):
-    require_png(f"src/main/resources/assets/minecraft/textures/blocks/{texture}")
-
-for texture in ("spore_blossom.png", "spore_blossom_base.png"):
-    require_png(f"src/main/resources/assets/minecraft/textures/blocks/{texture}")
-require_png("src/main/resources/assets/minecraft/textures/particle/drip_fall.png")
+    if expected not in asset_bridge:
+        failures.append(f"AssetDirector Caves & Cliffs alias missing: {expected}")
+if ('"textures/items/glow_lichen.png".equals(legacy.getResourcePath())' not in asset_bridge
+        or '"textures/blocks/glow_lichen.png"' not in asset_bridge):
+    failures.append("P009a glow-lichen legacy item request is not redirected to the modern block texture")
+for forbidden in (
+    "rooted_dirt.png", "hanging_roots.png", "small_dripleaf_top.png", "big_dripleaf_top.png",
+    "spore_blossom.png", "dripstone_block.png", "pointed_dripstone_down_tip.png",
+):
+    if (ROOT / "src/main/resources/assets/minecraft/textures/blocks" / forbidden).exists():
+        failures.append(f"migrated Mojang texture was re-bundled instead of AssetDirector-backed: {forbidden}")
+if (ROOT / "src/main/resources/assets/minecraft/textures/particle/drip_fall.png").exists():
+    failures.append("migrated Mojang drip_fall particle was re-bundled instead of AssetDirector-backed")
 
 lang = require("src/main/resources/assets/etfuturum/lang/en_US.lang")
 for expected in (
@@ -720,7 +735,7 @@ for expected in (
     "extends MapGenBase",
     "HEIGHT = WorldHeightCompat.EXTENDED_HEIGHT",
     "BLOCK_COUNT = 256 * HEIGHT",
-    "START_CHANCE = 85",
+    "START_CHANCE = 145",
     "terrain.sampleSurfacePhysicalY",
     "WorldHeightCompat.physicalToModernY",
     "columnIndex * HEIGHT",
@@ -1392,6 +1407,264 @@ license_text = require("LICENSE")
 if "GNU Lesser General Public License" not in license_text:
     failures.append("upstream LGPL licence file no longer appears intact")
 
+# P009 -- cave finale and AssetDirector redistribution hygiene.
+if 'config.addJar(modernAssetVersion);' not in etf or 'ModernAssetResourcePack.inject();' not in etf:
+    failures.append("AssetDirector modern-client-jar/alias bridge is not registered")
+
+cave_finale = require("src/main/java/ganymedes01/etfuturum/world/generate/terrain/ModernOverworldCaveGenerator.java")
+for expected in (
+    "SALT_LONG_TUNNEL_A", "longTunnelFieldA", "isLongTunnel(",
+    "threshold -= deep * 0.070D", "final double width = 0.098D + deep * 0.027D",
+):
+    if expected not in cave_finale:
+        failures.append(f"P009 cave-finale geometry invariant missing: {expected}")
+ravine_finale = require("src/main/java/ganymedes01/etfuturum/world/generate/terrain/ModernOverworldRavineGenerator.java")
+for expected in ("START_CHANCE = 145", "this.rand.nextInt(7) == 0", "28 + this.rand.nextInt(118)"):
+    if expected not in ravine_finale:
+        failures.append(f"P009 ravine rebalance invariant missing: {expected}")
+modern_mineshaft = require("src/main/java/ganymedes01/etfuturum/world/structure/StructureModernMineshaftStart.java")
+for expected in (
+    "SEA_LEVEL_HEADROOM = 10",
+    "WorldHeightCompat.PHYSICAL_SEA_LEVEL - SEA_LEVEL_HEADROOM",
+    "WorldHeightCompat.PHYSICAL_MIN_Y + this.boundingBox.getYSize() + 1",
+    "targetTopY += rand.nextInt(maxTopY - targetTopY)",
+    "targetTopY - this.boundingBox.maxY",
+    "this.boundingBox.offset",
+):
+    if expected not in modern_mineshaft:
+        failures.append(f"P009d modern mineshaft below-sea vertical invariant missing: {expected}")
+for forbidden in ("logical -48..72", "modernToPhysicalY(logicalY)", "maxPhysical - this.boundingBox.getYSize()"):
+    if forbidden in modern_mineshaft:
+        failures.append(f"P009d normal mineshafts still use the unsafe arbitrary modern Y band: {forbidden}")
+# With physical sea level 127 and ten blocks of headroom, rand.nextInt's exclusive upper bound means
+# an ordinary mineshaft's sampled bounding-box top is at most physical 116 / logical 52. This directly
+# rejects the reported physical-Y129 ocean-surface failure without collapsing generation back to 1.7 Y.
+p009d_max_regular_top = 127 - 10 - 1
+if p009d_max_regular_top - 64 != 52:
+    failures.append("P009d regular mineshaft translated sea-level arithmetic drifted")
+if "World#getHeightValue" not in modern_mineshaft or "re-enter chunk generation" not in modern_mineshaft:
+    failures.append("P009d regular mineshaft must document why structure-start terrain probing is unsafe in 1.7")
+mineshaft_pieces = require("src/main/java/ganymedes01/etfuturum/world/structure/StructureMesaMineshaftPieces.java")
+if 'MapGenStructureIO.registerStructure(StructureModernMineshaftStart.class, "MineshaftModern")' not in mineshaft_pieces:
+    failures.append("P009a modern mineshaft StructureStart is missing its unique NBT ID mapping")
+mesa_mineshaft = require("src/main/java/ganymedes01/etfuturum/world/structure/MapGenMesaMineshaft.java")
+for expected in ("ConfigWorld.modernOverworldGeneration", "return this.rand.nextDouble() < 0.004D", "new StructureModernMineshaftStart"):
+    if expected not in mesa_mineshaft:
+        failures.append(f"P009 modern mineshaft integration missing: {expected}")
+mesa_mineshaft_start = require("src/main/java/ganymedes01/etfuturum/world/structure/StructureMesaMineshaftStart.java")
+for expected in (
+    "getPlacementSeaLevel",
+    "ConfigWorld.extendedWorldHeight && ConfigWorld.modernOverworldGeneration",
+    "!ConfigMapCompatibility.isEnabled()",
+    "return WorldHeightCompat.PHYSICAL_SEA_LEVEL;",
+    "return 63;",
+    "placementSeaLevel - this.boundingBox.maxY + this.boundingBox.getYSize() / 2 + 5",
+):
+    if expected not in mesa_mineshaft_start:
+        failures.append(f"P009d Badlands mineshaft translated-sea-level invariant missing: {expected}")
+for expected in ("final double denseCore = core * core", "denseCore * 0.120D", "denseCore * 0.100D"):
+    if expected not in lush_worldgen:
+        failures.append(f"P009 dense Lush core polish missing: {expected}")
+for expected in ("modernToPhysicalY(MathHelper.getRandomIntegerInRange(rand, -58, 30))", "P009 cave-finale: modern geodes"):
+    if expected not in main_worldgen:
+        failures.append(f"P009 modern geode vertical distribution missing: {expected}")
+
+# P009b -- final Cave & Cliffs ore-distribution/modded-ore compatibility and inventory-lighting polish.
+world_config = require("src/main/java/ganymedes01/etfuturum/configuration/configs/ConfigWorld.java")
+mod_compat = require("src/main/java/ganymedes01/etfuturum/configuration/configs/ConfigModCompat.java")
+for expected in (
+    'public static boolean modernOreGeneration;',
+    'public static boolean modernLargeOreVeins;',
+    'getBoolean("modernOreGeneration", catGeneration, true',
+    'getBoolean("modernLargeOreVeins", catGeneration, true',
+):
+    if expected not in world_config:
+        failures.append(f"P009b modern ore config missing: {expected}")
+for expected in (
+    'modernOverworldTranslateModdedOreHeights',
+    'modernOverworldReshapeModdedOreVeins',
+    'modernOverworldModdedOreCompatibilityBlacklist',
+    'legacy physical Y0..255',
+    'Custom/non-WorldGenMinable generators are never rewritten',
+):
+    if expected not in mod_compat:
+        failures.append(f"P009b modded-ore compatibility config missing: {expected}")
+for expected in (
+    'ConfigWorld.modernOreGeneration = false;',
+    'ConfigWorld.modernLargeOreVeins = false;',
+    'ConfigModCompat.modernOverworldTranslateModdedOreHeights = false;',
+    'ConfigModCompat.modernOverworldReshapeModdedOreVeins = false;',
+):
+    if expected not in config:
+        failures.append(f"P009b Map Compatibility ore hard gate missing: {expected}")
+for expected in (
+    'mixins.add("modernoverworld.MixinBiomeDecorator")',
+    'mixins.add("modernoverworld.MixinBiomeGenHills")',
+    'mixins.add("modernoverworld.MixinWorldGenMinable")',
+):
+    if expected not in mixins:
+        failures.append(f"P009b modern ore mixin registration missing: {expected}")
+
+modern_ore = require("src/main/java/ganymedes01/etfuturum/world/generate/terrain/ModernOverworldOreGenerator.java", "class ModernOverworldOreGenerator")
+for expected in (
+    'generateNoiseVein(world, chunkX, chunkZ, 0, 50',
+    'generateNoiseVein(world, chunkX, chunkZ, -60, -8',
+    'Blocks.stone, 1, VEIN_COPPER_A, VEIN_COPPER_B',
+    'ModBlocks.TUFF.isEnabled() ? ModBlocks.TUFF.get() : Blocks.stone',
+    'ModBlocks.RAW_ORE_BLOCK',
+    'if (gate < 0.60D)',
+    'GameRegistry.findUniqueIdentifierFor(block)',
+    'OreDictionary.getOreIDs(stack)',
+    'modernOverworldModdedOreCompatibilityBlacklist.contains(id.modId)',
+    'modernOverworldModdedOreCompatibilityBlacklist.contains(name)',
+    'y + WorldHeightCompat.MODERN_Y_OFFSET',
+    'generateExternalModOreLegacy',
+):
+    if expected not in modern_ore:
+        failures.append(f"P009b modern ore/modded-ore invariant missing: {expected}")
+
+# P009d -- current modern ore parity. The P009b prototype deliberately used approximate bands and
+# oversized clumps; keep exact placement counts/ranges/discard semantics and compact spawn-size meaning.
+for expected in (
+    '30, 136, WorldHeightCompat.MODERN_MAX_Y, 0.0D',
+    '20, 0, 192, 0.5D',
+    '90, 80, 384, 0.0D',
+    '10, -24, 56, 0.0D',
+    '10, WorldHeightCompat.MODERN_MIN_Y, 72, 0.0D',
+    '4, WorldHeightCompat.MODERN_MIN_Y, 32, 0.5D',
+    'int deepAttempts = rand.nextInt(2);',
+    'deepAttempts, WorldHeightCompat.MODERN_MIN_Y, -48, 0.5D',
+    '4, WorldHeightCompat.MODERN_MIN_Y, 15, 0.0D',
+    '8, -96, -32, 0.0D',
+    '7, -144, 16, 0.5D',
+    '2, WorldHeightCompat.MODERN_MIN_Y, -4, 0.5D',
+    'if (rand.nextInt(9) == 0)',
+    '1, -144, 16, 0.7D',
+    '4, -144, 16, 1.0D',
+    '2, -32, 32, 0.0D',
+    '4, WorldHeightCompat.MODERN_MIN_Y, 64, 1.0D',
+    'int logicalY = sampleTriangle(rand, -16, 112);',
+    'int size = regions.isDripstone(x, physicalY, z) ? 20 : 10;',
+    '100, -16, 480, 0.0D',
+    '50, 32, 256, 0.0D',
+    'final float angle = rand.nextFloat() * (float) Math.PI;',
+    'final float halfSpan = size / 8.0F;',
+    'final double[] ellipsoids = new double[size * 4];',
+    'Set<Long> visited = new HashSet<Long>',
+    'double randomScale = rand.nextDouble() * size / 16.0D;',
+    'double radius = ((Math.sin(Math.PI * t) + 1.0D) * randomScale + 1.0D) * 0.5D;',
+    'radiusDelta * radiusDelta > dx * dx + dy * dy + dz * dz',
+    'rand.nextFloat() < (float) airDiscard',
+    '&& isAdjacentToAir(world, px, py, pz)',
+    'return minY + rand.nextInt(upperHalf + 1) + rand.nextInt(lowerHalf + 1);',
+):
+    if expected not in modern_ore:
+        failures.append(f"P009d modern ore parity invariant missing: {expected}")
+
+for forbidden in (
+    'int nodes = Math.max(2, size / 3);',
+    'size / 5.0D',
+    'rand.nextGaussian()',
+    'generateIncreasing(',
+    'generateDecreasing(',
+    'regions.isDripstone(x, physicalY, z) && rand.nextBoolean()',
+):
+    if forbidden in modern_ore:
+        failures.append(f"P009d superseded oversized/approximate ore logic remains: {forbidden}")
+
+
+ore_diag = require("scripts/validate_modern_ore_parity.py", "P009d modern ore parity diagnostic")
+for expected in (
+    'PLACEMENTS = (',
+    '("diamond_small", 7, "triangle", -144, 16, 4, 0.5)',
+    '("diamond_medium", 2, "uniform", -64, -4, 8, 0.5)',
+    'ellipsoid_candidate_count',
+    'JavaRandom',
+    '4096 deterministic Java-RNG samples',
+):
+    if expected not in ore_diag:
+        failures.append(f"P009d offline ore statistical diagnostic missing: {expected}")
+
+biome_ore_mixin = require("src/main/java/ganymedes01/etfuturum/mixins/early/modernoverworld/MixinBiomeDecorator.java", "class MixinBiomeDecorator")
+for expected in (
+    'generator == this.coalGen', 'generateCoal',
+    'generator == this.ironGen', 'generateIron',
+    'generator == this.goldGen', 'generateGold',
+    'generator == this.redstoneGen', 'generateRedstone',
+    'generator == this.diamondGen', 'generateDiamond',
+    'generator == this.lapisGen', 'generateLapis',
+    'Dirt/gravel and modded decorator helpers retain their original behaviour',
+):
+    if expected not in biome_ore_mixin:
+        failures.append(f"P009b vanilla ore helper interception missing: {expected}")
+
+hills_ore_mixin = require("src/main/java/ganymedes01/etfuturum/mixins/early/modernoverworld/MixinBiomeGenHills.java", "class MixinBiomeGenHills")
+for expected in ('method = "decorate"', 'ModernOverworldOreGenerator.isModernOreWorld(world)', 'return world.setBlock(x, y, z, block, meta, flags);'):
+    if expected not in hills_ore_mixin:
+        failures.append(f"P009b legacy mountain emerald suppression missing: {expected}")
+
+modded_ore_mixin = require("src/main/java/ganymedes01/etfuturum/mixins/early/modernoverworld/MixinWorldGenMinable.java", "class MixinWorldGenMinable")
+for expected in (
+    'shouldTranslateExternalModOre',
+    'translateLegacyModOreY',
+    'modernOverworldReshapeModdedOreVeins',
+    'generateExternalModOreLegacy',
+    'generateExternalModOre(world',
+):
+    if expected not in modded_ore_mixin:
+        failures.append(f"P009b standard modded WorldGenMinable bridge missing: {expected}")
+
+# P009c: the modern ore distributor runs from BiomeDecorator, so no custom blob may
+# synchronously load/populate a neighbour chunk while that decorator is active.
+for expected in (
+    '(chunkX << 4) + 8 + rand.nextInt(16)',
+    '(chunkZ << 4) + 8 + rand.nextInt(16)',
+    '!isChunkLoaded(world, px, pz)',
+    'world.getChunkProvider().chunkExists(x >> 4, z >> 4)',
+    'isLoadedAir(world, x + 1, y, z)',
+    'already-prepared 1.7 decoration neighbourhood',
+):
+    if expected not in modern_ore:
+        failures.append(f"P009c ore decoration re-entrancy guard missing: {expected}")
+
+if '@Shadow(remap = false) private int mineableBlockMeta;' not in modded_ore_mixin:
+    failures.append("P009c Forge-added WorldGenMinable metadata field must be shadowed without remapping")
+
+deepslate_registry = require("src/main/java/ganymedes01/etfuturum/api/DeepslateOreRegistry.java")
+for expected in (
+    'WorldHeightCompat.modernToPhysicalY(8)',
+    'complete transition band',
+    'host block is tagged as a Deepslate ore-replaceable',
+):
+    if expected not in deepslate_registry:
+        failures.append(f"P009b modern deepslate-ore conversion band missing: {expected}")
+
+for renderer_path in (
+    "src/main/java/ganymedes01/etfuturum/client/renderer/block/BlockSmallDripleafRenderer.java",
+    "src/main/java/ganymedes01/etfuturum/client/renderer/block/BlockBigDripleafRenderer.java",
+    "src/main/java/ganymedes01/etfuturum/client/renderer/block/BlockSporeBlossomRenderer.java",
+):
+    renderer_text = require(renderer_path)
+    if 'tess.setNormal(0.0F, 1.0F, 0.0F);' not in renderer_text:
+        failures.append(f"P009b inventory foliage normal missing: {renderer_path}")
+
+for expected in (
+    'final boolean modernOrePath',
+    'ModBlocks.COPPER_ORE.isEnabled() && !modernOrePath',
+    'ConfigWorld.enableExtraMesaGold && !modernOrePath',
+    'ModernOverworldOreGenerator.generateSupplementalOres',
+    'ModernOverworldOreGenerator.generateLargeVeins',
+):
+    if expected not in main_worldgen:
+        failures.append(f"P009b modern ore world-generator integration missing: {expected}")
+
+for expected in (
+    'setClayUnderfloorIfReplaceable',
+    'basin/wetland decoration must not silently erase an ore vein',
+):
+    if expected not in lush_worldgen:
+        failures.append(f"P009b Lush Cave ore-preservation guard missing: {expected}")
+
 if failures:
     print("Et Futurum Requiem Plus map-compat static validation FAILED")
     for failure in failures:
@@ -1420,4 +1693,7 @@ print(" - P008c deterministic 3D underground-region ownership remains present")
 print(" - P008d-b dense Lush ecology, recurring terraced/dotted clay-water wetlands, clay accents, and spaced Azalea markers present")
 print(" - P008e-d chamber-biased Dripstone cores remain present with connected-support generation guards and spectator overlay null-safety")
 print(" - P008e-h strict source-only water/lava tip droplets at vanilla-style cadence, modern Mud-above-support drying semantics, preserved Dripstone-Block-only growth, and reversible lava cauldrons present")
+print(" - P009b large ore veins, modded WorldGenMinable +64 compatibility, full deepslate conversion band, and corrected foliage inventory normals present")
+print(" - P009c modern ore decoration uses a backport-safe +8 origin, no-load neighbour guards, and non-remapped Forge metadata shadowing")
+print(" - P009d 1.21-era ore counts/ranges, OreFeature ellipsoid/RNG semantics, regular below-sea mineshafts, and translated Badlands mineshafts are present")
 print(" - no Campfire Backport GPL package source vendored")

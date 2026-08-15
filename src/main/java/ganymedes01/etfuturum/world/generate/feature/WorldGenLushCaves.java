@@ -153,11 +153,15 @@ public class WorldGenLushCaves {
                         continue;
                     }
                     final double core = lushCoreFactor(strength);
+                    // P009: retain P008's restrained region edges but let the strongest inner
+                    // volumes read unmistakably as dense Lush Cave chambers. Squaring core keeps
+                    // this extra coverage concentrated away from the boundary.
+                    final double denseCore = core * core;
 
                     final Block floor = world.getBlock(x, y - 1, z);
                     if (ModBlocks.MOSS_BLOCK.isEnabled() && isMossReplaceable(floor)
                             && coordinateChance(seed ^ MODERN_FLOOR_MOSS_SALT, x, y, z)
-                                    < 0.62D + core * 0.30D) {
+                                    < 0.62D + core * 0.30D + denseCore * 0.050D) {
                         world.setBlock(x, y - 1, z, ModBlocks.MOSS_BLOCK.get(), 0, 2);
                         changed = true;
                     }
@@ -165,7 +169,7 @@ public class WorldGenLushCaves {
                     if (ModBlocks.MOSS_BLOCK.isEnabled()
                             && world.getBlock(x, y - 1, z) == ModBlocks.MOSS_BLOCK.get()
                             && coordinateChance(seed ^ MODERN_VEGETATION_SALT, x, y, z)
-                                    < 0.30D + core * 0.42D) {
+                                    < 0.30D + core * 0.42D + denseCore * 0.120D) {
                         final Random vegetationRand = coordinateRandom(seed ^ MODERN_VEGETATION_SALT, x, y, z);
                         changed |= placeLushVegetation(world, vegetationRand, x, y, z);
                     }
@@ -173,27 +177,27 @@ public class WorldGenLushCaves {
                     final Block ceiling = world.getBlock(x, y + 1, z);
                     if (ModBlocks.MOSS_BLOCK.isEnabled() && isMossReplaceable(ceiling)
                             && coordinateChance(seed ^ MODERN_CEILING_MOSS_SALT, x, y, z)
-                                    < 0.28D + core * 0.38D) {
+                                    < 0.28D + core * 0.38D + denseCore * 0.100D) {
                         world.setBlock(x, y + 1, z, ModBlocks.MOSS_BLOCK.get(), 0, 2);
                         changed = true;
                     }
 
                     if (caveVines != null && isSolidCeiling(world, x, y, z)
                             && coordinateChance(seed ^ MODERN_CAVE_VINE_SALT, x, y, z)
-                                    < 0.10D + core * 0.22D) {
+                                    < 0.10D + core * 0.22D + denseCore * 0.090D) {
                         final Random vineRand = coordinateRandom(seed ^ MODERN_CAVE_VINE_SALT, x, y, z);
                         changed |= caveVines.generate(world, vineRand, x, y, z);
                     }
 
                     if (ModBlocks.SPORE_BLOSSOM.isEnabled() && isSolidCeiling(world, x, y, z)
                             && coordinateChance(seed ^ MODERN_SPORE_SALT, x, y, z)
-                                    < 0.008D + core * 0.020D
+                                    < 0.008D + core * 0.020D + denseCore * 0.014D
                             && ModBlocks.SPORE_BLOSSOM.get().canPlaceBlockAt(world, x, y, z)) {
                         world.setBlock(x, y, z, ModBlocks.SPORE_BLOSSOM.get(), 0, 2);
                         changed = true;
                     }
 
-                    if (coordinateChance(seed ^ MODERN_WALL_SALT, x, y, z) < 0.055D + core * 0.105D) {
+                    if (coordinateChance(seed ^ MODERN_WALL_SALT, x, y, z) < 0.055D + core * 0.105D + denseCore * 0.080D) {
                         changed |= decorateModernWall(world, source, seed, x, y, z, core);
                     }
                 }
@@ -469,7 +473,7 @@ public class WorldGenLushCaves {
                 }
 
                 final int groundY = airY - 1;
-                world.setBlock(px, groundY - 1, pz, Blocks.clay, 0, 2);
+                setClayUnderfloorIfReplaceable(world, px, groundY - 1, pz);
                 world.setBlock(px, groundY, pz, Blocks.water, 0, 2);
                 changed = true;
             }
@@ -497,7 +501,7 @@ public class WorldGenLushCaves {
                 continue;
             }
             final int groundY = airY - 1;
-            world.setBlock(px, groundY - 1, pz, Blocks.clay, 0, 2);
+            setClayUnderfloorIfReplaceable(world, px, groundY - 1, pz);
             world.setBlock(px, groundY, pz, Blocks.water, 0, 2);
             changed = true;
 
@@ -508,7 +512,7 @@ public class WorldGenLushCaves {
                 final int qAirY = findFloorNear(world, qx, airY, qz, 1);
                 if (qAirY != Integer.MIN_VALUE && world.getBlock(qx, qAirY - 1, qz) == Blocks.clay
                         && canCarveModernTerraceCell(world, source, qx, qAirY, qz, chunkX, chunkZ)) {
-                    world.setBlock(qx, qAirY - 2, qz, Blocks.clay, 0, 2);
+                    setClayUnderfloorIfReplaceable(world, qx, qAirY - 2, qz);
                     world.setBlock(qx, qAirY - 1, qz, Blocks.water, 0, 2);
                 }
             }
@@ -1043,7 +1047,7 @@ public class WorldGenLushCaves {
                     if (Math.abs(ox) == 1 && Math.abs(oz) == 1) {
                         continue;
                     }
-                    world.setBlock(x + ox, groundY - 1, z + oz, Blocks.clay, 0, 2);
+                    setClayUnderfloorIfReplaceable(world, x + ox, groundY - 1, z + oz);
                     world.setBlock(x + ox, groundY, z + oz, Blocks.water, 0, 2);
                     changed = true;
                 }
@@ -1236,6 +1240,16 @@ public class WorldGenLushCaves {
                 || block == Blocks.sand
                 || (ModBlocks.MOSS_BLOCK.isEnabled() && block == ModBlocks.MOSS_BLOCK.get());
     }
+
+    private static void setClayUnderfloorIfReplaceable(World world, int x, int y, int z) {
+        Block substrate = world.getBlock(x, y, z);
+        // P009b: basin/wetland decoration must not silently erase an ore vein one block below
+        // the visible Lush floor. Leaving that solid ore in place still contains the water cell.
+        if (isLushGroundReplaceable(substrate)) {
+            world.setBlock(x, y, z, Blocks.clay, 0, 2);
+        }
+    }
+
 
     private static boolean isRootReplaceable(Block block) {
         return isLushGroundReplaceable(block)

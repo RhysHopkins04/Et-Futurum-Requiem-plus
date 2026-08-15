@@ -377,6 +377,9 @@ public class EtFuturumEarlyMixins implements IFMLLoadingPlugin, IEarlyMixinLoade
 			mixins.add("modernoverworld.MixinWorldProvider");
 			mixins.add("modernoverworld.MixinChunkProviderGenerate");
 			mixins.add("modernoverworld.MixinMapGenScatteredFeatureStart");
+			mixins.add("modernoverworld.MixinBiomeDecorator");
+			mixins.add("modernoverworld.MixinBiomeGenHills");
+			mixins.add("modernoverworld.MixinWorldGenMinable");
 		}
 
 		return mixins;

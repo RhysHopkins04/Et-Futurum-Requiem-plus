@@ -70,6 +70,10 @@ public class ConfigMapCompatibility extends ConfigBase {
         // Compatibility Mode must leave the 1.7.10/RTG world architecture entirely untouched.
         ConfigWorld.extendedWorldHeight = false;
         ConfigWorld.modernOverworldGeneration = false;
+        ConfigWorld.modernOreGeneration = false;
+        ConfigWorld.modernLargeOreVeins = false;
+        ConfigModCompat.modernOverworldTranslateModdedOreHeights = false;
+        ConfigModCompat.modernOverworldReshapeModdedOreVeins = false;
 
         // Explicit belt-and-braces gate for the Plus Lush Cave backport. The three IWorldGenerator
         // registrations are already skipped in this profile, but keeping the feature flag false at

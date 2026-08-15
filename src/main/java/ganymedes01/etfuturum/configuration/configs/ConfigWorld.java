@@ -59,6 +59,8 @@ public class ConfigWorld extends ConfigBase {
 	public static boolean lushCavesWorldgen;
 	public static boolean extendedWorldHeight;
 	public static boolean modernOverworldGeneration;
+	public static boolean modernOreGeneration;
+	public static boolean modernLargeOreVeins;
 	public static int lushCaveRarity;
 	public static int lushCaveRegionRadiusChunks;
 	public static int lushCaveMinY;
@@ -204,6 +206,13 @@ public class ConfigWorld extends ConfigBase {
 		if (modernOverworldGeneration) {
 			extendedWorldHeight = true;
 		}
+		modernOreGeneration = getBoolean("modernOreGeneration", catGeneration, true,
+				"When modernOverworldGeneration is enabled, replace the legacy 1.7.10 vanilla Overworld ore bands with the Caves & Cliffs Part II distribution: " +
+				"height-biased coal/iron/copper/lapis/gold/redstone/diamond/emerald placement, reduced air exposure where modern Java uses it, and Dripstone-Cave copper bias. " +
+				"This option is ignored outside the Plus modern Overworld and Map Compatibility Mode always forces it off.");
+		modernLargeOreVeins = getBoolean("modernLargeOreVeins", catGeneration, true,
+				"Generate the rare Caves & Cliffs Part II large ore-vein family when modernOreGeneration is enabled: copper/granite veins at logical Y0..50 and iron/tuff veins at logical Y-60..-8, with occasional raw ore blocks. " +
+				"This does not control ordinary ore blobs or third-party mod ore generators.");
 		lushCavesWorldgen = getBoolean("lushCavesWorldgen", catGeneration, true,
 				"Generate the Et Futurum Requiem Plus Lush Cave backport in the Overworld. " +
 				"Because Minecraft 1.7.10 has no 3D biome system, this decorates deterministic underground cave regions rather than registering a fake surface biome. " +

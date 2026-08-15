@@ -17,6 +17,7 @@ import ganymedes01.etfuturum.api.*;
 import ganymedes01.etfuturum.client.BuiltInResourcePack;
 import ganymedes01.etfuturum.client.DynamicSoundsResourcePack;
 import ganymedes01.etfuturum.client.GrayscaleWaterResourcePack;
+import ganymedes01.etfuturum.client.ModernAssetResourcePack;
 import ganymedes01.etfuturum.client.sound.ModSounds;
 import ganymedes01.etfuturum.command.CommandFill;
 import ganymedes01.etfuturum.compat.*;
@@ -166,6 +167,11 @@ public class EtFuturum {
 
 		ADConfig config = new ADConfig();
 
+		// Plus backports modern Mojang textures through AssetDirector rather than redistributing
+		// unmodified game assets in the mod jar. Sounds continue to use the object index, while
+		// the client jar supplies texture/model resources selected by ModernAssetResourcePack.
+		String modernAssetVersion = Tags.MC_ASSET_VER.split("_")[1];
+		config.addJar(modernAssetVersion);
 		getSounds(config);
 
 		AssetDirectorAPI.register(config);
@@ -222,6 +228,11 @@ public class EtFuturum {
 			if (ConfigFunctions.enableNewTextures || ConfigFunctions.enableLangReplacements) {
 				BuiltInResourcePack.register("vanilla_overrides");
 			}
+
+			// AssetDirector has already loaded the requested modern client jar by PREINIT. Expose
+			// only the curated modern assets used by this backport under the legacy minecraft
+			// namespace so existing 1.7 render code does not need hundreds of brittle rewrites.
+			ModernAssetResourcePack.inject();
 
 			GrayscaleWaterResourcePack.inject();
 

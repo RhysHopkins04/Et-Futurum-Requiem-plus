@@ -36,6 +36,10 @@ public class StructureMesaMineshaftPieces {
 		MapGenStructureIO.func_143031_a/*registerStructureComponent*/(StructureMesaMineshaftPieces.MesaRoom.class, "MSMesaRoom");
 		MapGenStructureIO.func_143031_a/*registerStructureComponent*/(StructureMesaMineshaftPieces.MesaStairs.class, "MSMesaStairs");
 		MapGenStructureIO.registerStructure(StructureMesaMineshaftStart.class, "Mineshaft");
+		// P009a: the modern-height start is a distinct StructureStart subclass and must have its own
+		// NBT ID before MapGenStructure attempts to serialize it during initial chunk preparation.
+		// Keep a unique ID so loading a modern start cannot replace the legacy/mesa Mineshaft mapping.
+		MapGenStructureIO.registerStructure(StructureModernMineshaftStart.class, "MineshaftModern");
 	}
 
 	private static StructureComponent getRandomComponent(List<StructureComponent> p_78815_0_, Random p_78815_1_, int p_78815_2_, int p_78815_3_, int p_78815_4_, int p_78815_5_, int p_78815_6_) {

@@ -21,6 +21,9 @@ public class ConfigModCompat extends ConfigBase {
 	public static List<String> moddedRawOresBlacklist;
 	public static boolean moddedDeepslateOres;
 	public static List<String> moddedDeepslateOresBlacklist;
+	public static boolean modernOverworldTranslateModdedOreHeights;
+	public static boolean modernOverworldReshapeModdedOreVeins;
+	public static List<String> modernOverworldModdedOreCompatibilityBlacklist;
 
 	public static boolean disableBaseBountifulStonesOnly;
 	public static boolean disableCopperOreAndIngotOnly;
@@ -76,6 +79,16 @@ public class ConfigModCompat extends ConfigBase {
 		moddedDeepslateOresBlacklist = Lists.newArrayList(getStringList("moddedDeepslateOresBlacklist", catMisc, new String[0], """
 				List of modded deepslate ores to disable. Add a ModID or ore dictionary tag. For example adding "oreTin" disables deepslate tin, and adding "SimpleOres" would disable deepslate adamantium ore. CaSe-SeNsItIvE!\
 				Each entry is separated by a new line. This only disables deepslate ores added from Et Futurum's end and will not affect deepslate ores from other mods."""));
+		modernOverworldTranslateModdedOreHeights = getBoolean("modernOverworldTranslateModdedOreHeights", catMisc, true,
+				"PLUS MODDED-ORE COMPATIBILITY. In the extended modern Overworld, standard Forge WorldGenMinable ores from OTHER mods were authored for legacy physical Y0..255. " +
+				"Translate their requested Y by +64 so an ore intended for legacy Y12 still targets logical modern Y12 instead of logical Y-52. " +
+				"Disable this for packs whose ore mods already understand Et Futurum Plus' 0..383 physical/+64 logical coordinate contract.");
+		modernOverworldReshapeModdedOreVeins = getBoolean("modernOverworldReshapeModdedOreVeins", catMisc, false,
+				"OPTIONAL PLUS MODDED-ORE COMPATIBILITY. When height translation is active, also replace standard WorldGenMinable vein geometry from OTHER mods with a slightly clumpier modern-style blob while preserving that mod's requested vein size, ore block/meta and replacement target. " +
+				"Off by default because custom progression packs may rely on exact legacy vein shapes. Custom/non-WorldGenMinable generators are never rewritten.");
+		modernOverworldModdedOreCompatibilityBlacklist = Lists.newArrayList(getStringList("modernOverworldModdedOreCompatibilityBlacklist", catMisc, new String[0],
+				"Mod IDs or OreDictionary ore tags that Et Futurum Plus must leave completely untouched by its modern-Overworld WorldGenMinable compatibility bridge. " +
+				"Use this for an ore mod that already understands the Plus logical/physical height contract, or whose generator has special assumptions. Example entries: SomeOreMod or oreUranium."));
 
 		disableBaseBountifulStonesOnly = getBoolean("disableBaseBountifulStonesOnly", catMisc, false, "Disables just the andesite, granite, and diorite full blocks, but leaves their stairs and slabs, etc enabled." +
 				"\nUseful if you have mods like Chisel or Botania which feature these same stones but not the stairs and other variants.");

@@ -23,7 +23,7 @@ public final class ModernOverworldRavineGenerator extends MapGenBase {
     private static final int HEIGHT = WorldHeightCompat.EXTENDED_HEIGHT;
     private static final int BLOCK_COUNT = 256 * HEIGHT;
     private static final int MIN_CARVE_PHYSICAL_Y = 1;
-    private static final int START_CHANCE = 85;
+    private static final int START_CHANCE = 145;
     private static final int WATER_SURFACE_GUARD = 18;
     private static final int LOOSE_SURFACE_GUARD = 16;
 
@@ -53,12 +53,14 @@ public final class ModernOverworldRavineGenerator extends MapGenBase {
         final double startZ = sourceChunkZ * 16 + this.rand.nextInt(16) + 0.5D;
         final int surfaceY = terrain.sampleSurfacePhysicalY((int) Math.floor(startX), (int) Math.floor(startZ), amplified);
 
-        final boolean nearSurface = this.rand.nextInt(5) == 0;
-        final int depth = nearSurface ? 3 + this.rand.nextInt(12) : 18 + this.rand.nextInt(82);
+        // P009: ravines were too numerous and too often competed with the upper cavern layer.
+        // Keep occasional land-facing cuts, but bias most starts deeper into the expanded underground.
+        final boolean nearSurface = this.rand.nextInt(7) == 0;
+        final int depth = nearSurface ? 5 + this.rand.nextInt(14) : 28 + this.rand.nextInt(118);
         final double startY = clamp(surfaceY - depth, 14.0D, HEIGHT - 24.0D);
         final float heading = this.rand.nextFloat() * (float) Math.PI * 2.0F;
         final float pitch = (this.rand.nextFloat() - 0.5F) * 0.20F;
-        final float width = 2.8F + this.rand.nextFloat() * 3.8F;
+        final float width = 2.7F + this.rand.nextFloat() * 3.2F;
         final float verticalStretch = 1.9F + this.rand.nextFloat() * 1.7F;
         final int length = 76 + this.rand.nextInt(85);
         final long pathSeed = this.rand.nextLong();

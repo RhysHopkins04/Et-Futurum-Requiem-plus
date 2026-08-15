@@ -49,6 +49,8 @@ public final class ModernOverworldCaveGenerator extends MapGenBase {
     private static final long SALT_SPAGHETTI_A = 0xBB67AE8584CAA73BL;
     private static final long SALT_SPAGHETTI_B = 0x3C6EF372FE94F82BL;
     private static final long SALT_SPAGHETTI_WIDTH = 0xA54FF53A5F1D36F1L;
+    private static final long SALT_LONG_TUNNEL_A = 0x4C4F4E4754554E41L; // "LONGTUNA"
+    private static final long SALT_LONG_TUNNEL_B = 0x4C4F4E4754554E42L; // "LONGTUNB"
     private static final long SALT_NOODLE_A = 0x510E527FADE682D1L;
     private static final long SALT_NOODLE_B = 0x9B05688C2B3E6C1FL;
     private static final long SALT_NOODLE_TOGGLE = 0x1F83D9ABFB41BD6BL;
@@ -63,6 +65,8 @@ public final class ModernOverworldCaveGenerator extends MapGenBase {
     private final FractalNoise3D spaghettiNoiseA;
     private final FractalNoise3D spaghettiNoiseB;
     private final FractalNoise3D spaghettiWidthNoise;
+    private final FractalNoise3D longTunnelNoiseA;
+    private final FractalNoise3D longTunnelNoiseB;
     private final FractalNoise3D noodleNoiseA;
     private final FractalNoise3D noodleNoiseB;
     private final FractalNoise3D noodleToggleNoise;
@@ -75,6 +79,8 @@ public final class ModernOverworldCaveGenerator extends MapGenBase {
     private double[] spaghettiFieldA = new double[SAMPLE_COUNT];
     private double[] spaghettiFieldB = new double[SAMPLE_COUNT];
     private double[] spaghettiWidthField = new double[SAMPLE_COUNT];
+    private double[] longTunnelFieldA = new double[SAMPLE_COUNT];
+    private double[] longTunnelFieldB = new double[SAMPLE_COUNT];
     private double[] noodleFieldA = new double[SAMPLE_COUNT];
     private double[] noodleFieldB = new double[SAMPLE_COUNT];
     private double[] noodleToggleField = new double[SAMPLE_COUNT];
@@ -91,6 +97,8 @@ public final class ModernOverworldCaveGenerator extends MapGenBase {
         this.spaghettiNoiseA = new FractalNoise3D(seed ^ SALT_SPAGHETTI_A, 3, 0.50D);
         this.spaghettiNoiseB = new FractalNoise3D(seed ^ SALT_SPAGHETTI_B, 3, 0.50D);
         this.spaghettiWidthNoise = new FractalNoise3D(seed ^ SALT_SPAGHETTI_WIDTH, 2, 0.50D);
+        this.longTunnelNoiseA = new FractalNoise3D(seed ^ SALT_LONG_TUNNEL_A, 3, 0.52D);
+        this.longTunnelNoiseB = new FractalNoise3D(seed ^ SALT_LONG_TUNNEL_B, 3, 0.52D);
         this.noodleNoiseA = new FractalNoise3D(seed ^ SALT_NOODLE_A, 2, 0.50D);
         this.noodleNoiseB = new FractalNoise3D(seed ^ SALT_NOODLE_B, 2, 0.50D);
         this.noodleToggleNoise = new FractalNoise3D(seed ^ SALT_NOODLE_TOGGLE, 2, 0.50D);
@@ -141,6 +149,8 @@ public final class ModernOverworldCaveGenerator extends MapGenBase {
                     final double spaghettiA = sampleField(spaghettiFieldA, localX, physicalY, localZ);
                     final double spaghettiB = sampleField(spaghettiFieldB, localX, physicalY, localZ);
                     final double spaghettiControl = sampleField(spaghettiWidthField, localX, physicalY, localZ);
+                    final double longTunnelA = sampleField(longTunnelFieldA, localX, physicalY, localZ);
+                    final double longTunnelB = sampleField(longTunnelFieldB, localX, physicalY, localZ);
                     final double entrance = sampleField(entranceField, localX, physicalY, localZ);
                     final double region = sampleField(regionField, localX, physicalY, localZ);
 
@@ -163,6 +173,12 @@ public final class ModernOverworldCaveGenerator extends MapGenBase {
                             && isSurfaceEntrance(entrance, spaghettiA, spaghettiB, spaghettiControl, surfaceGap);
                     final boolean carveSpaghetti = (normalTunnel || surfaceEntrance)
                             && isSpaghettiCave(spaghettiA, spaghettiB, spaghettiControl, region, logicalY, physicalY);
+                    // P009: a second, much broader anisotropic field supplies the long sloping
+                    // tube systems that were underrepresented by the compact P008 spaghetti noise.
+                    // It stays underground and fades at the floor, but reaches deep deepslate space.
+                    final boolean carveLongTunnel = normalTunnel
+                            && logicalY >= -56 && logicalY <= 112
+                            && isLongTunnel(longTunnelA, longTunnelB, spaghettiControl, region, logicalY, physicalY);
 
                     boolean carveNoodle = false;
                     if (!carveCheese && !carveSpaghetti && logicalY <= 48 && surfaceGap >= TUNNEL_SURFACE_ROOF) {
@@ -178,7 +194,7 @@ public final class ModernOverworldCaveGenerator extends MapGenBase {
                     if (carveCheese) {
                         mask |= MASK_CHEESE;
                     }
-                    if (carveSpaghetti) {
+                    if (carveSpaghetti || carveLongTunnel) {
                         mask |= MASK_TUNNEL;
                     }
                     if (carveNoodle) {
@@ -278,6 +294,12 @@ public final class ModernOverworldCaveGenerator extends MapGenBase {
         spaghettiWidthField = spaghettiWidthNoise.fill(spaghettiWidthField, startX, 0, startZ,
                 X_SAMPLES, Y_SAMPLES, Z_SAMPLES, GRID_STEP, GRID_STEP, GRID_STEP,
                 176.0D, 128.0D, 176.0D);
+        longTunnelFieldA = longTunnelNoiseA.fill(longTunnelFieldA, startX, 0, startZ,
+                X_SAMPLES, Y_SAMPLES, Z_SAMPLES, GRID_STEP, GRID_STEP, GRID_STEP,
+                108.0D, 156.0D, 108.0D);
+        longTunnelFieldB = longTunnelNoiseB.fill(longTunnelFieldB, startX, 0, startZ,
+                X_SAMPLES, Y_SAMPLES, Z_SAMPLES, GRID_STEP, GRID_STEP, GRID_STEP,
+                108.0D, 156.0D, 108.0D);
         noodleFieldA = noodleNoiseA.fill(noodleFieldA, startX, 0, startZ,
                 X_SAMPLES, Y_SAMPLES, Z_SAMPLES, GRID_STEP, GRID_STEP, GRID_STEP,
                 30.0D, 24.0D, 30.0D);
@@ -315,6 +337,15 @@ public final class ModernOverworldCaveGenerator extends MapGenBase {
             threshold += smoothstep(48.0D, 176.0D, logicalY) * 0.19D;
         }
 
+        // P009 cave-finale: P008's broad caverns were visually biased toward the upper underground.
+        // Give deep deepslate a bounded cheese-pocket bonus without defeating the bedrock density slide.
+        // The regional multiplier keeps these as occasional large pockets rather than a continuous layer.
+        if (logicalY < 24) {
+            final double deep = clamp((24.0D - logicalY) / 72.0D, 0.0D, 1.0D);
+            final double richRegion = 0.55D + (regionClamped + 1.0D) * 0.225D;
+            threshold -= deep * 0.070D * richRegion;
+        }
+
         // Modern caves approach the seeded bedrock floor through a density slide rather than
         // terminating every cave family against one hard Y plane. Keep Y=-54 (physical 10)
         // reachable by sufficiently strong cheese density for large deep lava lakes, but rapidly
@@ -340,6 +371,18 @@ public final class ModernOverworldCaveGenerator extends MapGenBase {
         return width > 0.0D && Math.max(Math.abs(a), Math.abs(b)) < width;
     }
 
+    private static boolean isLongTunnel(double a, double b, double control, double region, int logicalY, int physicalY) {
+        double width = 0.042D + (clamp(control, -1.0D, 1.0D) + 1.0D) * 0.010D;
+        width *= 0.86D + (clamp(region, -1.0D, 1.0D) + 1.0D) * 0.11D;
+        if (logicalY < 8) {
+            width *= 1.0D + clamp((8.0D - logicalY) / 64.0D, 0.0D, 1.0D) * 0.18D;
+        } else if (logicalY > 72) {
+            width *= 1.0D - smoothstep(72.0D, 112.0D, logicalY) * 0.45D;
+        }
+        width *= deepFloorScale(physicalY);
+        return width > 0.0D && Math.max(Math.abs(a), Math.abs(b)) < width;
+    }
+
     private static boolean isNoodleCave(double a, double b, double toggle, double region, int logicalY, int physicalY) {
         double width = 0.040D + clamp((toggle - 0.30D) * 0.018D, 0.0D, 0.018D);
         width *= 0.88D + (clamp(region, -1.0D, 1.0D) + 1.0D) * 0.10D;
@@ -358,7 +401,10 @@ public final class ModernOverworldCaveGenerator extends MapGenBase {
         if (logicalY < -48 || logicalY > 128) {
             return false;
         }
-        final double width = 0.092D + smoothstep(-32.0D, 64.0D, logicalY) * 0.018D;
+        // P009: deep large pockets should retain substantial freestanding supports too.
+        // P008 made pillars slightly more common high up; reverse that bias while keeping them sparse.
+        final double deep = clamp((48.0D - logicalY) / 96.0D, 0.0D, 1.0D);
+        final double width = 0.098D + deep * 0.027D;
         return Math.max(Math.abs(a), Math.abs(b)) < width;
     }
 

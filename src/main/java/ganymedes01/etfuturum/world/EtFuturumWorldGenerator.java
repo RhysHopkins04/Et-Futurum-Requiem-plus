@@ -6,6 +6,7 @@ import ganymedes01.etfuturum.Tags;
 import ganymedes01.etfuturum.blocks.BlockChorusFlower;
 import ganymedes01.etfuturum.configuration.configs.ConfigWorld;
 import ganymedes01.etfuturum.core.utils.Utils;
+import ganymedes01.etfuturum.core.utils.WorldHeightCompat;
 import ganymedes01.etfuturum.world.end.dimension.WorldProviderEFREnd;
 import ganymedes01.etfuturum.world.generate.WorldGenMinableCustom;
 import ganymedes01.etfuturum.world.generate.decorate.WorldGenBamboo;
@@ -16,6 +17,7 @@ import ganymedes01.etfuturum.world.generate.feature.WorldGenFossil;
 import ganymedes01.etfuturum.world.generate.feature.WorldGenGeode;
 import ganymedes01.etfuturum.world.generate.feature.WorldGenLushCaves;
 import ganymedes01.etfuturum.world.generate.feature.WorldGenDripstoneCaves;
+import ganymedes01.etfuturum.world.generate.terrain.ModernOverworldOreGenerator;
 import ganymedes01.etfuturum.world.structure.OceanMonument;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
@@ -197,15 +199,28 @@ public class EtFuturumWorldGenerator implements IWorldGenerator {
 				x = (chunkX << 4) + rand.nextInt(16) + 8;
 				z = (chunkZ << 4) + rand.nextInt(16) + 8;
 				if (ConfigWorld.amethystRarity == 1 || rand.nextInt(ConfigWorld.amethystRarity) == 0) {
-					amethystGen.generate(world, rand, x, MathHelper.getRandomIntegerInRange(rand, 5, ConfigWorld.amethystMaxY - 5), z);
+					final int geodeY;
+					if (world.provider != null && world.provider.dimensionId == 0 && ConfigWorld.modernOverworldGeneration) {
+						// P009 cave-finale: modern geodes span the expanded deep underground instead of
+						// interpreting the legacy physical-Y cap as a logical coordinate. Keep the
+						// established 1.18-style logical -58..30 band and translate it by +64.
+						geodeY = WorldHeightCompat.modernToPhysicalY(MathHelper.getRandomIntegerInRange(rand, -58, 30));
+					} else {
+						geodeY = MathHelper.getRandomIntegerInRange(rand, 5, ConfigWorld.amethystMaxY - 5);
+					}
+					amethystGen.generate(world, rand, x, geodeY, z);
 				}
 			}
 
-			if (ModBlocks.COPPER_ORE.isEnabled()) {
+			final boolean modernOrePath = world.provider != null && world.provider.dimensionId == 0
+					&& ConfigWorld.extendedWorldHeight && ConfigWorld.modernOverworldGeneration
+					&& ConfigWorld.modernOreGeneration;
+
+			if (ModBlocks.COPPER_ORE.isEnabled() && !modernOrePath) {
 				generateOre(copperGen, world, rand, chunkX, chunkZ, 8, 4, 80);
 			}
 
-			if (ConfigWorld.enableExtraMesaGold) {
+			if (ConfigWorld.enableExtraMesaGold && !modernOrePath) {
 				if (ArrayUtils.contains(BiomeDictionary.getTypesForBiome(world.getBiomeGenForCoords(chunkX << 4, chunkZ << 4)), Type.MESA)) {
 					generateOre(mesaGoldGen, world, rand, chunkX, chunkZ, 20, 32, 80);
 				}
@@ -264,6 +279,13 @@ public class EtFuturumWorldGenerator implements IWorldGenerator {
                     int zoff = z + rand.nextInt(10) - rand.nextInt(10);
                     glowLichenGen.generate(world, rand, xoff, yoff, zoff);
                 }
+			}
+
+			if (modernOrePath) {
+				ModernOverworldOreGenerator.generateSupplementalOres(world, rand, chunkX, chunkZ);
+				if (ConfigWorld.modernLargeOreVeins) {
+					ModernOverworldOreGenerator.generateLargeVeins(world, chunkX, chunkZ);
+				}
 			}
 
 			if (lushCaveGen != null && world.provider.dimensionId == 0) {

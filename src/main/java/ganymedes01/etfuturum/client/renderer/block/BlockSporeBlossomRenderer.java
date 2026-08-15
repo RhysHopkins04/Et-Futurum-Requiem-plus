@@ -22,6 +22,11 @@ public class BlockSporeBlossomRenderer extends BlockModelBase {
     protected void renderInventoryModel(Block block, int meta, int modelId, RenderBlocks renderer,
                                         double minX, double minY, double minZ, double maxX, double maxY, double maxZ) {
         Tessellator tess = Tessellator.instance;
+        // Custom inventory tessellation does not pass through RenderBlocks' per-face normal setup.
+        // Without an explicit normal the GUI model inherits a stale normal from the previous draw
+        // and foliage appears much darker than the identical placed block. An upward-facing normal
+        // gives thin vegetation models the same neutral inventory lighting baseline as vanilla.
+        tess.setNormal(0.0F, 1.0F, 0.0F);
         tess.setColorOpaque_F(1.0F, 1.0F, 1.0F);
         renderModel((BlockSporeBlossom) block, 0, 0, 0, tess);
     }

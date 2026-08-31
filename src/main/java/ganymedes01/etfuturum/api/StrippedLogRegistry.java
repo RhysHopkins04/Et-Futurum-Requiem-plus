@@ -1,6 +1,7 @@
 package ganymedes01.etfuturum.api;
 
 import ganymedes01.etfuturum.ModBlocks;
+import ganymedes01.etfuturum.ModernMapParityBlocks;
 import ganymedes01.etfuturum.Tags;
 import ganymedes01.etfuturum.configuration.configs.ConfigBlocksItems;
 import lombok.NonNull;
@@ -8,9 +9,9 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockRotatedPillar;
 import net.minecraft.init.Blocks;
 import org.jetbrains.annotations.ApiStatus;
-import roadhog360.hogutils.api.blocksanditems.utils.BlockMeta2ObjectOpenHashMap;
-import roadhog360.hogutils.api.blocksanditems.utils.BlockMetaPair;
-import roadhog360.hogutils.api.utils.GenericUtils;
+import ganymedes01.etfuturum.api.mappings.BlockMeta2ObjectOpenHashMap;
+import ganymedes01.etfuturum.api.mappings.BlockMetaPair;
+import ganymedes01.etfuturum.core.utils.GenericUtils;
 
 import java.util.Collections;
 import java.util.Map;
@@ -188,6 +189,15 @@ public class StrippedLogRegistry {
 		if (ModBlocks.BAMBOO_BLOCK.isEnabled()) {
 			if (ConfigBlocksItems.enableStrippedLogs) {
 				addLog(ModBlocks.BAMBOO_BLOCK.get(), 0, ModBlocks.BAMBOO_BLOCK.get(), 1);
+			}
+		}
+
+		if (ConfigBlocksItems.enableModernMapParityBlocks && ConfigBlocksItems.enableStrippedLogs
+				&& ModernMapParityBlocks.PALE_OAK_LOG.get() != null && ModernMapParityBlocks.STRIPPED_PALE_OAK_LOG.get() != null) {
+			addLog(ModernMapParityBlocks.PALE_OAK_LOG.get(), 0, ModernMapParityBlocks.STRIPPED_PALE_OAK_LOG.get(), 0);
+			if (ConfigBlocksItems.enableBarkLogs && ModernMapParityBlocks.PALE_OAK_WOOD.get() != null
+					&& ModernMapParityBlocks.STRIPPED_PALE_OAK_WOOD.get() != null) {
+				addLog(ModernMapParityBlocks.PALE_OAK_WOOD.get(), 0, ModernMapParityBlocks.STRIPPED_PALE_OAK_WOOD.get(), 0);
 			}
 		}
 	}

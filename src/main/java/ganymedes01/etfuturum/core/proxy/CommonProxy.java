@@ -41,6 +41,11 @@ import java.util.List;
 
 public class CommonProxy implements IGuiHandler {
 
+	/** Client-only input query used by scaffolding movement; dedicated servers intentionally return false. */
+	public boolean isScaffoldingJumpHeld(EntityPlayer player) {
+		return false;
+	}
+
 	public void registerEvents() {
 		MinecraftForge.EVENT_BUS.register(EntityEventHandler.INSTANCE);
 

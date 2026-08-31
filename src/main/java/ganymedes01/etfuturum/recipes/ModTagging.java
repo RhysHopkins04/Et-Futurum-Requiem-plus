@@ -21,10 +21,10 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.OreDictionary;
 import org.apache.commons.lang3.ArrayUtils;
-import roadhog360.hogutils.api.hogtags.helpers.BlockTags;
-import roadhog360.hogutils.api.hogtags.helpers.ItemTags;
-import roadhog360.hogutils.api.utils.GenericUtils;
-import roadhog360.hogutils.api.utils.RecipeHelper;
+import ganymedes01.etfuturum.api.tags.BlockTags;
+import ganymedes01.etfuturum.api.tags.ItemTags;
+import ganymedes01.etfuturum.core.utils.GenericUtils;
+import ganymedes01.etfuturum.core.utils.RecipeHelper;
 
 import java.util.Map;
 
@@ -286,7 +286,7 @@ public class ModTagging {
 		RecipeHelper.registerOre("signWood", ModBlocks.CHERRY_SIGN.get());
 		RecipeHelper.registerOre("signWood", ModBlocks.BAMBOO_SIGN.get());
 
-		if (ConfigExperiments.enableMangroveBlocks) {
+		if (ConfigBlocksItems.enableMangroveWoodFamily) {
 			ItemStack ore = ModBlocks.SAPLING.newItemStack(1, 0);
 			RecipeHelper.registerOre("treeSapling", ore);
 		}

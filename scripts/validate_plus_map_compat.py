@@ -62,8 +62,41 @@ for expected in ("DeepslateOreRegistry.init();", "RawOreRegistry.init();", "Smit
         failures.append(f"expected upstream integration call disappeared: {expected}")
 
 mixins = require("src/main/java/ganymedes01/etfuturum/mixinplugin/EtFuturumEarlyMixins.java")
-if 'if (!ConfigMapCompatibility.isEnabled()) {\n\t\t\tmixins.add("deepslateores.MixinChunk");' not in mixins:
-    failures.append("deepslate ore-generation mixin is not mapcompat-gated")
+if ('if (!ConfigMapCompatibility.isEnabled()) {' not in mixins
+        or 'mixins.add("geninfo.MixinChunkProviderServer");' not in mixins
+        or 'mixins.add("deepslateores.MixinChunk");' not in mixins):
+    failures.append("deepslate ore-generation/generation-state mixins are not mapcompat-gated")
+
+# P013 -- the Plus fork must be self-contained and must not reintroduce the old external utility dependency.
+dependency_gradle = require("dependencies.gradle")
+reference_java = require("src/main/java/ganymedes01/etfuturum/lib/Reference.java")
+if "hogutils" in dependency_gradle.lower() or "required-after:hogutils" in reference_java.lower():
+    failures.append("P013 external HogUtils runtime/build dependency was reintroduced")
+for legacy_jar in (ROOT / "libs").glob("*hogutils*.jar"):
+    failures.append(f"P013 bundled HogUtils jar still present: {legacy_jar.relative_to(ROOT)}")
+for source_path in (ROOT / "src/main/java").rglob("*.java"):
+    if "roadhog360.hogutils" in source_path.read_text(encoding="utf-8"):
+        failures.append(f"P013 source still imports HogUtils: {source_path.relative_to(ROOT)}")
+for replacement in (
+    "src/main/java/ganymedes01/etfuturum/api/IMultiBlockSound.java",
+    "src/main/java/ganymedes01/etfuturum/api/tags/BlockTags.java",
+    "src/main/java/ganymedes01/etfuturum/api/tags/ItemTags.java",
+    "src/main/java/ganymedes01/etfuturum/core/utils/RecipeHelper.java",
+    "src/main/java/ganymedes01/etfuturum/core/utils/DummyWorld.java",
+    "src/main/java/ganymedes01/etfuturum/core/utils/WeighedRandomList.java",
+    "src/main/java/ganymedes01/etfuturum/mixins/early/geninfo/MixinChunkProviderServer.java",
+):
+    if not (ROOT / replacement).is_file():
+        failures.append(f"P013 self-contained replacement missing: {replacement}")
+config_world = require("src/main/java/ganymedes01/etfuturum/configuration/configs/ConfigWorld.java")
+for expected in (
+    'modernOreGeneration = getBoolean("modernOreGeneration", catGeneration, false,',
+    'modernLargeOreVeins = getBoolean("modernLargeOreVeins", catGeneration, false,',
+    'lushCavesWorldgen = getBoolean("lushCavesWorldgen", catGeneration, false,',
+    'dripstoneCavesWorldgen = getBoolean("dripstoneCavesWorldgen", catGeneration, false,',
+):
+    if expected not in config_world:
+        failures.append("P013 experimental world-generation default is not opt-in: " + expected)
 
 proxy = require("src/main/java/ganymedes01/etfuturum/core/proxy/CommonProxy.java")
 if "MinecraftForge.TERRAIN_GEN_BUS.register(WorldEventHandler.INSTANCE);" not in proxy or "ConfigMapCompatibility.isEnabled()" not in proxy:
@@ -244,7 +277,7 @@ if 'ModBlocks.MOSS_CARPET.newItemStack(3)' not in recipes or 'ModBlocks.MOSS_BLO
 # surface biome untouched. The entire generator is disabled by Map Compatibility Mode.
 world_config = require("src/main/java/ganymedes01/etfuturum/configuration/configs/ConfigWorld.java")
 for expected in (
-    'lushCavesWorldgen = getBoolean("lushCavesWorldgen", catGeneration, true',
+    'lushCavesWorldgen = getBoolean("lushCavesWorldgen", catGeneration, false',
     'lushCaveRarity = getInt("lushCaveRarity", catGeneration, 64',
     'lushCaveRegionRadiusChunks = getInt("lushCaveRegionRadiusChunks", catGeneration, 2',
     'lushCaveMinY = getInt("lushCaveMinY", catGeneration, 10',
@@ -947,7 +980,7 @@ for expected in (
 if 'getCategory(catExperiments).remove("enableDripstone")' not in drips_experiments:
     failures.append("P008e did not remove the old experimental dripstone property")
 for expected in (
-    'dripstoneCavesWorldgen = getBoolean("dripstoneCavesWorldgen", catGeneration, true',
+    'dripstoneCavesWorldgen = getBoolean("dripstoneCavesWorldgen", catGeneration, false',
     'modernDripstoneCaveMinY = getInt("modernDripstoneCaveMinY", catGeneration, -56',
     'modernDripstoneCaveMaxY = getInt("modernDripstoneCaveMaxY", catGeneration, 72',
     'P008e activates separate 3D Dripstone Cave regions',
@@ -1475,8 +1508,8 @@ mod_compat = require("src/main/java/ganymedes01/etfuturum/configuration/configs/
 for expected in (
     'public static boolean modernOreGeneration;',
     'public static boolean modernLargeOreVeins;',
-    'getBoolean("modernOreGeneration", catGeneration, true',
-    'getBoolean("modernLargeOreVeins", catGeneration, true',
+    'getBoolean("modernOreGeneration", catGeneration, false',
+    'getBoolean("modernLargeOreVeins", catGeneration, false',
 ):
     if expected not in world_config:
         failures.append(f"P009b modern ore config missing: {expected}")
@@ -1665,6 +1698,32 @@ for expected in (
     if expected not in lush_worldgen:
         failures.append(f"P009b Lush Cave ore-preservation guard missing: {expected}")
 
+# Cross-cutting post-P009 map-import visual parity layer. It must remain registry/renderer-only
+# and AssetDirector-backed so later update-family mechanics can replace shells without changing IDs.
+parity_registry = require("src/main/java/ganymedes01/etfuturum/ModernMapParityBlocks.java", "enum ModernMapParityBlocks")
+for expected in (
+    'GameRegistry.findBlock("minecraft", name)',
+    'GameRegistry.findBlock(Tags.MOD_ID, name)',
+    'GameRegistry.registerBlock(entry.block, name);',
+    'return new ParityModelBlock(this);',
+    'RenderIDs.MODERN_MAP_PARITY',
+    'pale_oak_planks',
+    'TRIAL_SPAWNER',
+    'COPPER_CHEST',
+    'DRIED_GHAST',
+):
+    if expected not in parity_registry:
+        failures.append(f"modern map visual parity invariant missing: {expected}")
+
+parity_bridge = require("src/main/java/ganymedes01/etfuturum/client/ModernAssetResourcePack.java", "DYNAMIC_MODEL_ALIASES")
+for expected in ('registerDynamicAlias', 'new ResourceLocation(Tags.MC_ASSET_VER, dynamicTarget)'):
+    if expected not in parity_bridge:
+        failures.append(f"modern map visual parity AssetDirector model bridge missing: {expected}")
+parity_model_bridge = require("src/main/java/ganymedes01/etfuturum/client/model/ModernJsonModelBridge.java", "class ModernJsonModelBridge")
+for expected in ('blockstates/" + entry.getRegistryName() + ".json', 'items/" + name + ".json', 'resolveRawModel', 'registerDynamicAlias'):
+    if expected not in parity_model_bridge:
+        failures.append(f"modern map visual parity JSON model bridge missing: {expected}")
+
 if failures:
     print("Et Futurum Requiem Plus map-compat static validation FAILED")
     for failure in failures:
@@ -1696,4 +1755,5 @@ print(" - P008e-h strict source-only water/lava tip droplets at vanilla-style ca
 print(" - P009b large ore veins, modded WorldGenMinable +64 compatibility, full deepslate conversion band, and corrected foliage inventory normals present")
 print(" - P009c modern ore decoration uses a backport-safe +8 origin, no-load neighbour guards, and non-remapped Forge metadata shadowing")
 print(" - P009d 1.21-era ore counts/ranges, OreFeature ellipsoid/RNG semantics, regular below-sea mineshafts, and translated Badlands mineshafts are present")
+print(" - 1.21.11 visual map-parity identities use AssetDirector-backed real block/item model rendering without gameplay/worldgen coupling")
 print(" - no Campfire Backport GPL package source vendored")

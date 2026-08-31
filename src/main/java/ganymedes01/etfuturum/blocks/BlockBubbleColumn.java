@@ -17,8 +17,8 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.World;
-import roadhog360.hogutils.api.hogtags.helpers.BlockTags;
-import roadhog360.hogutils.api.utils.RecipeHelper;
+import ganymedes01.etfuturum.api.tags.BlockTags;
+import ganymedes01.etfuturum.core.utils.RecipeHelper;
 
 import java.util.Random;
 
@@ -42,6 +42,9 @@ public class BlockBubbleColumn extends BaseBlock implements IInitAction {
 		downSupportTag = downTag;
 		setLightOpacity(Blocks.water.getLightOpacity());
 		setBlockName("bubble_column");
+		// The custom renderer draws vanilla water, but Block still participates in the 1.7 atlas stitch.
+		// Give it a real icon too so Forge never asks for MISSING_ICON_BLOCK_*_bubble_column.png.
+		setBlockTextureName("minecraft:water_still");
 		setBlockBounds(0, 0, 0, 0, 0, 0);
 	}
 

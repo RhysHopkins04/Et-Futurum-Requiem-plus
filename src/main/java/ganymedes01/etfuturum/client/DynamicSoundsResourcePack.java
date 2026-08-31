@@ -26,8 +26,9 @@ public class DynamicSoundsResourcePack implements IResourcePack {
 
 	@Override
 	public Set<String> getResourceDomains() {
-		// No modded namespace support for now
-		return ImmutableSet.of("minecraft");
+		// The vanilla namespace carries EFR's cave additions; the versioned AssetDirector namespace
+		// also needs a tiny sounds.json overlay for modern sound-event aliases (type=event).
+		return ImmutableSet.of("minecraft", Tags.MC_ASSET_VER);
 	}
 
 	@Override
@@ -46,19 +47,21 @@ public class DynamicSoundsResourcePack implements IResourcePack {
 	}
 
 	public InputStream getInputStream(ResourceLocation resLoc) {
-		if (resLoc.getResourcePath().equals("sounds.json")) {
-			return new ByteArrayInputStream(new JsonCreator().getJson().toString().getBytes());
-		}
-		return null;
+		if (!resLoc.getResourcePath().equals("sounds.json")) return null;
+		JsonObject json = Tags.MC_ASSET_VER.equals(resLoc.getResourceDomain())
+				? new JsonCreator().getModernAliasJson()
+				: new JsonCreator().getVanillaJson();
+		return new ByteArrayInputStream(json.toString().getBytes());
 	}
 
 	public boolean resourceExists(ResourceLocation resLoc) {
-		return resLoc.getResourcePath().equals("sounds.json")/* || resLoc.getResourcePath().endsWith("lang")*/;
+		return resLoc.getResourcePath().equals("sounds.json")
+				&& ("minecraft".equals(resLoc.getResourceDomain()) || Tags.MC_ASSET_VER.equals(resLoc.getResourceDomain()));
 	}
 
 	@SuppressWarnings("unchecked")
 	public static void inject() {
-		if (ConfigSounds.caveAmbience) {
+		if (shouldGenerateJson()) {
 			IResourcePack dynamicResourcePack = new DynamicSoundsResourcePack();
 			Minecraft.getMinecraft().defaultResourcePacks.add(dynamicResourcePack);
 			IResourceManager resMan = Minecraft.getMinecraft().getResourceManager();
@@ -69,7 +72,8 @@ public class DynamicSoundsResourcePack implements IResourcePack {
 	}
 
 	public static boolean shouldGenerateJson() {
-		return ConfigSounds.caveAmbience;
+		// The modern event alias is always required by hanging-sign interaction parity.
+		return true;
 	}
 
 	public class JsonCreator {
@@ -120,7 +124,7 @@ public class DynamicSoundsResourcePack implements IResourcePack {
 			}
 		}
 
-		public JsonObject getJson() {
+		public JsonObject getVanillaJson() {
 			if (ConfigSounds.caveAmbience) {
 				addSoundsToCategory("ambient.cave.cave",
 						Tags.MC_ASSET_VER + ":ambient/cave/cave14",
@@ -130,6 +134,17 @@ public class DynamicSoundsResourcePack implements IResourcePack {
 						Tags.MC_ASSET_VER + ":ambient/cave/cave18",
 						Tags.MC_ASSET_VER + ":ambient/cave/cave19");
 			}
+			return rootObject;
+		}
+
+		public JsonObject getModernAliasJson() {
+			// Vanilla 1.21.11: block.hanging_sign.waxed_interact_fail ->
+			// { name: block.sign.waxed_interact_fail, type: event }. Minecraft 1.7 already
+			// resolves bare type=event names inside the containing sounds.json namespace.
+			// Do NOT prefix Tags.MC_ASSET_VER here: SoundHandler applies that domain itself,
+			// and a prefixed name becomes a malformed/doubled event ResourceLocation.
+			addSoundEventsToCategory("block.hanging_sign.waxed_interact_fail",
+					"block.sign.waxed_interact_fail");
 			return rootObject;
 		}
 	}

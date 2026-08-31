@@ -12,7 +12,7 @@ import net.minecraft.inventory.*;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeHooks;
-import roadhog360.hogutils.api.hogtags.helpers.ItemTags;
+import ganymedes01.etfuturum.api.tags.ItemTags;
 
 import java.util.List;
 import java.util.Random;

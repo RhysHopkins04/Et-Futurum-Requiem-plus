@@ -3,6 +3,7 @@ package ganymedes01.etfuturum.blocks;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import ganymedes01.etfuturum.EtFuturum;
+import ganymedes01.etfuturum.ModernMapParityBlocks;
 import ganymedes01.etfuturum.configuration.configs.ConfigFunctions;
 import ganymedes01.etfuturum.core.utils.Utils;
 import ganymedes01.etfuturum.recipes.ModRecipes;
@@ -38,6 +39,8 @@ public class BlockWoodFence extends BlockFence {
 	@Override
 	public boolean canConnectFenceTo(IBlockAccess world, int x, int y, int z) {
 		Block block = world.getBlock(x, y, z);
+		ModernMapParityBlocks parity = ModernMapParityBlocks.fromBlock(block);
+		if (parity != null && parity.getStyle() == ModernMapParityBlocks.Style.FENCE_GATE) return true;
 		return block instanceof BlockWoodFence || block instanceof BlockModernWoodFence || block instanceof BlockWoodFenceGate || super.canConnectFenceTo(world, x, y, z);
 	}
 

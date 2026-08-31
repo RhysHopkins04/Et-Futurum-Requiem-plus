@@ -2,7 +2,6 @@ package ganymedes01.etfuturum.blocks;
 
 import ganymedes01.etfuturum.client.sound.ModSounds;
 import ganymedes01.etfuturum.configuration.configs.ConfigBlocksItems;
-import ganymedes01.etfuturum.configuration.configs.ConfigExperiments;
 import lombok.NonNull;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
@@ -12,7 +11,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
-import roadhog360.hogutils.api.blocksanditems.block.IMultiBlockSound;
+import ganymedes01.etfuturum.api.IMultiBlockSound;
 
 import java.util.List;
 
@@ -26,13 +25,13 @@ public class BlockModernWoodPlanks extends BaseSubtypesBlock implements IMultiBl
 
 	@Override
 	public void getSubBlocks(Item item, CreativeTabs tab, List<ItemStack> list) {
-		if (ConfigExperiments.enableCrimsonBlocks) {
+		if (ConfigBlocksItems.enableCrimsonWoodFamily) {
 			list.add(new ItemStack(item, 1, 0));
 		}
-		if (ConfigExperiments.enableWarpedBlocks) {
+		if (ConfigBlocksItems.enableWarpedWoodFamily) {
 			list.add(new ItemStack(item, 1, 1));
 		}
-		if (ConfigExperiments.enableMangroveBlocks) {
+		if (ConfigBlocksItems.enableMangroveWoodFamily) {
 			list.add(new ItemStack(item, 1, 2));
 		}
 		if (ConfigBlocksItems.enableCherryBlocks) {

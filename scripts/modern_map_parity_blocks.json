@@ -1,0 +1,2427 @@
+{
+  "target": "Minecraft Java 1.21.11 visual block compatibility shells",
+  "note": "Only genuinely missing visual/standalone families are listed; existing EFR subtype blocks remain authoritative and are mapped by the Backporter.",
+  "count": 242,
+  "blocks": [
+    {
+      "ver": "1.9",
+      "name": "repeating_command_block",
+      "style": "CUBE",
+      "texture": "repeating_command_block",
+      "asset": null,
+      "material": "ROCK",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.9",
+      "name": "chain_command_block",
+      "style": "CUBE",
+      "texture": "chain_command_block",
+      "asset": null,
+      "material": "ROCK",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.10",
+      "name": "structure_block",
+      "style": "CUBE",
+      "texture": "structure_block",
+      "asset": null,
+      "material": "ROCK",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.10",
+      "name": "structure_void",
+      "style": "CUBE",
+      "texture": "structure_void",
+      "asset": null,
+      "material": "ROCK",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.13",
+      "name": "dried_kelp_block",
+      "style": "CUBE",
+      "texture": "dried_kelp_block",
+      "asset": null,
+      "material": "PLANT",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.13",
+      "name": "kelp",
+      "style": "PLANT",
+      "texture": "kelp",
+      "asset": null,
+      "material": "PLANT",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.13",
+      "name": "kelp_plant",
+      "style": "PLANT",
+      "texture": "kelp_plant",
+      "asset": null,
+      "material": "PLANT",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.13",
+      "name": "seagrass",
+      "style": "PLANT",
+      "texture": "seagrass",
+      "asset": null,
+      "material": "PLANT",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.13",
+      "name": "tall_seagrass",
+      "style": "PLANT",
+      "texture": "seagrass",
+      "asset": null,
+      "material": "PLANT",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.13",
+      "name": "sea_pickle",
+      "style": "LAYER",
+      "texture": "sea_pickle",
+      "asset": null,
+      "material": "PLANT",
+      "light": 6,
+      "meta": ""
+    },
+    {
+      "ver": "1.13",
+      "name": "conduit",
+      "style": "SMALL",
+      "texture": "conduit_base",
+      "asset": "textures/entity/conduit/base.png",
+      "material": "ROCK",
+      "light": 15,
+      "meta": ""
+    },
+    {
+      "ver": "1.13",
+      "name": "turtle_egg",
+      "style": "SMALL",
+      "texture": "turtle_egg",
+      "asset": null,
+      "material": "ROCK",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.13",
+      "name": "tube_coral_block",
+      "style": "CUBE",
+      "texture": "tube_coral_block",
+      "asset": null,
+      "material": "ROCK",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.13",
+      "name": "dead_tube_coral_block",
+      "style": "CUBE",
+      "texture": "dead_tube_coral_block",
+      "asset": null,
+      "material": "ROCK",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.13",
+      "name": "tube_coral",
+      "style": "PLANT",
+      "texture": "tube_coral",
+      "asset": null,
+      "material": "PLANT",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.13",
+      "name": "dead_tube_coral",
+      "style": "PLANT",
+      "texture": "dead_tube_coral",
+      "asset": null,
+      "material": "PLANT",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.13",
+      "name": "tube_coral_fan",
+      "style": "PLANT",
+      "texture": "tube_coral_fan",
+      "asset": null,
+      "material": "PLANT",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.13",
+      "name": "dead_tube_coral_fan",
+      "style": "PLANT",
+      "texture": "dead_tube_coral_fan",
+      "asset": null,
+      "material": "PLANT",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.13",
+      "name": "tube_coral_wall_fan",
+      "style": "WALL_PLANT",
+      "texture": "tube_coral_fan",
+      "asset": null,
+      "material": "PLANT",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.13",
+      "name": "dead_tube_coral_wall_fan",
+      "style": "WALL_PLANT",
+      "texture": "dead_tube_coral_fan",
+      "asset": null,
+      "material": "PLANT",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.13",
+      "name": "brain_coral_block",
+      "style": "CUBE",
+      "texture": "brain_coral_block",
+      "asset": null,
+      "material": "ROCK",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.13",
+      "name": "dead_brain_coral_block",
+      "style": "CUBE",
+      "texture": "dead_brain_coral_block",
+      "asset": null,
+      "material": "ROCK",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.13",
+      "name": "brain_coral",
+      "style": "PLANT",
+      "texture": "brain_coral",
+      "asset": null,
+      "material": "PLANT",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.13",
+      "name": "dead_brain_coral",
+      "style": "PLANT",
+      "texture": "dead_brain_coral",
+      "asset": null,
+      "material": "PLANT",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.13",
+      "name": "brain_coral_fan",
+      "style": "PLANT",
+      "texture": "brain_coral_fan",
+      "asset": null,
+      "material": "PLANT",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.13",
+      "name": "dead_brain_coral_fan",
+      "style": "PLANT",
+      "texture": "dead_brain_coral_fan",
+      "asset": null,
+      "material": "PLANT",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.13",
+      "name": "brain_coral_wall_fan",
+      "style": "WALL_PLANT",
+      "texture": "brain_coral_fan",
+      "asset": null,
+      "material": "PLANT",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.13",
+      "name": "dead_brain_coral_wall_fan",
+      "style": "WALL_PLANT",
+      "texture": "dead_brain_coral_fan",
+      "asset": null,
+      "material": "PLANT",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.13",
+      "name": "bubble_coral_block",
+      "style": "CUBE",
+      "texture": "bubble_coral_block",
+      "asset": null,
+      "material": "ROCK",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.13",
+      "name": "dead_bubble_coral_block",
+      "style": "CUBE",
+      "texture": "dead_bubble_coral_block",
+      "asset": null,
+      "material": "ROCK",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.13",
+      "name": "bubble_coral",
+      "style": "PLANT",
+      "texture": "bubble_coral",
+      "asset": null,
+      "material": "PLANT",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.13",
+      "name": "dead_bubble_coral",
+      "style": "PLANT",
+      "texture": "dead_bubble_coral",
+      "asset": null,
+      "material": "PLANT",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.13",
+      "name": "bubble_coral_fan",
+      "style": "PLANT",
+      "texture": "bubble_coral_fan",
+      "asset": null,
+      "material": "PLANT",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.13",
+      "name": "dead_bubble_coral_fan",
+      "style": "PLANT",
+      "texture": "dead_bubble_coral_fan",
+      "asset": null,
+      "material": "PLANT",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.13",
+      "name": "bubble_coral_wall_fan",
+      "style": "WALL_PLANT",
+      "texture": "bubble_coral_fan",
+      "asset": null,
+      "material": "PLANT",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.13",
+      "name": "dead_bubble_coral_wall_fan",
+      "style": "WALL_PLANT",
+      "texture": "dead_bubble_coral_fan",
+      "asset": null,
+      "material": "PLANT",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.13",
+      "name": "fire_coral_block",
+      "style": "CUBE",
+      "texture": "fire_coral_block",
+      "asset": null,
+      "material": "ROCK",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.13",
+      "name": "dead_fire_coral_block",
+      "style": "CUBE",
+      "texture": "dead_fire_coral_block",
+      "asset": null,
+      "material": "ROCK",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.13",
+      "name": "fire_coral",
+      "style": "PLANT",
+      "texture": "fire_coral",
+      "asset": null,
+      "material": "PLANT",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.13",
+      "name": "dead_fire_coral",
+      "style": "PLANT",
+      "texture": "dead_fire_coral",
+      "asset": null,
+      "material": "PLANT",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.13",
+      "name": "fire_coral_fan",
+      "style": "PLANT",
+      "texture": "fire_coral_fan",
+      "asset": null,
+      "material": "PLANT",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.13",
+      "name": "dead_fire_coral_fan",
+      "style": "PLANT",
+      "texture": "dead_fire_coral_fan",
+      "asset": null,
+      "material": "PLANT",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.13",
+      "name": "fire_coral_wall_fan",
+      "style": "WALL_PLANT",
+      "texture": "fire_coral_fan",
+      "asset": null,
+      "material": "PLANT",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.13",
+      "name": "dead_fire_coral_wall_fan",
+      "style": "WALL_PLANT",
+      "texture": "dead_fire_coral_fan",
+      "asset": null,
+      "material": "PLANT",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.13",
+      "name": "horn_coral_block",
+      "style": "CUBE",
+      "texture": "horn_coral_block",
+      "asset": null,
+      "material": "ROCK",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.13",
+      "name": "dead_horn_coral_block",
+      "style": "CUBE",
+      "texture": "dead_horn_coral_block",
+      "asset": null,
+      "material": "ROCK",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.13",
+      "name": "horn_coral",
+      "style": "PLANT",
+      "texture": "horn_coral",
+      "asset": null,
+      "material": "PLANT",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.13",
+      "name": "dead_horn_coral",
+      "style": "PLANT",
+      "texture": "dead_horn_coral",
+      "asset": null,
+      "material": "PLANT",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.13",
+      "name": "horn_coral_fan",
+      "style": "PLANT",
+      "texture": "horn_coral_fan",
+      "asset": null,
+      "material": "PLANT",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.13",
+      "name": "dead_horn_coral_fan",
+      "style": "PLANT",
+      "texture": "dead_horn_coral_fan",
+      "asset": null,
+      "material": "PLANT",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.13",
+      "name": "horn_coral_wall_fan",
+      "style": "WALL_PLANT",
+      "texture": "horn_coral_fan",
+      "asset": null,
+      "material": "PLANT",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.13",
+      "name": "dead_horn_coral_wall_fan",
+      "style": "WALL_PLANT",
+      "texture": "dead_horn_coral_fan",
+      "asset": null,
+      "material": "PLANT",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.14",
+      "name": "scaffolding",
+      "style": "CUTOUT",
+      "texture": "scaffolding_side",
+      "asset": null,
+      "material": "WOOD",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.14",
+      "name": "bell",
+      "style": "SMALL",
+      "texture": "bell_body",
+      "asset": "textures/entity/bell/bell_body.png",
+      "material": "METAL",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.14",
+      "name": "lectern",
+      "style": "CUTOUT",
+      "texture": "lectern_sides",
+      "asset": null,
+      "material": "WOOD",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.14",
+      "name": "grindstone",
+      "style": "CUTOUT",
+      "texture": "grindstone_side",
+      "asset": null,
+      "material": "ROCK",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.14",
+      "name": "campfire",
+      "style": "LAYER",
+      "texture": "campfire_log",
+      "asset": null,
+      "material": "WOOD",
+      "light": 15,
+      "meta": ""
+    },
+    {
+      "ver": "1.14",
+      "name": "jigsaw",
+      "style": "CUBE",
+      "texture": "jigsaw_top",
+      "asset": null,
+      "material": "ROCK",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.16",
+      "name": "soul_campfire",
+      "style": "LAYER",
+      "texture": "soul_campfire_log",
+      "asset": null,
+      "material": "WOOD",
+      "light": 10,
+      "meta": ""
+    },
+    {
+      "ver": "1.16",
+      "name": "respawn_anchor",
+      "style": "CUBE",
+      "texture": "respawn_anchor_side0",
+      "asset": null,
+      "material": "ROCK",
+      "light": 3,
+      "meta": ""
+    },
+    {
+      "ver": "1.16",
+      "name": "lodestone",
+      "style": "CUBE",
+      "texture": "lodestone_side",
+      "asset": null,
+      "material": "ROCK",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.17",
+      "name": "candle",
+      "style": "CANDLE",
+      "texture": "candle",
+      "asset": null,
+      "material": "PLANT",
+      "light": 3,
+      "meta": ""
+    },
+    {
+      "ver": "1.17",
+      "name": "white_candle",
+      "style": "CANDLE",
+      "texture": "white_candle",
+      "asset": null,
+      "material": "PLANT",
+      "light": 3,
+      "meta": ""
+    },
+    {
+      "ver": "1.17",
+      "name": "orange_candle",
+      "style": "CANDLE",
+      "texture": "orange_candle",
+      "asset": null,
+      "material": "PLANT",
+      "light": 3,
+      "meta": ""
+    },
+    {
+      "ver": "1.17",
+      "name": "magenta_candle",
+      "style": "CANDLE",
+      "texture": "magenta_candle",
+      "asset": null,
+      "material": "PLANT",
+      "light": 3,
+      "meta": ""
+    },
+    {
+      "ver": "1.17",
+      "name": "light_blue_candle",
+      "style": "CANDLE",
+      "texture": "light_blue_candle",
+      "asset": null,
+      "material": "PLANT",
+      "light": 3,
+      "meta": ""
+    },
+    {
+      "ver": "1.17",
+      "name": "yellow_candle",
+      "style": "CANDLE",
+      "texture": "yellow_candle",
+      "asset": null,
+      "material": "PLANT",
+      "light": 3,
+      "meta": ""
+    },
+    {
+      "ver": "1.17",
+      "name": "lime_candle",
+      "style": "CANDLE",
+      "texture": "lime_candle",
+      "asset": null,
+      "material": "PLANT",
+      "light": 3,
+      "meta": ""
+    },
+    {
+      "ver": "1.17",
+      "name": "pink_candle",
+      "style": "CANDLE",
+      "texture": "pink_candle",
+      "asset": null,
+      "material": "PLANT",
+      "light": 3,
+      "meta": ""
+    },
+    {
+      "ver": "1.17",
+      "name": "gray_candle",
+      "style": "CANDLE",
+      "texture": "gray_candle",
+      "asset": null,
+      "material": "PLANT",
+      "light": 3,
+      "meta": ""
+    },
+    {
+      "ver": "1.17",
+      "name": "light_gray_candle",
+      "style": "CANDLE",
+      "texture": "light_gray_candle",
+      "asset": null,
+      "material": "PLANT",
+      "light": 3,
+      "meta": ""
+    },
+    {
+      "ver": "1.17",
+      "name": "cyan_candle",
+      "style": "CANDLE",
+      "texture": "cyan_candle",
+      "asset": null,
+      "material": "PLANT",
+      "light": 3,
+      "meta": ""
+    },
+    {
+      "ver": "1.17",
+      "name": "purple_candle",
+      "style": "CANDLE",
+      "texture": "purple_candle",
+      "asset": null,
+      "material": "PLANT",
+      "light": 3,
+      "meta": ""
+    },
+    {
+      "ver": "1.17",
+      "name": "blue_candle",
+      "style": "CANDLE",
+      "texture": "blue_candle",
+      "asset": null,
+      "material": "PLANT",
+      "light": 3,
+      "meta": ""
+    },
+    {
+      "ver": "1.17",
+      "name": "brown_candle",
+      "style": "CANDLE",
+      "texture": "brown_candle",
+      "asset": null,
+      "material": "PLANT",
+      "light": 3,
+      "meta": ""
+    },
+    {
+      "ver": "1.17",
+      "name": "green_candle",
+      "style": "CANDLE",
+      "texture": "green_candle",
+      "asset": null,
+      "material": "PLANT",
+      "light": 3,
+      "meta": ""
+    },
+    {
+      "ver": "1.17",
+      "name": "red_candle",
+      "style": "CANDLE",
+      "texture": "red_candle",
+      "asset": null,
+      "material": "PLANT",
+      "light": 3,
+      "meta": ""
+    },
+    {
+      "ver": "1.17",
+      "name": "black_candle",
+      "style": "CANDLE",
+      "texture": "black_candle",
+      "asset": null,
+      "material": "PLANT",
+      "light": 3,
+      "meta": ""
+    },
+    {
+      "ver": "1.17",
+      "name": "candle_cake",
+      "style": "CANDLE_CAKE",
+      "texture": "candle",
+      "asset": null,
+      "material": "PLANT",
+      "light": 3,
+      "meta": ""
+    },
+    {
+      "ver": "1.17",
+      "name": "white_candle_cake",
+      "style": "CANDLE_CAKE",
+      "texture": "white_candle",
+      "asset": null,
+      "material": "PLANT",
+      "light": 3,
+      "meta": ""
+    },
+    {
+      "ver": "1.17",
+      "name": "orange_candle_cake",
+      "style": "CANDLE_CAKE",
+      "texture": "orange_candle",
+      "asset": null,
+      "material": "PLANT",
+      "light": 3,
+      "meta": ""
+    },
+    {
+      "ver": "1.17",
+      "name": "magenta_candle_cake",
+      "style": "CANDLE_CAKE",
+      "texture": "magenta_candle",
+      "asset": null,
+      "material": "PLANT",
+      "light": 3,
+      "meta": ""
+    },
+    {
+      "ver": "1.17",
+      "name": "light_blue_candle_cake",
+      "style": "CANDLE_CAKE",
+      "texture": "light_blue_candle",
+      "asset": null,
+      "material": "PLANT",
+      "light": 3,
+      "meta": ""
+    },
+    {
+      "ver": "1.17",
+      "name": "yellow_candle_cake",
+      "style": "CANDLE_CAKE",
+      "texture": "yellow_candle",
+      "asset": null,
+      "material": "PLANT",
+      "light": 3,
+      "meta": ""
+    },
+    {
+      "ver": "1.17",
+      "name": "lime_candle_cake",
+      "style": "CANDLE_CAKE",
+      "texture": "lime_candle",
+      "asset": null,
+      "material": "PLANT",
+      "light": 3,
+      "meta": ""
+    },
+    {
+      "ver": "1.17",
+      "name": "pink_candle_cake",
+      "style": "CANDLE_CAKE",
+      "texture": "pink_candle",
+      "asset": null,
+      "material": "PLANT",
+      "light": 3,
+      "meta": ""
+    },
+    {
+      "ver": "1.17",
+      "name": "gray_candle_cake",
+      "style": "CANDLE_CAKE",
+      "texture": "gray_candle",
+      "asset": null,
+      "material": "PLANT",
+      "light": 3,
+      "meta": ""
+    },
+    {
+      "ver": "1.17",
+      "name": "light_gray_candle_cake",
+      "style": "CANDLE_CAKE",
+      "texture": "light_gray_candle",
+      "asset": null,
+      "material": "PLANT",
+      "light": 3,
+      "meta": ""
+    },
+    {
+      "ver": "1.17",
+      "name": "cyan_candle_cake",
+      "style": "CANDLE_CAKE",
+      "texture": "cyan_candle",
+      "asset": null,
+      "material": "PLANT",
+      "light": 3,
+      "meta": ""
+    },
+    {
+      "ver": "1.17",
+      "name": "purple_candle_cake",
+      "style": "CANDLE_CAKE",
+      "texture": "purple_candle",
+      "asset": null,
+      "material": "PLANT",
+      "light": 3,
+      "meta": ""
+    },
+    {
+      "ver": "1.17",
+      "name": "blue_candle_cake",
+      "style": "CANDLE_CAKE",
+      "texture": "blue_candle",
+      "asset": null,
+      "material": "PLANT",
+      "light": 3,
+      "meta": ""
+    },
+    {
+      "ver": "1.17",
+      "name": "brown_candle_cake",
+      "style": "CANDLE_CAKE",
+      "texture": "brown_candle",
+      "asset": null,
+      "material": "PLANT",
+      "light": 3,
+      "meta": ""
+    },
+    {
+      "ver": "1.17",
+      "name": "green_candle_cake",
+      "style": "CANDLE_CAKE",
+      "texture": "green_candle",
+      "asset": null,
+      "material": "PLANT",
+      "light": 3,
+      "meta": ""
+    },
+    {
+      "ver": "1.17",
+      "name": "red_candle_cake",
+      "style": "CANDLE_CAKE",
+      "texture": "red_candle",
+      "asset": null,
+      "material": "PLANT",
+      "light": 3,
+      "meta": ""
+    },
+    {
+      "ver": "1.17",
+      "name": "black_candle_cake",
+      "style": "CANDLE_CAKE",
+      "texture": "black_candle",
+      "asset": null,
+      "material": "PLANT",
+      "light": 3,
+      "meta": ""
+    },
+    {
+      "ver": "1.17",
+      "name": "powder_snow",
+      "style": "CUBE",
+      "texture": "powder_snow",
+      "asset": null,
+      "material": "SNOW",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.19",
+      "name": "sculk_vein",
+      "style": "VINE",
+      "texture": "sculk_vein",
+      "asset": null,
+      "material": "PLANT",
+      "light": 1,
+      "meta": ""
+    },
+    {
+      "ver": "1.19",
+      "name": "sculk_sensor",
+      "style": "SMALL",
+      "texture": "sculk_sensor_top",
+      "asset": null,
+      "material": "ROCK",
+      "light": 1,
+      "meta": ""
+    },
+    {
+      "ver": "1.19",
+      "name": "sculk_shrieker",
+      "style": "CUBE",
+      "texture": "sculk_shrieker_top",
+      "asset": null,
+      "material": "ROCK",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.19",
+      "name": "reinforced_deepslate",
+      "style": "CUBE",
+      "texture": "reinforced_deepslate",
+      "asset": null,
+      "material": "ROCK",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.19",
+      "name": "frogspawn",
+      "style": "LAYER",
+      "texture": "frogspawn",
+      "asset": null,
+      "material": "PLANT",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.19",
+      "name": "ochre_froglight",
+      "style": "CUBE",
+      "texture": "ochre_froglight",
+      "asset": null,
+      "material": "ROCK",
+      "light": 15,
+      "meta": ""
+    },
+    {
+      "ver": "1.19",
+      "name": "verdant_froglight",
+      "style": "CUBE",
+      "texture": "verdant_froglight",
+      "asset": null,
+      "material": "ROCK",
+      "light": 15,
+      "meta": ""
+    },
+    {
+      "ver": "1.19",
+      "name": "pearlescent_froglight",
+      "style": "CUBE",
+      "texture": "pearlescent_froglight",
+      "asset": null,
+      "material": "ROCK",
+      "light": 15,
+      "meta": ""
+    },
+    {
+      "ver": "1.19",
+      "name": "mangrove_leaves",
+      "style": "LEAVES",
+      "texture": "mangrove_leaves",
+      "asset": null,
+      "material": "LEAVES",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.19",
+      "name": "mangrove_propagule",
+      "style": "PLANT",
+      "texture": "mangrove_propagule",
+      "asset": null,
+      "material": "PLANT",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.20",
+      "name": "chiseled_bookshelf",
+      "style": "CUBE",
+      "texture": "chiseled_bookshelf_empty",
+      "asset": null,
+      "material": "WOOD",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.20",
+      "name": "suspicious_sand",
+      "style": "CUBE",
+      "texture": "suspicious_sand",
+      "asset": null,
+      "material": "SAND",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.20",
+      "name": "suspicious_gravel",
+      "style": "CUBE",
+      "texture": "suspicious_gravel",
+      "asset": null,
+      "material": "SAND",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.20",
+      "name": "decorated_pot",
+      "style": "SMALL",
+      "texture": "terracotta",
+      "asset": "textures/block/terracotta.png",
+      "material": "ROCK",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.20",
+      "name": "torchflower",
+      "style": "PLANT",
+      "texture": "torchflower",
+      "asset": null,
+      "material": "PLANT",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.20",
+      "name": "torchflower_crop",
+      "style": "PLANT",
+      "texture": "torchflower_crop_stage1",
+      "asset": null,
+      "material": "PLANT",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.20",
+      "name": "pitcher_plant",
+      "style": "PLANT",
+      "texture": "pitcher_plant_top",
+      "asset": null,
+      "material": "PLANT",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.20",
+      "name": "pitcher_crop",
+      "style": "PLANT",
+      "texture": "pitcher_crop_top_stage_4",
+      "asset": null,
+      "material": "PLANT",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.20",
+      "name": "sniffer_egg",
+      "style": "SMALL",
+      "texture": "sniffer_egg",
+      "asset": null,
+      "material": "ROCK",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.20",
+      "name": "calibrated_sculk_sensor",
+      "style": "SMALL",
+      "texture": "calibrated_sculk_sensor_top",
+      "asset": null,
+      "material": "ROCK",
+      "light": 1,
+      "meta": ""
+    },
+    {
+      "ver": "1.20",
+      "name": "oak_hanging_sign",
+      "style": "HANGING_SIGN",
+      "texture": "oak_planks",
+      "asset": null,
+      "material": "WOOD",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.20",
+      "name": "oak_wall_hanging_sign",
+      "style": "HANGING_SIGN",
+      "texture": "oak_planks",
+      "asset": null,
+      "material": "WOOD",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.20",
+      "name": "spruce_hanging_sign",
+      "style": "HANGING_SIGN",
+      "texture": "spruce_planks",
+      "asset": null,
+      "material": "WOOD",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.20",
+      "name": "spruce_wall_hanging_sign",
+      "style": "HANGING_SIGN",
+      "texture": "spruce_planks",
+      "asset": null,
+      "material": "WOOD",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.20",
+      "name": "birch_hanging_sign",
+      "style": "HANGING_SIGN",
+      "texture": "birch_planks",
+      "asset": null,
+      "material": "WOOD",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.20",
+      "name": "birch_wall_hanging_sign",
+      "style": "HANGING_SIGN",
+      "texture": "birch_planks",
+      "asset": null,
+      "material": "WOOD",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.20",
+      "name": "jungle_hanging_sign",
+      "style": "HANGING_SIGN",
+      "texture": "jungle_planks",
+      "asset": null,
+      "material": "WOOD",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.20",
+      "name": "jungle_wall_hanging_sign",
+      "style": "HANGING_SIGN",
+      "texture": "jungle_planks",
+      "asset": null,
+      "material": "WOOD",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.20",
+      "name": "acacia_hanging_sign",
+      "style": "HANGING_SIGN",
+      "texture": "acacia_planks",
+      "asset": null,
+      "material": "WOOD",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.20",
+      "name": "acacia_wall_hanging_sign",
+      "style": "HANGING_SIGN",
+      "texture": "acacia_planks",
+      "asset": null,
+      "material": "WOOD",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.20",
+      "name": "dark_oak_hanging_sign",
+      "style": "HANGING_SIGN",
+      "texture": "dark_oak_planks",
+      "asset": null,
+      "material": "WOOD",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.20",
+      "name": "dark_oak_wall_hanging_sign",
+      "style": "HANGING_SIGN",
+      "texture": "dark_oak_planks",
+      "asset": null,
+      "material": "WOOD",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.20",
+      "name": "mangrove_hanging_sign",
+      "style": "HANGING_SIGN",
+      "texture": "mangrove_planks",
+      "asset": null,
+      "material": "WOOD",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.20",
+      "name": "mangrove_wall_hanging_sign",
+      "style": "HANGING_SIGN",
+      "texture": "mangrove_planks",
+      "asset": null,
+      "material": "WOOD",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.20",
+      "name": "cherry_hanging_sign",
+      "style": "HANGING_SIGN",
+      "texture": "cherry_planks",
+      "asset": null,
+      "material": "WOOD",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.20",
+      "name": "cherry_wall_hanging_sign",
+      "style": "HANGING_SIGN",
+      "texture": "cherry_planks",
+      "asset": null,
+      "material": "WOOD",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.20",
+      "name": "bamboo_hanging_sign",
+      "style": "HANGING_SIGN",
+      "texture": "bamboo_planks",
+      "asset": null,
+      "material": "WOOD",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.20",
+      "name": "bamboo_wall_hanging_sign",
+      "style": "HANGING_SIGN",
+      "texture": "bamboo_planks",
+      "asset": null,
+      "material": "WOOD",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.20",
+      "name": "crimson_hanging_sign",
+      "style": "HANGING_SIGN",
+      "texture": "crimson_planks",
+      "asset": null,
+      "material": "WOOD",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.20",
+      "name": "crimson_wall_hanging_sign",
+      "style": "HANGING_SIGN",
+      "texture": "crimson_planks",
+      "asset": null,
+      "material": "WOOD",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.20",
+      "name": "warped_hanging_sign",
+      "style": "HANGING_SIGN",
+      "texture": "warped_planks",
+      "asset": null,
+      "material": "WOOD",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.20",
+      "name": "warped_wall_hanging_sign",
+      "style": "HANGING_SIGN",
+      "texture": "warped_planks",
+      "asset": null,
+      "material": "WOOD",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21",
+      "name": "trial_spawner",
+      "style": "CUBE",
+      "texture": "trial_spawner_side_inactive",
+      "asset": null,
+      "material": "METAL",
+      "light": 4,
+      "meta": ""
+    },
+    {
+      "ver": "1.21",
+      "name": "vault",
+      "style": "CUBE",
+      "texture": "vault_top",
+      "asset": null,
+      "material": "METAL",
+      "light": 6,
+      "meta": ""
+    },
+    {
+      "ver": "1.21",
+      "name": "crafter",
+      "style": "CUBE",
+      "texture": "crafter_top",
+      "asset": null,
+      "material": "WOOD",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21",
+      "name": "heavy_core",
+      "style": "SMALL",
+      "texture": "heavy_core",
+      "asset": null,
+      "material": "METAL",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.4",
+      "name": "pale_oak_planks",
+      "style": "CUBE",
+      "texture": "pale_oak_planks",
+      "asset": null,
+      "material": "WOOD",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.4",
+      "name": "pale_oak_log",
+      "style": "LOG",
+      "texture": "pale_oak_log",
+      "asset": null,
+      "material": "WOOD",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.4",
+      "name": "pale_oak_wood",
+      "style": "CUBE",
+      "texture": "pale_oak_log",
+      "asset": null,
+      "material": "WOOD",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.4",
+      "name": "stripped_pale_oak_log",
+      "style": "LOG",
+      "texture": "stripped_pale_oak_log",
+      "asset": null,
+      "material": "WOOD",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.4",
+      "name": "stripped_pale_oak_wood",
+      "style": "CUBE",
+      "texture": "stripped_pale_oak_log",
+      "asset": null,
+      "material": "WOOD",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.4",
+      "name": "pale_oak_leaves",
+      "style": "LEAVES",
+      "texture": "pale_oak_leaves",
+      "asset": null,
+      "material": "LEAVES",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.4",
+      "name": "pale_oak_sapling",
+      "style": "PLANT",
+      "texture": "pale_oak_sapling",
+      "asset": null,
+      "material": "PLANT",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.4",
+      "name": "pale_oak_stairs",
+      "style": "STAIRS",
+      "texture": "pale_oak_planks",
+      "asset": null,
+      "material": "WOOD",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.4",
+      "name": "pale_oak_slab",
+      "style": "SLAB",
+      "texture": "pale_oak_planks",
+      "asset": null,
+      "material": "WOOD",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.4",
+      "name": "pale_oak_fence",
+      "style": "FENCE",
+      "texture": "pale_oak_planks",
+      "asset": null,
+      "material": "WOOD",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.4",
+      "name": "pale_oak_fence_gate",
+      "style": "FENCE_GATE",
+      "texture": "pale_oak_planks",
+      "asset": null,
+      "material": "WOOD",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.4",
+      "name": "pale_oak_door",
+      "style": "DOOR",
+      "texture": "pale_oak_door",
+      "asset": null,
+      "material": "WOOD",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.4",
+      "name": "pale_oak_trapdoor",
+      "style": "TRAPDOOR",
+      "texture": "pale_oak_trapdoor",
+      "asset": null,
+      "material": "WOOD",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.4",
+      "name": "pale_oak_pressure_plate",
+      "style": "LAYER",
+      "texture": "pale_oak_planks",
+      "asset": null,
+      "material": "WOOD",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.4",
+      "name": "pale_oak_button",
+      "style": "BUTTON",
+      "texture": "pale_oak_planks",
+      "asset": null,
+      "material": "WOOD",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.4",
+      "name": "pale_oak_sign",
+      "style": "SIGN",
+      "texture": "pale_oak_planks",
+      "asset": null,
+      "material": "WOOD",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.4",
+      "name": "pale_oak_wall_sign",
+      "style": "SIGN",
+      "texture": "pale_oak_planks",
+      "asset": null,
+      "material": "WOOD",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.4",
+      "name": "pale_oak_hanging_sign",
+      "style": "HANGING_SIGN",
+      "texture": "pale_oak_planks",
+      "asset": null,
+      "material": "WOOD",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.4",
+      "name": "pale_oak_wall_hanging_sign",
+      "style": "HANGING_SIGN",
+      "texture": "pale_oak_planks",
+      "asset": null,
+      "material": "WOOD",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.4",
+      "name": "pale_moss_block",
+      "style": "CUBE",
+      "texture": "pale_moss_block",
+      "asset": null,
+      "material": "PLANT",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.4",
+      "name": "pale_moss_carpet",
+      "style": "LAYER",
+      "texture": "pale_moss_carpet",
+      "asset": null,
+      "material": "PLANT",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.4",
+      "name": "pale_hanging_moss",
+      "style": "VINE",
+      "texture": "pale_hanging_moss",
+      "asset": null,
+      "material": "PLANT",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.4",
+      "name": "creaking_heart",
+      "style": "CUBE",
+      "texture": "creaking_heart",
+      "asset": null,
+      "material": "WOOD",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.4",
+      "name": "closed_eyeblossom",
+      "style": "PLANT",
+      "texture": "closed_eyeblossom",
+      "asset": null,
+      "material": "PLANT",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.4",
+      "name": "open_eyeblossom",
+      "style": "PLANT",
+      "texture": "open_eyeblossom",
+      "asset": null,
+      "material": "PLANT",
+      "light": 3,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.4",
+      "name": "resin_clump",
+      "style": "VINE",
+      "texture": "resin_clump",
+      "asset": null,
+      "material": "PLANT",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.4",
+      "name": "resin_block",
+      "style": "CUBE",
+      "texture": "resin_block",
+      "asset": null,
+      "material": "ROCK",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.4",
+      "name": "resin_bricks",
+      "style": "CUBE",
+      "texture": "resin_bricks",
+      "asset": null,
+      "material": "ROCK",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.4",
+      "name": "resin_brick_slab",
+      "style": "SLAB",
+      "texture": "resin_bricks",
+      "asset": null,
+      "material": "ROCK",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.4",
+      "name": "resin_brick_stairs",
+      "style": "STAIRS",
+      "texture": "resin_bricks",
+      "asset": null,
+      "material": "ROCK",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.4",
+      "name": "resin_brick_wall",
+      "style": "WALL",
+      "texture": "resin_bricks",
+      "asset": null,
+      "material": "ROCK",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.4",
+      "name": "chiseled_resin_bricks",
+      "style": "CUBE",
+      "texture": "chiseled_resin_bricks",
+      "asset": null,
+      "material": "ROCK",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.5",
+      "name": "firefly_bush",
+      "style": "PLANT",
+      "texture": "firefly_bush",
+      "asset": null,
+      "material": "PLANT",
+      "light": 2,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.5",
+      "name": "bush",
+      "style": "PLANT",
+      "texture": "bush",
+      "asset": null,
+      "material": "PLANT",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.5",
+      "name": "short_dry_grass",
+      "style": "PLANT",
+      "texture": "short_dry_grass",
+      "asset": null,
+      "material": "PLANT",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.5",
+      "name": "tall_dry_grass",
+      "style": "PLANT",
+      "texture": "tall_dry_grass",
+      "asset": null,
+      "material": "PLANT",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.5",
+      "name": "cactus_flower",
+      "style": "PLANT",
+      "texture": "cactus_flower",
+      "asset": null,
+      "material": "PLANT",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.5",
+      "name": "leaf_litter",
+      "style": "LAYER",
+      "texture": "leaf_litter",
+      "asset": null,
+      "material": "PLANT",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.5",
+      "name": "wildflowers",
+      "style": "LAYER",
+      "texture": "wildflowers",
+      "asset": null,
+      "material": "PLANT",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.6",
+      "name": "dried_ghast",
+      "style": "SMALL",
+      "texture": "dried_ghast",
+      "asset": null,
+      "material": "ROCK",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.9",
+      "name": "copper_chest",
+      "style": "CUBE",
+      "texture": "copper_block",
+      "asset": null,
+      "material": "METAL",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.9",
+      "name": "copper_golem_statue",
+      "style": "SMALL",
+      "texture": "copper_block",
+      "asset": null,
+      "material": "METAL",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.9",
+      "name": "copper_bars",
+      "style": "PANE",
+      "texture": "copper_bars",
+      "asset": null,
+      "material": "METAL",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.9",
+      "name": "copper_chain",
+      "style": "CUTOUT",
+      "texture": "copper_chain",
+      "asset": null,
+      "material": "METAL",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.9",
+      "name": "copper_lantern",
+      "style": "SMALL",
+      "texture": "copper_lantern",
+      "asset": null,
+      "material": "METAL",
+      "light": 15,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.9",
+      "name": "waxed_copper_chest",
+      "style": "CUBE",
+      "texture": "copper_block",
+      "asset": null,
+      "material": "METAL",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.9",
+      "name": "waxed_copper_golem_statue",
+      "style": "SMALL",
+      "texture": "copper_block",
+      "asset": null,
+      "material": "METAL",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.9",
+      "name": "waxed_copper_bars",
+      "style": "PANE",
+      "texture": "copper_bars",
+      "asset": null,
+      "material": "METAL",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.9",
+      "name": "waxed_copper_chain",
+      "style": "CUTOUT",
+      "texture": "copper_chain",
+      "asset": null,
+      "material": "METAL",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.9",
+      "name": "waxed_copper_lantern",
+      "style": "SMALL",
+      "texture": "copper_lantern",
+      "asset": null,
+      "material": "METAL",
+      "light": 15,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.9",
+      "name": "waxed_lightning_rod",
+      "style": "SMALL",
+      "texture": "copper_block",
+      "asset": null,
+      "material": "METAL",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.9",
+      "name": "exposed_copper_chest",
+      "style": "CUBE",
+      "texture": "exposed_copper",
+      "asset": null,
+      "material": "METAL",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.9",
+      "name": "exposed_copper_golem_statue",
+      "style": "SMALL",
+      "texture": "exposed_copper",
+      "asset": null,
+      "material": "METAL",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.9",
+      "name": "exposed_copper_bars",
+      "style": "PANE",
+      "texture": "exposed_copper_bars",
+      "asset": null,
+      "material": "METAL",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.9",
+      "name": "exposed_copper_chain",
+      "style": "CUTOUT",
+      "texture": "exposed_copper_chain",
+      "asset": null,
+      "material": "METAL",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.9",
+      "name": "exposed_copper_lantern",
+      "style": "SMALL",
+      "texture": "exposed_copper_lantern",
+      "asset": null,
+      "material": "METAL",
+      "light": 15,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.9",
+      "name": "exposed_lightning_rod",
+      "style": "SMALL",
+      "texture": "exposed_copper",
+      "asset": null,
+      "material": "METAL",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.9",
+      "name": "waxed_exposed_copper_chest",
+      "style": "CUBE",
+      "texture": "exposed_copper",
+      "asset": null,
+      "material": "METAL",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.9",
+      "name": "waxed_exposed_copper_golem_statue",
+      "style": "SMALL",
+      "texture": "exposed_copper",
+      "asset": null,
+      "material": "METAL",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.9",
+      "name": "waxed_exposed_copper_bars",
+      "style": "PANE",
+      "texture": "exposed_copper_bars",
+      "asset": null,
+      "material": "METAL",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.9",
+      "name": "waxed_exposed_copper_chain",
+      "style": "CUTOUT",
+      "texture": "exposed_copper_chain",
+      "asset": null,
+      "material": "METAL",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.9",
+      "name": "waxed_exposed_copper_lantern",
+      "style": "SMALL",
+      "texture": "exposed_copper_lantern",
+      "asset": null,
+      "material": "METAL",
+      "light": 15,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.9",
+      "name": "waxed_exposed_lightning_rod",
+      "style": "SMALL",
+      "texture": "exposed_copper",
+      "asset": null,
+      "material": "METAL",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.9",
+      "name": "weathered_copper_chest",
+      "style": "CUBE",
+      "texture": "weathered_copper",
+      "asset": null,
+      "material": "METAL",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.9",
+      "name": "weathered_copper_golem_statue",
+      "style": "SMALL",
+      "texture": "weathered_copper",
+      "asset": null,
+      "material": "METAL",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.9",
+      "name": "weathered_copper_bars",
+      "style": "PANE",
+      "texture": "weathered_copper_bars",
+      "asset": null,
+      "material": "METAL",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.9",
+      "name": "weathered_copper_chain",
+      "style": "CUTOUT",
+      "texture": "weathered_copper_chain",
+      "asset": null,
+      "material": "METAL",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.9",
+      "name": "weathered_copper_lantern",
+      "style": "SMALL",
+      "texture": "weathered_copper_lantern",
+      "asset": null,
+      "material": "METAL",
+      "light": 15,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.9",
+      "name": "weathered_lightning_rod",
+      "style": "SMALL",
+      "texture": "weathered_copper",
+      "asset": null,
+      "material": "METAL",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.9",
+      "name": "waxed_weathered_copper_chest",
+      "style": "CUBE",
+      "texture": "weathered_copper",
+      "asset": null,
+      "material": "METAL",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.9",
+      "name": "waxed_weathered_copper_golem_statue",
+      "style": "SMALL",
+      "texture": "weathered_copper",
+      "asset": null,
+      "material": "METAL",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.9",
+      "name": "waxed_weathered_copper_bars",
+      "style": "PANE",
+      "texture": "weathered_copper_bars",
+      "asset": null,
+      "material": "METAL",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.9",
+      "name": "waxed_weathered_copper_chain",
+      "style": "CUTOUT",
+      "texture": "weathered_copper_chain",
+      "asset": null,
+      "material": "METAL",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.9",
+      "name": "waxed_weathered_copper_lantern",
+      "style": "SMALL",
+      "texture": "weathered_copper_lantern",
+      "asset": null,
+      "material": "METAL",
+      "light": 15,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.9",
+      "name": "waxed_weathered_lightning_rod",
+      "style": "SMALL",
+      "texture": "weathered_copper",
+      "asset": null,
+      "material": "METAL",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.9",
+      "name": "oxidized_copper_chest",
+      "style": "CUBE",
+      "texture": "oxidized_copper",
+      "asset": null,
+      "material": "METAL",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.9",
+      "name": "oxidized_copper_golem_statue",
+      "style": "SMALL",
+      "texture": "oxidized_copper",
+      "asset": null,
+      "material": "METAL",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.9",
+      "name": "oxidized_copper_bars",
+      "style": "PANE",
+      "texture": "oxidized_copper_bars",
+      "asset": null,
+      "material": "METAL",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.9",
+      "name": "oxidized_copper_chain",
+      "style": "CUTOUT",
+      "texture": "oxidized_copper_chain",
+      "asset": null,
+      "material": "METAL",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.9",
+      "name": "oxidized_copper_lantern",
+      "style": "SMALL",
+      "texture": "oxidized_copper_lantern",
+      "asset": null,
+      "material": "METAL",
+      "light": 15,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.9",
+      "name": "oxidized_lightning_rod",
+      "style": "SMALL",
+      "texture": "oxidized_copper",
+      "asset": null,
+      "material": "METAL",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.9",
+      "name": "waxed_oxidized_copper_chest",
+      "style": "CUBE",
+      "texture": "oxidized_copper",
+      "asset": null,
+      "material": "METAL",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.9",
+      "name": "waxed_oxidized_copper_golem_statue",
+      "style": "SMALL",
+      "texture": "oxidized_copper",
+      "asset": null,
+      "material": "METAL",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.9",
+      "name": "waxed_oxidized_copper_bars",
+      "style": "PANE",
+      "texture": "oxidized_copper_bars",
+      "asset": null,
+      "material": "METAL",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.9",
+      "name": "waxed_oxidized_copper_chain",
+      "style": "CUTOUT",
+      "texture": "oxidized_copper_chain",
+      "asset": null,
+      "material": "METAL",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.9",
+      "name": "waxed_oxidized_copper_lantern",
+      "style": "SMALL",
+      "texture": "oxidized_copper_lantern",
+      "asset": null,
+      "material": "METAL",
+      "light": 15,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.9",
+      "name": "waxed_oxidized_lightning_rod",
+      "style": "SMALL",
+      "texture": "oxidized_copper",
+      "asset": null,
+      "material": "METAL",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.9",
+      "name": "copper_torch",
+      "style": "TORCH",
+      "texture": "copper_torch",
+      "asset": null,
+      "material": "PLANT",
+      "light": 14,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.9",
+      "name": "oak_shelf",
+      "style": "SHELF",
+      "texture": "oak_shelf",
+      "asset": "textures/block/oak_shelf.png",
+      "material": "WOOD",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.9",
+      "name": "spruce_shelf",
+      "style": "SHELF",
+      "texture": "spruce_shelf",
+      "asset": "textures/block/spruce_shelf.png",
+      "material": "WOOD",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.9",
+      "name": "birch_shelf",
+      "style": "SHELF",
+      "texture": "birch_shelf",
+      "asset": "textures/block/birch_shelf.png",
+      "material": "WOOD",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.9",
+      "name": "jungle_shelf",
+      "style": "SHELF",
+      "texture": "jungle_shelf",
+      "asset": "textures/block/jungle_shelf.png",
+      "material": "WOOD",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.9",
+      "name": "acacia_shelf",
+      "style": "SHELF",
+      "texture": "acacia_shelf",
+      "asset": "textures/block/acacia_shelf.png",
+      "material": "WOOD",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.9",
+      "name": "dark_oak_shelf",
+      "style": "SHELF",
+      "texture": "dark_oak_shelf",
+      "asset": "textures/block/dark_oak_shelf.png",
+      "material": "WOOD",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.9",
+      "name": "mangrove_shelf",
+      "style": "SHELF",
+      "texture": "mangrove_shelf",
+      "asset": "textures/block/mangrove_shelf.png",
+      "material": "WOOD",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.9",
+      "name": "cherry_shelf",
+      "style": "SHELF",
+      "texture": "cherry_shelf",
+      "asset": "textures/block/cherry_shelf.png",
+      "material": "WOOD",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.9",
+      "name": "pale_oak_shelf",
+      "style": "SHELF",
+      "texture": "pale_oak_shelf",
+      "asset": "textures/block/pale_oak_shelf.png",
+      "material": "WOOD",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.9",
+      "name": "bamboo_shelf",
+      "style": "SHELF",
+      "texture": "bamboo_shelf",
+      "asset": "textures/block/bamboo_shelf.png",
+      "material": "WOOD",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.9",
+      "name": "crimson_shelf",
+      "style": "SHELF",
+      "texture": "crimson_shelf",
+      "asset": "textures/block/crimson_shelf.png",
+      "material": "WOOD",
+      "light": 0,
+      "meta": ""
+    },
+    {
+      "ver": "1.21.9",
+      "name": "warped_shelf",
+      "style": "SHELF",
+      "texture": "warped_shelf",
+      "asset": "textures/block/warped_shelf.png",
+      "material": "WOOD",
+      "light": 0,
+      "meta": ""
+    }
+  ]
+}

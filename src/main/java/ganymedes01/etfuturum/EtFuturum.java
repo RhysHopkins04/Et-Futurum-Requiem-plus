@@ -28,6 +28,7 @@ import ganymedes01.etfuturum.core.handlers.WorldEventHandler;
 import ganymedes01.etfuturum.core.proxy.CommonProxy;
 import ganymedes01.etfuturum.core.utils.IInitAction;
 import ganymedes01.etfuturum.core.utils.Logger;
+import ganymedes01.etfuturum.core.utils.RecipeHelper;
 import ganymedes01.etfuturum.entities.ModEntityList;
 import ganymedes01.etfuturum.items.ItemWoodSign;
 import ganymedes01.etfuturum.lib.Reference;
@@ -176,9 +177,6 @@ public class EtFuturum {
 
 		AssetDirectorAPI.register(config);
 
-		FMLCommonHandler.instance().bus().register(RegistryIterateEventHandler.INSTANCE);
-		MinecraftForge.EVENT_BUS.register(RegistryIterateEventHandler.INSTANCE);
-
 		ModTagging.registerEarlyHogTags();
 	}
 
@@ -188,6 +186,7 @@ public class EtFuturum {
 	@EventHandler
 	@SuppressWarnings("unchecked")
 	public void preInit(FMLPreInitializationEvent event) {
+		RecipeHelper.init();
 		if(ModsList.IRON_CHEST.isLoaded()) {
 			CompatIronChests.init();
 		}
@@ -207,7 +206,11 @@ public class EtFuturum {
 		}
 
 		ModBlocks.init();
+		ModernMapParityBlocks.init();
 		ModItems.init();
+		if (ConfigBlocksItems.enableVanillaSigns) {
+			ganymedes01.etfuturum.blocks.BlockWoodSign.installVanillaSignTileEntityCompatibility();
+		}
 		ModEnchantments.init();
 		ModPotions.init();
 		SpectatorMode.init();
@@ -260,6 +263,7 @@ public class EtFuturum {
 		networkWrapper.registerMessage(ChestBoatOpenInventoryHandler.class, ChestBoatOpenInventoryMessage.class, 5, Side.SERVER);
 		networkWrapper.registerMessage(StartElytraFlyingHandler.class, StartElytraFlyingMessage.class, 6, Side.SERVER);
 		networkWrapper.registerMessage(AttackYawHandler.class, AttackYawMessage.class, 7, Side.CLIENT);
+		networkWrapper.registerMessage(WoodSignUpdateHandler.class, WoodSignUpdateMessage.class, 8, Side.SERVER);
 
 		if (!Reference.SNAPSHOT_BUILD && !Reference.DEV_ENVIRONMENT) {
 			MCLibModules.updateCheckAPI.submitModTask(Tags.MOD_ID, Tags.VERSION, Reference.VERSION_URL);
@@ -274,6 +278,7 @@ public class EtFuturum {
 
 	@EventHandler
 	public void init(FMLInitializationEvent event) {
+		RegistryIterateEventHandler.runInitPass();
 		for (ModBlocks block : ModBlocks.values()) {
 			if (block.isEnabled() && block.get() instanceof IInitAction) {
 				((IInitAction) block.get()).initAction();
@@ -758,10 +763,13 @@ public class EtFuturum {
 		config.addSoundEvent(ver, "entity.item_frame.place", "player");
 		config.addSoundEvent(ver, "entity.item_frame.remove_item", "player");
 		config.addSoundEvent(ver, "entity.item_frame.rotate_item", "player");
+		// 1.21.11 keeps painting break in the player category and placement in block.
+		// Lead-knot entity events were removed in 1.21.11 in favour of the item.lead family.
 		config.addSoundEvent(ver, "entity.painting.break", "player");
-		config.addSoundEvent(ver, "entity.painting.place", "player");
-		config.addSoundEvent(ver, "entity.leash_knot.break", "player");
-		config.addSoundEvent(ver, "entity.leash_knot.place", "player");
+		config.addSoundEvent(ver, "entity.painting.place", "block");
+		config.addSoundEvent(ver, "item.lead.break", "player");
+		config.addSoundEvent(ver, "item.lead.tied", "player");
+		config.addSoundEvent(ver, "item.lead.untied", "player");
 		config.addSoundEvent(ver, "entity.ender_eye.death", "neutral");
 		config.addSoundEvent(ver, "entity.ender_eye.launch", "neutral");
 		config.addSoundEvent(ver, "entity.fishing_bobber.retrieve", "neutral");
@@ -816,6 +824,7 @@ public class EtFuturum {
 		config.addSoundEvent(ver, "item.bottle.empty", "player");
 		config.addSoundEvent(ver, "item.bone_meal.use", "player");
 		config.addSoundEvent(ver, "item.honey_bottle.drink", "player");
+		config.addSoundEvent(ver, "block.lily_pad.place", "block");
 
 		config.addSoundEvent(ver, "item.armor.equip_leather", "player");
 		config.addSoundEvent(ver, "item.armor.equip_copper", "player");
@@ -854,6 +863,43 @@ public class EtFuturum {
 		config.addSoundEvent(ver, "block.blastfurnace.fire_crackle", "block");
 		config.addSoundEvent(ver, "block.smoker.smoke", "block");
 		config.addSoundEvent(ver, "block.chest.close", "block");
+		config.addSoundEvent(ver, "block.campfire.crackle", "block");
+		config.addSoundEvent(ver, "block.fire.extinguish", "block");
+		config.addSoundEvent(ver, "block.candle.place", "block");
+		config.addSoundEvent(ver, "block.candle.extinguish", "block");
+		config.addSoundEvent(ver, "item.flintandsteel.use", "player");
+		config.addSoundEvent(ver, "item.firecharge.use", "player");
+
+		// Modern sign interaction sounds are referenced directly by the two-sided sign layer.
+		config.addSoundEvent(ver, "item.dye.use", "player");
+		config.addSoundEvent(ver, "item.glow_ink_sac.use", "player");
+		config.addSoundEvent(ver, "item.ink_sac.use", "player");
+		config.addSoundEvent(ver, "block.sign.waxed_interact_fail", "block");
+		// 1.21.11 maps block.hanging_sign.waxed_interact_fail to the sign wax event with
+		// sounds.json type=event. MCLib AssetDirector treats every object name as an OGG, so
+		// requesting that alias directly would incorrectly fetch sounds/block.sign.waxed_interact_fail.ogg.
+		// DynamicSoundsResourcePack recreates the alias locally with the bare target event name;
+		// Minecraft 1.7 SoundHandler then resolves it inside the versioned AssetDirector domain.
+
+		// These parity blocks create 1.7 SoundType instances locally rather than through ModSounds,
+		// so AssetDirector must be told about their complete modern sound families explicitly.
+		for (String family : new String[] {
+				"scaffolding",
+				"hanging_sign",
+				"nether_wood_hanging_sign",
+				"bamboo_wood_hanging_sign",
+				"cherry_wood_hanging_sign"
+		}) {
+			for (String action : new String[] {"break", "step", "place", "hit", "fall"}) {
+				config.addSoundEvent(ver, "block." + family + "." + action, "block");
+			}
+		}
+		config.addSoundEvent(ver, "block.copper_chest.open", "block");
+		config.addSoundEvent(ver, "block.copper_chest.close", "block");
+		config.addSoundEvent(ver, "block.copper_chest_weathered.open", "block");
+		config.addSoundEvent(ver, "block.copper_chest_weathered.close", "block");
+		config.addSoundEvent(ver, "block.copper_chest_oxidized.open", "block");
+		config.addSoundEvent(ver, "block.copper_chest_oxidized.close", "block");
 		config.addSoundEvent(ver, "block.ender_chest.open", "block");
 		config.addSoundEvent(ver, "block.ender_chest.close", "block");
 		config.addSoundEvent(ver, "block.composter.empty", "block");
@@ -940,6 +986,9 @@ public class EtFuturum {
 		//Then we remove the mc version prefix and register that sound.
 
 		for (ModSounds.CustomSound sound : ModSounds.getSounds()) {
+			// Painting uses entity sound events with deliberately different 1.21.11 categories and
+			// is registered explicitly above; do not re-register it through the block-sound path.
+			if (sound == ModSounds.soundPainting) continue;
 			if (sound.getStepResourcePath().startsWith(Tags.MC_ASSET_VER)) { //Step sound
 				config.addSoundEvent(ver, sound.getStepResourcePath().substring(Tags.MC_ASSET_VER.length() + 1), "neutral");
 			}

@@ -1,25 +1,32 @@
 package ganymedes01.etfuturum.core.handlers;
 
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import ganymedes01.etfuturum.api.ArmorSoundsRegistry;
 import ganymedes01.etfuturum.client.sound.BlockSoundRegisterHelper;
 import ganymedes01.etfuturum.configuration.configs.ConfigSounds;
 import ganymedes01.etfuturum.recipes.ModTagging;
-import roadhog360.hogutils.api.event.BlockItemIterateEvent;
+import net.minecraft.block.Block;
+import net.minecraft.item.Item;
 
-public class RegistryIterateEventHandler {
-	private RegistryIterateEventHandler() {};
-	public static final Object INSTANCE = new RegistryIterateEventHandler();
+/**
+ * Performs the registry init pass EFR used to receive from HogUtils events.
+ * Running it directly also makes startup ordering explicit and self-contained.
+ */
+public final class RegistryIterateEventHandler {
+    private RegistryIterateEventHandler() {}
 
-	@SubscribeEvent
-	public void initIterateBlock(BlockItemIterateEvent.BlockRegister.Init event) {
-		if (ConfigSounds.newBlockSounds) {
-			BlockSoundRegisterHelper.registerSoundsDynamic(event.objToRegister, event.namespaceID);
-		}
-		ModTagging.registerBlockTagsDynamic(event.objToRegister);
-	}
+    public static void runInitPass() {
+        for (Object object : Block.blockRegistry) {
+            if (!(object instanceof Block block)) continue;
+            String name = String.valueOf(Block.blockRegistry.getNameForObject(block));
+            if (ConfigSounds.newBlockSounds) BlockSoundRegisterHelper.registerSoundsDynamic(block, name);
+            ModTagging.registerBlockTagsDynamic(block);
+        }
 
-	@SubscribeEvent
-	public void initIterateBlock(BlockItemIterateEvent.ItemRegister.Init event) {
-		ModTagging.registerItemTagsDynamic(event.objToRegister);
-	}
+        for (Object object : Item.itemRegistry) {
+            if (!(object instanceof Item item)) continue;
+            String name = String.valueOf(Item.itemRegistry.getNameForObject(item));
+            ModTagging.registerItemTagsDynamic(item);
+            if (ConfigSounds.armorEquip) ArmorSoundsRegistry.registerDefaults(item, name);
+        }
+    }
 }

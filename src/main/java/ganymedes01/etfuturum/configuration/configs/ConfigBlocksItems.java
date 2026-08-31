@@ -120,6 +120,7 @@ public class ConfigBlocksItems extends ConfigBase {
 	public static boolean enableDyedBeds;
 	public static boolean enableTarget;
 	public static boolean enableHoney;
+	public static boolean enableModernMapParityBlocks;
 
 	public static boolean enableBubbleColumns;
 
@@ -133,10 +134,21 @@ public class ConfigBlocksItems extends ConfigBase {
 	public static boolean enableSoulSoil;
 	public static boolean enableSoulLighting;
 
+	// Content availability is deliberately separate from experimental biome/world-generation toggles.
+	public static boolean enableCrimsonVegetation;
+	public static boolean enableWarpedVegetation;
+	public static boolean enableMangroveEcology;
+	public static boolean enableSculkBlocks;
+	public static boolean enableLightningRodBlock;
+	public static boolean enableEndGatewayBlock;
+
 	// Wilds Update
 	public static boolean enableMud;
 
 	// 1.20
+	public static boolean enableCrimsonWoodFamily;
+	public static boolean enableWarpedWoodFamily;
+	public static boolean enableMangroveWoodFamily;
 	public static boolean enableCherryBlocks;
 	public static boolean enableBambooBlocks;
 
@@ -215,6 +227,18 @@ public class ConfigBlocksItems extends ConfigBase {
 		enableSoulSoil = getBoolean("enableSoulSoil", catBlockNatural, true, "Not required for the Soul Sand Valley to generate.");
 		enableSoulLighting = getBoolean("enableSoulLighting", catBlockNatural, true, "Soul torches and soul lanterns.");
 		enableBasalt = getBoolean("enableBasalt", catBlockNatural, true, "This must be on for the basalt deltas biome to generate unless Netherlicious is installed.");
+		enableCrimsonVegetation = getBoolean("enableCrimsonVegetation", catBlockNatural, true,
+				"Enables Crimson Nylium, Crimson Roots, Crimson Fungus, Weeping Vines and shared Shroomlight content. Content only: this does not enable Crimson Forest biome/world generation.");
+		enableWarpedVegetation = getBoolean("enableWarpedVegetation", catBlockNatural, true,
+				"Enables Warped Nylium, Warped Roots, Warped Fungus, Nether Sprouts, Twisting Vines, Warped Wart Block and shared Shroomlight content. Content only: this does not enable Warped Forest biome/world generation.");
+		enableMangroveEcology = getBoolean("enableMangroveEcology", catBlockNatural, true,
+				"Enables Mangrove Roots and Muddy Mangrove Roots. Mangrove wood, leaves and propagules remain controlled by enableMangroveWoodFamily. Content only: no Mangrove biome/world generation is enabled.");
+		enableSculkBlocks = getBoolean("enableSculkBlocks", catBlockNatural, true,
+				"Enables Sculk and Sculk Catalyst content. This does not enable Deep Dark world generation.");
+		enableLightningRodBlock = getBoolean("enableLightningRodBlock", catBlockNatural, true,
+				"Enables the Lightning Rod block/content identity. This does not enable any experimental weather/world-generation system.");
+		enableEndGatewayBlock = getBoolean("enableEndGatewayBlock", catBlockFunc, true,
+				"Enables the End Gateway block/content identity. This does not enable the experimental End dimension provider, outer-island generation or gateway generation.");
 		enableGlowLichen = getBoolean("enableGlowLichen", catBlockNatural, true, "");
 		enableGlowBerries = getBoolean("enableGlowBerries", catBlockNatural, true, "");
 		enableLushCaveBlocks = getBoolean("enableLushCaveBlocks", catBlockNatural, true,
@@ -223,7 +247,9 @@ public class ConfigBlocksItems extends ConfigBase {
 				"Enables dripstone blocks and pointed dripstone. P008e completes pointed-dripstone mechanics and allows modern Dripstone Cave regions to generate when enabled in world.cfg.");
 		if (ConfigExperiments.enableCrimsonBlocks) {
 			enableNetherwartBlock = true;
+			enableCrimsonVegetation = true;
 		}
+		if (ConfigExperiments.enableWarpedBlocks) enableWarpedVegetation = true;
 
 		boolean masterNetherToggle = getBoolean("masterNetherToggle", catBlockNatural, true,
 				"NOTE: Currently the content below is referring to some things which are behind an experimental toggle." +
@@ -231,20 +257,36 @@ public class ConfigBlocksItems extends ConfigBase {
 						"\n" +
 						"Set this to false to easily turn off all Nether blocks. This also turns off all Nether biomes because they require the blocks to generate.\n" +
 						"My biomes have compat with Netherlicious (read world.cfg for more info) but if you don't want any compat or EFR Nether stuff at all turn this off.\n" +
-						"This disables the following toggles: enableCrimsonBlocks, enableWarpedBlocks, enableBlackstone, enableSoulSoil, enableSoulLighting and enableBasalt.\n" +
+						"This disables the following experimental/generation toggles: enableCrimsonBlocks, enableWarpedBlocks, enableBlackstone, enableSoulSoil, enableSoulLighting and enableBasalt. It does not hide the normal Crimson/Warped wood-family content.\n" +
 						"Amethyst geodes use smooth basalt so go to world.cfg to change the outer block to something else or they won't generate.\n" +
 						"This also turns off Nether wart blocks even though they are older, because Netherlicious also has those.");
 
 		if (!masterNetherToggle) {
-			ConfigExperiments.enableCrimsonBlocks = ConfigExperiments.enableWarpedBlocks = enableNetherwartBlock = enableBlackstone = enableSoulSoil = enableSoulLighting = enableBasalt = false;
+			ConfigExperiments.enableCrimsonBlocks = ConfigExperiments.enableWarpedBlocks = false;
+			enableNetherwartBlock = enableBlackstone = enableSoulSoil = enableSoulLighting = enableBasalt = false;
+			enableCrimsonVegetation = enableWarpedVegetation = false;
 		}
 
-//		enableMangroveBlocks = getBoolean("enableMangroveBlocks", catBlockNatural, true, "Enables mangrove wood and all of its wood subtypes, and the roots (+ muddy versions).");
+		enableCrimsonWoodFamily = getBoolean("enableCrimsonWoodFamily", catBlockNatural, true,
+				"Enables the normal Crimson wood content family (stems/hyphae, planks and crafted wood variants). Content only: this does not enable Crimson Forest world generation or the experimental Crimson vegetation set.");
+		enableWarpedWoodFamily = getBoolean("enableWarpedWoodFamily", catBlockNatural, true,
+				"Enables the normal Warped wood content family (stems/hyphae, planks and crafted wood variants). Content only: this does not enable Warped Forest world generation or the experimental Warped vegetation set.");
+		enableMangroveWoodFamily = getBoolean("enableMangroveWoodFamily", catBlockNatural, true,
+				"Enables the normal Mangrove wood content family, leaves and propagule. Content only: this does not enable Mangrove biome/world generation; roots are controlled separately by enableMangroveEcology.");
 		enableCherryBlocks = getBoolean("enableCherryBlocks", catBlockNatural, true, "Enables cherry wood and all of its wood subtypes.");
 		enableBambooBlocks = getBoolean("enableBambooBlocks", catBlockNatural, true, "Enables bamboo wood and all of its wood subtypes, including the bamboo stalks themselves.");
 
 		// Check if we enable wood variants at all. Used by blocks where all the wood is 1 ID
-		woodVariants = ConfigExperiments.enableCrimsonBlocks || ConfigExperiments.enableWarpedBlocks || ConfigExperiments.enableMangroveBlocks || enableCherryBlocks || enableBambooBlocks;
+		// Experimental forest generation may depend on its matching stems, but the dependency is
+		// intentionally one-way: enabling content never opts a world into experimental generation.
+		if (ConfigExperiments.enableCrimsonBlocks) enableCrimsonWoodFamily = true;
+		if (ConfigExperiments.enableWarpedBlocks) enableWarpedWoodFamily = true;
+		if (ConfigExperiments.enableMangroveBlocks) {
+			enableMangroveWoodFamily = true;
+			enableMangroveEcology = true;
+		}
+
+		woodVariants = enableCrimsonWoodFamily || enableWarpedWoodFamily || enableMangroveWoodFamily || enableCherryBlocks || enableBambooBlocks;
 
 //		enableSculk = getBoolean("enableSculk", catBlockNatural, true, "Enables sculk-related blocks.");
 
@@ -331,6 +373,9 @@ public class ConfigBlocksItems extends ConfigBase {
 		enableLightBlock = getBoolean("enableLightBlock", catBlockMisc, true, "Invisible light blocks. Only has a selection box when held, right click to change light level. Otherwise functionally identical to air and can be replaced by placing blocks into it. Invisible, but can be seen when holding it in Creative mode.");
 		enableChain = getBoolean("enableChain", catBlockMisc, true, "");
 		enableHoney = getBoolean("enableHoney", catBlockMisc, true, "Enables honey blocks, honeycomb blocks, honeycombs, and honey bottles. See entities.cfg for toggling bee nests, beehives, and bees.");
+		enableModernMapParityBlocks = getBoolean("enableModernMapParityBlocks", catBlockMisc, true,
+				"Registers static visual compatibility shells for modern vanilla block families through Minecraft 1.21.11 that EFR does not otherwise provide. " +
+				"Intended for imported-map fidelity; these shells deliberately do not imply modern mechanics, world generation, block entities or redstone behaviour.");
 
 		//Misc Items
 		enableMutton = getBoolean("enableMutton", catItemMisc, true, "");

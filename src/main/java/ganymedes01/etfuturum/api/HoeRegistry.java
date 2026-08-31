@@ -2,7 +2,7 @@ package ganymedes01.etfuturum.api;
 
 import net.minecraft.block.Block;
 import net.minecraftforge.oredict.OreDictionary;
-import roadhog360.hogutils.api.hogtags.helpers.BlockTags;
+import ganymedes01.etfuturum.api.tags.BlockTags;
 
 import java.util.ArrayList;
 

@@ -6,6 +6,7 @@ import cpw.mods.fml.client.registry.ClientRegistry;
 import cpw.mods.fml.client.registry.RenderingRegistry;
 import cpw.mods.fml.common.FMLCommonHandler;
 import ganymedes01.etfuturum.ModBlocks;
+import ganymedes01.etfuturum.ModernMapParityBlocks;
 import ganymedes01.etfuturum.api.event.GlowLichenHighlightEvent;
 import ganymedes01.etfuturum.ModItems;
 import ganymedes01.etfuturum.client.model.ModelShulker;
@@ -46,6 +47,12 @@ public class ClientProxy extends CommonProxy {
 	public static boolean isRenderingInventoryPlayer = false;
 
 	@Override
+	public boolean isScaffoldingJumpHeld(EntityPlayer player) {
+		Minecraft minecraft = Minecraft.getMinecraft();
+		return minecraft.thePlayer == player && minecraft.gameSettings.keyBindJump.getIsKeyPressed();
+	}
+
+	@Override
 	public void registerEvents() {
 		super.registerEvents();
 		FMLCommonHandler.instance().bus().register(ClientEventHandler.INSTANCE);
@@ -55,7 +62,7 @@ public class ClientProxy extends CommonProxy {
 			GuiSubtitles.INSTANCE = new GuiSubtitles(FMLClientHandler.instance().getClient());
 			MinecraftForge.EVENT_BUS.register(GuiSubtitles.INSTANCE);
 		}
-		
+
 		MinecraftForge.EVENT_BUS.register(new GlowLichenHighlightEvent());
 		MinecraftForge.EVENT_BUS.register(BiomeFogEventHandler.INSTANCE);
 		MinecraftForge.EVENT_BUS.register(new GlowingEffectRenderer());
@@ -76,6 +83,10 @@ public class ClientProxy extends CommonProxy {
 			MinecraftForgeClient.registerItemRenderer(ModItems.GOAT_HORN.get(), new ItemGoatHornRenderer());
 		}
 		MinecraftForgeClient.registerItemRenderer(Item.getItemFromBlock(ModBlocks.SHULKER_BOX.get()), new ItemShulkerBoxRenderer());
+		if (ModBlocks.LIGHTNING_ROD.isEnabled()) {
+			MinecraftForgeClient.registerItemRenderer(ModBlocks.LIGHTNING_ROD.getItem(),
+					new ItemModernJsonModelRenderer(ModernMapParityBlocks.WAXED_LIGHTNING_ROD));
+		}
 		if (ConfigFunctions.inventoryBedModels) {
 			MinecraftForgeClient.registerItemRenderer(Items.bed, new Item3DBedRenderer((BlockBed) Blocks.bed));
 			for (ModBlocks bed : ModBlocks.BEDS) {
@@ -87,6 +98,11 @@ public class ClientProxy extends CommonProxy {
 
 		if(ModsList.APPLIED_ENERGISTICS_2.isLoaded()) {
 			MinecraftForgeClient.registerItemRenderer(ModBlocks.DEEPSLATE_CERTUS_QUARTZ_ORE.getItem(), new BlockDeepslateCertusQuartzRenderer());
+		}
+		for (ModernMapParityBlocks entry : ModernMapParityBlocks.values()) {
+			if (entry.get() != null) {
+				MinecraftForgeClient.registerItemRenderer(Item.getItemFromBlock(entry.get()), new ItemModernJsonModelRenderer(entry));
+			}
 		}
 	}
 
@@ -101,6 +117,9 @@ public class ClientProxy extends CommonProxy {
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityNewBeacon.class, new TileEntityNewBeaconRenderer());
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityShulkerBox.class, new TileEntityShulkerBoxRenderer(new ModelShulker()));
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityGateway.class, new TileEntityGatewayRenderer());
+		ClientRegistry.bindTileEntitySpecialRenderer(ModernMapParityBlocks.ParityCopperChestTileEntity.class, new TileEntityParityCopperChestRenderer());
+		ClientRegistry.bindTileEntitySpecialRenderer(ModernMapParityBlocks.ParitySignTileEntity.class, new TileEntityModernParityRenderer.Sign());
+		ClientRegistry.bindTileEntitySpecialRenderer(ModernMapParityBlocks.ParityCampfireTileEntity.class, new TileEntityModernParityRenderer.Campfire());
 		if(ModsList.IRON_CHEST.isLoaded() && CompatIronChests.enableCrystalRendering()) {
 			ClientRegistry.bindTileEntitySpecialRenderer(TileEntityBarrel.ClearTE.class, new TileEntityClearChestItemRenderer(key -> {
 				if (key instanceof TileEntityBarrel.ClearTE barrel) {
@@ -141,6 +160,7 @@ public class ClientProxy extends CommonProxy {
 		RenderingRegistry.registerBlockHandler(new BlockSmallDripleafRenderer(RenderIDs.SMALL_DRIPLEAF));
 		RenderingRegistry.registerBlockHandler(new BlockBigDripleafRenderer(RenderIDs.BIG_DRIPLEAF));
 		RenderingRegistry.registerBlockHandler(new BlockSporeBlossomRenderer(RenderIDs.SPORE_BLOSSOM));
+		RenderingRegistry.registerBlockHandler(new BlockModernJsonModelRenderer());
 		if(ModsList.APPLIED_ENERGISTICS_2.isLoaded()) {
 			RenderingRegistry.registerBlockHandler(new BlockDeepslateCertusQuartzRenderer());
 		}

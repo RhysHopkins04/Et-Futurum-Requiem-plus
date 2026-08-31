@@ -10,12 +10,13 @@ import ganymedes01.etfuturum.items.ItemShulkerBoxUpgrade;
 import it.unimi.dsi.fastutil.Pair;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
-import me.mrnavastar.r.R;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
-import roadhog360.hogutils.api.utils.RecipeHelper;
+import ganymedes01.etfuturum.core.utils.RecipeHelper;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.Map;
 
 public class CompatIronChests {
@@ -26,20 +27,19 @@ public class CompatIronChests {
 	private static double renderDistance;
 	static {
 		// Collects all enabled chest upgrade typee
-		R icInvoker = R.of(IronChest.class);
-		renderDistance = getOrDefaultR(icInvoker, "TRANSPARENT_RENDER_INSIDE", Boolean.class, true)
-				? getOrDefaultR(icInvoker, "TRANSPARENT_RENDER_DISTANCE", Double.class, 128D) : 0F;
+		renderDistance = getStaticFieldOrDefault(IronChest.class, "TRANSPARENT_RENDER_INSIDE", Boolean.class, true)
+				? getStaticFieldOrDefault(IronChest.class, "TRANSPARENT_RENDER_DISTANCE", Double.class, 128D) : 0F;
 		for(IronChestType type : IronChestType.values()) {
-			R typeInvoker = R.of(type);
-			if(callWithDefaultR(typeInvoker, "isEnabled", Boolean.class, true)) {
+			if(callNoArgOrDefault(type, "isEnabled", Boolean.class, true)) {
 				tiers.put(type.name(), type);
 			}
 		}
 		for(ChestChangerType type : ChestChangerType.values()) {
-			R ccInvoker = R.of(type);
-			IronChestType source = ccInvoker.get("source", IronChestType.class);
-			IronChestType target = ccInvoker.get("target", IronChestType.class);
-			boolean isEnabled = getOrDefaultR(ccInvoker, "isAllowed", Boolean.class, true) && tierExists(source.name()) && tierExists(target.name());
+			IronChestType source = getFieldOrDefault(type, "source", IronChestType.class, null);
+			IronChestType target = getFieldOrDefault(type, "target", IronChestType.class, null);
+			boolean isEnabled = source != null && target != null
+					&& getFieldOrDefault(type, "isAllowed", Boolean.class, true)
+					&& tierExists(source.name()) && tierExists(target.name());
 			if(isEnabled) {
 				upgradeTypes.put(type.name(), type);
 				upgradeMappings.put(type, Pair.of(source, target));
@@ -57,11 +57,10 @@ public class CompatIronChests {
 
 	public static void init() {
 		for(ChestChangerType type : upgradeTypes.values()) {
-			R ccInvoker = R.of(type);
-			Item item = ccInvoker.get("item", ItemChestChanger.class);
+			ItemChestChanger item = getFieldOrDefault(type, "item", ItemChestChanger.class, null);
 			boolean isEnabled = item != null && item.delegate.name() != null;
 			if(isEnabled) {
-				upgradeItems.put(type.name(), ccInvoker.get("item", ItemChestChanger.class));
+				upgradeItems.put(type.name(), item);
 			}
 		}
 	}
@@ -126,18 +125,57 @@ public class CompatIronChests {
 		return renderDistance;
 	}
 
-	private static <T> T callWithDefaultR(R r, String name, Class<T> cast, T def) {
+	private static Field findField(Class<?> owner, String name) throws NoSuchFieldException {
+		Class<?> current = owner;
+		while(current != null) {
+			try {
+				Field field = current.getDeclaredField(name);
+				field.setAccessible(true);
+				return field;
+			} catch(NoSuchFieldException ignored) {
+				current = current.getSuperclass();
+			}
+		}
+		throw new NoSuchFieldException(name);
+	}
+
+	private static Method findNoArgMethod(Class<?> owner, String name) throws NoSuchMethodException {
+		Class<?> current = owner;
+		while(current != null) {
+			try {
+				Method method = current.getDeclaredMethod(name);
+				method.setAccessible(true);
+				return method;
+			} catch(NoSuchMethodException ignored) {
+				current = current.getSuperclass();
+			}
+		}
+		throw new NoSuchMethodException(name);
+	}
+
+	private static <T> T getStaticFieldOrDefault(Class<?> owner, String name, Class<T> cast, T def) {
 		try {
-			return r.call(name, cast);
-		} catch (Exception e) {
+			Object value = findField(owner, name).get(null);
+			return value == null ? def : cast.cast(value);
+		} catch(Exception e) {
 			return def;
 		}
 	}
 
-	private static <T> T getOrDefaultR(R r, String name, Class<T> cast, T def) {
+	private static <T> T getFieldOrDefault(Object target, String name, Class<T> cast, T def) {
 		try {
-			return r.get(name, cast);
-		} catch (Exception e) {
+			Object value = findField(target.getClass(), name).get(target);
+			return value == null ? def : cast.cast(value);
+		} catch(Exception e) {
+			return def;
+		}
+	}
+
+	private static <T> T callNoArgOrDefault(Object target, String name, Class<T> cast, T def) {
+		try {
+			Object value = findNoArgMethod(target.getClass(), name).invoke(target);
+			return value == null ? def : cast.cast(value);
+		} catch(Exception e) {
 			return def;
 		}
 	}

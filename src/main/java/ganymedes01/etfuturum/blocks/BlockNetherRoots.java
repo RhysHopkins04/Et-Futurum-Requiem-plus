@@ -4,7 +4,7 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import ganymedes01.etfuturum.EtFuturum;
 import ganymedes01.etfuturum.client.sound.ModSounds;
-import ganymedes01.etfuturum.configuration.configs.ConfigExperiments;
+import ganymedes01.etfuturum.configuration.configs.ConfigBlocksItems;
 import ganymedes01.etfuturum.core.utils.Utils;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockBush;
@@ -76,10 +76,10 @@ public class BlockNetherRoots extends BlockBush implements ISubBlocksBlock {
 
 	@Override
 	public void getSubBlocks(Item item, CreativeTabs tab, List<ItemStack> list) {
-		if (ConfigExperiments.enableCrimsonBlocks) {
+		if (ConfigBlocksItems.enableCrimsonVegetation) {
 			list.add(new ItemStack(item, 1, 0));
 		}
-		if (ConfigExperiments.enableWarpedBlocks) {
+		if (ConfigBlocksItems.enableWarpedVegetation) {
 			list.add(new ItemStack(item, 1, 1));
 		}
 	}

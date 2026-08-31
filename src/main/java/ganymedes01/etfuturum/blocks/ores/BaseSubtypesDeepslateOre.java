@@ -20,7 +20,7 @@ import net.minecraft.util.Vec3;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import roadhog360.hogutils.api.world.DummyWorld;
+import ganymedes01.etfuturum.core.utils.DummyWorld;
 
 import java.util.ArrayList;
 import java.util.List;

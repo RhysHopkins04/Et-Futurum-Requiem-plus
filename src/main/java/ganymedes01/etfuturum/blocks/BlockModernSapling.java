@@ -5,7 +5,6 @@ import cpw.mods.fml.relauncher.SideOnly;
 import ganymedes01.etfuturum.EtFuturum;
 import ganymedes01.etfuturum.client.sound.ModSounds;
 import ganymedes01.etfuturum.configuration.configs.ConfigBlocksItems;
-import ganymedes01.etfuturum.configuration.configs.ConfigExperiments;
 import ganymedes01.etfuturum.world.generate.decorate.WorldGenCherryTrees;
 import lombok.NonNull;
 import net.minecraft.block.Block;
@@ -19,7 +18,7 @@ import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
 import net.minecraft.world.gen.feature.WorldGenAbstractTree;
 import net.minecraftforge.event.terraingen.TerrainGen;
-import roadhog360.hogutils.api.blocksanditems.block.IMultiBlockSound;
+import ganymedes01.etfuturum.api.IMultiBlockSound;
 
 import java.util.List;
 import java.util.Random;
@@ -35,7 +34,7 @@ public class BlockModernSapling extends BlockSapling implements ISubBlocksBlock,
 
 	@Override
 	public void getSubBlocks(Item itemIn, CreativeTabs tab, List<ItemStack> list) {
-		if (ConfigExperiments.enableMangroveBlocks) {
+		if (ConfigBlocksItems.enableMangroveWoodFamily) {
 			list.add(new ItemStack(itemIn, 1, 0));
 		}
 		if (ConfigBlocksItems.enableCherryBlocks) {

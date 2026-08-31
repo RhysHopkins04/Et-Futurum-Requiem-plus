@@ -90,7 +90,7 @@ import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
-import roadhog360.hogutils.api.utils.FastRandom;
+import ganymedes01.etfuturum.core.utils.FastRandom;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
@@ -463,10 +463,16 @@ public class ClientEventHandler {
 				String s = event.name;
 				String blockID = block.delegate.name().split(":")[1].toLowerCase();
 				if (blockID.contains("chest") && (event.name.contains("open") || event.name.contains("close"))) {
-					if ((blockID.contains("ender") && block.getMaterial().equals(Material.rock)))
-						s = Tags.MC_ASSET_VER + ":" + "block.ender_chest." + (event.name.contains("close") ? "close" : "open");
-					else if (block.getMaterial().equals(Material.wood) && event.name.contains("close"))
+					String action = event.name.contains("close") ? "close" : "open";
+					if (blockID.contains("copper_chest")) {
+						String family = blockID.contains("oxidized") ? "copper_chest_oxidized"
+								: blockID.contains("weathered") ? "copper_chest_weathered" : "copper_chest";
+						s = Tags.MC_ASSET_VER + ":block." + family + "." + action;
+					} else if ((blockID.contains("ender") && block.getMaterial().equals(Material.rock))) {
+						s = Tags.MC_ASSET_VER + ":" + "block.ender_chest." + action;
+					} else if (block.getMaterial().equals(Material.wood) && event.name.contains("close")) {
 						s = Tags.MC_ASSET_VER + ":" + "block.chest.close";
+					}
 				}
 
 				if (!s.equals(event.name)) {

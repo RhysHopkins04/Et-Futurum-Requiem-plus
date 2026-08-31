@@ -5,7 +5,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 import ganymedes01.etfuturum.EtFuturum;
 import ganymedes01.etfuturum.ModBlocks;
 import ganymedes01.etfuturum.client.sound.ModSounds;
-import ganymedes01.etfuturum.configuration.configs.ConfigExperiments;
+import ganymedes01.etfuturum.configuration.configs.ConfigBlocksItems;
 import ganymedes01.etfuturum.core.utils.Utils;
 import ganymedes01.etfuturum.world.generate.decorate.WorldGenHugeFungus;
 import net.minecraft.block.Block;
@@ -68,10 +68,10 @@ public class BlockNetherFungus extends BlockBush implements ISubBlocksBlock, IGr
 
 	@Override
 	public void getSubBlocks(Item item, CreativeTabs tab, List<ItemStack> list) {
-		if (ConfigExperiments.enableCrimsonBlocks) {
+		if (ConfigBlocksItems.enableCrimsonVegetation) {
 			list.add(new ItemStack(item, 1, 0));
 		}
-		if (ConfigExperiments.enableWarpedBlocks) {
+		if (ConfigBlocksItems.enableWarpedVegetation) {
 			list.add(new ItemStack(item, 1, 1));
 		}
 	}

@@ -4,6 +4,7 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import ganymedes01.etfuturum.EtFuturum;
 import ganymedes01.etfuturum.ModBlocks;
 import ganymedes01.etfuturum.ModItems;
+import ganymedes01.etfuturum.ModernMapParityBlocks;
 import ganymedes01.etfuturum.Tags;
 import ganymedes01.etfuturum.api.DeepslateOreRegistry;
 import ganymedes01.etfuturum.api.RawOreRegistry;
@@ -45,7 +46,7 @@ import net.minecraftforge.oredict.ShapedOreRecipe;
 import net.minecraftforge.oredict.ShapelessOreRecipe;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import roadhog360.hogutils.api.utils.RecipeHelper;
+import ganymedes01.etfuturum.core.utils.RecipeHelper;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -61,14 +62,18 @@ public class ModRecipes {
 	static final boolean[] modernWoodTypesEnabled = new boolean[5];
 
 	public static void init() {
+		// Forge 1.7 requires every custom IRecipe class to be classified so recipe
+		// ordering is deterministic and startup does not emit "Unknown recipe class".
+		RecipeSorter.register(Tags.MOD_ID + ".RecipeFixedFireworks", RecipeFixedFireworks.class, Category.SHAPELESS, "after:minecraft:shapeless");
+		RecipeSorter.register(Tags.MOD_ID + ".RecipeDyedShulkerBox", RecipeDyedShulkerBox.class, Category.SHAPELESS, "after:minecraft:shapeless");
 		if (ConfigBlocksItems.enableBanners) {
 			RecipeSorter.register(Tags.MOD_ID + ".RecipeDuplicatePattern", RecipeDuplicatePattern.class, Category.SHAPELESS, "after:minecraft:shapeless");
 			RecipeSorter.register(Tags.MOD_ID + ".RecipeAddPattern", RecipeAddPattern.class, Category.SHAPED, "after:minecraft:shaped");
 		}
 
-		modernWoodTypesEnabled[0] = ConfigExperiments.enableCrimsonBlocks;
-		modernWoodTypesEnabled[1] = ConfigExperiments.enableWarpedBlocks;
-		modernWoodTypesEnabled[2] = ConfigExperiments.enableMangroveBlocks;
+		modernWoodTypesEnabled[0] = ConfigBlocksItems.enableCrimsonWoodFamily;
+		modernWoodTypesEnabled[1] = ConfigBlocksItems.enableWarpedWoodFamily;
+		modernWoodTypesEnabled[2] = ConfigBlocksItems.enableMangroveWoodFamily;
 		modernWoodTypesEnabled[3] = ConfigBlocksItems.enableCherryBlocks;
 		modernWoodTypesEnabled[4] = ConfigBlocksItems.enableBambooBlocks;
 
@@ -80,6 +85,7 @@ public class ModRecipes {
 		}
 
 		registerRecipes();
+		registerModernWoodParityRecipes();
 		tweakRecipes();
 		registerLoot();
 		if(ModsList.IRON_CHEST.isLoaded() && !ModsList.GTNH.isLoaded()) {
@@ -159,6 +165,92 @@ public class ModRecipes {
 					break;
 				}
 			}
+		}
+	}
+
+
+	/**
+	 * Crafting coverage for the modern map-parity wood blocks that do not have a legacy EFR
+	 * registration of their own. This deliberately reuses the stable ModernMapParityBlocks
+	 * registry identities rather than creating duplicate blocks.
+	 */
+	private static void registerModernWoodParityRecipes() {
+		if (!ConfigBlocksItems.enableModernMapParityBlocks) return;
+
+		// Pale Oak is represented by the map-parity bridge, so give that existing family the
+		// same ordinary survival crafting relationships as the legacy-backed wood families.
+		Block paleLog = ModernMapParityBlocks.PALE_OAK_LOG.get();
+		Block paleWood = ModernMapParityBlocks.PALE_OAK_WOOD.get();
+		Block strippedPaleLog = ModernMapParityBlocks.STRIPPED_PALE_OAK_LOG.get();
+		Block strippedPaleWood = ModernMapParityBlocks.STRIPPED_PALE_OAK_WOOD.get();
+		Block palePlanks = ModernMapParityBlocks.PALE_OAK_PLANKS.get();
+		if (paleLog != null && paleWood != null && strippedPaleLog != null && strippedPaleWood != null && palePlanks != null) {
+			RecipeHelper.addShapedRecipe(RecipeHelper.Priority.HIGH, new ItemStack(palePlanks, 4), new Object[]{"x", 'x', new ItemStack(paleLog)});
+			RecipeHelper.addShapedRecipe(RecipeHelper.Priority.HIGH, new ItemStack(palePlanks, 4), new Object[]{"x", 'x', new ItemStack(paleWood)});
+			RecipeHelper.addShapedRecipe(RecipeHelper.Priority.HIGH, new ItemStack(palePlanks, 4), new Object[]{"x", 'x', new ItemStack(strippedPaleLog)});
+			RecipeHelper.addShapedRecipe(RecipeHelper.Priority.HIGH, new ItemStack(palePlanks, 4), new Object[]{"x", 'x', new ItemStack(strippedPaleWood)});
+			if (ConfigBlocksItems.enableBarkLogs) {
+				RecipeHelper.addShapedRecipe(RecipeHelper.Priority.HIGH, new ItemStack(paleWood, 3), new Object[]{"xx", "xx", 'x', new ItemStack(paleLog)});
+				RecipeHelper.addShapedRecipe(RecipeHelper.Priority.HIGH, new ItemStack(strippedPaleWood, 3), new Object[]{"xx", "xx", 'x', new ItemStack(strippedPaleLog)});
+			}
+			addParityWoodRecipe(ModernMapParityBlocks.PALE_OAK_STAIRS, 4, new Object[]{"x  ", "xx ", "xxx", 'x', new ItemStack(palePlanks)});
+			addParityWoodRecipe(ModernMapParityBlocks.PALE_OAK_SLAB, 6, new Object[]{"xxx", 'x', new ItemStack(palePlanks)});
+			addParityWoodRecipe(ModernMapParityBlocks.PALE_OAK_FENCE, 3, new Object[]{"xyx", "xyx", 'x', new ItemStack(palePlanks), 'y', "stickWood"});
+			addParityWoodRecipe(ModernMapParityBlocks.PALE_OAK_FENCE_GATE, 1, new Object[]{"yxy", "yxy", 'x', new ItemStack(palePlanks), 'y', "stickWood"});
+			addParityWoodRecipe(ModernMapParityBlocks.PALE_OAK_DOOR, ConfigFunctions.enableDoorRecipeBuffs ? 3 : 1, new Object[]{"xx", "xx", "xx", 'x', new ItemStack(palePlanks)});
+			addParityWoodRecipe(ModernMapParityBlocks.PALE_OAK_TRAPDOOR, 2, new Object[]{"xxx", "xxx", 'x', new ItemStack(palePlanks)});
+			addParityWoodRecipe(ModernMapParityBlocks.PALE_OAK_BUTTON, 1, new Object[]{"x", 'x', new ItemStack(palePlanks)});
+			addParityWoodRecipe(ModernMapParityBlocks.PALE_OAK_PRESSURE_PLATE, 1, new Object[]{"xx", 'x', new ItemStack(palePlanks)});
+			addParityWoodRecipe(ModernMapParityBlocks.PALE_OAK_SIGN, 3, new Object[]{"xxx", "xxx", " y ", 'x', new ItemStack(palePlanks), 'y', "stickWood"});
+		}
+
+		// 1.20+ hanging signs and 1.21.9 shelves both craft from the matching stripped wood
+		// family. Keep the modern result counts/shapes and use EFR's existing Chain block item.
+		if (ConfigBlocksItems.enableChain && ModBlocks.CHAIN.isEnabled() && ConfigBlocksItems.enableStrippedLogs) {
+			Object chain = ModBlocks.CHAIN.newItemStack();
+			addHangingSignRecipe(ModernMapParityBlocks.OAK_HANGING_SIGN, ModBlocks.LOG_STRIPPED.newItemStack(1, 0), chain);
+			addHangingSignRecipe(ModernMapParityBlocks.SPRUCE_HANGING_SIGN, ModBlocks.LOG_STRIPPED.newItemStack(1, 1), chain);
+			addHangingSignRecipe(ModernMapParityBlocks.BIRCH_HANGING_SIGN, ModBlocks.LOG_STRIPPED.newItemStack(1, 2), chain);
+			addHangingSignRecipe(ModernMapParityBlocks.JUNGLE_HANGING_SIGN, ModBlocks.LOG_STRIPPED.newItemStack(1, 3), chain);
+			addHangingSignRecipe(ModernMapParityBlocks.ACACIA_HANGING_SIGN, ModBlocks.LOG2_STRIPPED.newItemStack(1, 0), chain);
+			addHangingSignRecipe(ModernMapParityBlocks.DARK_OAK_HANGING_SIGN, ModBlocks.LOG2_STRIPPED.newItemStack(1, 1), chain);
+			if (ConfigBlocksItems.enableMangroveWoodFamily) addHangingSignRecipe(ModernMapParityBlocks.MANGROVE_HANGING_SIGN, ModBlocks.MANGROVE_LOG.newItemStack(1, 2), chain);
+			if (ConfigBlocksItems.enableCherryBlocks) addHangingSignRecipe(ModernMapParityBlocks.CHERRY_HANGING_SIGN, ModBlocks.CHERRY_LOG.newItemStack(1, 2), chain);
+			if (ConfigBlocksItems.enableBambooBlocks) addHangingSignRecipe(ModernMapParityBlocks.BAMBOO_HANGING_SIGN, ModBlocks.BAMBOO_BLOCK.newItemStack(1, 1), chain);
+			if (ConfigBlocksItems.enableCrimsonWoodFamily) addHangingSignRecipe(ModernMapParityBlocks.CRIMSON_HANGING_SIGN, ModBlocks.CRIMSON_STEM.newItemStack(1, 2), chain);
+			if (ConfigBlocksItems.enableWarpedWoodFamily) addHangingSignRecipe(ModernMapParityBlocks.WARPED_HANGING_SIGN, ModBlocks.WARPED_STEM.newItemStack(1, 2), chain);
+			if (strippedPaleLog != null) addHangingSignRecipe(ModernMapParityBlocks.PALE_OAK_HANGING_SIGN, new ItemStack(strippedPaleLog), chain);
+		}
+
+		if (ConfigBlocksItems.enableStrippedLogs) {
+			addShelfRecipe(ModernMapParityBlocks.OAK_SHELF, ModBlocks.LOG_STRIPPED.newItemStack(1, 0));
+			addShelfRecipe(ModernMapParityBlocks.SPRUCE_SHELF, ModBlocks.LOG_STRIPPED.newItemStack(1, 1));
+			addShelfRecipe(ModernMapParityBlocks.BIRCH_SHELF, ModBlocks.LOG_STRIPPED.newItemStack(1, 2));
+			addShelfRecipe(ModernMapParityBlocks.JUNGLE_SHELF, ModBlocks.LOG_STRIPPED.newItemStack(1, 3));
+			addShelfRecipe(ModernMapParityBlocks.ACACIA_SHELF, ModBlocks.LOG2_STRIPPED.newItemStack(1, 0));
+			addShelfRecipe(ModernMapParityBlocks.DARK_OAK_SHELF, ModBlocks.LOG2_STRIPPED.newItemStack(1, 1));
+			if (ConfigBlocksItems.enableMangroveWoodFamily) addShelfRecipe(ModernMapParityBlocks.MANGROVE_SHELF, ModBlocks.MANGROVE_LOG.newItemStack(1, 2));
+			if (ConfigBlocksItems.enableCherryBlocks) addShelfRecipe(ModernMapParityBlocks.CHERRY_SHELF, ModBlocks.CHERRY_LOG.newItemStack(1, 2));
+			if (ConfigBlocksItems.enableBambooBlocks) addShelfRecipe(ModernMapParityBlocks.BAMBOO_SHELF, ModBlocks.BAMBOO_BLOCK.newItemStack(1, 1));
+			if (ConfigBlocksItems.enableCrimsonWoodFamily) addShelfRecipe(ModernMapParityBlocks.CRIMSON_SHELF, ModBlocks.CRIMSON_STEM.newItemStack(1, 2));
+			if (ConfigBlocksItems.enableWarpedWoodFamily) addShelfRecipe(ModernMapParityBlocks.WARPED_SHELF, ModBlocks.WARPED_STEM.newItemStack(1, 2));
+			if (strippedPaleLog != null) addShelfRecipe(ModernMapParityBlocks.PALE_OAK_SHELF, new ItemStack(strippedPaleLog));
+		}
+	}
+
+	private static void addParityWoodRecipe(ModernMapParityBlocks entry, int count, Object[] recipe) {
+		if (entry.get() != null) RecipeHelper.addShapedRecipe(RecipeHelper.Priority.HIGH, new ItemStack(entry.get(), count), recipe);
+	}
+
+	private static void addHangingSignRecipe(ModernMapParityBlocks entry, ItemStack strippedWood, Object chain) {
+		if (entry.get() != null && strippedWood != null && chain != null) {
+			RecipeHelper.addShapedRecipe(RecipeHelper.Priority.HIGH, new ItemStack(entry.get(), 6), new Object[]{"x x", "yyy", "yyy", 'x', chain, 'y', strippedWood});
+		}
+	}
+
+	private static void addShelfRecipe(ModernMapParityBlocks entry, ItemStack strippedWood) {
+		if (entry.get() != null && strippedWood != null) {
+			RecipeHelper.addShapedRecipe(RecipeHelper.Priority.HIGH, new ItemStack(entry.get(), 6), new Object[]{"xxx", "   ", "xxx", 'x', strippedWood});
 		}
 	}
 
@@ -492,7 +584,7 @@ public class ModRecipes {
 			Object[] objects2 = new Object[]{"xyx", "xyx", 'x', new ItemStack(Blocks.planks, 1, 5), 'y', "stickWood"};
 			RecipeHelper.addShapedRecipe(RecipeHelper.Priority.HIGH, output3, objects2);
 
-			if (ConfigExperiments.enableCrimsonBlocks) {
+			if (ConfigBlocksItems.enableCrimsonWoodFamily) {
 				ItemStack output1 = ModBlocks.WOOD_FENCE.newItemStack(3);
 				Object[] objects1 = new Object[]{"xyx", "xyx", 'x', ModBlocks.WOOD_PLANKS.newItemStack(1), 'y', "stickWood"};
 				RecipeHelper.addShapedRecipe(RecipeHelper.Priority.HIGH, output1, objects1);
@@ -500,7 +592,7 @@ public class ModRecipes {
 				Object[] objects = new Object[]{"xxx", 'x', ModBlocks.WOOD_PLANKS.newItemStack(1, 0)};
 				RecipeHelper.addShapedRecipe(RecipeHelper.Priority.HIGH, output, objects);
 			}
-			if (ConfigExperiments.enableWarpedBlocks) {
+			if (ConfigBlocksItems.enableWarpedWoodFamily) {
 				ItemStack output1 = ModBlocks.WOOD_FENCE.newItemStack(3, 1);
 				Object[] objects1 = new Object[]{"xyx", "xyx", 'x', ModBlocks.WOOD_PLANKS.newItemStack(1, 1), 'y', "stickWood"};
 				RecipeHelper.addShapedRecipe(RecipeHelper.Priority.HIGH, output1, objects1);
@@ -508,7 +600,7 @@ public class ModRecipes {
 				Object[] objects = new Object[]{"xxx", 'x', ModBlocks.WOOD_PLANKS.newItemStack(1, 1)};
 				RecipeHelper.addShapedRecipe(RecipeHelper.Priority.HIGH, output, objects);
 			}
-			if (ConfigExperiments.enableMangroveBlocks) {
+			if (ConfigBlocksItems.enableMangroveWoodFamily) {
 				ItemStack output1 = ModBlocks.WOOD_FENCE.newItemStack(3, 2);
 				Object[] objects1 = new Object[]{"xyx", "xyx", 'x', ModBlocks.WOOD_PLANKS.newItemStack(1, 2), 'y', "stickWood"};
 				RecipeHelper.addShapedRecipe(RecipeHelper.Priority.HIGH, output1, objects1);

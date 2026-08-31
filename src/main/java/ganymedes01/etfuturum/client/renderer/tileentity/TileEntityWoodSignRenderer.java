@@ -1,92 +1,122 @@
 package ganymedes01.etfuturum.client.renderer.tileentity;
 
 import ganymedes01.etfuturum.blocks.BlockWoodSign;
+import ganymedes01.etfuturum.client.gui.inventory.GuiEditWoodSign;
 import ganymedes01.etfuturum.tileentities.TileEntityWoodSign;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.model.ModelSign;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
+import net.minecraft.init.Blocks;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
 
+/** EFR wood-sign TESR with modern front/back text, per-side dye and glow state. */
 public class TileEntityWoodSignRenderer extends TileEntitySpecialRenderer {
 
-	/**
-	 * The ModelSign instance for use in this renderer
-	 */
-	private final ModelSign model = new ModelSign();
+    private final ModelSign model = new ModelSign();
 
-	/*
-	 * The following code is derived from Mojang's original sign code as I had no other choice as there was
-	 * no way for me to add in my texture without copying most of the code to add my own code to this class.
-	 * Extending the block class was not enough, since I had to copy this code anyways.
-	 * I, in no way, take credit for the majority of this code. I only altered it to work with my blocks and
-	 * textures.
-	 */
-	@Override
-	public void renderTileEntityAt(TileEntity p_147500_1_, double p_147500_2_, double p_147500_4_, double p_147500_6_, float p_147500_8_) {
-		if (!(p_147500_1_.getBlockType() instanceof BlockWoodSign block))
-			return;
-		GL11.glPushMatrix();
-		float f1 = 0.6666667F;
-		float f3;
+    @Override
+    public void renderTileEntityAt(TileEntity tile, double x, double y, double z, float partialTicks) {
+        if (!(tile instanceof TileEntityWoodSign)) return;
+        boolean vanilla = tile.getBlockType() == Blocks.standing_sign || tile.getBlockType() == Blocks.wall_sign;
+        BlockWoodSign block = tile.getBlockType() instanceof BlockWoodSign ? (BlockWoodSign) tile.getBlockType() : null;
+        if (!vanilla && block == null) return;
 
-		if (block.standing) {
-			GL11.glTranslatef((float) p_147500_2_ + 0.5F, (float) p_147500_4_ + 0.75F * f1, (float) p_147500_6_ + 0.5F);
-			float f2 = p_147500_1_.getBlockMetadata() * 360 / 16.0F;
-			GL11.glRotatef(-f2, 0.0F, 1.0F, 0.0F);
-			this.model.signStick.showModel = true;
-		} else {
-			int j = p_147500_1_.getBlockMetadata();
-			f3 = 0.0F;
+        TileEntityWoodSign sign = (TileEntityWoodSign) tile;
+        boolean standing = vanilla ? tile.getBlockType() == Blocks.standing_sign : block.standing;
 
-			if (j == 2) {
-				f3 = 180.0F;
-			}
+        GL11.glPushMatrix();
+        float modelScale = 0.6666667F;
+        float yaw;
 
-			if (j == 4) {
-				f3 = 90.0F;
-			}
+        if (standing) {
+            GL11.glTranslatef((float) x + 0.5F, (float) y + 0.75F * modelScale, (float) z + 0.5F);
+            yaw = tile.getBlockMetadata() * 360.0F / 16.0F;
+            GL11.glRotatef(-yaw, 0.0F, 1.0F, 0.0F);
+            model.signStick.showModel = true;
+        } else {
+            int meta = tile.getBlockMetadata();
+            yaw = wallYaw(meta);
+            GL11.glTranslatef((float) x + 0.5F, (float) y + 0.75F * modelScale, (float) z + 0.5F);
+            GL11.glRotatef(-yaw, 0.0F, 1.0F, 0.0F);
+            GL11.glTranslatef(0.0F, -0.3125F, -0.4375F);
+            model.signStick.showModel = false;
+        }
 
-			if (j == 5) {
-				f3 = -90.0F;
-			}
+        // Literal 1.7 oak signs keep the vanilla entity texture; EFR wood variants retain
+        // their existing per-wood sign texture path.
+        bindTexture(vanilla
+                ? new ResourceLocation("textures/entity/sign.png")
+                : new ResourceLocation("textures/entity/signs/" + block.type + ".png"));
+        GL11.glPushMatrix();
+        GL11.glScalef(modelScale, -modelScale, -modelScale);
+        model.renderSign();
+        GL11.glPopMatrix();
 
-			GL11.glTranslatef((float) p_147500_2_ + 0.5F, (float) p_147500_4_ + 0.75F * f1, (float) p_147500_6_ + 0.5F);
-			GL11.glRotatef(-f3, 0.0F, 1.0F, 0.0F);
-			GL11.glTranslatef(0.0F, -0.3125F, -0.4375F);
-			this.model.signStick.showModel = false;
-		}
-		bindTexture(new ResourceLocation("textures/entity/signs/" + block.type + ".png"));
-		GL11.glPushMatrix();
-		GL11.glScalef(f1, -f1, -f1);
-		this.model.renderSign();
-		GL11.glPopMatrix();
-		FontRenderer fontrenderer = this.func_147498_b();
-		f3 = 0.016666668F * f1;
-		GL11.glTranslatef(0.0F, 0.5F * f1, 0.07F * f1);
-		GL11.glScalef(f3, -f3, f3);
-		GL11.glNormal3f(0.0F, 0.0F, -1.0F * f3);
-		GL11.glDepthMask(false);
-		byte b0 = 0;
-		TileEntityWoodSign sign = (TileEntityWoodSign) p_147500_1_;
-		for (int i = 0; i < sign.signText.length; ++i) {
-			String colour = "";
-//          if (signType(sign)) {
-//              colour = "\u00A7f";
-//          }
-			String s = colour + sign.signText[i];
+        FontRenderer font = func_147498_b();
+        float textScale = 0.016666668F * modelScale;
+        GL11.glTranslatef(0.0F, 0.5F * modelScale, 0.0F);
+        GL11.glScalef(textScale, -textScale, textScale);
+        GL11.glNormal3f(0.0F, 0.0F, -textScale);
+        GL11.glDepthMask(false);
 
-			if (i == sign.lineBeingEdited) {
-				s = "> " + s + " <";
-				fontrenderer.drawString(s, -fontrenderer.getStringWidth(s) / 2, i * 10 - sign.signText.length * 5, b0);
-			} else {
-				fontrenderer.drawString(s, -fontrenderer.getStringWidth(s) / 2, i * 10 - sign.signText.length * 5, b0);
-			}
-		}
+        boolean editor = Minecraft.getMinecraft().currentScreen instanceof GuiEditWoodSign;
+        if (editor) GL11.glDisable(GL11.GL_DEPTH_TEST);
 
-		GL11.glDepthMask(true);
-		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-		GL11.glPopMatrix();
-	}
+        // 0.07 * modelScale was the original vanilla-derived EFR front plane. Expressing it after
+        // the text scale keeps it just outside the board and makes the same geometry usable on back.
+        float zPixels = (0.07F * modelScale) / textScale;
+        if (editor) {
+            renderFace(font, sign, sign.isEditingBack(), zPixels, true);
+        } else {
+            renderFace(font, sign, false, zPixels, false);
+            renderFace(font, sign, true, zPixels, false);
+        }
+
+        if (editor) GL11.glEnable(GL11.GL_DEPTH_TEST);
+        GL11.glDepthMask(true);
+        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+        GL11.glPopMatrix();
+    }
+
+    private static void renderFace(FontRenderer font, TileEntityWoodSign sign, boolean back, float zPixels, boolean editor) {
+        GL11.glPushMatrix();
+        if (back) GL11.glRotatef(180.0F, 0.0F, 1.0F, 0.0F);
+        GL11.glTranslatef(0.0F, 0.0F, zPixels);
+        String[] lines = sign.getText(back);
+        int colour = sign.getTextColour(back);
+        boolean glowing = sign.isGlowing(back);
+        int drawColour = glowing ? colour : darken(colour);
+        int outline = colour == 0 ? 0xF0EBCC : darken(colour);
+        for (int i = 0; i < 4; i++) {
+            String text = lines[i] == null ? "" : lines[i];
+            if (editor && i == sign.lineBeingEdited) text = "> " + text + " <";
+            int tx = -font.getStringWidth(text) / 2;
+            int ty = i * 10 - 20;
+            if (glowing) {
+                font.drawString(text, tx - 1, ty, outline);
+                font.drawString(text, tx + 1, ty, outline);
+                font.drawString(text, tx, ty - 1, outline);
+                font.drawString(text, tx, ty + 1, outline);
+            }
+            font.drawString(text, tx, ty, drawColour);
+        }
+        GL11.glPopMatrix();
+    }
+
+    private static int darken(int colour) {
+        int r = (int) (((colour >> 16) & 255) * 0.4F);
+        int g = (int) (((colour >> 8) & 255) * 0.4F);
+        int b = (int) ((colour & 255) * 0.4F);
+        return r << 16 | g << 8 | b;
+    }
+
+    private static float wallYaw(int meta) {
+        if (meta == 2) return 180.0F;
+        if (meta == 4) return 90.0F;
+        if (meta == 5) return -90.0F;
+        return 0.0F;
+    }
 }

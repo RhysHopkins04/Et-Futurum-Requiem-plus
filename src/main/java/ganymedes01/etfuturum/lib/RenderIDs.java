@@ -37,6 +37,7 @@ public class RenderIDs {
 	public static final int BIG_DRIPLEAF = RenderingRegistry.getNextAvailableRenderId();
 	public static final int SPORE_BLOSSOM = RenderingRegistry.getNextAvailableRenderId();
 	public static final int DEEPSLATE_CERTUS_QUARTZ_ORE = RenderingRegistry.getNextAvailableRenderId();
+	public static final int MODERN_MAP_PARITY = RenderingRegistry.getNextAvailableRenderId();
 
 	public static final int EXTENDED_CROSSED_SQUARES = RenderingRegistry.getNextAvailableRenderId();
 	public static final int FENCE = RenderingRegistry.getNextAvailableRenderId();

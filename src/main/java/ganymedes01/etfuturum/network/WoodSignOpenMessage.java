@@ -5,36 +5,41 @@ import ganymedes01.etfuturum.tileentities.TileEntityWoodSign;
 import io.netty.buffer.ByteBuf;
 
 public class WoodSignOpenMessage implements IMessage {
+    public int tileX;
+    public int tileY;
+    public int tileZ;
+    public int id;
+    public boolean back;
 
-	public int tileX;
-	public int tileY;
-	public int tileZ;
-	public int id;
+    public WoodSignOpenMessage() {}
 
-	public WoodSignOpenMessage() {
-	}
+    public WoodSignOpenMessage(TileEntityWoodSign tileentitysign, int id) {
+        this(tileentitysign, id, false);
+    }
 
-	public WoodSignOpenMessage(TileEntityWoodSign tileentitysign, int i) {
-		tileX = tileentitysign.xCoord;
-		tileY = tileentitysign.yCoord;
-		tileZ = tileentitysign.zCoord;
-		id = i;
-	}
+    public WoodSignOpenMessage(TileEntityWoodSign tileentitysign, int id, boolean back) {
+        tileX = tileentitysign.xCoord;
+        tileY = tileentitysign.yCoord;
+        tileZ = tileentitysign.zCoord;
+        this.id = id;
+        this.back = back;
+    }
 
-	@Override
-	public void fromBytes(ByteBuf buf) {
-		this.tileX = buf.readInt();
-		this.tileY = buf.readInt();
-		this.tileZ = buf.readInt();
-		this.id = buf.readInt();
-	}
+    @Override
+    public void fromBytes(ByteBuf buf) {
+        tileX = buf.readInt();
+        tileY = buf.readInt();
+        tileZ = buf.readInt();
+        id = buf.readInt();
+        back = buf.readBoolean();
+    }
 
-	@Override
-	public void toBytes(ByteBuf buf) {
-		buf.writeInt(this.tileX);
-		buf.writeInt(this.tileY);
-		buf.writeInt(this.tileZ);
-		buf.writeInt(this.id);
-	}
-
+    @Override
+    public void toBytes(ByteBuf buf) {
+        buf.writeInt(tileX);
+        buf.writeInt(tileY);
+        buf.writeInt(tileZ);
+        buf.writeInt(id);
+        buf.writeBoolean(back);
+    }
 }

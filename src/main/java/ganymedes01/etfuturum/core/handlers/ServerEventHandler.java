@@ -18,6 +18,7 @@ import ganymedes01.etfuturum.api.mappings.RawOreDropMapping;
 import ganymedes01.etfuturum.api.spectator.SpectatorUtils;
 import ganymedes01.etfuturum.blocks.BlockHoney;
 import ganymedes01.etfuturum.blocks.BlockMagma;
+import ganymedes01.etfuturum.blocks.BlockWoodSign;
 import ganymedes01.etfuturum.client.sound.ModSounds;
 import ganymedes01.etfuturum.compat.ExternalContent;
 import ganymedes01.etfuturum.compat.ModsList;
@@ -69,6 +70,7 @@ import net.minecraft.potion.PotionEffect;
 import net.minecraft.potion.PotionHelper;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityMobSpawner;
+import net.minecraft.tileentity.TileEntitySign;
 import net.minecraft.util.*;
 import net.minecraft.util.MovingObjectPosition.MovingObjectType;
 import net.minecraft.world.World;
@@ -98,10 +100,10 @@ import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.oredict.OreDictionary;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.mutable.MutableFloat;
-import roadhog360.hogutils.api.blocksanditems.utils.BlockMetaPair;
-import roadhog360.hogutils.api.hogtags.helpers.BlockTags;
-import roadhog360.hogutils.api.hogtags.helpers.ItemTags;
-import roadhog360.hogutils.api.utils.RecipeHelper;
+import ganymedes01.etfuturum.api.mappings.BlockMetaPair;
+import ganymedes01.etfuturum.api.tags.BlockTags;
+import ganymedes01.etfuturum.api.tags.ItemTags;
+import ganymedes01.etfuturum.core.utils.RecipeHelper;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -199,7 +201,7 @@ public class ServerEventHandler {
 			} else if (ConfigSounds.paintingItemFramePlacing && event.target instanceof EntityPainting) { // --- Break a painting --- //
 				event.target.playSound(Tags.MC_ASSET_VER + ":entity.painting.break", 1.0F, 1.0F);
 			} else if (ConfigSounds.leashSounds && event.target instanceof EntityLeashKnot) { // --- Break a lead knot --- //
-				event.target.playSound(Tags.MC_ASSET_VER + ":entity.leash_knot.break", 1.0F, 1.0F);
+				event.target.playSound(Tags.MC_ASSET_VER + ":item.lead.break", 1.0F, 1.0F);
 			}
 		}
 	}
@@ -211,16 +213,17 @@ public class ServerEventHandler {
 
 		Chunk chunk = event.world.getChunkFromChunkCoords(MathHelper.floor_double(event.entity.posX) >> 4, MathHelper.floor_double(event.entity.posZ) >> 4);
 
-		String sound = "";
+		String placementSound = null;
 		if (ConfigSounds.paintingItemFramePlacing && event.entity instanceof EntityItemFrame) {
-			sound = "item_frame";
+			placementSound = "entity.item_frame.place";
 		} else if (ConfigSounds.paintingItemFramePlacing && event.entity instanceof EntityPainting) {
-			sound = "painting";
+			placementSound = "entity.painting.place";
 		} else if (ConfigSounds.leashSounds && event.entity instanceof EntityLeashKnot) {
-			sound = "leash_knot";
+			// 1.21.11 replaced entity.leash_knot.place with the item.lead sound family.
+			placementSound = "item.lead.tied";
 		}
-		if (!sound.equals("")) {
-			event.world.playSoundAtEntity(event.entity, Tags.MC_ASSET_VER + ":entity." + sound + ".place", 1.0F, 1.0F);
+		if (placementSound != null) {
+			event.world.playSoundAtEntity(event.entity, Tags.MC_ASSET_VER + ":" + placementSound, 1.0F, 1.0F);
 			return;
 		}
 
@@ -255,6 +258,19 @@ public class ServerEventHandler {
 	@SubscribeEvent
 	public void chunkLoad(ChunkEvent.Load event) {
 		loadedChunks.add(event.getChunk());
+
+		// Vanilla 1.7 oak signs saved before the modern sign layer still deserialize as the
+		// original TileEntitySign ID. Upgrade them in place on both logical sides so existing
+		// worlds gain front/back editing, dye, glow and waxing without changing block IDs/text.
+		if (ConfigBlocksItems.enableVanillaSigns) {
+			for (TileEntity tile : new ArrayList<TileEntity>(event.getChunk().chunkTileEntityMap.values())) {
+				if (!(tile instanceof TileEntitySign)) continue;
+				Block block = event.getChunk().worldObj.getBlock(tile.xCoord, tile.yCoord, tile.zCoord);
+				if (block == Blocks.standing_sign || block == Blocks.wall_sign) {
+					BlockWoodSign.upgradeVanillaSignTile(event.getChunk().worldObj, tile.xCoord, tile.yCoord, tile.zCoord);
+				}
+			}
+		}
 	}
 
 	@SubscribeEvent
@@ -633,6 +649,25 @@ public class ServerEventHandler {
 	@SubscribeEvent(priority = EventPriority.HIGHEST)
 	public void onPlayerInteract(PlayerInteractEvent event) {
 		EntityPlayer player = event.entityPlayer;
+
+		// Literal vanilla oak signs do not have an onBlockActivated hook in 1.7.10. Route their
+		// right-click through EFR's modern sign layer, while leaving the client event uncancelled
+		// so the normal interaction packet still reaches the server.
+		if (ConfigBlocksItems.enableVanillaSigns && event.action == Action.RIGHT_CLICK_BLOCK
+				&& !SpectatorUtils.isSpectator(player)) {
+			Block clicked = event.world.getBlock(event.x, event.y, event.z);
+			if (clicked == Blocks.standing_sign || clicked == Blocks.wall_sign) {
+				if (BlockWoodSign.handleVanillaSignActivation(event.world, event.x, event.y, event.z, player)) {
+					if (!event.world.isRemote) {
+						event.useBlock = Result.DENY;
+						event.useItem = Result.DENY;
+						event.setCanceled(true);
+					}
+					return;
+				}
+			}
+		}
+
 		if ((event.action == Action.RIGHT_CLICK_BLOCK || event.action == Action.RIGHT_CLICK_AIR) && !SpectatorUtils.isSpectator(player)) {
 			if (player != null) {
 				final ItemStack heldStack = player.getHeldItem();
@@ -1461,7 +1496,7 @@ public class ServerEventHandler {
 		}
 
 		if (ConfigSounds.leashSounds && target instanceof EntityLeashKnot) { // --- Remove a Lead Knot --- //
-			world.playSoundEffect(target.posX + 0.5, target.posY + 0.5, target.posZ + 0.5, Tags.MC_ASSET_VER + ":entity.leash_knot.break", 1.0F, 1.0F);
+			world.playSoundEffect(target.posX + 0.5, target.posY + 0.5, target.posZ + 0.5, Tags.MC_ASSET_VER + ":item.lead.untied", 1.0F, 1.0F);
 		}
 	}
 
@@ -2002,6 +2037,17 @@ public class ServerEventHandler {
 			noBurnItems.add(ModBlocks.WARPED_TRAPDOOR.newItemStack(1, OreDictionary.WILDCARD_VALUE));
 			noBurnItems.add(ModBlocks.CRIMSON_SIGN.newItemStack(1, OreDictionary.WILDCARD_VALUE));
 			noBurnItems.add(ModBlocks.WARPED_SIGN.newItemStack(1, OreDictionary.WILDCARD_VALUE));
+
+			if (ConfigBlocksItems.enableModernMapParityBlocks) {
+				if (ModernMapParityBlocks.CRIMSON_HANGING_SIGN.get() != null)
+					noBurnItems.add(new ItemStack(ModernMapParityBlocks.CRIMSON_HANGING_SIGN.get()));
+				if (ModernMapParityBlocks.WARPED_HANGING_SIGN.get() != null)
+					noBurnItems.add(new ItemStack(ModernMapParityBlocks.WARPED_HANGING_SIGN.get()));
+				if (ModernMapParityBlocks.CRIMSON_SHELF.get() != null)
+					noBurnItems.add(new ItemStack(ModernMapParityBlocks.CRIMSON_SHELF.get()));
+				if (ModernMapParityBlocks.WARPED_SHELF.get() != null)
+					noBurnItems.add(new ItemStack(ModernMapParityBlocks.WARPED_SHELF.get()));
+			}
 
 			for (ModBlocks bed : ModBlocks.BEDS) {
 				if (bed.isEnabled()) {

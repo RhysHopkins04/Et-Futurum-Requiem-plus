@@ -1,11 +1,7 @@
 package ganymedes01.etfuturum.api;
 
-import com.gtnewhorizon.gtnhlib.eventbus.EventBusSubscriber;
-import com.gtnewhorizon.gtnhlib.eventbus.Phase;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import ganymedes01.etfuturum.ModItems;
 import ganymedes01.etfuturum.Tags;
-import ganymedes01.etfuturum.core.handlers.client.ArmorSoundEventHandler;
 import it.unimi.dsi.fastutil.Pair;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
@@ -15,19 +11,17 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.OreDictionary;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
-import roadhog360.hogutils.api.event.BlockItemIterateEvent;
-import roadhog360.hogutils.api.hogtags.helpers.ItemTags;
+import ganymedes01.etfuturum.api.tags.ItemTags;
 
 import java.util.Map;
 import java.util.Set;
 
-@EventBusSubscriber(phase = Phase.INIT)
 public class ArmorSoundsRegistry {
 	private static final Object2ObjectOpenHashMap<String, String> TAG_TO_SOUND_MAP = new Object2ObjectOpenHashMap<>();
 
 	public static final String GENERIC_EQUIP_SOUND = Tags.MC_ASSET_VER + ":item.armor.equip_generic";
 
-	public static final String TURTLE_HELMET_EQUIP_SOUND = Tags.MC_ASSET_VER + ":item.armor.equip_turtle_helmet";
+	public static final String TURTLE_HELMET_EQUIP_SOUND = Tags.MC_ASSET_VER + ":item.armor.equip_turtle";
 	public static final String ELYTRA_EQUIP_SOUND = Tags.MC_ASSET_VER + ":item.armor.equip_elytra";
 
 	public static final String LEATHER_EQUIP_SOUND = Tags.MC_ASSET_VER + ":item.armor.equip_leather";
@@ -116,25 +110,19 @@ public class ArmorSoundsRegistry {
 		ItemTags.addTags(ModItems.ELYTRA.get(), Tags.MOD_ID + ":elytra_equip_sound");
 	}
 
-	@SubscribeEvent
-	public static void registerDefaults(BlockItemIterateEvent.ItemRegister.Init event) {
-		boolean checkEquip = event.objToRegister instanceof ItemArmor
-				|| event.namespaceID.contains("skull") || event.namespaceID.contains("head") || event.namespaceID.contains("pumpkin");
-		if(checkEquip && getEquipSound(event.objToRegister, OreDictionary.WILDCARD_VALUE) == null) {
+	public static void registerDefaults(Item item, String namespaceID) {
+		boolean checkEquip = item instanceof ItemArmor
+				|| namespaceID.contains("skull") || namespaceID.contains("head") || namespaceID.contains("pumpkin");
+		if(checkEquip && getEquipSound(item, OreDictionary.WILDCARD_VALUE) == null) {
 			for(Pair<String[], String> condition : DEFAULT_CONDITIONS) {
 				for(String nameCheck : condition.first()) {
-					if(event.namespaceID.toLowerCase().contains(nameCheck)) {
-						ItemTags.addTags(event.objToRegister, condition.second());
+					if(namespaceID.toLowerCase().contains(nameCheck)) {
+						ItemTags.addTags(item, condition.second());
 						return;
 					}
 				}
 			}
-			ItemTags.addTags(event.objToRegister, Tags.MOD_ID + ":generic_equip_sound");
+			ItemTags.addTags(item, Tags.MOD_ID + ":generic_equip_sound");
 		}
-	}
-
-	@EventBusSubscriber.Condition
-	public static boolean condition() {
-		return ArmorSoundEventHandler.condition();
 	}
 }

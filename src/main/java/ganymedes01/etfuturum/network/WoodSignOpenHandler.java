@@ -32,7 +32,12 @@ public class WoodSignOpenHandler implements IMessageHandler<WoodSignOpenMessage,
 
 			tileEntity.markDirty();
 
-			FMLClientHandler.instance().getClient().displayGuiScreen(new GuiEditWoodSign((TileEntityWoodSign) tileEntity));
+			// Use EFR's long-standing vanilla-compatible sign editor for every wood/sign family.
+			// Pass 11 delegated parity signs to GuiEditSign directly, but that screen assumes its
+			// tile belongs to Blocks.standing_sign / Blocks.wall_sign and the hanging-sign preview
+			// could swallow visible keyboard edits. GuiEditWoodSign duplicates the vanilla typing,
+			// cursor, Done-button and C12 packet flow while now also understanding parity models.
+			FMLClientHandler.instance().getClient().displayGuiScreen(new GuiEditWoodSign((TileEntityWoodSign) tileEntity, message.back));
 		}
 		return null;
 	}

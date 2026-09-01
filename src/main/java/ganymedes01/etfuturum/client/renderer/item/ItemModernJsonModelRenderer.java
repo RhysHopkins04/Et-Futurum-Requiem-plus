@@ -8,10 +8,14 @@ import ganymedes01.etfuturum.client.model.ModernJsonModelBridge.PreparedModels;
 import ganymedes01.etfuturum.client.model.ModernJsonModelBridge.Quad;
 import ganymedes01.etfuturum.client.model.ModernJsonModelBridge.Transform;
 import ganymedes01.etfuturum.client.model.ModernJsonModelBridge.Vertex;
+import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemRenderer;
+import net.minecraft.client.renderer.RenderBlocks;
+import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.TextureMap;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
 import net.minecraftforge.client.IItemRenderer;
@@ -52,9 +56,9 @@ public final class ItemModernJsonModelRenderer implements IItemRenderer {
         Model model = prepared.item;
 
         OpenGLHelper.pushMatrix();
-        // IItemRenderer is invoked inside several vanilla render paths with different GL lighting
-        // expectations (Creative grid, hotbar, equipped item, dropped entity). Preserve the full
-        // caller state so a parity item cannot leave vanilla blocks dark after it renders.
+
+        // Preserve all caller GL state. This renderer is used by inventory,
+        // equipped-item and EntityItem render paths.
         GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
         OpenGLHelper.enableRescaleNormal();
         OpenGLHelper.enableBlend();
@@ -62,32 +66,116 @@ public final class ItemModernJsonModelRenderer implements IItemRenderer {
         OpenGLHelper.colour(1.0F, 1.0F, 1.0F);
 
         boolean flat = model != null && model.flatIcon != null;
-        // Forge has already applied its standard 3D inventory-block transform when the helper is
-        // enabled. Applying the modern GUI transform again is what made cubes tiny and special
-        // models skewed. Raw generated sprites are handled directly in 16x16 GUI coordinates.
+
+        /*
+         * Forge 1.7.10 has already applied its legacy EntityItem presentation
+         * scale before IItemRenderer receives ENTITY.
+         *
+         * Remove that legacy scale so Mojang's modern ground/fixed transform is
+         * the only item-model scale.
+         *
+         * Forge also performs ENTITY_ROTATION around local (0,0,0), while the
+         * modern model geometry occupies 0..1. Move the centre of that geometry
+         * onto the EntityItem origin so it spins in place instead of orbiting
+         * around a corner.
+         */
+        if (type == ItemRenderType.ENTITY) {
+            undoForgeEntityPresentation(stack);
+            OpenGLHelper.translate(-0.5F, -0.5F, -0.5F);
+        }
+
+        /*
+         * IMPORTANT: exactly ONE modern display transform is applied here.
+         *
+         * For ENTITY:
+         *   normal dropped item -> "ground"
+         *   item frame          -> "fixed"
+         *
+         * For 3D inventory models Forge already supplied its inventory-block
+         * camera, so do not stack Mojang's GUI transform on top of it.
+         */
         if (!(type == ItemRenderType.INVENTORY && !flat)) {
             applyModernDisplayTransform(model, type, flat);
         }
+
         if (type == ItemRenderType.INVENTORY && !flat) {
             applyParityGuiCorrection(entry, model);
         }
 
-        // Modern item models are self-shaded. Avoid the legacy fixed-function item lighting from
-        // darkening the same model a second time, especially in the Creative inventory.
+        // Modern item models provide their own shading.
         OpenGLHelper.disableLighting();
+
         if (flat && type == ItemRenderType.INVENTORY) {
             renderFlatInventory(model.flatIcon);
         } else if (flat) {
+            /*
+             * ItemRenderer.renderItemIn2D builds legacy flat geometry from Z=0
+             * backwards to Z=-1/16, giving it a depth centre of -1/32.
+             *
+             * Modern display transforms assume item geometry is centred on the
+             * normal model-space centre Z=0.5. Move only ENTITY flat geometry into
+             * that modern basis before it is drawn.
+             *
+             * 0.5 + 1/32 = 17/32 = 0.53125.
+             *
+             * This correction is intentionally ENTITY-only so already-correct
+             * first/third-person rendering is not changed.
+             */
+            if (type == ItemRenderType.ENTITY) {
+                OpenGLHelper.translate(0.0F, 0.0F, 17.0F / 32.0F);
+            }
+
             renderFlat(model.flatIcon);
         } else if (model != null && !model.quads.isEmpty()) {
             renderQuads(model);
         } else {
             renderFallback(stack);
         }
-        // Restore exactly what the calling vanilla renderer had configured. In particular, do
-        // not unconditionally enable GL_LIGHTING: the hotbar/equipped paths frequently had it off.
+
         GL11.glPopAttrib();
         OpenGLHelper.popMatrix();
+    }
+
+    private static Block getItemBlock(ItemStack stack) {
+        if (stack == null || !(stack.getItem() instanceof ItemBlock)) return null;
+        return Block.getBlockFromItem(stack.getItem());
+    }
+
+    /** Mirrors ForgeHooksClient.renderEntityItem's branch decision for this renderer. */
+    private boolean usesForgeEntity3D(ItemStack stack) {
+        Block block = getItemBlock(stack);
+        return shouldUseRenderHelper(ItemRenderType.ENTITY, stack, ItemRendererHelper.BLOCK_3D)
+                || (block != null && RenderBlocks.renderItemIn3d(block.getRenderType()));
+    }
+
+    /** Mirrors Forge 1.7.10's EntityItem scale exactly; do not replace with a blanket x4. */
+    private float getForgeEntityScale(ItemStack stack) {
+        Block block = getItemBlock(stack);
+        if (usesForgeEntity3D(stack)) {
+            int renderType = block != null ? block.getRenderType() : 1;
+            return renderType == 1 || renderType == 19 || renderType == 12 || renderType == 2
+                    ? 0.5F : 0.25F;
+        }
+        return 0.5F;
+    }
+
+    /**
+     * Cancels only the legacy Forge EntityItem/model-presentation transform which precedes this
+     * renderer. Entity bobbing/spin and the outer RenderItemFrame world placement remain intact.
+     */
+    private void undoForgeEntityPresentation(ItemStack stack) {
+        boolean forge3D = usesForgeEntity3D(stack);
+        float forgeScale = getForgeEntityScale(stack);
+        float inverseScale = 1.0F / forgeScale;
+        OpenGLHelper.scale(inverseScale, inverseScale, inverseScale);
+
+        if (forge3D && RenderItem.renderInFrame) {
+            // Forge applied: scale(1.25), translate(+0.05Y), rotate(-90Y), then entity scale.
+            // Current-matrix operations append on the right, so cancel them in reverse order.
+            OpenGLHelper.rotate(90.0F, 0.0F, 1.0F, 0.0F);
+            OpenGLHelper.translate(0.0F, -0.05F, 0.0F);
+            OpenGLHelper.scale(0.8F, 0.8F, 0.8F);
+        }
     }
 
 
@@ -146,7 +234,7 @@ public final class ItemModernJsonModelRenderer implements IItemRenderer {
         String key;
         switch (type) {
             case INVENTORY: key = "gui"; break;
-            case ENTITY: key = "ground"; break;
+            case ENTITY: key = RenderItem.renderInFrame ? "fixed" : "ground"; break;
             case EQUIPPED_FIRST_PERSON: key = "firstperson_righthand"; break;
             case EQUIPPED: key = "thirdperson_righthand"; break;
             default: key = "fixed"; break;

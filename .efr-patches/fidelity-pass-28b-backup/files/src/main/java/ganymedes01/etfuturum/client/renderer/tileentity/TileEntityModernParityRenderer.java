@@ -244,10 +244,7 @@ public final class TileEntityModernParityRenderer {
                 entity.setEntityItemStack(renderStack); entity.age = 0;
                 boolean block3d = stack.getItem() instanceof ItemBlock && stack.getItemSpriteNumber() == 0
                         && RenderBlocks.renderItemIn3d(net.minecraft.block.Block.getBlockFromItem(stack.getItem()).getRenderType());
-                // shelfSlot() numbers compartments from the player's left while looking at
-                // the front. The old renderer walked the local X axis in the opposite order,
-                // so clicking the right compartment displayed the stack on the left.
-                double[] pos = rotate(0.82D - slot * 0.32D, 0.695D, facing);
+                double[] pos = rotate(0.18D + slot * 0.32D, 0.695D, facing);
                 GL11.glPushMatrix();
                 GL11.glTranslated(x + pos[0], y + (block3d ? 0.49D : 0.50D), z + pos[1]);
                 GL11.glRotatef(-(facing & 3) * 90.0F, 0.0F, 1.0F, 0.0F);

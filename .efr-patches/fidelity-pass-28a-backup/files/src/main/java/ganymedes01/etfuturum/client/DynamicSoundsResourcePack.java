@@ -145,19 +145,6 @@ public class DynamicSoundsResourcePack implements IResourcePack {
 			// and a prefixed name becomes a malformed/doubled event ResourceLocation.
 			addSoundEventsToCategory("block.hanging_sign.waxed_interact_fail",
 					"block.sign.waxed_interact_fail");
-
-			/*
-			 * Do not request the Decorated Pot OGGs through AssetDirector. A failed optional
-			 * sound download aborts that library's whole per-mod pass before it loads the
-			 * modern client JAR, which removes every AssetDirector-backed model and texture.
-			 * Define the two versioned events locally using stable vanilla 1.7 sound objects.
-			 */
-			addSoundsToCategory("block.decorated_pot.insert",
-					"minecraft:random/pop");
-			addSoundsToCategory("block.decorated_pot.shatter",
-					"minecraft:random/glass1",
-					"minecraft:random/glass2",
-					"minecraft:random/glass3");
 			return rootObject;
 		}
 	}

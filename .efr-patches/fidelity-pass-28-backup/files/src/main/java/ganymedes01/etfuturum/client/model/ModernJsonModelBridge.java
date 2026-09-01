@@ -11,9 +11,6 @@ import ganymedes01.etfuturum.ModernPotterySherds;
 import ganymedes01.etfuturum.Tags;
 import ganymedes01.etfuturum.client.ModernAssetResourcePack;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockFence;
-import net.minecraft.block.BlockFenceGate;
-import net.minecraft.block.BlockWall;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.client.resources.IResource;
@@ -154,11 +151,6 @@ public final class ModernJsonModelBridge {
         }
         ModernMapParityBlocks.Style style = entry.getStyle();
         String name = entry.getRegistryName();
-        if ("suspicious_sand".equals(name) || "suspicious_gravel".equals(name)) {
-            int dusted = world.getBlockMetadata(x, y, z) & 3;
-            Model stage = models.facingModels[dusted];
-            if (stage != null) return stage;
-        }
         if ("decorated_pot".equals(name)) {
             net.minecraft.tileentity.TileEntity tile = world.getTileEntity(x, y, z);
             String[] sherds = null;
@@ -266,10 +258,6 @@ public final class ModernJsonModelBridge {
     private static boolean connects(ModernMapParityBlocks entry, IBlockAccess world, int x, int y, int z) {
         Block other = world.getBlock(x, y, z);
         if (other == null) return false;
-        if (entry.getStyle() == ModernMapParityBlocks.Style.WALL && other instanceof BlockWall) return true;
-        if (entry.getStyle() == ModernMapParityBlocks.Style.FENCE && other instanceof BlockFence) return true;
-        if ((entry.getStyle() == ModernMapParityBlocks.Style.WALL
-                || entry.getStyle() == ModernMapParityBlocks.Style.FENCE) && other instanceof BlockFenceGate) return true;
         ModernMapParityBlocks otherEntry = ModernMapParityBlocks.fromBlock(other);
         if (otherEntry != null) {
             if (otherEntry.getStyle() == entry.getStyle()) return true;
@@ -401,11 +389,6 @@ public final class ModernJsonModelBridge {
         ModernAssetResourcePack.registerDynamicAlias("textures/blocks/" + synthetic + ".png", target);
         ModernAssetResourcePack.registerDynamicAlias("textures/blocks/" + synthetic + ".png.mcmeta", target + ".mcmeta");
         return register.registerIcon("minecraft:" + synthetic);
-    }
-
-    /** Makes one exact modern texture available to legacy block renderers such as doors/slabs. */
-    public static IIcon registerModernTexture(String texture, IIconRegister register) {
-        return registerTexture(texture, register);
     }
 
     private static String texturePath(String texture) {
@@ -794,7 +777,6 @@ public final class ModernJsonModelBridge {
         p.put("attachment", "floor");
         p.put("powered", "false");
         p.put("side_chain", "unconnected");
-        p.put("dusted", "0");
         for (int slot = 0; slot < 6; slot++) p.put("slot_" + slot + "_occupied", "false");
         p.put("north", entry.getStyle() == ModernMapParityBlocks.Style.WALL ? "none" : "false");
         p.put("east", entry.getStyle() == ModernMapParityBlocks.Style.WALL ? "none" : "false");
@@ -821,13 +803,6 @@ public final class ModernJsonModelBridge {
                 Map<String, String> state = defaultsFor(entry);
                 state.put("hanging", Boolean.toString(hanging != 0));
                 prepared.facingModels[hanging] = loadBlockStateModel(entry, state);
-            }
-        }
-        if ("suspicious_sand".equals(registryName) || "suspicious_gravel".equals(registryName)) {
-            for (int dusted = 0; dusted < 4; dusted++) {
-                Map<String, String> state = defaultsFor(entry);
-                state.put("dusted", Integer.toString(dusted));
-                prepared.facingModels[dusted] = loadBlockStateModel(entry, state);
             }
         }
         if (style == ModernMapParityBlocks.Style.PANE || style == ModernMapParityBlocks.Style.FENCE

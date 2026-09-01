@@ -123,7 +123,6 @@ public class ClientProxy extends CommonProxy {
 		ClientRegistry.bindTileEntitySpecialRenderer(ModernMapParityBlocks.ParityCopperChestTileEntity.class, new TileEntityParityCopperChestRenderer());
 		ClientRegistry.bindTileEntitySpecialRenderer(ModernMapParityBlocks.ParitySignTileEntity.class, new TileEntityModernParityRenderer.Sign());
 		ClientRegistry.bindTileEntitySpecialRenderer(ModernMapParityBlocks.ParityCampfireTileEntity.class, new TileEntityModernParityRenderer.Campfire());
-		ClientRegistry.bindTileEntitySpecialRenderer(ModernMapParityBlocks.ParityShelfTileEntity.class, new TileEntityModernParityRenderer.Shelf());
 		if(ModsList.IRON_CHEST.isLoaded() && CompatIronChests.enableCrystalRendering()) {
 			ClientRegistry.bindTileEntitySpecialRenderer(TileEntityBarrel.ClearTE.class, new TileEntityClearChestItemRenderer(key -> {
 				if (key instanceof TileEntityBarrel.ClearTE barrel) {

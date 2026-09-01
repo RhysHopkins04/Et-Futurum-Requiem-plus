@@ -19,7 +19,6 @@ import ganymedes01.etfuturum.recipes.crafting.RecipeDecoratedPot;
 import ganymedes01.etfuturum.tileentities.TileEntityWoodSign;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockChest;
-import net.minecraft.block.BlockFalling;
 import net.minecraft.block.BlockFence;
 import net.minecraft.block.BlockFenceGate;
 import net.minecraft.block.BlockWall;
@@ -27,7 +26,6 @@ import net.minecraft.block.BlockStairs;
 import net.minecraft.block.BlockTorch;
 import net.minecraft.block.BlockTrapDoor;
 import net.minecraft.block.BlockVine;
-import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.EntityFX;
@@ -41,7 +39,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.IProjectile;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.item.EntityFallingBlock;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
@@ -443,8 +440,7 @@ public enum ModernMapParityBlocks {
                 GameRegistry.registerBlock(entry.block, BaseSlabItemBlock.class, name);
                 GameRegistry.registerBlock(entry.doubleSlabBlock, BaseSlabItemBlock.class, "double_" + name);
             } else if (entry.block instanceof BaseDoor) {
-                GameRegistry.registerBlock(entry.block,
-                        entry == PALE_OAK_DOOR ? ParityDoorItemBlock.class : ItemBlockNewDoor.class, name);
+                GameRegistry.registerBlock(entry.block, ItemBlockNewDoor.class, name);
             } else if (name.endsWith("_coral_wall_fan")) GameRegistry.registerBlock(entry.block, (Class<? extends ItemBlock>) null, name);
             else if ("potted_torchflower".equals(name)) {
                 GameRegistry.registerBlock(entry.block, (Class<? extends ItemBlock>) null, name);
@@ -472,7 +468,7 @@ public enum ModernMapParityBlocks {
         if (getRegistryName().endsWith("copper_chest")) return new ParityCopperChestBlock(this);
         if (style == Style.STAIRS) {
             Block base = this == PALE_OAK_STAIRS ? PALE_OAK_PLANKS.get() : RESIN_BRICKS.get();
-            return new ParityStairBlock(this, base);
+            return new BaseStairs(base, 0);
         }
         if (style == Style.SLAB) {
             Block base = this == PALE_OAK_SLAB ? PALE_OAK_PLANKS.get() : RESIN_BRICKS.get();
@@ -512,26 +508,6 @@ public enum ModernMapParityBlocks {
     }
 
     /** Standard slab placement/merging with the modern backing block's atlas texture. */
-    private static final class ParityStairBlock extends BaseStairs {
-        private final ModernMapParityBlocks entry;
-
-        ParityStairBlock(ModernMapParityBlocks entry, Block backing) {
-            super(backing, 0);
-            this.entry = entry;
-            setBlockName(Tags.MOD_ID + "." + entry.getRegistryName());
-            setHardness(entry.material == Material.wood ? 2.0F : 1.5F);
-            setResistance(5.0F);
-            setStepSound(entry.material == Material.wood ? soundTypeWood : soundTypeStone);
-        }
-
-        @Override @SideOnly(Side.CLIENT)
-        public void registerBlockIcons(IIconRegister reg) {
-            super.registerBlockIcons(reg);
-            ModernJsonModelBridge.prepare(entry, reg);
-        }
-    }
-
-    /** Standard slab placement/merging with the modern backing block's atlas texture. */
     private static final class ParitySlabBlock extends BaseSlab {
         private final ModernMapParityBlocks entry;
         private final Block backing;
@@ -560,23 +536,11 @@ public enum ModernMapParityBlocks {
                     "minecraft:block/" + entry.textureKey, reg);
             setIcons(new IIcon[]{icon});
             blockIcon = icon;
-            ModernJsonModelBridge.prepare(entry, reg);
-        }
-
-        @Override
-        public String func_150002_b(int meta) {
-            return entry.getRegistryName();
         }
     }
 
     private static final class ParityDoorBlock extends BaseDoor {
-        private final ModernMapParityBlocks entry;
-
-        ParityDoorBlock(ModernMapParityBlocks entry) {
-            super(Material.wood, "pale_oak");
-            this.entry = entry;
-            setBlockName(Tags.MOD_ID + "." + entry.getRegistryName());
-        }
+        ParityDoorBlock(ModernMapParityBlocks entry) { super(Material.wood, "pale_oak"); }
 
         @Override @SideOnly(Side.CLIENT)
         public void registerBlockIcons(IIconRegister reg) {
@@ -589,37 +553,16 @@ public enum ModernMapParityBlocks {
             field_150017_a[1] = new IconFlipped(field_150017_a[0], true, false);
             field_150016_b[1] = new IconFlipped(field_150016_b[0], true, false);
             blockIcon = field_150016_b[0];
-            ModernJsonModelBridge.prepare(entry, reg);
-        }
-    }
-
-    /** Supplies the modern door's generated inventory icon without probing a nonexistent 1.7 path. */
-    public static final class ParityDoorItemBlock extends ItemBlockNewDoor {
-        public ParityDoorItemBlock(Block block) { super(block); }
-
-        @Override @SideOnly(Side.CLIENT)
-        public void registerIcons(IIconRegister reg) {
-            ModernAssetResourcePack.registerDynamicAlias(
-                    "textures/items/modern_item/pale_oak_door.png",
-                    "textures/item/pale_oak_door.png");
-            itemIcon = reg.registerIcon("minecraft:modern_item/pale_oak_door");
         }
     }
 
     private static final class ParityTrapdoorBlock extends BaseTrapdoor {
-        private final ModernMapParityBlocks entry;
-
-        ParityTrapdoorBlock(ModernMapParityBlocks entry) {
-            super(Material.wood, "pale_oak");
-            this.entry = entry;
-            setBlockName(Tags.MOD_ID + "." + entry.getRegistryName());
-        }
+        ParityTrapdoorBlock(ModernMapParityBlocks entry) { super(Material.wood, "pale_oak"); }
 
         @Override @SideOnly(Side.CLIENT)
         public void registerBlockIcons(IIconRegister reg) {
             blockIcon = registerLegacyModernTexture(
                     "minecraft:block/pale_oak_trapdoor", reg);
-            ModernJsonModelBridge.prepare(entry, reg);
         }
     }
 
@@ -1220,7 +1163,7 @@ public enum ModernMapParityBlocks {
         }
     }
 
-    private static final class ParityModelBlock extends Block implements ITileEntityProvider {
+    private static final class ParityModelBlock extends Block {
         private final ModernMapParityBlocks entry;
 
         ParityModelBlock(ModernMapParityBlocks entry) {
@@ -1969,17 +1912,8 @@ public enum ModernMapParityBlocks {
             for (int i = 0; i < 2 && isConnectedPoweredShelf(world, startX + leftX, y, startZ + leftZ, facing); i++) {
                 startX += leftX; startZ += leftZ;
             }
-            int rightX = -leftX, rightZ = -leftZ;
-            int shelfCount = 0, countX = startX, countZ = startZ;
-            while (shelfCount < 3 && isConnectedPoweredShelf(world, countX, y, countZ, facing)) {
-                shelfCount++;
-                countX += rightX;
-                countZ += rightZ;
-            }
-            int shelfX = startX, shelfZ = startZ;
-            // One/two/three powered shelves exchange the rightmost 3/6/9 hotbar slots.
-            int hotbar = 9 - shelfCount * 3;
-            for (int shelfIndex = 0; shelfIndex < shelfCount; shelfIndex++) {
+            int rightX = -leftX, rightZ = -leftZ, shelfX = startX, shelfZ = startZ, hotbar = 0;
+            for (int shelfIndex = 0; shelfIndex < 3 && isConnectedPoweredShelf(world, shelfX, y, shelfZ, facing); shelfIndex++) {
                 ParityShelfTileEntity shelf = (ParityShelfTileEntity) world.getTileEntity(shelfX, y, shelfZ);
                 for (int slot = 0; slot < 3; slot++, hotbar++) {
                     ItemStack stored = shelf.getStackInSlot(slot);
@@ -2481,11 +2415,6 @@ public enum ModernMapParityBlocks {
         }
 
         @Override
-        public TileEntity createNewTileEntity(World world, int metadata) {
-            return createTileEntity(world, metadata);
-        }
-
-        @Override
         public boolean hasComparatorInputOverride() {
             return isDecoratedPot() || isShelf() || super.hasComparatorInputOverride();
         }
@@ -2569,54 +2498,9 @@ public enum ModernMapParityBlocks {
         }
 
         @Override
-        public void onBlockAdded(World world, int x, int y, int z) {
-            super.onBlockAdded(world, x, y, z);
-            if (isSuspicious()) world.scheduleBlockUpdate(x, y, z, this, 2);
-        }
-
-        /** Mirrors BlockFalling while retaining the buried item/progress block-entity data. */
-        private void fallSuspiciousBlock(World world, int x, int y, int z) {
-            if (world.isRemote || y < 0 || !BlockFalling.func_149831_e(world, x, y - 1, z)) return;
-
-            int meta = world.getBlockMetadata(x, y, z);
-            NBTTagCompound tileData = null;
-            TileEntity tile = world.getTileEntity(x, y, z);
-            if (tile != null) {
-                tileData = new NBTTagCompound();
-                tile.writeToNBT(tileData);
-            }
-
-            byte radius = 32;
-            if (!BlockFalling.fallInstantly && world.checkChunksExist(
-                    x - radius, y - radius, z - radius, x + radius, y + radius, z + radius)) {
-                EntityFallingBlock falling = new EntityFallingBlock(
-                        world, x + 0.5D, y + 0.5D, z + 0.5D, this, meta);
-                falling.field_145810_d = tileData;
-                world.spawnEntityInWorld(falling);
-                return;
-            }
-
-            world.setBlockToAir(x, y, z);
-            int landingY = y;
-            while (landingY > 0 && BlockFalling.func_149831_e(world, x, landingY - 1, z)) landingY--;
-            if (landingY <= 0 || !world.setBlock(x, landingY, z, this, meta, 3) || tileData == null) return;
-            TileEntity landed = world.getTileEntity(x, landingY, z);
-            if (landed != null) {
-                tileData.setInteger("x", x);
-                tileData.setInteger("y", landingY);
-                tileData.setInteger("z", z);
-                landed.readFromNBT(tileData);
-                landed.markDirty();
-                world.markBlockForUpdate(x, landingY, z);
-            }
-        }
-
-        @Override
         public void onNeighborBlockChange(World world, int x, int y, int z, Block neighbor) {
             if (isScaffolding()) {
                 world.scheduleBlockUpdate(x, y, z, this, 1);
-            } else if (isSuspicious()) {
-                world.scheduleBlockUpdate(x, y, z, this, 2);
             } else if (isCopperLantern()) {
                 boolean hanging = (world.getBlockMetadata(x, y, z) & 1) != 0;
                 if ((hanging && !canCopperLanternHang(world, x, y, z))
@@ -2646,10 +2530,6 @@ public enum ModernMapParityBlocks {
 
         @Override
         public void updateTick(World world, int x, int y, int z, Random random) {
-            if (isSuspicious()) {
-                fallSuspiciousBlock(world, x, y, z);
-                return;
-            }
             if (isScaffolding()) {
                 int next = computeScaffoldingMeta(world, x, y, z);
                 if ((next & 7) >= 7) {

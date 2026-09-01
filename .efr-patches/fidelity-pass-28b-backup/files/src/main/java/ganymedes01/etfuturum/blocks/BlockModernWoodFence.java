@@ -76,8 +76,7 @@ public class BlockModernWoodFence extends BlockFence implements ISubBlocksBlock,
 	public boolean canConnectFenceTo(IBlockAccess world, int x, int y, int z) {
 		Block block = world.getBlock(x, y, z);
 		ModernMapParityBlocks parity = ModernMapParityBlocks.fromBlock(block);
-		if (parity != null && (parity.getStyle() == ModernMapParityBlocks.Style.FENCE
-				|| parity.getStyle() == ModernMapParityBlocks.Style.FENCE_GATE)) return true;
+		if (parity != null && parity.getStyle() == ModernMapParityBlocks.Style.FENCE_GATE) return true;
 		return block instanceof BlockWoodFence || block instanceof BlockModernWoodFence || block instanceof BlockWoodFenceGate || super.canConnectFenceTo(world, x, y, z);
 	}
 

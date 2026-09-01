@@ -1,7 +1,6 @@
 package ganymedes01.etfuturum.core.utils.structurenbt;
 
 import cpw.mods.fml.common.registry.GameRegistry;
-import ganymedes01.etfuturum.ModernMapParityBlocks;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.init.Blocks;
@@ -1218,15 +1217,6 @@ public class BlockStateConverter {
 		//Should we manually override "stone_slab" to return the default of Blocks.stone or should we leave it alone?
 
 		Block block = GameRegistry.findBlock(blockName.substring(0, blockName.indexOf(":")), truncatedName);
-		if ("minecraft".equals(blockName.substring(0, blockName.indexOf(":")))) {
-			try {
-				ModernMapParityBlocks parity = ModernMapParityBlocks.valueOf(truncatedName.toUpperCase(java.util.Locale.ROOT));
-				if ("double".equals(blockStates.get("type"))
-						&& parity.getStyle() == ModernMapParityBlocks.Style.SLAB && parity.getDoubleSlab() != null) {
-					block = parity.getDoubleSlab();
-				} else if (parity.get() != null) block = parity.get();
-			} catch (IllegalArgumentException ignored) { }
-		}
 		return block == null ? Blocks.stone : block;
 	}
 

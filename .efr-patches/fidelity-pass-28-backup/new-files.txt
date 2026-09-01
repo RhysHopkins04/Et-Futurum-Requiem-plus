@@ -1,0 +1,2 @@
+src/main/java/ganymedes01/etfuturum/ModernArchaeology.java
+scripts/validate_fidelity_pass_28.py

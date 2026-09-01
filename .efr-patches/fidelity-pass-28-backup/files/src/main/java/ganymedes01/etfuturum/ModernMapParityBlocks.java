@@ -5,21 +5,13 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import ganymedes01.etfuturum.configuration.configs.ConfigBlocksItems;
 import ganymedes01.etfuturum.client.model.ModernJsonModelBridge;
-import ganymedes01.etfuturum.client.ModernAssetResourcePack;
 import ganymedes01.etfuturum.client.particle.CustomParticles;
-import ganymedes01.etfuturum.blocks.BaseDoor;
-import ganymedes01.etfuturum.blocks.BaseSlab;
-import ganymedes01.etfuturum.blocks.BaseStairs;
-import ganymedes01.etfuturum.blocks.BaseTrapdoor;
-import ganymedes01.etfuturum.blocks.itemblocks.BaseSlabItemBlock;
-import ganymedes01.etfuturum.blocks.itemblocks.ItemBlockNewDoor;
 import ganymedes01.etfuturum.lib.RenderIDs;
 import ganymedes01.etfuturum.network.WoodSignOpenMessage;
 import ganymedes01.etfuturum.recipes.crafting.RecipeDecoratedPot;
 import ganymedes01.etfuturum.tileentities.TileEntityWoodSign;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockChest;
-import net.minecraft.block.BlockFalling;
 import net.minecraft.block.BlockFence;
 import net.minecraft.block.BlockFenceGate;
 import net.minecraft.block.BlockWall;
@@ -27,11 +19,9 @@ import net.minecraft.block.BlockStairs;
 import net.minecraft.block.BlockTorch;
 import net.minecraft.block.BlockTrapDoor;
 import net.minecraft.block.BlockVine;
-import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.EntityFX;
-import net.minecraft.client.renderer.IconFlipped;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.tileentity.TileEntity;
@@ -41,7 +31,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.IProjectile;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.item.EntityFallingBlock;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
@@ -350,14 +339,11 @@ public enum ModernMapParityBlocks {
     private final String modernAssetPath;
     private final int lightLevel;
     private Block block;
-    private Block doubleSlabBlock;
     private static boolean parityChestTileRegistered;
     private static boolean paritySignTileRegistered;
     private static boolean parityCampfireTileRegistered;
     private static boolean parityChiseledBookshelfTileRegistered;
     private static boolean parityDecoratedPotTileRegistered;
-    private static boolean parityShelfTileRegistered;
-    private static boolean parityBrushableTileRegistered;
     private static boolean decoratedPotRecipeRegistered;
 
     ModernMapParityBlocks(String vanillaVersion, Style style, Material material,
@@ -410,18 +396,7 @@ public enum ModernMapParityBlocks {
                     Tags.MOD_ID + ":modern_parity_decorated_pot");
             parityDecoratedPotTileRegistered = true;
         }
-        if (!parityShelfTileRegistered) {
-            GameRegistry.registerTileEntity(ParityShelfTileEntity.class,
-                    Tags.MOD_ID + ":modern_parity_shelf");
-            parityShelfTileRegistered = true;
-        }
-        if (!parityBrushableTileRegistered) {
-            GameRegistry.registerTileEntity(ParityBrushableTileEntity.class,
-                    Tags.MOD_ID + ":modern_parity_brushable");
-            parityBrushableTileRegistered = true;
-        }
         ModernPotterySherds.init();
-        ModernArchaeology.init();
         for (ModernMapParityBlocks entry : values()) {
             String name = entry.getRegistryName();
             if (GameRegistry.findBlock("minecraft", name) != null || GameRegistry.findBlock(Tags.MOD_ID, name) != null) {
@@ -439,13 +414,7 @@ public enum ModernMapParityBlocks {
                     || "potted_torchflower".equals(name);
             if (!technicalPlacementBlock) entry.block.setCreativeTab(EtFuturum.creativeTabBlocks);
             if (entry.lightLevel > 0 && !entry.usesDynamicLight()) entry.block.setLightLevel(entry.lightLevel / 15.0F);
-            if (entry.block instanceof BaseSlab) {
-                GameRegistry.registerBlock(entry.block, BaseSlabItemBlock.class, name);
-                GameRegistry.registerBlock(entry.doubleSlabBlock, BaseSlabItemBlock.class, "double_" + name);
-            } else if (entry.block instanceof BaseDoor) {
-                GameRegistry.registerBlock(entry.block,
-                        entry == PALE_OAK_DOOR ? ParityDoorItemBlock.class : ItemBlockNewDoor.class, name);
-            } else if (name.endsWith("_coral_wall_fan")) GameRegistry.registerBlock(entry.block, (Class<? extends ItemBlock>) null, name);
+            if (name.endsWith("_coral_wall_fan")) GameRegistry.registerBlock(entry.block, (Class<? extends ItemBlock>) null, name);
             else if ("potted_torchflower".equals(name)) {
                 GameRegistry.registerBlock(entry.block, (Class<? extends ItemBlock>) null, name);
             } else if ("torchflower".equals(name)) {
@@ -470,36 +439,15 @@ public enum ModernMapParityBlocks {
 
     private Block createBlock() {
         if (getRegistryName().endsWith("copper_chest")) return new ParityCopperChestBlock(this);
-        if (style == Style.STAIRS) {
-            Block base = this == PALE_OAK_STAIRS ? PALE_OAK_PLANKS.get() : RESIN_BRICKS.get();
-            return new ParityStairBlock(this, base);
-        }
-        if (style == Style.SLAB) {
-            Block base = this == PALE_OAK_SLAB ? PALE_OAK_PLANKS.get() : RESIN_BRICKS.get();
-            ParitySlabBlock single = new ParitySlabBlock(false, this, base);
-            doubleSlabBlock = new ParitySlabBlock(true, this, base);
-            return single;
-        }
-        if (this == PALE_OAK_DOOR) return new ParityDoorBlock(this);
-        if (this == PALE_OAK_TRAPDOOR) return new ParityTrapdoorBlock(this);
         return new ParityModelBlock(this);
-    }
-
-    public Block getDoubleSlab() {
-        return doubleSlabBlock;
     }
 
     public static ModernMapParityBlocks fromBlock(Block block) {
         if (block == null) return null;
         for (ModernMapParityBlocks entry : values()) {
             if (entry.block == block) return entry;
-            if (entry.doubleSlabBlock == block) return entry;
         }
         return null;
-    }
-
-    public static boolean isSuspiciousBlock(Block block) {
-        return block != null && (block == SUSPICIOUS_SAND.get() || block == SUSPICIOUS_GRAVEL.get());
     }
 
     /**
@@ -509,131 +457,6 @@ public enum ModernMapParityBlocks {
      */
     public static Map<String, String> getAssetAliases() {
         return Collections.emptyMap();
-    }
-
-    /** Standard slab placement/merging with the modern backing block's atlas texture. */
-    private static final class ParityStairBlock extends BaseStairs {
-        private final ModernMapParityBlocks entry;
-
-        ParityStairBlock(ModernMapParityBlocks entry, Block backing) {
-            super(backing, 0);
-            this.entry = entry;
-            setBlockName(Tags.MOD_ID + "." + entry.getRegistryName());
-            setHardness(entry.material == Material.wood ? 2.0F : 1.5F);
-            setResistance(5.0F);
-            setStepSound(entry.material == Material.wood ? soundTypeWood : soundTypeStone);
-        }
-
-        @Override @SideOnly(Side.CLIENT)
-        public void registerBlockIcons(IIconRegister reg) {
-            super.registerBlockIcons(reg);
-            ModernJsonModelBridge.prepare(entry, reg);
-        }
-    }
-
-    /** Standard slab placement/merging with the modern backing block's atlas texture. */
-    private static final class ParitySlabBlock extends BaseSlab {
-        private final ModernMapParityBlocks entry;
-        private final Block backing;
-
-        ParitySlabBlock(boolean isDouble, ModernMapParityBlocks entry, Block backing) {
-            super(isDouble, entry.material, entry.textureKey);
-            this.entry = entry;
-            this.backing = backing;
-            setBlockName(Tags.MOD_ID + "." + entry.getRegistryName());
-            setHardness(entry.material == Material.wood ? 2.0F : 1.5F);
-            setResistance(5.0F);
-            setStepSound(entry.material == Material.wood ? soundTypeWood : soundTypeStone);
-        }
-
-        @Override @SideOnly(Side.CLIENT)
-        public IIcon getIcon(int side, int meta) {
-            IIcon icon = backing == null ? null : backing.getIcon(side, 0);
-            return icon == null ? super.getIcon(side, meta) : icon;
-        }
-
-        @Override @SideOnly(Side.CLIENT)
-        public void registerBlockIcons(IIconRegister reg) {
-            if (backing != null) backing.registerBlockIcons(reg);
-            IIcon icon = backing == null ? null : backing.getIcon(0, 0);
-            if (icon == null) icon = registerLegacyModernTexture(
-                    "minecraft:block/" + entry.textureKey, reg);
-            setIcons(new IIcon[]{icon});
-            blockIcon = icon;
-            ModernJsonModelBridge.prepare(entry, reg);
-        }
-
-        @Override
-        public String func_150002_b(int meta) {
-            return entry.getRegistryName();
-        }
-    }
-
-    private static final class ParityDoorBlock extends BaseDoor {
-        private final ModernMapParityBlocks entry;
-
-        ParityDoorBlock(ModernMapParityBlocks entry) {
-            super(Material.wood, "pale_oak");
-            this.entry = entry;
-            setBlockName(Tags.MOD_ID + "." + entry.getRegistryName());
-        }
-
-        @Override @SideOnly(Side.CLIENT)
-        public void registerBlockIcons(IIconRegister reg) {
-            field_150017_a = new IIcon[2];
-            field_150016_b = new IIcon[2];
-            field_150017_a[0] = registerLegacyModernTexture(
-                    "minecraft:block/pale_oak_door_top", reg);
-            field_150016_b[0] = registerLegacyModernTexture(
-                    "minecraft:block/pale_oak_door_bottom", reg);
-            field_150017_a[1] = new IconFlipped(field_150017_a[0], true, false);
-            field_150016_b[1] = new IconFlipped(field_150016_b[0], true, false);
-            blockIcon = field_150016_b[0];
-            ModernJsonModelBridge.prepare(entry, reg);
-        }
-    }
-
-    /** Supplies the modern door's generated inventory icon without probing a nonexistent 1.7 path. */
-    public static final class ParityDoorItemBlock extends ItemBlockNewDoor {
-        public ParityDoorItemBlock(Block block) { super(block); }
-
-        @Override @SideOnly(Side.CLIENT)
-        public void registerIcons(IIconRegister reg) {
-            ModernAssetResourcePack.registerDynamicAlias(
-                    "textures/items/modern_item/pale_oak_door.png",
-                    "textures/item/pale_oak_door.png");
-            itemIcon = reg.registerIcon("minecraft:modern_item/pale_oak_door");
-        }
-    }
-
-    private static final class ParityTrapdoorBlock extends BaseTrapdoor {
-        private final ModernMapParityBlocks entry;
-
-        ParityTrapdoorBlock(ModernMapParityBlocks entry) {
-            super(Material.wood, "pale_oak");
-            this.entry = entry;
-            setBlockName(Tags.MOD_ID + "." + entry.getRegistryName());
-        }
-
-        @Override @SideOnly(Side.CLIENT)
-        public void registerBlockIcons(IIconRegister reg) {
-            blockIcon = registerLegacyModernTexture(
-                    "minecraft:block/pale_oak_trapdoor", reg);
-            ModernJsonModelBridge.prepare(entry, reg);
-        }
-    }
-
-    @SideOnly(Side.CLIENT)
-    private static IIcon registerLegacyModernTexture(String texture, IIconRegister register) {
-        String normalized = texture.indexOf(':') < 0 ? "minecraft:" + texture : texture;
-        String safe = normalized.replace(':', '_').replace('/', '_').replace('.', '_')
-                + "_" + Integer.toHexString(normalized.hashCode());
-        String synthetic = "modern_model/" + safe;
-        String path = normalized.substring(normalized.indexOf(':') + 1);
-        String target = path.startsWith("textures/") ? path : "textures/" + path;
-        if (!target.endsWith(".png")) target += ".png";
-        ModernAssetResourcePack.registerDynamicAlias("textures/blocks/" + synthetic + ".png", target);
-        return register.registerIcon("minecraft:" + synthetic);
     }
 
     /**
@@ -768,135 +591,6 @@ public enum ModernMapParityBlocks {
             if (worldObj != null) {
                 worldObj.markBlockRangeForRenderUpdate(xCoord, yCoord, zCoord, xCoord, yCoord, zCoord);
             }
-        }
-    }
-
-    /** Three visible full-stack slots used by every 1.21.11 Shelf wood family. */
-    public static final class ParityShelfTileEntity extends TileEntity implements ISidedInventory {
-        private static final int[] SLOTS = {0, 1, 2};
-        private final ItemStack[] items = new ItemStack[3];
-
-        public void markDirtyAndSync() {
-            markDirty();
-            if (worldObj != null) {
-                worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
-                worldObj.func_147453_f(xCoord, yCoord, zCoord, getBlockType());
-            }
-        }
-
-        @Override public int getSizeInventory() { return items.length; }
-        @Override public ItemStack getStackInSlot(int slot) { return slot >= 0 && slot < items.length ? items[slot] : null; }
-        @Override public ItemStack decrStackSize(int slot, int amount) {
-            ItemStack stack = getStackInSlot(slot);
-            if (stack == null) return null;
-            ItemStack removed;
-            if (stack.stackSize <= amount) { removed = stack; items[slot] = null; }
-            else removed = stack.splitStack(amount);
-            markDirtyAndSync();
-            return removed;
-        }
-        @Override public ItemStack getStackInSlotOnClosing(int slot) {
-            ItemStack stack = getStackInSlot(slot);
-            if (stack != null) items[slot] = null;
-            return stack;
-        }
-        @Override public void setInventorySlotContents(int slot, ItemStack stack) {
-            if (slot < 0 || slot >= items.length) return;
-            items[slot] = stack;
-            if (items[slot] != null && items[slot].stackSize > getInventoryStackLimit()) items[slot].stackSize = getInventoryStackLimit();
-            markDirtyAndSync();
-        }
-        @Override public String getInventoryName() { return "container.etfuturum.shelf"; }
-        @Override public boolean hasCustomInventoryName() { return false; }
-        @Override public int getInventoryStackLimit() { return 64; }
-        @Override public boolean isUseableByPlayer(EntityPlayer player) {
-            return worldObj != null && worldObj.getTileEntity(xCoord, yCoord, zCoord) == this
-                    && player.getDistanceSq(xCoord + 0.5D, yCoord + 0.5D, zCoord + 0.5D) <= 64.0D;
-        }
-        @Override public void openInventory() { }
-        @Override public void closeInventory() { }
-        @Override public boolean isItemValidForSlot(int slot, ItemStack stack) { return slot >= 0 && slot < 3 && stack != null; }
-        @Override public int[] getAccessibleSlotsFromSide(int side) { return SLOTS; }
-        @Override public boolean canInsertItem(int slot, ItemStack stack, int side) { return isItemValidForSlot(slot, stack); }
-        @Override public boolean canExtractItem(int slot, ItemStack stack, int side) { return slot >= 0 && slot < 3; }
-
-        @Override public void writeToNBT(NBTTagCompound tag) {
-            super.writeToNBT(tag);
-            NBTTagList list = new NBTTagList();
-            for (int slot = 0; slot < items.length; slot++) {
-                if (items[slot] == null) continue;
-                NBTTagCompound itemTag = new NBTTagCompound();
-                itemTag.setByte("Slot", (byte) slot);
-                items[slot].writeToNBT(itemTag);
-                list.appendTag(itemTag);
-            }
-            tag.setTag("Items", list);
-        }
-        @Override public void readFromNBT(NBTTagCompound tag) {
-            super.readFromNBT(tag);
-            for (int slot = 0; slot < items.length; slot++) items[slot] = null;
-            NBTTagList list = tag.getTagList("Items", 10);
-            for (int i = 0; i < list.tagCount(); i++) {
-                NBTTagCompound itemTag = list.getCompoundTagAt(i);
-                int slot = itemTag.getByte("Slot") & 255;
-                if (slot < items.length) items[slot] = ItemStack.loadItemStackFromNBT(itemTag);
-            }
-        }
-        @Override public Packet getDescriptionPacket() {
-            NBTTagCompound tag = new NBTTagCompound(); writeToNBT(tag);
-            return new S35PacketUpdateTileEntity(xCoord, yCoord, zCoord, 4, tag);
-        }
-        @Override public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity packet) {
-            readFromNBT(packet.func_148857_g());
-            if (worldObj != null) worldObj.markBlockRangeForRenderUpdate(xCoord, yCoord, zCoord, xCoord, yCoord, zCoord);
-        }
-    }
-
-    /** Persistent hidden loot and four-step brushing progress for suspicious sand/gravel. */
-    public static final class ParityBrushableTileEntity extends TileEntity {
-        private ItemStack item;
-        private int progress;
-
-        public void setHiddenItem(ItemStack stack) { item = stack; markDirtyAndSync(); }
-
-        public boolean brush(EntityPlayer player) {
-            if (worldObj == null || worldObj.isRemote || !isSuspiciousBlock(getBlockType())) return false;
-            progress++;
-            if (progress < 4) {
-                worldObj.setBlockMetadataWithNotify(xCoord, yCoord, zCoord, progress, 3);
-                markDirtyAndSync();
-                worldObj.playSoundEffect(xCoord + 0.5D, yCoord + 0.5D, zCoord + 0.5D, "dig.sand", 0.35F, 1.15F);
-                return false;
-            }
-            ItemStack revealed = item == null ? null : item.copy();
-            Block replacement = getBlockType() == SUSPICIOUS_GRAVEL.get() ? Blocks.gravel : Blocks.sand;
-            worldObj.setBlock(xCoord, yCoord, zCoord, replacement, 0, 3);
-            if (revealed != null) {
-                EntityItem entity = new EntityItem(worldObj, xCoord + 0.5D, yCoord + 0.45D, zCoord + 0.5D, revealed);
-                double dx = player.posX - (xCoord + 0.5D), dz = player.posZ - (zCoord + 0.5D);
-                double length = Math.max(0.001D, Math.sqrt(dx * dx + dz * dz));
-                entity.motionX = dx / length * 0.12D; entity.motionY = 0.08D; entity.motionZ = dz / length * 0.12D;
-                worldObj.spawnEntityInWorld(entity);
-            }
-            worldObj.playSoundEffect(xCoord + 0.5D, yCoord + 0.5D, zCoord + 0.5D, "dig.sand", 0.8F, 0.9F);
-            return true;
-        }
-        private void markDirtyAndSync() { markDirty(); if (worldObj != null) worldObj.markBlockForUpdate(xCoord, yCoord, zCoord); }
-        @Override public void writeToNBT(NBTTagCompound tag) {
-            super.writeToNBT(tag); tag.setInteger("brush_count", progress);
-            if (item != null) { NBTTagCompound itemTag = new NBTTagCompound(); item.writeToNBT(itemTag); tag.setTag("item", itemTag); }
-        }
-        @Override public void readFromNBT(NBTTagCompound tag) {
-            super.readFromNBT(tag); progress = MathHelper.clamp_int(tag.getInteger("brush_count"), 0, 3);
-            item = tag.hasKey("item", 10) ? ItemStack.loadItemStackFromNBT(tag.getCompoundTag("item")) : null;
-        }
-        @Override public Packet getDescriptionPacket() {
-            NBTTagCompound tag = new NBTTagCompound(); writeToNBT(tag);
-            return new S35PacketUpdateTileEntity(xCoord, yCoord, zCoord, 5, tag);
-        }
-        @Override public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity packet) {
-            readFromNBT(packet.func_148857_g());
-            if (worldObj != null) worldObj.markBlockRangeForRenderUpdate(xCoord, yCoord, zCoord, xCoord, yCoord, zCoord);
         }
     }
 
@@ -1220,7 +914,7 @@ public enum ModernMapParityBlocks {
         }
     }
 
-    private static final class ParityModelBlock extends Block implements ITileEntityProvider {
+    private static final class ParityModelBlock extends Block {
         private final ModernMapParityBlocks entry;
 
         ParityModelBlock(ModernMapParityBlocks entry) {
@@ -1230,8 +924,7 @@ public enum ModernMapParityBlocks {
             // Recompute the cached vanilla opacity values now that the parity entry is available.
             this.opaque = isOpaqueCube();
             this.lightOpacity = this.opaque ? 255 : 0;
-            setHardness(isScaffolding() ? 0.0F : isDecoratedPot() ? 0.0F
-                    : entry.material == Material.wood ? 2.0F : entry.material == Material.plants ? 0.0F : 1.5F);
+            setHardness(isScaffolding() ? 0.0F : entry.material == Material.wood ? 2.0F : entry.material == Material.plants ? 0.0F : 1.5F);
             setResistance(entry.material == Material.plants || isScaffolding() ? 0.0F : 5.0F);
             if (isScaffolding()) {
                 // Modern scaffolding breaks essentially instantly even by hand and has its own
@@ -1295,10 +988,6 @@ public enum ModernMapParityBlocks {
 
         private boolean isDecoratedPot() {
             return entry == DECORATED_POT;
-        }
-
-        private boolean isSuspicious() {
-            return entry == SUSPICIOUS_SAND || entry == SUSPICIOUS_GRAVEL;
         }
 
         private boolean isFroglight() {
@@ -1428,7 +1117,7 @@ public enum ModernMapParityBlocks {
             }
             if (isCopperLantern()) {
                 setBlockBounds(5.0F / 16.0F, 0.0F, 5.0F / 16.0F,
-                        11.0F / 16.0F, 7.0F / 16.0F, 11.0F / 16.0F);
+                        11.0F / 16.0F, 9.0F / 16.0F, 11.0F / 16.0F);
                 return;
             }
             if ("heavy_core".equals(name)) {
@@ -1499,7 +1188,6 @@ public enum ModernMapParityBlocks {
             Block other = world.getBlock(x, y, z);
             if (other == this) return true;
             if (style == Style.WALL && other instanceof BlockWall) return true;
-            if (style == Style.FENCE && other instanceof BlockFence) return true;
             if ((style == Style.WALL || style == Style.FENCE) && other instanceof BlockFenceGate) return true;
             ModernMapParityBlocks otherEntry = ModernMapParityBlocks.fromBlock(other);
             if (otherEntry != null) {
@@ -1521,7 +1209,7 @@ public enum ModernMapParityBlocks {
             if (isCopperLantern()) {
                 boolean hanging = (world.getBlockMetadata(x, y, z) & 1) != 0;
                 float minY = hanging ? 1.0F / 16.0F : 0.0F;
-                float maxY = hanging ? 8.0F / 16.0F : 7.0F / 16.0F;
+                float maxY = hanging ? 1.0F : 9.0F / 16.0F;
                 setBlockBounds(5.0F/16.0F, minY, 5.0F/16.0F, 11.0F/16.0F, maxY, 11.0F/16.0F);
                 return;
             }
@@ -1926,97 +1614,19 @@ public enum ModernMapParityBlocks {
             float horizontal;
             switch (facing & 3) {
                 case 1: horizontal = hitZ; break;
-                case 2: horizontal = hitX; break;
+                case 2: horizontal = 1.0F - hitX; break;
                 case 3: horizontal = 1.0F - hitZ; break;
-                default: horizontal = 1.0F - hitX; break;
+                default: horizontal = hitX; break;
             }
             int column = Math.max(0, Math.min(2, (int) (horizontal * 3.0F)));
             int row = hitY >= 0.5F ? 0 : 1;
             return row * 3 + column;
         }
 
-        private static int frontSideForFacing(int facing) {
-            return facing == 0 ? 2 : facing == 1 ? 5 : facing == 2 ? 3 : 4;
-        }
-
-        private static int shelfSlot(int facing, float hitX, float hitZ) {
-            float horizontal;
-            switch (facing & 3) {
-                case 1: horizontal = hitZ; break;
-                case 2: horizontal = hitX; break;
-                case 3: horizontal = 1.0F - hitZ; break;
-                default: horizontal = 1.0F - hitX; break;
-            }
-            return Math.max(0, Math.min(2, (int) (horizontal * 3.0F)));
-        }
-
-        private boolean isConnectedPoweredShelf(World world, int x, int y, int z, int facing) {
-            if (world.getBlock(x, y, z) != this) return false;
-            int meta = world.getBlockMetadata(x, y, z) & 7;
-            return (meta & 3) == facing && (meta & 4) != 0
-                    && world.getTileEntity(x, y, z) instanceof ParityShelfTileEntity;
-        }
-
-        private void swapPoweredShelfGroup(World world, int x, int y, int z, EntityPlayer player, int facing) {
-            int leftX = 0, leftZ = 0;
-            switch (facing & 3) {
-                case 1: leftZ = 1; break;
-                case 2: leftX = -1; break;
-                case 3: leftZ = -1; break;
-                default: leftX = 1; break;
-            }
-            int startX = x, startZ = z;
-            for (int i = 0; i < 2 && isConnectedPoweredShelf(world, startX + leftX, y, startZ + leftZ, facing); i++) {
-                startX += leftX; startZ += leftZ;
-            }
-            int rightX = -leftX, rightZ = -leftZ;
-            int shelfCount = 0, countX = startX, countZ = startZ;
-            while (shelfCount < 3 && isConnectedPoweredShelf(world, countX, y, countZ, facing)) {
-                shelfCount++;
-                countX += rightX;
-                countZ += rightZ;
-            }
-            int shelfX = startX, shelfZ = startZ;
-            // One/two/three powered shelves exchange the rightmost 3/6/9 hotbar slots.
-            int hotbar = 9 - shelfCount * 3;
-            for (int shelfIndex = 0; shelfIndex < shelfCount; shelfIndex++) {
-                ParityShelfTileEntity shelf = (ParityShelfTileEntity) world.getTileEntity(shelfX, y, shelfZ);
-                for (int slot = 0; slot < 3; slot++, hotbar++) {
-                    ItemStack stored = shelf.getStackInSlot(slot);
-                    ItemStack carried = player.inventory.getStackInSlot(hotbar);
-                    shelf.setInventorySlotContents(slot, carried);
-                    player.inventory.setInventorySlotContents(hotbar, stored);
-                }
-                shelfX += rightX; shelfZ += rightZ;
-            }
-            player.inventory.markDirty();
-        }
-
         @Override
         public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int side,
                 float hitX, float hitY, float hitZ) {
             ItemStack held = player.getHeldItem();
-
-            if (isShelf()) {
-                int facing = world.getBlockMetadata(x, y, z) & 3;
-                if (side != frontSideForFacing(facing)) return false;
-                TileEntity tile = world.getTileEntity(x, y, z);
-                if (!(tile instanceof ParityShelfTileEntity)) return false;
-                if (!world.isRemote) {
-                    if ((world.getBlockMetadata(x, y, z) & 4) != 0) {
-                        swapPoweredShelfGroup(world, x, y, z, player, facing);
-                    } else {
-                        ParityShelfTileEntity shelf = (ParityShelfTileEntity) tile;
-                        int slot = shelfSlot(facing, hitX, hitZ);
-                        ItemStack stored = shelf.getStackInSlot(slot);
-                        shelf.setInventorySlotContents(slot, held);
-                        player.inventory.setInventorySlotContents(player.inventory.currentItem, stored);
-                        player.inventory.markDirty();
-                    }
-                    world.playSoundEffect(x + 0.5D, y + 0.5D, z + 0.5D, "random.pop", 0.5F, 1.0F);
-                }
-                return true;
-            }
 
             if (entry == POTTED_TORCHFLOWER) {
                 if (held != null) return false;
@@ -2065,25 +1675,14 @@ public enum ModernMapParityBlocks {
 
             if (isChiseledBookshelf()) {
                 int facing = world.getBlockMetadata(x, y, z) & 3;
-                int expectedSide = frontSideForFacing(facing);
+                int expectedSide = facing == 0 ? 2 : facing == 1 ? 5 : facing == 2 ? 3 : 4;
                 if (side != expectedSide) return false;
                 TileEntity tile = world.getTileEntity(x, y, z);
                 if (!(tile instanceof ParityChiseledBookshelfTileEntity)) return false;
                 ParityChiseledBookshelfTileEntity shelf = (ParityChiseledBookshelfTileEntity) tile;
                 int slot = chiseledBookshelfSlot(facing, hitX, hitY, hitZ);
                 ItemStack stored = shelf.getStackInSlot(slot);
-                if (stored != null) {
-                    if (!world.isRemote) {
-                        ItemStack removed = shelf.getStackInSlotOnClosing(slot);
-                        shelf.markDirtyAndSync();
-                        if (!player.inventory.addItemStackToInventory(removed)) {
-                            world.spawnEntityInWorld(new EntityItem(world, x + 0.5D, y + 0.5D, z + 0.5D, removed));
-                        }
-                        world.playSoundEffect(x + 0.5D, y + 0.5D, z + 0.5D, "random.pop", 0.5F, 0.85F);
-                    }
-                    return true;
-                }
-                if (isBook(held)) {
+                if (stored == null && isBook(held)) {
                     if (!world.isRemote) {
                         ItemStack inserted = held.copy();
                         inserted.stackSize = 1;
@@ -2092,6 +1691,17 @@ public enum ModernMapParityBlocks {
                             player.inventory.setInventorySlotContents(player.inventory.currentItem, null);
                         }
                         world.playSoundEffect(x + 0.5D, y + 0.5D, z + 0.5D, "random.pop", 0.5F, 1.0F);
+                    }
+                    return true;
+                }
+                if (stored != null && held == null) {
+                    if (!world.isRemote) {
+                        ItemStack removed = shelf.getStackInSlotOnClosing(slot);
+                        shelf.markDirtyAndSync();
+                        if (!player.inventory.addItemStackToInventory(removed)) {
+                            world.spawnEntityInWorld(new EntityItem(world, x + 0.5D, y + 0.5D, z + 0.5D, removed));
+                        }
+                        world.playSoundEffect(x + 0.5D, y + 0.5D, z + 0.5D, "random.pop", 0.5F, 0.85F);
                     }
                     return true;
                 }
@@ -2465,8 +2075,7 @@ public enum ModernMapParityBlocks {
 
         @Override
         public boolean hasTileEntity(int metadata) {
-            return isSign() || isHangingSign() || isCampfire() || isChiseledBookshelf()
-                    || isDecoratedPot() || isShelf() || isSuspicious();
+            return isSign() || isHangingSign() || isCampfire() || isChiseledBookshelf() || isDecoratedPot();
         }
 
         @Override
@@ -2475,24 +2084,17 @@ public enum ModernMapParityBlocks {
             if (isCampfire()) return new ParityCampfireTileEntity();
             if (isChiseledBookshelf()) return new ParityChiseledBookshelfTileEntity();
             if (isDecoratedPot()) return new ParityDecoratedPotTileEntity();
-            if (isShelf()) return new ParityShelfTileEntity();
-            if (isSuspicious()) return new ParityBrushableTileEntity();
             return null;
         }
 
         @Override
-        public TileEntity createNewTileEntity(World world, int metadata) {
-            return createTileEntity(world, metadata);
-        }
-
-        @Override
         public boolean hasComparatorInputOverride() {
-            return isDecoratedPot() || isShelf() || super.hasComparatorInputOverride();
+            return isDecoratedPot() || super.hasComparatorInputOverride();
         }
 
         @Override
         public int getComparatorInputOverride(World world, int x, int y, int z, int side) {
-            if (isDecoratedPot() || isShelf()) {
+            if (isDecoratedPot()) {
                 TileEntity tile = world.getTileEntity(x, y, z);
                 return tile instanceof IInventory ? Container.calcRedstoneFromInventory((IInventory) tile) : 0;
             }
@@ -2569,54 +2171,9 @@ public enum ModernMapParityBlocks {
         }
 
         @Override
-        public void onBlockAdded(World world, int x, int y, int z) {
-            super.onBlockAdded(world, x, y, z);
-            if (isSuspicious()) world.scheduleBlockUpdate(x, y, z, this, 2);
-        }
-
-        /** Mirrors BlockFalling while retaining the buried item/progress block-entity data. */
-        private void fallSuspiciousBlock(World world, int x, int y, int z) {
-            if (world.isRemote || y < 0 || !BlockFalling.func_149831_e(world, x, y - 1, z)) return;
-
-            int meta = world.getBlockMetadata(x, y, z);
-            NBTTagCompound tileData = null;
-            TileEntity tile = world.getTileEntity(x, y, z);
-            if (tile != null) {
-                tileData = new NBTTagCompound();
-                tile.writeToNBT(tileData);
-            }
-
-            byte radius = 32;
-            if (!BlockFalling.fallInstantly && world.checkChunksExist(
-                    x - radius, y - radius, z - radius, x + radius, y + radius, z + radius)) {
-                EntityFallingBlock falling = new EntityFallingBlock(
-                        world, x + 0.5D, y + 0.5D, z + 0.5D, this, meta);
-                falling.field_145810_d = tileData;
-                world.spawnEntityInWorld(falling);
-                return;
-            }
-
-            world.setBlockToAir(x, y, z);
-            int landingY = y;
-            while (landingY > 0 && BlockFalling.func_149831_e(world, x, landingY - 1, z)) landingY--;
-            if (landingY <= 0 || !world.setBlock(x, landingY, z, this, meta, 3) || tileData == null) return;
-            TileEntity landed = world.getTileEntity(x, landingY, z);
-            if (landed != null) {
-                tileData.setInteger("x", x);
-                tileData.setInteger("y", landingY);
-                tileData.setInteger("z", z);
-                landed.readFromNBT(tileData);
-                landed.markDirty();
-                world.markBlockForUpdate(x, landingY, z);
-            }
-        }
-
-        @Override
         public void onNeighborBlockChange(World world, int x, int y, int z, Block neighbor) {
             if (isScaffolding()) {
                 world.scheduleBlockUpdate(x, y, z, this, 1);
-            } else if (isSuspicious()) {
-                world.scheduleBlockUpdate(x, y, z, this, 2);
             } else if (isCopperLantern()) {
                 boolean hanging = (world.getBlockMetadata(x, y, z) & 1) != 0;
                 if ((hanging && !canCopperLanternHang(world, x, y, z))
@@ -2646,10 +2203,6 @@ public enum ModernMapParityBlocks {
 
         @Override
         public void updateTick(World world, int x, int y, int z, Random random) {
-            if (isSuspicious()) {
-                fallSuspiciousBlock(world, x, y, z);
-                return;
-            }
             if (isScaffolding()) {
                 int next = computeScaffoldingMeta(world, x, y, z);
                 if ((next & 7) >= 7) {
@@ -2821,7 +2374,6 @@ public enum ModernMapParityBlocks {
 
         @Override
         public void breakBlock(World world, int x, int y, int z, Block block, int meta) {
-            boolean releaseWater = isDecoratedPot() && (meta & 4) != 0;
             if (isCampfire()) {
                 TileEntity tile = world.getTileEntity(x, y, z);
                 if (tile instanceof ParityCampfireTileEntity) ((ParityCampfireTileEntity) tile).ejectAll();
@@ -2838,16 +2390,6 @@ public enum ModernMapParityBlocks {
                     }
                 }
             }
-            if (isShelf() && !world.isRemote) {
-                TileEntity tile = world.getTileEntity(x, y, z);
-                if (tile instanceof ParityShelfTileEntity) {
-                    ParityShelfTileEntity shelf = (ParityShelfTileEntity) tile;
-                    for (int slot = 0; slot < shelf.getSizeInventory(); slot++) {
-                        ItemStack stored = shelf.getStackInSlot(slot);
-                        if (stored != null) world.spawnEntityInWorld(new EntityItem(world, x + 0.5D, y + 0.5D, z + 0.5D, stored.copy()));
-                    }
-                }
-            }
             if (isDecoratedPot() && !world.isRemote) {
                 TileEntity tile = world.getTileEntity(x, y, z);
                 if (tile instanceof ParityDecoratedPotTileEntity) {
@@ -2855,14 +2397,10 @@ public enum ModernMapParityBlocks {
                 }
             }
             super.breakBlock(world, x, y, z, block, meta);
-            if (releaseWater && !world.isRemote && world.getBlock(x, y, z) == Blocks.air) {
-                world.setBlock(x, y, z, Blocks.water, 0, 3);
-            }
         }
 
         @Override
         public ArrayList<ItemStack> getDrops(World world, int x, int y, int z, int metadata, int fortune) {
-            if (isSuspicious()) return new ArrayList<ItemStack>();
             if (entry == POTTED_TORCHFLOWER) {
                 ArrayList<ItemStack> drops = new ArrayList<ItemStack>();
                 drops.add(new ItemStack(Item.getItemFromBlock(Blocks.flower_pot)));

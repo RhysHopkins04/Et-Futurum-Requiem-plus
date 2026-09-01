@@ -4,7 +4,6 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import ganymedes01.etfuturum.EtFuturum;
 import ganymedes01.etfuturum.ModBlocks;
 import ganymedes01.etfuturum.ModItems;
-import ganymedes01.etfuturum.ModernArchaeology;
 import ganymedes01.etfuturum.ModernMapParityBlocks;
 import ganymedes01.etfuturum.Tags;
 import ganymedes01.etfuturum.api.DeepslateOreRegistry;
@@ -236,12 +235,6 @@ public class ModRecipes {
 			if (ConfigBlocksItems.enableCrimsonWoodFamily) addShelfRecipe(ModernMapParityBlocks.CRIMSON_SHELF, ModBlocks.CRIMSON_STEM.newItemStack(1, 2));
 			if (ConfigBlocksItems.enableWarpedWoodFamily) addShelfRecipe(ModernMapParityBlocks.WARPED_SHELF, ModBlocks.WARPED_STEM.newItemStack(1, 2));
 			if (strippedPaleLog != null) addShelfRecipe(ModernMapParityBlocks.PALE_OAK_SHELF, new ItemStack(strippedPaleLog));
-		}
-
-		if (ModernArchaeology.getBrush() != null) {
-			Object copper = ModItems.COPPER_INGOT.isEnabled() ? new ItemStack(ModItems.COPPER_INGOT.get()) : "ingotCopper";
-			RecipeHelper.addShapedRecipe(RecipeHelper.Priority.HIGH, new ItemStack(ModernArchaeology.getBrush()),
-					new Object[]{"f", "c", "s", 'f', Items.feather, 'c', copper, 's', Items.stick});
 		}
 	}
 

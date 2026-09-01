@@ -155,9 +155,9 @@ public class DynamicSoundsResourcePack implements IResourcePack {
 			addSoundsToCategory("block.decorated_pot.insert",
 					"minecraft:random/pop");
 			addSoundsToCategory("block.decorated_pot.shatter",
-					"minecraft:random/glass1",
-					"minecraft:random/glass2",
-					"minecraft:random/glass3");
+					"minecraft:dig/glass1",
+					"minecraft:dig/glass2",
+					"minecraft:dig/glass3");
 			return rootObject;
 		}
 	}

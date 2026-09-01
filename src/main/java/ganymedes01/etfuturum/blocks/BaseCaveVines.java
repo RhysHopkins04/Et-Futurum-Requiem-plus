@@ -44,7 +44,7 @@ public class BaseCaveVines extends Block implements IGrowable
     @Override
     public IIcon getIcon(int side, int meta)
     {
-        return iicons[meta];
+        return iicons[meta & 1];
     }
 
     @Override
@@ -93,7 +93,7 @@ public class BaseCaveVines extends Block implements IGrowable
     }
     
     protected boolean onBlockActivatedShared(World world, int x, int y, int z, EntityPlayer player, int side, float hitX, float hitY, float hitZ) {
-        if (world.getBlockMetadata(x, y, z) == 1)
+        if ((world.getBlockMetadata(x, y, z) & 1) != 0)
         {
             world.setBlockMetadataWithNotify(x, y, z, 0, 3);
             world.updateLightByType(EnumSkyBlock.Block, x, y, z);
@@ -133,7 +133,7 @@ public class BaseCaveVines extends Block implements IGrowable
      */
     @Override
     public boolean func_149851_a(World worldIn, int x, int y, int z, boolean isClient) {
-        return worldIn.getBlockMetadata(x, y, z) == 0;
+        return (worldIn.getBlockMetadata(x, y, z) & 1) == 0;
     }
 
     /**
@@ -149,7 +149,7 @@ public class BaseCaveVines extends Block implements IGrowable
      */
     @Override
     public void func_149853_b(World world, Random rand, int x, int y, int z) {
-        int i = world.getBlockMetadata(x, y, z);
+        int i = world.getBlockMetadata(x, y, z) & 1;
         if (i == 0) {
             world.setBlockMetadataWithNotify(x, y, z, 1, 3);
             world.updateLightByType(EnumSkyBlock.Block, x, y, z);
@@ -158,7 +158,7 @@ public class BaseCaveVines extends Block implements IGrowable
 
     @Override
     public int getLightValue(IBlockAccess world, int x, int y, int z) {
-        int meta = world.getBlockMetadata(x, y, z);
+        int meta = world.getBlockMetadata(x, y, z) & 1;
         if (meta == 1) {
             return 14;
         }

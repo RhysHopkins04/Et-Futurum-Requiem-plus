@@ -101,7 +101,10 @@ public class ClientProxy extends CommonProxy {
 		}
 		for (ModernMapParityBlocks entry : ModernMapParityBlocks.values()) {
 			if (entry.get() != null) {
-				MinecraftForgeClient.registerItemRenderer(Item.getItemFromBlock(entry.get()), new ItemModernJsonModelRenderer(entry));
+				Item item = Item.getItemFromBlock(entry.get());
+				if (item != null) {
+					MinecraftForgeClient.registerItemRenderer(item, new ItemModernJsonModelRenderer(entry));
+				}
 			}
 		}
 	}
@@ -161,6 +164,7 @@ public class ClientProxy extends CommonProxy {
 		RenderingRegistry.registerBlockHandler(new BlockBigDripleafRenderer(RenderIDs.BIG_DRIPLEAF));
 		RenderingRegistry.registerBlockHandler(new BlockSporeBlossomRenderer(RenderIDs.SPORE_BLOSSOM));
 		RenderingRegistry.registerBlockHandler(new BlockModernJsonModelRenderer());
+		RenderingRegistry.registerBlockHandler(new BlockModernWallRenderer());
 		if(ModsList.APPLIED_ENERGISTICS_2.isLoaded()) {
 			RenderingRegistry.registerBlockHandler(new BlockDeepslateCertusQuartzRenderer());
 		}

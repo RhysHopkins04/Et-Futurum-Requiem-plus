@@ -26,8 +26,9 @@ public class WorldGenCaveVines extends WorldGenerator {
 
             for (int i = 1; i < rand.nextInt(6) + 1; i++)
             {
-                if (world.isAirBlock(x, y - i, z) && world.getBlock(x, y - i + 1, z) instanceof BlockCaveVines vine)
+                if (world.isAirBlock(x, y - i, z) && world.getBlock(x, y - i + 1, z) instanceof BlockCaveVines)
                 {
+                    BlockCaveVines vine = (BlockCaveVines) world.getBlock(x, y - i + 1, z);
                     vine.growVine(world, x, y - i + 1, z, false);
                 }
             }

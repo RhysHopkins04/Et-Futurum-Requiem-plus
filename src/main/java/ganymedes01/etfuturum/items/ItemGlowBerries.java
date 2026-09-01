@@ -87,8 +87,9 @@ public class ItemGlowBerries extends BaseFood {
             world.setBlock(x, y, z, ModBlocks.CAVE_VINE.get(), 0, 3);
             return true;
         }
-        else if (world.getBlock(x, y + 1, z) instanceof BlockCaveVines headVine)
+        else if (world.getBlock(x, y + 1, z) instanceof BlockCaveVines)
         {
+            BlockCaveVines headVine = (BlockCaveVines) world.getBlock(x, y + 1, z);
             headVine.growVine(world, x, y + 1, z, true);
         }
         return false;

@@ -1,7 +1,7 @@
 {
   "target": "Minecraft Java 1.21.11 visual block compatibility shells",
   "note": "Only genuinely missing visual/standalone families are listed; existing EFR subtype blocks remain authoritative and are mapped by the Backporter.",
-  "count": 242,
+  "count": 243,
   "blocks": [
     {
       "ver": "1.9",
@@ -1122,6 +1122,16 @@
       "material": "PLANT",
       "light": 0,
       "meta": ""
+    },
+    {
+      "ver": "1.20",
+      "name": "potted_torchflower",
+      "style": "SMALL",
+      "texture": "flower_pot",
+      "asset": null,
+      "material": "ROCK",
+      "light": 0,
+      "meta": "technical potted block; no standalone ItemBlock"
     },
     {
       "ver": "1.20",

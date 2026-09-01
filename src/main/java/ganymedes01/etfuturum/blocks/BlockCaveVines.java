@@ -66,8 +66,9 @@ public class BlockCaveVines extends BaseCaveVines implements IShearable, ITileEn
     @Override
     public boolean isShearable(ItemStack item, IBlockAccess world, int x, int y, int z) {
         TileEntity te = world.getTileEntity(x, y, z);
-        if (te instanceof TileEntityCaveVines teCaveVine)
+        if (te instanceof TileEntityCaveVines)
         {
+            TileEntityCaveVines teCaveVine = (TileEntityCaveVines) te;
             return !teCaveVine.getTipSheared();
         }
         return false;
@@ -76,8 +77,9 @@ public class BlockCaveVines extends BaseCaveVines implements IShearable, ITileEn
     @Override
     public ArrayList<ItemStack> onSheared(ItemStack item, IBlockAccess world, int x, int y, int z, int fortune) {
         TileEntity te = world.getTileEntity(x, y, z);
-        if (te instanceof TileEntityCaveVines teCaveVines)
+        if (te instanceof TileEntityCaveVines)
         {
+            TileEntityCaveVines teCaveVines = (TileEntityCaveVines) te;
             teCaveVines.setTipSheared(true);
         }
         return new ArrayList<>();
@@ -123,8 +125,9 @@ public class BlockCaveVines extends BaseCaveVines implements IShearable, ITileEn
 
         if (!world.isRemote && world.isAirBlock(x, y - 1, z) && random.nextInt(10) == 0) {
             TileEntity te = world.getTileEntity(x, y, z);
-            if (te instanceof TileEntityCaveVines teCaveVines)
+            if (te instanceof TileEntityCaveVines)
             {
+                TileEntityCaveVines teCaveVines = (TileEntityCaveVines) te;
                 if (!teCaveVines.getTipSheared() && getLength(world, x, y, z) < teCaveVines.getMaxLength())
                 {
                     growVine(world, x, y, z, false);

@@ -1074,6 +1074,9 @@ public class BlockStateConverter {
 				case "attached_melon_stem":
 					return Blocks.melon_stem;
 
+				case "potted_torchflower":
+					Block pottedTorchflower = GameRegistry.findBlock("etfuturum", "potted_torchflower");
+					return pottedTorchflower == null ? Blocks.flower_pot : pottedTorchflower;
 				case "potted_poppy":
 				case "potted_dandelion":
 				case "potted_blue_orchid":

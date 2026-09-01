@@ -7,14 +7,12 @@ import com.google.gson.JsonParser;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import ganymedes01.etfuturum.ModernMapParityBlocks;
-import ganymedes01.etfuturum.ModernPotterySherds;
 import ganymedes01.etfuturum.Tags;
 import ganymedes01.etfuturum.client.ModernAssetResourcePack;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.client.resources.IResource;
-import net.minecraft.init.Blocks;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.IBlockAccess;
@@ -92,18 +90,6 @@ public final class ModernJsonModelBridge {
         for (Model model : prepared.facingModels) if (model != null) registerTextures(model, register);
         for (Model model : prepared.chiseledBookshelfBase) if (model != null) registerTextures(model, register);
         for (Model model : prepared.chiseledBookshelfSlots) if (model != null) registerTextures(model, register);
-        if ("chiseled_bookshelf".equals(name)) {
-            prepared.chiseledBookshelfOccupiedFallback = registerTexture(
-                    "minecraft:block/chiseled_bookshelf_occupied", register);
-        }
-        if ("decorated_pot".equals(name)) {
-            prepared.decoratedPotPatterns.put("brick", registerTexture(
-                    "minecraft:entity/decorated_pot/decorated_pot_side", register));
-            for (ModernPotterySherds sherd : ModernPotterySherds.values()) {
-                prepared.decoratedPotPatterns.put(sherd.getPatternName(), registerTexture(
-                        "minecraft:entity/decorated_pot/" + sherd.getPatternName() + "_pottery_pattern", register));
-            }
-        }
         return prepared;
     }
 
@@ -151,14 +137,6 @@ public final class ModernJsonModelBridge {
         }
         ModernMapParityBlocks.Style style = entry.getStyle();
         String name = entry.getRegistryName();
-        if ("decorated_pot".equals(name)) {
-            net.minecraft.tileentity.TileEntity tile = world.getTileEntity(x, y, z);
-            String[] sherds = null;
-            if (tile instanceof ModernMapParityBlocks.ParityDecoratedPotTileEntity) {
-                sherds = ((ModernMapParityBlocks.ParityDecoratedPotTileEntity) tile).getSherds();
-            }
-            return decoratedPotWorldModel(models, sherds, world.getBlockMetadata(x, y, z) & 7);
-        }
         if (name.endsWith("_froglight") || name.endsWith("copper_chain")) {
             int axis = world.getBlockMetadata(x, y, z) & 3;
             if (axis > 2) axis = 0;
@@ -305,73 +283,9 @@ public final class ModernJsonModelBridge {
         for (int slot = 0; slot < 6; slot++) {
             int occupied = (occupiedMask >> slot) & 1;
             Model part = models.chiseledBookshelfSlots[(facing & 3) * 12 + slot * 2 + occupied];
-            // An occupied state must never silently fall back to an empty-looking block if a
-            // malformed/incomplete modern asset graph omits its slot overlay. The normal path is
-            // still Mojang's authored slot JSON; this guarded fallback is only a visible marker.
-            if (part != null && !part.quads.isEmpty()) out.quads.addAll(part.quads);
-            else if (occupied != 0) addChiseledBookshelfOccupiedFallback(out, models, facing, slot);
+            if (part != null) out.quads.addAll(part.quads);
         }
         return out;
-    }
-
-    private static Model decoratedPotWorldModel(PreparedModels models, String[] sherds, int metadata) {
-        Model base = models.block;
-        if (base == null) return Model.empty();
-        Model out = new Model();
-        out.display.putAll(base.display);
-        out.flatTexture = base.flatTexture;
-        out.flatIcon = base.flatIcon;
-        out.particleTexture = base.particleTexture;
-
-        IIcon[] worldSides = new IIcon[4]; // north, east, south, west
-        int[] localSherd = {3, 2, 0, 1}; // front, right, back, left when facing north
-        int facing = metadata & 3;
-        for (int localSide = 0; localSide < 4; localSide++) {
-            int worldSide = (localSide + facing) & 3;
-            String sherd = sherds != null && sherds.length > localSherd[localSide]
-                    ? sherds[localSherd[localSide]] : "minecraft:brick";
-            worldSides[worldSide] = decoratedPotPatternIcon(models, sherd);
-        }
-        int[] quadToWorldSide = {0, 2, 3, 1}; // model quads are north, south, west, east
-        for (int i = 0; i < base.quads.size(); i++) {
-            Quad source = base.quads.get(i);
-            Quad copy = new Quad(source.vertices, source.uv, source.texture, source.shade, source.tintIndex);
-            copy.icon = i < 4 && worldSides[quadToWorldSide[i]] != null
-                    ? worldSides[quadToWorldSide[i]] : source.icon;
-            out.quads.add(copy);
-        }
-        if ((metadata & 4) != 0) {
-            Model water = new Model();
-            addPlane(water, Direction.UP, 5, 15.75D, 5, 11, 15.75D, 11,
-                    0, 0, 16, 16, "minecraft:block/water_still");
-            for (Quad quad : water.quads) quad.icon = Blocks.water.getIcon(1, 0);
-            out.quads.addAll(water.quads);
-        }
-        return out;
-    }
-
-    private static IIcon decoratedPotPatternIcon(PreparedModels models, String sherd) {
-        String clean = sherd == null ? "brick" : sherd;
-        int colon = clean.indexOf(':');
-        if (colon >= 0) clean = clean.substring(colon + 1);
-        if (clean.endsWith("_pottery_sherd")) clean = clean.substring(0, clean.length() - "_pottery_sherd".length());
-        IIcon icon = models.decoratedPotPatterns.get(clean);
-        return icon != null ? icon : models.decoratedPotPatterns.get("brick");
-    }
-
-    private static void addChiseledBookshelfOccupiedFallback(Model out, PreparedModels models, int facing, int slot) {
-        int column = slot % 3;
-        int row = slot / 3;
-        double x0 = column == 0 ? 1.0D : column == 1 ? 6.0D : 11.0D;
-        double x1 = column == 0 ? 5.0D : column == 1 ? 10.0D : 15.0D;
-        double y0 = row == 0 ? 8.0D : 1.0D;
-        double y1 = row == 0 ? 15.0D : 8.0D;
-        Model marker = new Model();
-        addPlane(marker, Direction.NORTH, x0, y0, 0.01D, x1, y1, 0.01D,
-                x0, 16.0D - y1, x1, 16.0D - y0, "minecraft:block/chiseled_bookshelf_occupied");
-        rotateModelY(marker, (facing & 3) * 90);
-        for (Quad quad : marker.quads) quad.icon = models.chiseledBookshelfOccupiedFallback;
-        out.quads.addAll(marker.quads);
     }
 
     private static void registerTextures(Model model, IIconRegister register) {
@@ -1465,8 +1379,6 @@ public final class ModernJsonModelBridge {
         public final Model[] facingModels = new Model[32];
         public final Model[] chiseledBookshelfBase = new Model[4];
         public final Model[] chiseledBookshelfSlots = new Model[48];
-        private IIcon chiseledBookshelfOccupiedFallback;
-        private final Map<String, IIcon> decoratedPotPatterns = new HashMap<String, IIcon>();
     }
 
     public static final class Model {

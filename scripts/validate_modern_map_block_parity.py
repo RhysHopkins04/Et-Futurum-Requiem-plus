@@ -35,8 +35,8 @@ failures=[]
 manifest=json.loads(MANIFEST.read_text(encoding="utf-8")); blocks=manifest.get("blocks",[]); names=[e["name"] for e in blocks]
 if manifest.get("target") != "Minecraft Java 1.21.11 visual block compatibility shells": failures.append("manifest target is not pinned to Minecraft Java 1.21.11")
 if manifest.get("count") != len(blocks): failures.append("manifest count mismatch")
-if len(names)!=242 or len(names)!=len(set(names)): failures.append(f"expected 242 unique visual-gap identities, found {len(names)}")
-required={"kelp","seagrass","conduit","tube_coral_block","scaffolding","bell","candle","sculk_sensor","decorated_pot","trial_spawner","vault","crafter","pale_oak_planks","resin_bricks","firefly_bush","dried_ghast","copper_chest","copper_golem_statue","oak_shelf"}
+if len(names)!=243 or len(names)!=len(set(names)): failures.append(f"expected 243 unique visual-gap identities, found {len(names)}")
+required={"kelp","seagrass","conduit","tube_coral_block","scaffolding","bell","candle","sculk_sensor","decorated_pot","potted_torchflower","trial_spawner","vault","crafter","pale_oak_planks","resin_bricks","firefly_bush","dried_ghast","copper_chest","copper_golem_statue","oak_shelf"}
 if required-set(names): failures.append("required families missing: "+", ".join(sorted(required-set(names))))
 versions=Counter(e["ver"] for e in blocks)
 for v in ("1.13","1.17","1.19","1.20","1.21","1.21.4","1.21.5","1.21.6","1.21.9"):

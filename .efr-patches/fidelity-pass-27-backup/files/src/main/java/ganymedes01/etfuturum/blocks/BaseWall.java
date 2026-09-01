@@ -4,7 +4,6 @@ import com.google.common.collect.Maps;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import ganymedes01.etfuturum.EtFuturum;
-import ganymedes01.etfuturum.ModernMapParityBlocks;
 import ganymedes01.etfuturum.core.utils.Utils;
 import ganymedes01.etfuturum.lib.RenderIDs;
 import net.minecraft.block.Block;
@@ -96,11 +95,7 @@ public class BaseWall extends BlockWall implements ISubBlocksBlock {
 	@Override
 	public boolean canConnectWallTo(IBlockAccess p_150091_1_, int p_150091_2_, int p_150091_3_, int p_150091_4_) {
 		Block block = p_150091_1_.getBlock(p_150091_2_, p_150091_3_, p_150091_4_);
-		ModernMapParityBlocks parity = ModernMapParityBlocks.fromBlock(block);
-		return block instanceof BlockFenceGate || block instanceof BaseWall
-				|| parity != null && (parity.getStyle() == ModernMapParityBlocks.Style.WALL
-						|| parity.getStyle() == ModernMapParityBlocks.Style.FENCE_GATE)
-				|| super.canConnectWallTo(p_150091_1_, p_150091_2_, p_150091_3_, p_150091_4_);
+		return block instanceof BlockFenceGate || block instanceof BaseWall || super.canConnectWallTo(p_150091_1_, p_150091_2_, p_150091_3_, p_150091_4_);
 	}
 
 	@Override

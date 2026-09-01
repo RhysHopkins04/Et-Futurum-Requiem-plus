@@ -230,6 +230,12 @@ public final class ModernAssetResourcePack extends DefaultResourcePack {
     }
 
     private static ResourceLocation toModernLocation(ResourceLocation legacy) {
+        // Cave Vines are mature EFR blocks that still request the legacy plural atlas path.
+        // AssetDirector exposes the 1.21.11 client jar verbatim, where these live under block/.
+        if (legacy.getResourcePath().startsWith("textures/blocks/cave_vines")) {
+            return new ResourceLocation(Tags.MC_ASSET_VER,
+                    legacy.getResourcePath().replace("textures/blocks/", "textures/block/"));
+        }
         // Glow lichen has no standalone modern item texture; the modern item model reuses the
         // block texture. Legacy 1.7 item registration still asks for textures/items/glow_lichen,
         // so bridge that one legacy request to the official modern block asset.

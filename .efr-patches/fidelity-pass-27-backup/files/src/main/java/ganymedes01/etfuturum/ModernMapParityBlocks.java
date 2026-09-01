@@ -8,7 +8,6 @@ import ganymedes01.etfuturum.client.model.ModernJsonModelBridge;
 import ganymedes01.etfuturum.client.particle.CustomParticles;
 import ganymedes01.etfuturum.lib.RenderIDs;
 import ganymedes01.etfuturum.network.WoodSignOpenMessage;
-import ganymedes01.etfuturum.recipes.crafting.RecipeDecoratedPot;
 import ganymedes01.etfuturum.tileentities.TileEntityWoodSign;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockChest;
@@ -28,7 +27,6 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.IProjectile;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
@@ -41,9 +39,6 @@ import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemSpade;
 import net.minecraft.item.ItemStack;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.ISidedInventory;
-import net.minecraft.inventory.Container;
-import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -59,7 +54,6 @@ import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
-import net.minecraftforge.oredict.RecipeSorter;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -343,8 +337,6 @@ public enum ModernMapParityBlocks {
     private static boolean paritySignTileRegistered;
     private static boolean parityCampfireTileRegistered;
     private static boolean parityChiseledBookshelfTileRegistered;
-    private static boolean parityDecoratedPotTileRegistered;
-    private static boolean decoratedPotRecipeRegistered;
 
     ModernMapParityBlocks(String vanillaVersion, Style style, Material material,
             String textureKey, String modernAssetPath, int lightLevel) {
@@ -391,12 +383,6 @@ public enum ModernMapParityBlocks {
                     Tags.MOD_ID + ":modern_parity_chiseled_bookshelf");
             parityChiseledBookshelfTileRegistered = true;
         }
-        if (!parityDecoratedPotTileRegistered) {
-            GameRegistry.registerTileEntity(ParityDecoratedPotTileEntity.class,
-                    Tags.MOD_ID + ":modern_parity_decorated_pot");
-            parityDecoratedPotTileRegistered = true;
-        }
-        ModernPotterySherds.init();
         for (ModernMapParityBlocks entry : values()) {
             String name = entry.getRegistryName();
             if (GameRegistry.findBlock("minecraft", name) != null || GameRegistry.findBlock(Tags.MOD_ID, name) != null) {
@@ -422,12 +408,6 @@ public enum ModernMapParityBlocks {
             } else {
                 GameRegistry.registerBlock(entry.block, name);
             }
-        }
-        if (!decoratedPotRecipeRegistered && DECORATED_POT.get() != null) {
-            RecipeSorter.register(Tags.MOD_ID + ".RecipeDecoratedPot", RecipeDecoratedPot.class,
-                    RecipeSorter.Category.SHAPED, "after:minecraft:shaped");
-            CraftingManager.getInstance().getRecipeList().add(new RecipeDecoratedPot());
-            decoratedPotRecipeRegistered = true;
         }
     }
 
@@ -585,145 +565,6 @@ public enum ModernMapParityBlocks {
         @Override
         public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity packet) {
             readFromNBT(packet.func_148857_g());
-            // The occupied-slot geometry is compiled into the owning chunk's display list. A tile
-            // packet updates the six stacks, but 1.7 does not automatically rebuild that display
-            // list; explicitly dirty this one block so inserted/removed books become visible now.
-            if (worldObj != null) {
-                worldObj.markBlockRangeForRenderUpdate(xCoord, yCoord, zCoord, xCoord, yCoord, zCoord);
-            }
-        }
-    }
-
-    /** One-stack container plus the four modern pot-decoration identities. */
-    public static final class ParityDecoratedPotTileEntity extends TileEntity implements ISidedInventory {
-        private static final int[] ACCESSIBLE_SLOT = {0};
-        // Modern order: back, left, right, front.
-        private final String[] sherds = {"minecraft:brick", "minecraft:brick", "minecraft:brick", "minecraft:brick"};
-        private ItemStack item;
-
-        public String[] getSherds() {
-            return sherds.clone();
-        }
-
-        public void setSherdsFromItem(ItemStack stack) {
-            if (stack == null || !stack.hasTagCompound()) return;
-            NBTTagCompound root = stack.getTagCompound();
-            NBTTagCompound source = root.hasKey("BlockEntityTag", 10)
-                    ? root.getCompoundTag("BlockEntityTag") : root;
-            readSherds(source);
-            markDirtyAndSync();
-        }
-
-        public boolean insertOne(ItemStack held) {
-            if (held == null || held.getItem() == null) return false;
-            if (item == null) {
-                item = held.copy();
-                item.stackSize = 1;
-            } else {
-                if (!item.isItemEqual(held) || !ItemStack.areItemStackTagsEqual(item, held)
-                        || item.stackSize >= Math.min(item.getMaxStackSize(), getInventoryStackLimit())) return false;
-                item.stackSize++;
-            }
-            markDirtyAndSync();
-            return true;
-        }
-
-        public void ejectStoredItem() {
-            if (worldObj == null || worldObj.isRemote || item == null) return;
-            worldObj.spawnEntityInWorld(new EntityItem(worldObj, xCoord + 0.5D, yCoord + 0.7D, zCoord + 0.5D, item.copy()));
-            item = null;
-        }
-
-        private void markDirtyAndSync() {
-            markDirty();
-            if (worldObj != null) {
-                worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
-                worldObj.func_147453_f(xCoord, yCoord, zCoord, getBlockType());
-            }
-        }
-
-        private void readSherds(NBTTagCompound tag) {
-            NBTTagList list = tag.getTagList("sherds", 8);
-            for (int i = 0; i < sherds.length; i++) {
-                sherds[i] = i < list.tagCount() ? list.getStringTagAt(i) : "minecraft:brick";
-                if (sherds[i] == null || sherds[i].isEmpty()) sherds[i] = "minecraft:brick";
-            }
-        }
-
-        @Override
-        public void writeToNBT(NBTTagCompound tag) {
-            super.writeToNBT(tag);
-            NBTTagList list = new NBTTagList();
-            for (String sherd : sherds) list.appendTag(new net.minecraft.nbt.NBTTagString(sherd));
-            tag.setTag("sherds", list);
-            if (item != null) {
-                NBTTagCompound itemTag = new NBTTagCompound();
-                item.writeToNBT(itemTag);
-                tag.setTag("item", itemTag);
-            }
-        }
-
-        @Override
-        public void readFromNBT(NBTTagCompound tag) {
-            super.readFromNBT(tag);
-            readSherds(tag);
-            item = tag.hasKey("item", 10) ? ItemStack.loadItemStackFromNBT(tag.getCompoundTag("item")) : null;
-        }
-
-        @Override public int getSizeInventory() { return 1; }
-        @Override public ItemStack getStackInSlot(int slot) { return slot == 0 ? item : null; }
-        @Override
-        public ItemStack decrStackSize(int slot, int amount) {
-            if (slot != 0 || item == null) return null;
-            ItemStack removed;
-            if (item.stackSize <= amount) {
-                removed = item;
-                item = null;
-            } else {
-                removed = item.splitStack(amount);
-            }
-            markDirtyAndSync();
-            return removed;
-        }
-        @Override
-        public ItemStack getStackInSlotOnClosing(int slot) {
-            if (slot != 0) return null;
-            ItemStack closing = item;
-            item = null;
-            return closing;
-        }
-        @Override
-        public void setInventorySlotContents(int slot, ItemStack stack) {
-            if (slot != 0) return;
-            item = stack;
-            if (item != null && item.stackSize > getInventoryStackLimit()) item.stackSize = getInventoryStackLimit();
-            markDirtyAndSync();
-        }
-        @Override public String getInventoryName() { return "container.etfuturum.decorated_pot"; }
-        @Override public boolean hasCustomInventoryName() { return false; }
-        @Override public int getInventoryStackLimit() { return 64; }
-        @Override public boolean isUseableByPlayer(EntityPlayer player) {
-            return worldObj != null && worldObj.getTileEntity(xCoord, yCoord, zCoord) == this
-                    && player.getDistanceSq(xCoord + 0.5D, yCoord + 0.5D, zCoord + 0.5D) <= 64.0D;
-        }
-        @Override public void openInventory() { }
-        @Override public void closeInventory() { }
-        @Override public boolean isItemValidForSlot(int slot, ItemStack stack) { return slot == 0 && stack != null; }
-        @Override public int[] getAccessibleSlotsFromSide(int side) { return ACCESSIBLE_SLOT; }
-        @Override public boolean canInsertItem(int slot, ItemStack stack, int side) { return isItemValidForSlot(slot, stack); }
-        @Override public boolean canExtractItem(int slot, ItemStack stack, int side) { return slot == 0; }
-
-        @Override
-        public Packet getDescriptionPacket() {
-            NBTTagCompound tag = new NBTTagCompound();
-            writeToNBT(tag);
-            return new S35PacketUpdateTileEntity(xCoord, yCoord, zCoord, 3, tag);
-        }
-
-        @Override
-        public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity packet) {
-            readFromNBT(packet.func_148857_g());
-            if (worldObj != null) worldObj.markBlockRangeForRenderUpdate(xCoord, yCoord, zCoord, xCoord, yCoord, zCoord);
         }
     }
 
@@ -986,10 +827,6 @@ public enum ModernMapParityBlocks {
             return entry == CHISELED_BOOKSHELF;
         }
 
-        private boolean isDecoratedPot() {
-            return entry == DECORATED_POT;
-        }
-
         private boolean isFroglight() {
             String name = entry.getRegistryName();
             return name.endsWith("_froglight");
@@ -1187,8 +1024,6 @@ public enum ModernMapParityBlocks {
         private boolean connectsTo(IBlockAccess world, int x, int y, int z, Style style) {
             Block other = world.getBlock(x, y, z);
             if (other == this) return true;
-            if (style == Style.WALL && other instanceof BlockWall) return true;
-            if ((style == Style.WALL || style == Style.FENCE) && other instanceof BlockFenceGate) return true;
             ModernMapParityBlocks otherEntry = ModernMapParityBlocks.fromBlock(other);
             if (otherEntry != null) {
                 if (otherEntry.style == style) return true;
@@ -1543,15 +1378,6 @@ public enum ModernMapParityBlocks {
                 world.setBlockMetadataWithNotify(x, y, z, lit | ((quadrant + 2) & 3), 2);
                 return;
             }
-            if (isDecoratedPot()) {
-                int storedWater = world.getBlockMetadata(x, y, z) & 4;
-                world.setBlockMetadataWithNotify(x, y, z, storedWater | quadrant, 2);
-                TileEntity tile = world.getTileEntity(x, y, z);
-                if (tile instanceof ParityDecoratedPotTileEntity) {
-                    ((ParityDecoratedPotTileEntity) tile).setSherdsFromItem(stack);
-                }
-                return;
-            }
             if (isScaffolding()) {
                 world.setBlockMetadataWithNotify(x, y, z, computeScaffoldingMeta(world, x, y, z), 2);
                 world.scheduleBlockUpdate(x, y, z, this, 1);
@@ -1638,39 +1464,6 @@ public enum ModernMapParityBlocks {
                     }
                 }
                 return true;
-            }
-
-            if (isDecoratedPot()) {
-                TileEntity tile = world.getTileEntity(x, y, z);
-                if (!(tile instanceof ParityDecoratedPotTileEntity)) return false;
-                ParityDecoratedPotTileEntity pot = (ParityDecoratedPotTileEntity) tile;
-                int meta = world.getBlockMetadata(x, y, z) & 7;
-                if (held != null && held.getItem() == Items.water_bucket && (meta & 4) == 0) {
-                    if (!world.isRemote) {
-                        world.setBlockMetadataWithNotify(x, y, z, meta | 4, 3);
-                        replaceBucket(player, held, Items.bucket);
-                        playModernSound(world, x, y, z, "item.bucket.empty", 1.0F, 1.0F);
-                    }
-                    return true;
-                }
-                if (held != null && held.getItem() == Items.bucket && (meta & 4) != 0) {
-                    if (!world.isRemote) {
-                        world.setBlockMetadataWithNotify(x, y, z, meta & 3, 3);
-                        replaceBucket(player, held, Items.water_bucket);
-                        playModernSound(world, x, y, z, "item.bucket.fill", 1.0F, 1.0F);
-                    }
-                    return true;
-                }
-                if (held != null && held.getItem() != Item.getItemFromBlock(this)) {
-                    if (!world.isRemote && pot.insertOne(held)) {
-                        if (!player.capabilities.isCreativeMode && --held.stackSize <= 0) {
-                            player.inventory.setInventorySlotContents(player.inventory.currentItem, null);
-                        }
-                        playModernSound(world, x, y, z, "block.decorated_pot.insert", 1.0F, 1.0F);
-                    }
-                    return true;
-                }
-                return false;
             }
 
             if (isChiseledBookshelf()) {
@@ -2032,19 +1825,6 @@ public enum ModernMapParityBlocks {
             world.playSoundEffect(x + 0.5D, y + 0.5D, z + 0.5D, Tags.MC_ASSET_VER + ":" + sound, volume, pitch);
         }
 
-        private static void replaceBucket(EntityPlayer player, ItemStack held, Item replacement) {
-            if (player.capabilities.isCreativeMode) return;
-            if (held.stackSize <= 1) {
-                player.inventory.setInventorySlotContents(player.inventory.currentItem, new ItemStack(replacement));
-            } else {
-                held.stackSize--;
-                ItemStack result = new ItemStack(replacement);
-                if (!player.inventory.addItemStackToInventory(result) && player.worldObj != null) {
-                    player.worldObj.spawnEntityInWorld(new EntityItem(player.worldObj, player.posX, player.posY, player.posZ, result));
-                }
-            }
-        }
-
         private void setMetadataAndRelight(World world, int x, int y, int z, int meta) {
             world.setBlockMetadataWithNotify(x, y, z, meta, 3);
             world.updateLightByType(EnumSkyBlock.Block, x, y, z);
@@ -2060,22 +1840,20 @@ public enum ModernMapParityBlocks {
         @Override
         public int damageDropped(int meta) {
             return (isSegmentedGroundDecal() || isCandle() || isTurtleEgg() || isCampfire() || isScaffolding()
-                    || isFroglight() || isCopperChain() || isCopperLantern() || isShelf() || isChiseledBookshelf()
-                    || isDecoratedPot())
+                    || isFroglight() || isCopperChain() || isCopperLantern() || isShelf() || isChiseledBookshelf())
                     ? 0 : super.damageDropped(meta);
         }
 
         @Override
         public int getDamageValue(World world, int x, int y, int z) {
             return (isSegmentedGroundDecal() || isCandle() || isTurtleEgg() || isCampfire() || isScaffolding()
-                    || isFroglight() || isCopperChain() || isCopperLantern() || isShelf() || isChiseledBookshelf()
-                    || isDecoratedPot())
+                    || isFroglight() || isCopperChain() || isCopperLantern() || isShelf() || isChiseledBookshelf())
                     ? 0 : super.getDamageValue(world, x, y, z);
         }
 
         @Override
         public boolean hasTileEntity(int metadata) {
-            return isSign() || isHangingSign() || isCampfire() || isChiseledBookshelf() || isDecoratedPot();
+            return isSign() || isHangingSign() || isCampfire() || isChiseledBookshelf();
         }
 
         @Override
@@ -2083,22 +1861,7 @@ public enum ModernMapParityBlocks {
             if (isSign() || isHangingSign()) return new ParitySignTileEntity();
             if (isCampfire()) return new ParityCampfireTileEntity();
             if (isChiseledBookshelf()) return new ParityChiseledBookshelfTileEntity();
-            if (isDecoratedPot()) return new ParityDecoratedPotTileEntity();
             return null;
-        }
-
-        @Override
-        public boolean hasComparatorInputOverride() {
-            return isDecoratedPot() || super.hasComparatorInputOverride();
-        }
-
-        @Override
-        public int getComparatorInputOverride(World world, int x, int y, int z, int side) {
-            if (isDecoratedPot()) {
-                TileEntity tile = world.getTileEntity(x, y, z);
-                return tile instanceof IInventory ? Container.calcRedstoneFromInventory((IInventory) tile) : 0;
-            }
-            return super.getComparatorInputOverride(world, x, y, z, side);
         }
 
         @Override
@@ -2224,19 +1987,6 @@ public enum ModernMapParityBlocks {
 
         @Override
         public void onEntityCollidedWithBlock(World world, int x, int y, int z, Entity entity) {
-            if (isDecoratedPot() && entity instanceof IProjectile && !world.isRemote) {
-                TileEntity tile = world.getTileEntity(x, y, z);
-                if (tile instanceof ParityDecoratedPotTileEntity) {
-                    for (String sherd : ((ParityDecoratedPotTileEntity) tile).getSherds()) {
-                        ItemStack drop = ModernPotterySherds.ingredientFor(sherd);
-                        world.spawnEntityInWorld(new EntityItem(world, x + 0.5D, y + 0.5D, z + 0.5D, drop));
-                    }
-                }
-                playModernSound(world, x, y, z, "block.decorated_pot.shatter", 1.0F, 1.0F);
-                world.setBlockToAir(x, y, z);
-                entity.setDead();
-                return;
-            }
             if (isScaffolding()) {
                 entity.fallDistance = 0.0F;
                 if (entity instanceof EntityPlayer) {
@@ -2390,12 +2140,6 @@ public enum ModernMapParityBlocks {
                     }
                 }
             }
-            if (isDecoratedPot() && !world.isRemote) {
-                TileEntity tile = world.getTileEntity(x, y, z);
-                if (tile instanceof ParityDecoratedPotTileEntity) {
-                    ((ParityDecoratedPotTileEntity) tile).ejectStoredItem();
-                }
-            }
             super.breakBlock(world, x, y, z, block, meta);
         }
 
@@ -2405,22 +2149,6 @@ public enum ModernMapParityBlocks {
                 ArrayList<ItemStack> drops = new ArrayList<ItemStack>();
                 drops.add(new ItemStack(Item.getItemFromBlock(Blocks.flower_pot)));
                 if (TORCHFLOWER.get() != null) drops.add(new ItemStack(Item.getItemFromBlock(TORCHFLOWER.get())));
-                return drops;
-            }
-            if (isDecoratedPot()) {
-                ArrayList<ItemStack> drops = new ArrayList<ItemStack>();
-                ItemStack pot = new ItemStack(Item.getItemFromBlock(this));
-                TileEntity tile = world.getTileEntity(x, y, z);
-                if (tile instanceof ParityDecoratedPotTileEntity) {
-                    NBTTagCompound blockEntityTag = new NBTTagCompound();
-                    NBTTagList list = new NBTTagList();
-                    for (String sherd : ((ParityDecoratedPotTileEntity) tile).getSherds()) {
-                        list.appendTag(new net.minecraft.nbt.NBTTagString(sherd));
-                    }
-                    blockEntityTag.setTag("sherds", list);
-                    pot.setTagInfo("BlockEntityTag", blockEntityTag);
-                }
-                drops.add(pot);
                 return drops;
             }
             return super.getDrops(world, x, y, z, metadata, fortune);

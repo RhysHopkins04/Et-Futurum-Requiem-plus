@@ -44,6 +44,7 @@ import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.item.EntityFallingBlock;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
@@ -66,10 +67,13 @@ import net.minecraft.util.IIcon;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.stats.StatList;
+import net.minecraft.util.Vec3;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.oredict.RecipeSorter;
 
 import java.util.ArrayList;
@@ -358,7 +362,13 @@ public enum ModernMapParityBlocks {
     private static boolean parityDecoratedPotTileRegistered;
     private static boolean parityShelfTileRegistered;
     private static boolean parityBrushableTileRegistered;
+    private static boolean parityMultifaceTileRegistered;
     private static boolean decoratedPotRecipeRegistered;
+
+    /** Pass 30 bit order: DOWN, UP, NORTH, SOUTH, WEST, EAST (ForgeDirection ordinals 0..5). */
+    public static final int MULTIFACE_ALL_FACES = 0x3F;
+    public static final String MULTIFACE_FACE_MASK_TAG = "FaceMask";
+    private static final String[] MULTIFACE_FACE_NAMES = {"down", "up", "north", "south", "west", "east"};
 
     ModernMapParityBlocks(String vanillaVersion, Style style, Material material,
             String textureKey, String modernAssetPath, int lightLevel) {
@@ -380,6 +390,32 @@ public enum ModernMapParityBlocks {
 
     public Style getStyle() {
         return style;
+    }
+
+    /** Pass 30 deliberately enables shared multiface state for these two identities only. */
+    public boolean usesMultifaceState() {
+        return this == SCULK_VEIN || this == RESIN_CLUMP;
+    }
+
+    /** Converts the six modern boolean properties into the stable Pass 30 FaceMask format. */
+    public static int encodeMultifaceProperties(Map<String, String> properties) {
+        int mask = 0;
+        if (properties == null) return mask;
+        for (int face = 0; face < MULTIFACE_FACE_NAMES.length; face++) {
+            if (Boolean.parseBoolean(properties.get(MULTIFACE_FACE_NAMES[face]))) mask |= 1 << face;
+        }
+        return mask & MULTIFACE_ALL_FACES;
+    }
+
+    /** Reads synchronized multiface state, with a safe floor-face fallback during TE bootstrap. */
+    public static int getMultifaceFaceMask(IBlockAccess world, int x, int y, int z) {
+        if (world != null) {
+            TileEntity tile = world.getTileEntity(x, y, z);
+            if (tile instanceof ParityMultifaceTileEntity) {
+                return ((ParityMultifaceTileEntity) tile).getFaceMask();
+            }
+        }
+        return 1 << ForgeDirection.DOWN.ordinal();
     }
 
     public Block get() {
@@ -420,6 +456,11 @@ public enum ModernMapParityBlocks {
                     Tags.MOD_ID + ":modern_parity_brushable");
             parityBrushableTileRegistered = true;
         }
+        if (!parityMultifaceTileRegistered) {
+            GameRegistry.registerTileEntity(ParityMultifaceTileEntity.class,
+                    Tags.MOD_ID + ":modern_parity_multiface");
+            parityMultifaceTileRegistered = true;
+        }
         ModernPotterySherds.init();
         ModernArchaeology.init();
         for (ModernMapParityBlocks entry : values()) {
@@ -450,6 +491,8 @@ public enum ModernMapParityBlocks {
                 GameRegistry.registerBlock(entry.block, (Class<? extends ItemBlock>) null, name);
             } else if ("torchflower".equals(name)) {
                 GameRegistry.registerBlock(entry.block, ParityTorchflowerItemBlock.class, name);
+            } else if (entry.usesMultifaceState()) {
+                GameRegistry.registerBlock(entry.block, ParityMultifaceItemBlock.class, name);
             } else {
                 GameRegistry.registerBlock(entry.block, name);
             }
@@ -1190,6 +1233,88 @@ public enum ModernMapParityBlocks {
         }
     }
 
+    /** Persistent, packet-synchronized six-face state shared by the Pass 30 blocks. */
+    public static final class ParityMultifaceTileEntity extends TileEntity {
+        private int faceMask = 1 << ForgeDirection.DOWN.ordinal();
+
+        public int getFaceMask() {
+            return faceMask & MULTIFACE_ALL_FACES;
+        }
+
+        public void setFaceMask(int mask) {
+            int clean = mask & MULTIFACE_ALL_FACES;
+            if (clean == faceMask) return;
+            faceMask = clean;
+            markDirty();
+            if (worldObj != null) {
+                worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
+                worldObj.markBlockRangeForRenderUpdate(xCoord, yCoord, zCoord, xCoord, yCoord, zCoord);
+            }
+        }
+
+        @Override
+        public boolean canUpdate() {
+            return false;
+        }
+
+        @Override
+        public void writeToNBT(NBTTagCompound tag) {
+            super.writeToNBT(tag);
+            tag.setInteger(MULTIFACE_FACE_MASK_TAG, getFaceMask());
+        }
+
+        @Override
+        public void readFromNBT(NBTTagCompound tag) {
+            super.readFromNBT(tag);
+            faceMask = tag.getInteger(MULTIFACE_FACE_MASK_TAG) & MULTIFACE_ALL_FACES;
+            if (worldObj != null) worldObj.markBlockRangeForRenderUpdate(xCoord, yCoord, zCoord, xCoord, yCoord, zCoord);
+        }
+
+        @Override
+        public Packet getDescriptionPacket() {
+            NBTTagCompound tag = new NBTTagCompound();
+            writeToNBT(tag);
+            return new S35PacketUpdateTileEntity(xCoord, yCoord, zCoord, 1, tag);
+        }
+
+        @Override
+        public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity packet) {
+            readFromNBT(packet.func_148857_g());
+        }
+    }
+
+    /** Lets another item add a supported face to an existing block instead of replacing it. */
+    public static final class ParityMultifaceItemBlock extends ItemBlock {
+        public ParityMultifaceItemBlock(Block block) {
+            super(block);
+        }
+
+        @Override
+        public boolean onItemUse(ItemStack stack, EntityPlayer player, World world, int x, int y, int z,
+                int side, float hitX, float hitY, float hitZ) {
+            if (world.getBlock(x, y, z) == field_150939_a && field_150939_a instanceof ParityModelBlock) {
+                if (stack.stackSize == 0 || !player.canPlayerEdit(x, y, z, side, stack)) return false;
+                ParityModelBlock block = (ParityModelBlock) field_150939_a;
+                // When the clicked cell is already multiface, the hit side itself identifies
+                // the new attachment face. (Fresh placement against a support uses the opposite.)
+                int face = side >= 0 && side < 6 ? side : -1;
+                int bit = face < 0 ? 0 : 1 << face;
+                int oldMask = getMultifaceFaceMask(world, x, y, z);
+                if (bit != 0 && (oldMask & bit) == 0 && block.canAttachMultifaceFace(world, x, y, z, face)) {
+                    if (!world.isRemote && block.addMultifaceFace(world, x, y, z, face)) {
+                        if (!player.capabilities.isCreativeMode) stack.stackSize--;
+                        world.playSoundEffect(x + 0.5D, y + 0.5D, z + 0.5D,
+                                field_150939_a.stepSound.func_150496_b(),
+                                (field_150939_a.stepSound.getVolume() + 1.0F) / 2.0F,
+                                field_150939_a.stepSound.getPitch() * 0.8F);
+                    }
+                    return true;
+                }
+            }
+            return super.onItemUse(stack, player, world, x, y, z, side, hitX, hitY, hitZ);
+        }
+    }
+
     private static final class ParityCopperChestBlock extends BlockChest {
         private final ModernMapParityBlocks entry;
 
@@ -1222,6 +1347,7 @@ public enum ModernMapParityBlocks {
 
     private static final class ParityModelBlock extends Block implements ITileEntityProvider {
         private final ModernMapParityBlocks entry;
+        private final ThreadLocal<Integer> harvestedMultifaceMask = new ThreadLocal<Integer>();
 
         ParityModelBlock(ModernMapParityBlocks entry) {
             super(entry.material);
@@ -1314,6 +1440,14 @@ public enum ModernMapParityBlocks {
             return entry.style == Style.LOG;
         }
 
+        private boolean isMultiface() {
+            return entry.usesMultifaceState();
+        }
+
+        private boolean isSculkVein() {
+            return entry == SCULK_VEIN;
+        }
+
         private boolean isCopperLantern() {
             return entry.getRegistryName().endsWith("copper_lantern");
         }
@@ -1401,6 +1535,10 @@ public enum ModernMapParityBlocks {
         }
 
         private void applyBounds(Style style) {
+            if (isMultiface()) {
+                setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 1.0F / 16.0F, 1.0F);
+                return;
+            }
             if (isLightningRod()) {
                 setBlockBounds(0.375F, 0.0F, 0.375F, 0.625F, 1.0F, 0.625F);
                 return;
@@ -1515,6 +1653,10 @@ public enum ModernMapParityBlocks {
 
         @Override
         public void setBlockBoundsBasedOnState(IBlockAccess world, int x, int y, int z) {
+            if (isMultiface()) {
+                setMultifaceBounds(getMultifaceFaceMask(world, x, y, z));
+                return;
+            }
             if (isCopperChain()) {
                 int axis = world.getBlockMetadata(x, y, z) & 3;
                 if (axis == 1) setBlockBounds(0.0F, 6.5F/16.0F, 6.5F/16.0F, 1.0F, 9.5F/16.0F, 9.5F/16.0F);
@@ -1753,6 +1895,7 @@ public enum ModernMapParityBlocks {
         @Override
         public int onBlockPlaced(World world, int x, int y, int z, int side,
                 float hitX, float hitY, float hitZ, int meta) {
+            if (isMultiface()) return side >= 0 && side < 6 ? ForgeDirection.OPPOSITES[side] : ForgeDirection.DOWN.ordinal();
             if (isFroglight() || isCopperChain()) {
                 if (side == 4 || side == 5) return 1; // X
                 if (side == 2 || side == 3) return 2; // Z
@@ -1817,6 +1960,15 @@ public enum ModernMapParityBlocks {
 
         @Override
         public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase placer, ItemStack stack) {
+            if (isMultiface()) {
+                int face = world.getBlockMetadata(x, y, z) & 7;
+                TileEntity tile = world.getTileEntity(x, y, z);
+                if (tile instanceof ParityMultifaceTileEntity && face < 6) {
+                    ((ParityMultifaceTileEntity) tile).setFaceMask(1 << face);
+                }
+                world.setBlockMetadataWithNotify(x, y, z, 0, 2);
+                return;
+            }
             int quadrant = MathHelper.floor_double((double) (placer.rotationYaw * 4.0F / 360.0F) + 0.5D) & 3;
             if (isCoralFan()) {
                 int side = world.getBlockMetadata(x, y, z) & 7;
@@ -2460,7 +2612,7 @@ public enum ModernMapParityBlocks {
         public int damageDropped(int meta) {
             return (isSegmentedGroundDecal() || isCandle() || isTurtleEgg() || isCampfire() || isScaffolding()
                     || isFroglight() || isCopperChain() || isCopperLantern() || isShelf() || isChiseledBookshelf()
-                    || isDecoratedPot() || isAxisLog())
+                    || isDecoratedPot() || isAxisLog() || isMultiface())
                     ? 0 : super.damageDropped(meta);
         }
 
@@ -2468,14 +2620,14 @@ public enum ModernMapParityBlocks {
         public int getDamageValue(World world, int x, int y, int z) {
             return (isSegmentedGroundDecal() || isCandle() || isTurtleEgg() || isCampfire() || isScaffolding()
                     || isFroglight() || isCopperChain() || isCopperLantern() || isShelf() || isChiseledBookshelf()
-                    || isDecoratedPot() || isAxisLog())
+                    || isDecoratedPot() || isAxisLog() || isMultiface())
                     ? 0 : super.getDamageValue(world, x, y, z);
         }
 
         @Override
         public boolean hasTileEntity(int metadata) {
             return isSign() || isHangingSign() || isCampfire() || isChiseledBookshelf()
-                    || isDecoratedPot() || isShelf() || isSuspicious();
+                    || isDecoratedPot() || isShelf() || isSuspicious() || isMultiface();
         }
 
         @Override
@@ -2486,6 +2638,7 @@ public enum ModernMapParityBlocks {
             if (isDecoratedPot()) return new ParityDecoratedPotTileEntity();
             if (isShelf()) return new ParityShelfTileEntity();
             if (isSuspicious()) return new ParityBrushableTileEntity();
+            if (isMultiface()) return new ParityMultifaceTileEntity();
             return null;
         }
 
@@ -2551,8 +2704,74 @@ public enum ModernMapParityBlocks {
             };
         }
 
+        private boolean canAttachMultifaceFace(IBlockAccess world, int x, int y, int z, int face) {
+            if (!isMultiface() || face < 0 || face >= 6) return false;
+            ForgeDirection direction = ForgeDirection.getOrientation(face);
+            int sx = x + direction.offsetX;
+            int sy = y + direction.offsetY;
+            int sz = z + direction.offsetZ;
+            return world.isSideSolid(sx, sy, sz, direction.getOpposite(), false);
+        }
+
+        private int supportedMultifaceMask(IBlockAccess world, int x, int y, int z, int mask) {
+            int supported = 0;
+            for (int face = 0; face < 6; face++) {
+                if ((mask & (1 << face)) != 0 && canAttachMultifaceFace(world, x, y, z, face)) supported |= 1 << face;
+            }
+            return supported;
+        }
+
+        private boolean addMultifaceFace(World world, int x, int y, int z, int face) {
+            TileEntity tile = world.getTileEntity(x, y, z);
+            if (!(tile instanceof ParityMultifaceTileEntity) || !canAttachMultifaceFace(world, x, y, z, face)) return false;
+            ParityMultifaceTileEntity multiface = (ParityMultifaceTileEntity) tile;
+            int bit = 1 << face;
+            if ((multiface.getFaceMask() & bit) != 0) return false;
+            multiface.setFaceMask(multiface.getFaceMask() | bit);
+            return true;
+        }
+
+        private void setMultifaceBounds(int mask) {
+            float minX = 1.0F, minY = 1.0F, minZ = 1.0F;
+            float maxX = 0.0F, maxY = 0.0F, maxZ = 0.0F;
+            final float t = 1.0F / 16.0F;
+            if ((mask & 1) != 0) { minX = 0; minY = 0; minZ = 0; maxX = 1; maxY = Math.max(maxY, t); maxZ = 1; }
+            if ((mask & 2) != 0) { minX = 0; minY = Math.min(minY, 1-t); minZ = 0; maxX = 1; maxY = 1; maxZ = 1; }
+            if ((mask & 4) != 0) { minX = 0; minY = 0; minZ = 0; maxX = 1; maxY = 1; maxZ = Math.max(maxZ, t); }
+            if ((mask & 8) != 0) { minX = 0; minY = 0; minZ = Math.min(minZ, 1-t); maxX = 1; maxY = 1; maxZ = 1; }
+            if ((mask & 16) != 0) { minX = 0; minY = 0; minZ = 0; maxX = Math.max(maxX, t); maxY = 1; maxZ = 1; }
+            if ((mask & 32) != 0) { minX = Math.min(minX, 1-t); minY = 0; minZ = 0; maxX = 1; maxY = 1; maxZ = 1; }
+            if ((mask & MULTIFACE_ALL_FACES) == 0) { minX = minY = minZ = 0; maxX = maxZ = 1; maxY = t; }
+            setBlockBounds(minX, minY, minZ, maxX, maxY, maxZ);
+        }
+
+        private void setMultifaceFaceBounds(int face) {
+            final float t = 1.0F / 16.0F;
+            switch (face) {
+                case 0: setBlockBounds(0, 0, 0, 1, t, 1); break;
+                case 1: setBlockBounds(0, 1-t, 0, 1, 1, 1); break;
+                case 2: setBlockBounds(0, 0, 0, 1, 1, t); break;
+                case 3: setBlockBounds(0, 0, 1-t, 1, 1, 1); break;
+                case 4: setBlockBounds(0, 0, 0, t, 1, 1); break;
+                default: setBlockBounds(1-t, 0, 0, 1, 1, 1); break;
+            }
+        }
+
+        @Override
+        public boolean canPlaceBlockOnSide(World world, int x, int y, int z, int side) {
+            if (isMultiface()) {
+                int face = side >= 0 && side < 6 ? ForgeDirection.OPPOSITES[side] : -1;
+                return canAttachMultifaceFace(world, x, y, z, face);
+            }
+            return super.canPlaceBlockOnSide(world, x, y, z, side);
+        }
+
         @Override
         public boolean canPlaceBlockAt(World world, int x, int y, int z) {
+            if (isMultiface()) {
+                for (int face = 0; face < 6; face++) if (canAttachMultifaceFace(world, x, y, z, face)) return true;
+                return false;
+            }
             if (isCopperLantern()) {
                 return canCopperLanternStand(world, x, y, z) || canCopperLanternHang(world, x, y, z);
             }
@@ -2622,7 +2841,23 @@ public enum ModernMapParityBlocks {
 
         @Override
         public void onNeighborBlockChange(World world, int x, int y, int z, Block neighbor) {
-            if (isScaffolding()) {
+            if (isMultiface()) {
+                if (!world.isRemote) {
+                    TileEntity tile = world.getTileEntity(x, y, z);
+                    int oldMask = getMultifaceFaceMask(world, x, y, z);
+                    int nextMask = supportedMultifaceMask(world, x, y, z, oldMask);
+                    if (nextMask == 0) {
+                        if (entry == RESIN_CLUMP) {
+                            dropBlockAsItem(world, x, y, z,
+                                    new ItemStack(Item.getItemFromBlock(this), Integer.bitCount(oldMask), 0));
+                        }
+                        world.setBlockToAir(x, y, z);
+                    } else if (nextMask != oldMask && tile instanceof ParityMultifaceTileEntity) {
+                        ((ParityMultifaceTileEntity) tile).setFaceMask(nextMask);
+                    }
+                }
+                return;
+            } else if (isScaffolding()) {
                 world.scheduleBlockUpdate(x, y, z, this, 1);
             } else if (isSuspicious()) {
                 world.scheduleBlockUpdate(x, y, z, this, 2);
@@ -2872,6 +3107,14 @@ public enum ModernMapParityBlocks {
         @Override
         public ArrayList<ItemStack> getDrops(World world, int x, int y, int z, int metadata, int fortune) {
             if (isSuspicious()) return new ArrayList<ItemStack>();
+            if (isMultiface()) {
+                ArrayList<ItemStack> drops = new ArrayList<ItemStack>();
+                if (entry == RESIN_CLUMP) {
+                    int count = Integer.bitCount(getMultifaceFaceMask(world, x, y, z));
+                    if (count > 0) drops.add(new ItemStack(Item.getItemFromBlock(this), count, 0));
+                }
+                return drops;
+            }
             if (entry == POTTED_TORCHFLOWER) {
                 ArrayList<ItemStack> drops = new ArrayList<ItemStack>();
                 drops.add(new ItemStack(Item.getItemFromBlock(Blocks.flower_pot)));
@@ -2895,6 +3138,47 @@ public enum ModernMapParityBlocks {
                 return drops;
             }
             return super.getDrops(world, x, y, z, metadata, fortune);
+        }
+
+        @Override
+        public boolean removedByPlayer(World world, EntityPlayer player, int x, int y, int z, boolean willHarvest) {
+            if (isMultiface() && willHarvest) {
+                harvestedMultifaceMask.set(getMultifaceFaceMask(world, x, y, z));
+            }
+            return super.removedByPlayer(world, player, x, y, z, willHarvest);
+        }
+
+        @Override
+        public void harvestBlock(World world, EntityPlayer player, int x, int y, int z, int meta) {
+            if (!isMultiface()) {
+                super.harvestBlock(world, player, x, y, z, meta);
+                return;
+            }
+            player.addStat(StatList.mineBlockStatArray[getIdFromBlock(this)], 1);
+            player.addExhaustion(0.025F);
+            Integer capturedMask = harvestedMultifaceMask.get();
+            harvestedMultifaceMask.remove();
+            int count = Integer.bitCount(capturedMask == null ? getMultifaceFaceMask(world, x, y, z) : capturedMask);
+            boolean silk = EnchantmentHelper.getSilkTouchModifier(player);
+            ArrayList<ItemStack> drops = new ArrayList<ItemStack>();
+            if (count > 0 && (entry == RESIN_CLUMP || silk)) {
+                drops.add(new ItemStack(Item.getItemFromBlock(this), count, 0));
+            }
+            ForgeEventFactory.fireBlockHarvesting(drops, world, this, x, y, z, meta,
+                    EnchantmentHelper.getFortuneModifier(player), 1.0F, silk, player);
+            for (ItemStack drop : drops) {
+                dropBlockAsItem(world, x, y, z, drop);
+            }
+        }
+
+        @Override
+        protected boolean canSilkHarvest() {
+            return isSculkVein() || super.canSilkHarvest();
+        }
+
+        @Override
+        public int getExpDrop(IBlockAccess world, int metadata, int fortune) {
+            return isSculkVein() ? 1 : super.getExpDrop(world, metadata, fortune);
         }
 
         @Override public int getRenderType() { return RenderIDs.MODERN_MAP_PARITY; }
@@ -2985,6 +3269,28 @@ public enum ModernMapParityBlocks {
             if (s) addCollisionBox(mask, list, x, y, z, min, 0.0F, max, max, collisionHeight, 1.0F);
             if (w) addCollisionBox(mask, list, x, y, z, 0.0F, 0.0F, min, min, collisionHeight, max);
             if (e) addCollisionBox(mask, list, x, y, z, max, 0.0F, min, 1.0F, collisionHeight, max);
+        }
+
+        @Override
+        public MovingObjectPosition collisionRayTrace(World world, int x, int y, int z, Vec3 start, Vec3 end) {
+            if (!isMultiface()) return super.collisionRayTrace(world, x, y, z, start, end);
+            int mask = getMultifaceFaceMask(world, x, y, z);
+            MovingObjectPosition closest = null;
+            double closestDistance = Double.MAX_VALUE;
+            for (int face = 0; face < 6; face++) {
+                if ((mask & (1 << face)) == 0) continue;
+                setMultifaceFaceBounds(face);
+                MovingObjectPosition hit = super.collisionRayTrace(world, x, y, z, start, end);
+                if (hit != null && hit.hitVec != null) {
+                    double distance = start.squareDistanceTo(hit.hitVec);
+                    if (distance < closestDistance) {
+                        closestDistance = distance;
+                        closest = hit;
+                    }
+                }
+            }
+            setMultifaceBounds(mask);
+            return closest;
         }
 
         private static void addShelfCollisionBoxes(int facing, AxisAlignedBB mask, List<AxisAlignedBB> list,

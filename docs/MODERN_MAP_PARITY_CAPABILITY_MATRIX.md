@@ -27,7 +27,27 @@ Validate that all manifest identities remain classified:
 ```bash
 python3 scripts/audit_modern_map_parity_capabilities.py --check
 python3 scripts/validate_fidelity_pass_29.py
+python3 scripts/validate_fidelity_pass_30.py
 ```
+
+## Pass 30 multiface contract
+
+Sculk Vein and Resin Clump share one six-face state implementation. The state is stored by
+`ParityMultifaceTileEntity` as the integer NBT field `FaceMask`; metadata is normalized to zero.
+Bits are stable and importer-facing: bit 0 `down`, bit 1 `up`, bit 2 `north`, bit 3 `south`, bit 4
+`west`, and bit 5 `east`. Backporter imports must set one or more bits from the six modern boolean
+blockstate properties. A zero mask is not a valid placed state.
+
+Each active face requires a solid supporting face in its direction, renders the matching Mojang
+blockstate combination, and contributes a 1/16-thick outline/ray target. Unsupported faces are
+pruned after neighbour changes; the block is removed when none remain. Resin Clump drops one item
+per active face. Sculk Vein drops one item per active face only under Silk Touch. Waterlogging and
+the blocks' larger spreading/growth systems remain outside Pass 30.
+
+Pass 30b keeps that state contract unchanged and corrects only the legacy JSON bridge boundary:
+Mojang's `down=true`/`x=90` and `up=true`/`x=270` model rotations are exchanged when selecting the
+legacy baked model because the bridge's positive X rotation convention is reversed. This does not
+invert `FaceMask`, placement, support checks, bounds, drops, synchronization or Backporter input.
 
 ## Pass 29 axis contract
 

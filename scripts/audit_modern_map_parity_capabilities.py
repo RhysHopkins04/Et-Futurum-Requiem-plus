@@ -49,6 +49,8 @@ SPECIAL_STATE_NAMES = {
     "wildflowers",
 }
 
+PASS_30_MULTIFACE_NAMES = {"sculk_vein", "resin_clump"}
+
 VISUAL_SHELL_GAPS = {
     "crafter": "No inventory, disabled-slot, recipe, redstone craft or block-entity implementation.",
     "trial_spawner": "No trial-spawner phase, cooldown, reward or block-entity implementation.",
@@ -61,8 +63,6 @@ VISUAL_SHELL_GAPS = {
     "sculk_sensor": "No vibration, phase, cooldown or redstone implementation.",
     "calibrated_sculk_sensor": "No calibration filtering, vibration phase or redstone implementation.",
     "sculk_shrieker": "No shrieking, cooldown, can_summon or player-trigger implementation.",
-    "sculk_vein": "Six independent attachment faces are not represented.",
-    "resin_clump": "Six independent attachment faces are not represented.",
     "pale_oak_button": "Visual button shell; wooden-button power and projectile mechanics are absent.",
     "pale_oak_pressure_plate": "Visual layer shell; entity detection and redstone mechanics are absent.",
     "powder_snow": "No sinking, leather-boots collision, freezing or bucket behaviour.",
@@ -117,6 +117,8 @@ def is_copper_weathering_family(name):
 
 
 def profile_for(name, style):
+    if name in PASS_30_MULTIFACE_NAMES:
+        return "PASS_30_MULTIFACE"
     if style == "LOG":
         return "PASS_29_AXIS_LOG"
     if name.endswith("copper_chest"):
@@ -136,6 +138,9 @@ def profile_for(name, style):
 
 
 def gap_for(name, style, profile):
+    if profile == "PASS_30_MULTIFACE":
+        return ("Six-face placement/render/support/drop/persistence parity is implemented; "
+                "waterlogging and block-specific spreading/growth mechanics remain deferred.")
     if profile == "PASS_29_AXIS_LOG":
         return "None for valid non-waterlogged axis and axe-stripping states; metadata 3 renders as Y fallback."
     if name in VISUAL_SHELL_GAPS:
@@ -189,6 +194,15 @@ def row_for(entry):
             "function": "axis-aware placement and axe stripping; canonical item damage 0",
             "map_import": "axis maps deterministically to metadata 0/1/2",
             "review_status": "PASS_29_VERIFIED",
+        })
+    elif profile == "PASS_30_MULTIFACE":
+        row.update({
+            "blockstate": "six booleans in synchronized FaceMask bits DOWN/UP/NORTH/SOUTH/WEST/EAST",
+            "shape": "union outline and exact ray target from 1/16-thick attached faces; no collision",
+            "function": "supported placement, same-block face merging, support pruning and face-count drops",
+            "nbt": "ParityMultifaceTileEntity FaceMask integer",
+            "map_import": "six boolean properties map deterministically to FaceMask bits 0..5",
+            "review_status": "PASS_30_VERIFIED",
         })
     elif profile == "COPPER_CHEST_COMPAT":
         row.update({

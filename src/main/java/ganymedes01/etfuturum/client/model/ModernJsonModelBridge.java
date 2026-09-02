@@ -93,6 +93,7 @@ public final class ModernJsonModelBridge {
         registerTextures(prepared.item, register);
         for (Model model : prepared.connectionModels) if (model != null) registerTextures(model, register);
         for (Model model : prepared.facingModels) if (model != null) registerTextures(model, register);
+        for (Model model : prepared.multifaceModels) if (model != null) registerTextures(model, register);
         for (Model model : prepared.chiseledBookshelfBase) if (model != null) registerTextures(model, register);
         for (Model model : prepared.chiseledBookshelfSlots) if (model != null) registerTextures(model, register);
         if ("chiseled_bookshelf".equals(name)) {
@@ -140,6 +141,12 @@ public final class ModernJsonModelBridge {
     public static synchronized Model getWorldModel(ModernMapParityBlocks entry, IBlockAccess world, int x, int y, int z) {
         PreparedModels models = CACHE.get(entry.getRegistryName());
         if (models == null) return Model.empty();
+        if (entry.usesMultifaceState()) {
+            int mask = ModernMapParityBlocks.getMultifaceFaceMask(world, x, y, z)
+                    & ModernMapParityBlocks.MULTIFACE_ALL_FACES;
+            Model multiface = models.multifaceModels[mask];
+            if (multiface != null) return multiface;
+        }
         if ("grindstone".equals(entry.getRegistryName())) {
             int state = world.getBlockMetadata(x, y, z) & 15;
             if (state < 0 || state >= 12) state = 0;
@@ -809,6 +816,21 @@ public final class ModernJsonModelBridge {
     private static void prepareDynamicBlockModels(ModernMapParityBlocks entry, PreparedModels prepared) throws IOException {
         ModernMapParityBlocks.Style style = entry.getStyle();
         String registryName = entry.getRegistryName();
+        if (entry.usesMultifaceState()) {
+            String[] faces = {"down", "up", "north", "south", "west", "east"};
+            for (int mask = 1; mask <= ModernMapParityBlocks.MULTIFACE_ALL_FACES; mask++) {
+                Map<String, String> state = defaultsFor(entry);
+                for (int face = 0; face < faces.length; face++) {
+                    // The legacy bridge's positive X blockstate rotation is opposite Mojang's
+                    // FaceBakery convention. Mojang authors down=true with x=90 and up=true with
+                    // x=270, so swap only those two inputs at this compatibility boundary. The
+                    // persisted FaceMask, placement, support and hitbox directions remain exact.
+                    int maskFace = face == 0 ? 1 : face == 1 ? 0 : face;
+                    state.put(faces[face], Boolean.toString((mask & (1 << maskFace)) != 0));
+                }
+                prepared.multifaceModels[mask] = applySpecialBlockVisual(entry, loadBlockStateModel(entry, state));
+            }
+        }
         if (registryName.endsWith("_froglight") || registryName.endsWith("copper_chain")
                 || style == ModernMapParityBlocks.Style.LOG) {
             String[] axes = {"y", "x", "z"};
@@ -1490,6 +1512,7 @@ public final class ModernJsonModelBridge {
         public Model item = Model.empty();
         public final Model[] connectionModels = new Model[16];
         public final Model[] facingModels = new Model[32];
+        public final Model[] multifaceModels = new Model[64];
         public final Model[] chiseledBookshelfBase = new Model[4];
         public final Model[] chiseledBookshelfSlots = new Model[48];
         private IIcon chiseledBookshelfOccupiedFallback;

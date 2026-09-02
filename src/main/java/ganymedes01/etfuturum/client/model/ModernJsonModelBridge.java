@@ -167,7 +167,8 @@ public final class ModernJsonModelBridge {
             }
             return decoratedPotWorldModel(models, sherds, world.getBlockMetadata(x, y, z) & 7);
         }
-        if (name.endsWith("_froglight") || name.endsWith("copper_chain")) {
+        if (name.endsWith("_froglight") || name.endsWith("copper_chain")
+                || style == ModernMapParityBlocks.Style.LOG) {
             int axis = world.getBlockMetadata(x, y, z) & 3;
             if (axis > 2) axis = 0;
             Model oriented = models.facingModels[axis];
@@ -808,7 +809,8 @@ public final class ModernJsonModelBridge {
     private static void prepareDynamicBlockModels(ModernMapParityBlocks entry, PreparedModels prepared) throws IOException {
         ModernMapParityBlocks.Style style = entry.getStyle();
         String registryName = entry.getRegistryName();
-        if (registryName.endsWith("_froglight") || registryName.endsWith("copper_chain")) {
+        if (registryName.endsWith("_froglight") || registryName.endsWith("copper_chain")
+                || style == ModernMapParityBlocks.Style.LOG) {
             String[] axes = {"y", "x", "z"};
             for (int axis = 0; axis < axes.length; axis++) {
                 Map<String, String> state = defaultsFor(entry);

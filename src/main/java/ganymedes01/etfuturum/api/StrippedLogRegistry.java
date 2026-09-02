@@ -195,6 +195,8 @@ public class StrippedLogRegistry {
 		if (ConfigBlocksItems.enableModernMapParityBlocks && ConfigBlocksItems.enableStrippedLogs
 				&& ModernMapParityBlocks.PALE_OAK_LOG.get() != null && ModernMapParityBlocks.STRIPPED_PALE_OAK_LOG.get() != null) {
 			addLog(ModernMapParityBlocks.PALE_OAK_LOG.get(), 0, ModernMapParityBlocks.STRIPPED_PALE_OAK_LOG.get(), 0);
+			addLog(ModernMapParityBlocks.PALE_OAK_LOG.get(), 1, ModernMapParityBlocks.STRIPPED_PALE_OAK_LOG.get(), 1);
+			addLog(ModernMapParityBlocks.PALE_OAK_LOG.get(), 2, ModernMapParityBlocks.STRIPPED_PALE_OAK_LOG.get(), 2);
 			if (ConfigBlocksItems.enableBarkLogs && ModernMapParityBlocks.PALE_OAK_WOOD.get() != null
 					&& ModernMapParityBlocks.STRIPPED_PALE_OAK_WOOD.get() != null) {
 				addLog(ModernMapParityBlocks.PALE_OAK_WOOD.get(), 0, ModernMapParityBlocks.STRIPPED_PALE_OAK_WOOD.get(), 0);

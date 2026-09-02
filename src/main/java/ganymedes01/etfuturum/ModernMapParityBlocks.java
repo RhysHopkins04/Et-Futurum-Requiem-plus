@@ -1310,6 +1310,10 @@ public enum ModernMapParityBlocks {
             return entry.getRegistryName().endsWith("copper_chain");
         }
 
+        private boolean isAxisLog() {
+            return entry.style == Style.LOG;
+        }
+
         private boolean isCopperLantern() {
             return entry.getRegistryName().endsWith("copper_lantern");
         }
@@ -1750,6 +1754,11 @@ public enum ModernMapParityBlocks {
         public int onBlockPlaced(World world, int x, int y, int z, int side,
                 float hitX, float hitY, float hitZ, int meta) {
             if (isFroglight() || isCopperChain()) {
+                if (side == 4 || side == 5) return 1; // X
+                if (side == 2 || side == 3) return 2; // Z
+                return 0; // Y
+            }
+            if (isAxisLog()) {
                 if (side == 4 || side == 5) return 1; // X
                 if (side == 2 || side == 3) return 2; // Z
                 return 0; // Y
@@ -2451,7 +2460,7 @@ public enum ModernMapParityBlocks {
         public int damageDropped(int meta) {
             return (isSegmentedGroundDecal() || isCandle() || isTurtleEgg() || isCampfire() || isScaffolding()
                     || isFroglight() || isCopperChain() || isCopperLantern() || isShelf() || isChiseledBookshelf()
-                    || isDecoratedPot())
+                    || isDecoratedPot() || isAxisLog())
                     ? 0 : super.damageDropped(meta);
         }
 
@@ -2459,7 +2468,7 @@ public enum ModernMapParityBlocks {
         public int getDamageValue(World world, int x, int y, int z) {
             return (isSegmentedGroundDecal() || isCandle() || isTurtleEgg() || isCampfire() || isScaffolding()
                     || isFroglight() || isCopperChain() || isCopperLantern() || isShelf() || isChiseledBookshelf()
-                    || isDecoratedPot())
+                    || isDecoratedPot() || isAxisLog())
                     ? 0 : super.getDamageValue(world, x, y, z);
         }
 

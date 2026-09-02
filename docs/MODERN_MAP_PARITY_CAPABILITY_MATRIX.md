@@ -1,0 +1,60 @@
+# Modern Map Parity Capability Matrix
+
+Et Futurum Requiem Plus exposes 243 stable modern registry identities for map conversion. A valid
+AssetDirector-backed model is not, by itself, proof that every modern block state or mechanic is
+represented.
+
+`scripts/audit_modern_map_parity_capabilities.py` generates one machine-readable row for every
+identity in `scripts/modern_map_parity_blocks.json`. Each row records the parity registry's creation
+path, any already-resolved mature EFR equivalent, visual path, state storage, shape, mechanics, NBT
+status, map-import status, review level and known difference. `parity_create_path` describes what the
+parity registry would create; it does not claim that this path supersedes an older EFR block.
+
+Run the complete JSON report:
+
+```bash
+python3 scripts/audit_modern_map_parity_capabilities.py --format json
+```
+
+Run a spreadsheet-friendly TSV report:
+
+```bash
+python3 scripts/audit_modern_map_parity_capabilities.py --format tsv
+```
+
+Validate that all manifest identities remain classified:
+
+```bash
+python3 scripts/audit_modern_map_parity_capabilities.py --check
+python3 scripts/validate_fidelity_pass_29.py
+```
+
+## Pass 29 axis contract
+
+Pass 29 verifies the complete non-waterlogged `axis` representation for:
+
+- `etfuturum:pale_oak_log`
+- `etfuturum:stripped_pale_oak_log`
+
+The deterministic mapping for placement and map conversion is:
+
+| Modern state | EFR metadata | Placement faces |
+| --- | ---: | --- |
+| `axis=y` | `0` | top or bottom |
+| `axis=x` | `1` | east or west |
+| `axis=z` | `2` | north or south |
+
+Metadata `3` is invalid/reserved and is rendered as the safe vertical/Y fallback. Inventory,
+dropped-item and pick-block stacks always use canonical item damage `0`; the axis applies only to
+the placed block.
+
+## Pass 29b stripping contract
+
+Using an item tagged as an EFR stripped-log tool converts every valid Pale Oak Log axis to the
+matching Stripped Pale Oak Log axis. The conversion is metadata-preserving: `0 -> 0`, `1 -> 1`
+and `2 -> 2`, so removing the bark cannot rotate a vertical, east-west or north-south log. Pale Oak
+Wood continues to convert to Stripped Pale Oak Wood when bark-log support is enabled.
+
+General waterlogging remains outside this contract. Later passes must promote additional rows only
+after their exact 1.21.11 properties, storage, renderer behaviour and Backporter mapping are
+implemented and validated.

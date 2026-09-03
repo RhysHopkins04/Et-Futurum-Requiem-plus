@@ -4,11 +4,9 @@ import com.google.common.collect.Maps;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import ganymedes01.etfuturum.EtFuturum;
-import ganymedes01.etfuturum.ModernMapParityBlocks;
 import ganymedes01.etfuturum.core.utils.Utils;
 import ganymedes01.etfuturum.lib.RenderIDs;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockFenceGate;
 import net.minecraft.block.BlockWall;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
@@ -94,13 +92,8 @@ public class BaseWall extends BlockWall implements ISubBlocksBlock {
 	}
 
 	@Override
-	public boolean canConnectWallTo(IBlockAccess p_150091_1_, int p_150091_2_, int p_150091_3_, int p_150091_4_) {
-		Block block = p_150091_1_.getBlock(p_150091_2_, p_150091_3_, p_150091_4_);
-		ModernMapParityBlocks parity = ModernMapParityBlocks.fromBlock(block);
-		return block instanceof BlockFenceGate || block instanceof BaseWall
-				|| parity != null && (parity.getStyle() == ModernMapParityBlocks.Style.WALL
-						|| parity.getStyle() == ModernMapParityBlocks.Style.FENCE_GATE)
-				|| super.canConnectWallTo(p_150091_1_, p_150091_2_, p_150091_3_, p_150091_4_);
+	public boolean canConnectWallTo(IBlockAccess world, int x, int y, int z) {
+		return ModernWallState.canConnectWallTo(this, world, x, y, z);
 	}
 
 	@Override
@@ -108,44 +101,30 @@ public class BaseWall extends BlockWall implements ISubBlocksBlock {
 		return true;
 	}
 
-	/** Modern walls use an 8px post and 6px-wide, 14px-high arms. */
+	/** Modern walls use an 8px post and neighbour-derived none/low/tall side states. */
 	public boolean hasModernPost(IBlockAccess world, int x, int y, int z) {
-		Block above = world.getBlock(x, y + 1, z);
-		if (above != null && above.isOpaqueCube()) return true;
-		boolean north = canConnectWallTo(world, x, y, z - 1);
-		boolean south = canConnectWallTo(world, x, y, z + 1);
-		boolean west = canConnectWallTo(world, x - 1, y, z);
-		boolean east = canConnectWallTo(world, x + 1, y, z);
-		boolean straightNS = north && south && !west && !east;
-		boolean straightEW = east && west && !north && !south;
-		return !(straightNS || straightEW);
+		return ModernWallState.derive(this, world, x, y, z).up;
 	}
 
 	@Override
 	public void setBlockBoundsBasedOnState(IBlockAccess world, int x, int y, int z) {
-		boolean north = canConnectWallTo(world, x, y, z - 1);
-		boolean south = canConnectWallTo(world, x, y, z + 1);
-		boolean west = canConnectWallTo(world, x - 1, y, z);
-		boolean east = canConnectWallTo(world, x + 1, y, z);
-		float minX = west ? 0.0F : 0.25F;
-		float maxX = east ? 1.0F : 0.75F;
-		float minZ = north ? 0.0F : 0.25F;
-		float maxZ = south ? 1.0F : 0.75F;
-		setBlockBounds(minX, 0.0F, minZ, maxX, 1.0F, maxZ);
+		ModernWallState.State state = ModernWallState.derive(this, world, x, y, z);
+		float minX = state.west.isConnected() ? 0.0F : 0.25F;
+		float maxX = state.east.isConnected() ? 1.0F : 0.75F;
+		float minZ = state.north.isConnected() ? 0.0F : 0.25F;
+		float maxZ = state.south.isConnected() ? 1.0F : 0.75F;
+		setBlockBounds(minX, 0.0F, minZ, maxX, state.getVisualMaxY(), maxZ);
 	}
 
 	@Override
 	public void addCollisionBoxesToList(World world, int x, int y, int z, AxisAlignedBB mask,
 			List<AxisAlignedBB> list, Entity collider) {
-		boolean north = canConnectWallTo(world, x, y, z - 1);
-		boolean south = canConnectWallTo(world, x, y, z + 1);
-		boolean west = canConnectWallTo(world, x - 1, y, z);
-		boolean east = canConnectWallTo(world, x + 1, y, z);
-		if (hasModernPost(world, x, y, z)) addWallCollision(mask, list, x, y, z, 0.25, 0, 0.25, 0.75, 1.5, 0.75);
-		if (north) addWallCollision(mask, list, x, y, z, 5.0/16.0, 0, 0, 11.0/16.0, 1.5, 0.5);
-		if (south) addWallCollision(mask, list, x, y, z, 5.0/16.0, 0, 0.5, 11.0/16.0, 1.5, 1);
-		if (west) addWallCollision(mask, list, x, y, z, 0, 0, 5.0/16.0, 0.5, 1.5, 11.0/16.0);
-		if (east) addWallCollision(mask, list, x, y, z, 0.5, 0, 5.0/16.0, 1, 1.5, 11.0/16.0);
+		ModernWallState.State state = ModernWallState.derive(this, world, x, y, z);
+		if (state.up) addWallCollision(mask, list, x, y, z, 0.25, 0, 0.25, 0.75, 1.5, 0.75);
+		if (state.north.isConnected()) addWallCollision(mask, list, x, y, z, 5.0/16.0, 0, 0, 11.0/16.0, 1.5, 0.5);
+		if (state.south.isConnected()) addWallCollision(mask, list, x, y, z, 5.0/16.0, 0, 0.5, 11.0/16.0, 1.5, 1);
+		if (state.west.isConnected()) addWallCollision(mask, list, x, y, z, 0, 0, 5.0/16.0, 0.5, 1.5, 11.0/16.0);
+		if (state.east.isConnected()) addWallCollision(mask, list, x, y, z, 0.5, 0, 5.0/16.0, 1, 1.5, 11.0/16.0);
 	}
 
 	private static void addWallCollision(AxisAlignedBB mask, List<AxisAlignedBB> list, int x, int y, int z,

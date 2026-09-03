@@ -9,11 +9,11 @@ import cpw.mods.fml.relauncher.SideOnly;
 import ganymedes01.etfuturum.ModernMapParityBlocks;
 import ganymedes01.etfuturum.ModernPotterySherds;
 import ganymedes01.etfuturum.Tags;
+import ganymedes01.etfuturum.blocks.ModernWallState;
 import ganymedes01.etfuturum.client.ModernAssetResourcePack;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockFence;
 import net.minecraft.block.BlockFenceGate;
-import net.minecraft.block.BlockWall;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.client.resources.IResource;
@@ -253,8 +253,12 @@ public final class ModernJsonModelBridge {
             Model oriented = models.facingModels[facing];
             if (oriented != null) return oriented;
         }
-        if (style == ModernMapParityBlocks.Style.PANE || style == ModernMapParityBlocks.Style.FENCE
-                || style == ModernMapParityBlocks.Style.WALL) {
+        if (style == ModernMapParityBlocks.Style.WALL) {
+            ModernWallState.State state = ModernWallState.derive(entry.get(), world, x, y, z);
+            Model connected = models.connectionModels[state.getModelIndex()];
+            if (connected != null) return connected;
+        }
+        if (style == ModernMapParityBlocks.Style.PANE || style == ModernMapParityBlocks.Style.FENCE) {
             int mask = connectionMask(entry, world, x, y, z);
             Model connected = models.connectionModels[mask];
             if (connected != null) return connected;
@@ -274,10 +278,8 @@ public final class ModernJsonModelBridge {
     private static boolean connects(ModernMapParityBlocks entry, IBlockAccess world, int x, int y, int z) {
         Block other = world.getBlock(x, y, z);
         if (other == null) return false;
-        if (entry.getStyle() == ModernMapParityBlocks.Style.WALL && other instanceof BlockWall) return true;
         if (entry.getStyle() == ModernMapParityBlocks.Style.FENCE && other instanceof BlockFence) return true;
-        if ((entry.getStyle() == ModernMapParityBlocks.Style.WALL
-                || entry.getStyle() == ModernMapParityBlocks.Style.FENCE) && other instanceof BlockFenceGate) return true;
+        if (entry.getStyle() == ModernMapParityBlocks.Style.FENCE && other instanceof BlockFenceGate) return true;
         ModernMapParityBlocks otherEntry = ModernMapParityBlocks.fromBlock(other);
         if (otherEntry != null) {
             if (otherEntry.getStyle() == entry.getStyle()) return true;
@@ -854,26 +856,37 @@ public final class ModernJsonModelBridge {
                 prepared.facingModels[dusted] = loadBlockStateModel(entry, state);
             }
         }
-        if (style == ModernMapParityBlocks.Style.PANE || style == ModernMapParityBlocks.Style.FENCE
-                || style == ModernMapParityBlocks.Style.WALL) {
+        if (style == ModernMapParityBlocks.Style.WALL) {
+            for (ModernWallState.Side north : ModernWallState.Side.values()) {
+                for (ModernWallState.Side east : ModernWallState.Side.values()) {
+                    for (ModernWallState.Side south : ModernWallState.Side.values()) {
+                        for (ModernWallState.Side west : ModernWallState.Side.values()) {
+                            for (int post = 0; post < 2; post++) {
+                                boolean up = post != 0;
+                                Map<String, String> state = defaultsFor(entry);
+                                state.put("north", north.getSerializedName());
+                                state.put("east", east.getSerializedName());
+                                state.put("south", south.getSerializedName());
+                                state.put("west", west.getSerializedName());
+                                state.put("up", Boolean.toString(up));
+                                int index = ModernWallState.modelIndex(north, east, south, west, up);
+                                prepared.connectionModels[index] = applySpecialBlockVisual(entry, loadBlockStateModel(entry, state));
+                            }
+                        }
+                    }
+                }
+            }
+        } else if (style == ModernMapParityBlocks.Style.PANE || style == ModernMapParityBlocks.Style.FENCE) {
             for (int mask = 0; mask < 16; mask++) {
                 Map<String, String> state = defaultsFor(entry);
                 boolean n = (mask & 1) != 0;
                 boolean e = (mask & 2) != 0;
                 boolean s = (mask & 4) != 0;
                 boolean w = (mask & 8) != 0;
-                if (style == ModernMapParityBlocks.Style.WALL) {
-                    state.put("north", n ? "low" : "none");
-                    state.put("east", e ? "low" : "none");
-                    state.put("south", s ? "low" : "none");
-                    state.put("west", w ? "low" : "none");
-                    state.put("up", (mask == 5 || mask == 10) ? "false" : "true");
-                } else {
-                    state.put("north", Boolean.toString(n));
-                    state.put("east", Boolean.toString(e));
-                    state.put("south", Boolean.toString(s));
-                    state.put("west", Boolean.toString(w));
-                }
+                state.put("north", Boolean.toString(n));
+                state.put("east", Boolean.toString(e));
+                state.put("south", Boolean.toString(s));
+                state.put("west", Boolean.toString(w));
                 prepared.connectionModels[mask] = applySpecialBlockVisual(entry, loadBlockStateModel(entry, state));
             }
         }
@@ -1510,7 +1523,7 @@ public final class ModernJsonModelBridge {
         static final PreparedModels EMPTY = new PreparedModels();
         public Model block = Model.empty();
         public Model item = Model.empty();
-        public final Model[] connectionModels = new Model[16];
+        public final Model[] connectionModels = new Model[162];
         public final Model[] facingModels = new Model[32];
         public final Model[] multifaceModels = new Model[64];
         public final Model[] chiseledBookshelfBase = new Model[4];

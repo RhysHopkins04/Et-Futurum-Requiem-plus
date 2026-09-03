@@ -24,8 +24,8 @@ bridge = read("src/main/java/ganymedes01/etfuturum/client/model/ModernJsonModelB
 sherds = read("src/main/java/ganymedes01/etfuturum/ModernPotterySherds.java")
 recipe = read("src/main/java/ganymedes01/etfuturum/recipes/crafting/RecipeDecoratedPot.java")
 
-require(wall, "parity.getStyle() == ModernMapParityBlocks.Style.WALL", "BaseWall -> parity-wall connection")
-require(main, "style == Style.WALL && other instanceof BlockWall", "parity wall -> BlockWall connection")
+require(wall, "ModernWallState.canConnectWallTo(this, world, x, y, z)", "BaseWall -> shared wall connection")
+require(main, "if (style == Style.WALL) return ModernWallState.canConnectWallTo(this, world, x, y, z);", "parity wall -> shared wall connection")
 require(main, "markBlockRangeForRenderUpdate(xCoord, yCoord, zCoord, xCoord, yCoord, zCoord)",
         "tile-packet render invalidation")
 require(bridge, "chiseled_bookshelf_occupied", "occupied-slot visual fallback")

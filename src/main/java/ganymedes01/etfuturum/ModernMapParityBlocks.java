@@ -11,6 +11,7 @@ import ganymedes01.etfuturum.blocks.BaseDoor;
 import ganymedes01.etfuturum.blocks.BaseSlab;
 import ganymedes01.etfuturum.blocks.BaseStairs;
 import ganymedes01.etfuturum.blocks.BaseTrapdoor;
+import ganymedes01.etfuturum.blocks.ModernWallState;
 import ganymedes01.etfuturum.blocks.itemblocks.BaseSlabItemBlock;
 import ganymedes01.etfuturum.blocks.itemblocks.ItemBlockNewDoor;
 import ganymedes01.etfuturum.lib.RenderIDs;
@@ -1638,11 +1639,11 @@ public enum ModernMapParityBlocks {
         }
 
         private boolean connectsTo(IBlockAccess world, int x, int y, int z, Style style) {
+            if (style == Style.WALL) return ModernWallState.canConnectWallTo(this, world, x, y, z);
             Block other = world.getBlock(x, y, z);
             if (other == this) return true;
-            if (style == Style.WALL && other instanceof BlockWall) return true;
             if (style == Style.FENCE && other instanceof BlockFence) return true;
-            if ((style == Style.WALL || style == Style.FENCE) && other instanceof BlockFenceGate) return true;
+            if (style == Style.FENCE && other instanceof BlockFenceGate) return true;
             ModernMapParityBlocks otherEntry = ModernMapParityBlocks.fromBlock(other);
             if (otherEntry != null) {
                 if (otherEntry.style == style) return true;
@@ -1653,6 +1654,15 @@ public enum ModernMapParityBlocks {
 
         @Override
         public void setBlockBoundsBasedOnState(IBlockAccess world, int x, int y, int z) {
+            if (entry.style == Style.WALL) {
+                ModernWallState.State state = ModernWallState.derive(this, world, x, y, z);
+                float minX = state.west.isConnected() ? 0.0F : 0.25F;
+                float maxX = state.east.isConnected() ? 1.0F : 0.75F;
+                float minZ = state.north.isConnected() ? 0.0F : 0.25F;
+                float maxZ = state.south.isConnected() ? 1.0F : 0.75F;
+                setBlockBounds(minX, 0.0F, minZ, maxX, state.getVisualMaxY(), maxZ);
+                return;
+            }
             if (isMultiface()) {
                 setMultifaceBounds(getMultifaceFaceMask(world, x, y, z));
                 return;
@@ -3242,7 +3252,16 @@ public enum ModernMapParityBlocks {
                 addShelfCollisionBoxes(world.getBlockMetadata(x, y, z) & 3, mask, list, x, y, z);
                 return;
             }
-            if (entry.style != Style.PANE && entry.style != Style.FENCE && entry.style != Style.WALL) {
+            if (entry.style == Style.WALL) {
+                ModernWallState.State state = ModernWallState.derive(this, world, x, y, z);
+                if (state.up) addCollisionBox(mask, list, x, y, z, 0.25F, 0.0F, 0.25F, 0.75F, 1.5F, 0.75F);
+                if (state.north.isConnected()) addCollisionBox(mask, list, x, y, z, 5.0F/16.0F, 0.0F, 0.0F, 11.0F/16.0F, 1.5F, 0.5F);
+                if (state.south.isConnected()) addCollisionBox(mask, list, x, y, z, 5.0F/16.0F, 0.0F, 0.5F, 11.0F/16.0F, 1.5F, 1.0F);
+                if (state.west.isConnected()) addCollisionBox(mask, list, x, y, z, 0.0F, 0.0F, 5.0F/16.0F, 0.5F, 1.5F, 11.0F/16.0F);
+                if (state.east.isConnected()) addCollisionBox(mask, list, x, y, z, 0.5F, 0.0F, 5.0F/16.0F, 1.0F, 1.5F, 11.0F/16.0F);
+                return;
+            }
+            if (entry.style != Style.PANE && entry.style != Style.FENCE) {
                 setBlockBoundsBasedOnState(world, x, y, z);
                 super.addCollisionBoxesToList(world, x, y, z, mask, list, collider);
                 return;
@@ -3334,6 +3353,14 @@ public enum ModernMapParityBlocks {
 
         @Override public AxisAlignedBB getCollisionBoundingBoxFromPool(World world, int x, int y, int z) {
             if (isSegmentedGroundDecal() || isScaffolding()) return null;
+            if (entry.style == Style.WALL) {
+                ModernWallState.State state = ModernWallState.derive(this, world, x, y, z);
+                double minX = state.west.isConnected() ? 0.0D : 0.25D;
+                double maxX = state.east.isConnected() ? 1.0D : 0.75D;
+                double minZ = state.north.isConnected() ? 0.0D : 0.25D;
+                double maxZ = state.south.isConnected() ? 1.0D : 0.75D;
+                return AxisAlignedBB.getBoundingBox(x + minX, y, z + minZ, x + maxX, y + 1.5D, z + maxZ);
+            }
             if (isFenceGate()) {
                 int meta = world.getBlockMetadata(x, y, z) & 7;
                 if ((meta & 4) != 0) return null;

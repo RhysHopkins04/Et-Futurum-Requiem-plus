@@ -121,6 +121,8 @@ def profile_for(name, style):
         return "PASS_30_MULTIFACE"
     if style == "LOG":
         return "PASS_29_AXIS_LOG"
+    if style == "WALL":
+        return "PASS_31_WALL_STATE"
     if name.endswith("copper_chest"):
         return "COPPER_CHEST_COMPAT"
     if style in {"STAIRS", "SLAB", "DOOR", "TRAPDOOR"}:
@@ -145,8 +147,9 @@ def gap_for(name, style, profile):
         return "None for valid non-waterlogged axis and axe-stripping states; metadata 3 renders as Y fallback."
     if name in VISUAL_SHELL_GAPS:
         return VISUAL_SHELL_GAPS[name]
-    if style == "WALL":
-        return "Connections are boolean/low only; per-side tall and exact up state remain deferred."
+    if profile == "PASS_31_WALL_STATE":
+        return ("Neighbour-derived none/low/tall/up parity is implemented; waterlogging and explicit "
+                "debug-stick/import overrides are intentionally not stored in 1.7 metadata.")
     if is_copper_weathering_family(name):
         return "Static identity exists; oxidation, waxing and scraping lifecycle remains deferred."
     if name.endswith("candle_cake"):
@@ -203,6 +206,14 @@ def row_for(entry):
             "nbt": "ParityMultifaceTileEntity FaceMask integer",
             "map_import": "six boolean properties map deterministically to FaceMask bits 0..5",
             "review_status": "PASS_30_VERIFIED",
+        })
+    elif profile == "PASS_31_WALL_STATE":
+        row.update({
+            "blockstate": "north/east/south/west=none|low|tall plus up, derived from live neighbours",
+            "shape": "8px post; 6px arms at 14px low or 16px tall; independent 1.5-block collision prisms",
+            "function": "modern wall connections and post/side recomputation without consuming subtype metadata",
+            "map_import": "source wall connection/up properties are derived state and intentionally discarded",
+            "review_status": "PASS_31_VERIFIED",
         })
     elif profile == "COPPER_CHEST_COMPAT":
         row.update({

@@ -28,7 +28,7 @@ fence_mixin = read("src/main/java/ganymedes01/etfuturum/mixins/early/fencewallco
 us = read("src/main/resources/assets/etfuturum/lang/en_US.lang")
 gb = read("src/main/resources/assets/etfuturum/lang/en_GB.lang")
 
-require(bridge, "other instanceof BlockWall", "legacy-wall visual connection")
+require(bridge, "ModernWallState.State state = ModernWallState.derive", "legacy/parity wall visual connection")
 require(bridge, "other instanceof BlockFence", "legacy-fence visual connection")
 require(main, "new ParityStairBlock(this, base)", "real stair behavior with modern inventory model")
 require(main, "ParitySlabBlock(false", "real single/double slab behavior")

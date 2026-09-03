@@ -109,15 +109,15 @@ for token in (
 # independent collision prisms.
 for token in (
     "public boolean hasModernPost(",
-    "block instanceof BlockFenceGate || block instanceof BaseWall",
+    "ModernWallState.canConnectWallTo(this, world, x, y, z)",
     "addWallCollision(mask, list",
     "RenderIDs.MODERN_WALL",
 ):
     require(wall, token, "modern BaseWall contract")
 for token in (
     "class BlockModernWallRenderer extends BlockModelBase",
-    "5.0/16.0, 0, 0, 11.0/16.0, 14.0/16.0",
-    "wall.canConnectWallTo",
+    "5.0/16.0, 0, 0, 11.0/16.0",
+    "ModernWallState.State state = ModernWallState.derive",
 ):
     require(wall_renderer, token, "modern wall renderer contract")
 require(render_ids, "MODERN_WALL = RenderingRegistry.getNextAvailableRenderId()", "modern wall render ID")

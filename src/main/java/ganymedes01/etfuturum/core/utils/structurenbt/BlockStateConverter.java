@@ -151,7 +151,8 @@ public class BlockStateConverter {
 	 * This function is for getting the equivalent meta value for a BlockState value when unflattening an ID in structure NBT.
 	 * For example an up-down log is meta 0 in unflattened versions, x-facing log is 1 and z is 2.
 	 * <p>
-	 * Wall and fence states are completely discarded as all of their connections and states are done directly in the renderer.
+	 * Wall and fence connection states are deliberately discarded and derived from the placed neighbours at runtime.
+ * Pass 31 therefore maps modern wall north/east/south/west=none|low|tall and up without consuming 1.7 metadata.
 	 * <p>
 	 * The facing direction can only be NORTH, SOUTH, EAST, or WEST.
 	 */

@@ -28,7 +28,21 @@ Validate that all manifest identities remain classified:
 python3 scripts/audit_modern_map_parity_capabilities.py --check
 python3 scripts/validate_fidelity_pass_29.py
 python3 scripts/validate_fidelity_pass_30.py
+python3 scripts/validate_fidelity_pass_31.py
 ```
+
+
+## Pass 31 wall-state contract
+
+Wall state is now resolved by the shared `ModernWallState` helper for both mature `BaseWall`
+families and parity walls. Horizontal properties use the modern `none` / `low` / `tall` domain and
+`up` is derived from the same neighbourhood. Resin Brick Wall prepares all 162 Mojang wall model
+combinations (`2 * 3^4`) instead of reducing every connection to `low`.
+
+These properties remain importer-derived rather than persisted: Backporter/structure input keeps the
+wall identity and subtype metadata, discards `north/east/south/west/up`, and lets the placed world
+recompute the natural modern state. Waterlogging and explicit impossible/debug-stick overrides remain
+outside Pass 31. See `docs/FIDELITY_PASS_31_MODERN_WALL_STATES.md` for the bounded contract.
 
 ## Pass 30 multiface contract
 

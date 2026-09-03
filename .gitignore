@@ -88,3 +88,6 @@ usernamecache.json
 
 /*.kate-swp
 addon.local.gradle
+
+## Local EFR patch/install backups
+/.efr-patches/

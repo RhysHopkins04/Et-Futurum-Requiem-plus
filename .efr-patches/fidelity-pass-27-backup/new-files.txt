@@ -1,3 +1,0 @@
-src/main/java/ganymedes01/etfuturum/ModernPotterySherds.java
-src/main/java/ganymedes01/etfuturum/recipes/crafting/RecipeDecoratedPot.java
-scripts/validate_fidelity_pass_27.py

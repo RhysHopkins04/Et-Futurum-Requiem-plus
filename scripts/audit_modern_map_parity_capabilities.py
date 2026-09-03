@@ -51,6 +51,16 @@ SPECIAL_STATE_NAMES = {
 
 PASS_30_MULTIFACE_NAMES = {"sculk_vein", "resin_clump"}
 
+PASS_32_CONTRACT_NAMES = {
+    "chiseled_bookshelf", "decorated_pot", "campfire", "soul_campfire",
+    "suspicious_sand", "suspicious_gravel",
+}
+
+
+def has_pass32_contract(name, style):
+    return (name in PASS_32_CONTRACT_NAMES or style in {"SHELF", "SIGN", "HANGING_SIGN"}
+            or name.endswith("copper_chest"))
+
 VISUAL_SHELL_GAPS = {
     "crafter": "No inventory, disabled-slot, recipe, redstone craft or block-entity implementation.",
     "trial_spawner": "No trial-spawner phase, cooldown, reward or block-entity implementation.",
@@ -158,10 +168,9 @@ def gap_for(name, style, profile):
         return "Egg count and hatch models exist; hatching and trampling lifecycle remains incomplete."
     if name in {"leaf_litter", "wildflowers"}:
         return "Amount/facing state exists; exact support, bonemeal and spreading behaviour needs review."
-    if name in {"campfire", "soul_campfire", "decorated_pot", "chiseled_bookshelf"} or style == "SHELF":
-        return "Substantial implementation exists; exact modern semantics and map-import NBT remain under review."
-    if style in {"SIGN", "HANGING_SIGN"}:
-        return "Substantial two-sided implementation exists; modern text/NBT conversion remains a Backporter contract."
+    if has_pass32_contract(name, style):
+        return ("Persistent target state is defined by docs/BACKPORTER_STATE_CONTRACT.json; "
+                "entry-specific unsupported properties remain explicit in that contract.")
     if name.endswith("_froglight"):
         return "Axis state is represented; retain as a regression-sensitive family."
     if profile == "DEDICATED_GEOMETRY":
@@ -217,12 +226,12 @@ def row_for(entry):
         })
     elif profile == "COPPER_CHEST_COMPAT":
         row.update({
-            "blockstate": "vanilla chest facing/adjacency plus registry weathering identity",
+            "blockstate": "vanilla chest facing/adjacency plus exact registry weathering/waxed identity",
             "shape": "vanilla chest bounds and renderer",
             "function": "vanilla chest inventory/lid/comparator foundation",
-            "nbt": "TileEntityChest-compatible inventory",
-            "map_import": "identity and vanilla chest NBT; oxidation transition contract pending",
-            "review_status": "REGRESSION_SENSITIVE",
+            "nbt": "TileEntityChest-compatible Items plus optional CustomName",
+            "map_import": "deterministic Pass 32 contract in docs/BACKPORTER_STATE_CONTRACT.json; lifecycle remains Pass 34",
+            "review_status": "PASS_32_CONTRACT_VERIFIED",
         })
     elif profile == "DEDICATED_GEOMETRY":
         row.update({
@@ -246,6 +255,9 @@ def row_for(entry):
             row["nbt"] = "four-slot cooking parity tile entity"
         elif style in {"SIGN", "HANGING_SIGN"}:
             row["nbt"] = "two-sided sign tile entity"
+        if has_pass32_contract(name, style):
+            row["map_import"] = "deterministic Pass 32 target metadata/NBT contract in docs/BACKPORTER_STATE_CONTRACT.json"
+            row["review_status"] = "PASS_32_CONTRACT_VERIFIED"
     return row
 
 

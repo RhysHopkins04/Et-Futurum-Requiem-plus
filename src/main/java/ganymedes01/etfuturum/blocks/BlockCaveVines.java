@@ -38,9 +38,12 @@ public class BlockCaveVines extends BaseCaveVines implements IShearable, ITileEn
     public void growVine(World world, int x, int y, int z, boolean manualPlace) {
         TileEntity oldTE = world.getTileEntity(x, y, z);
         int maxLength;
+        int oldAge = 0;
         if (oldTE instanceof TileEntityCaveVines)
         {
-            maxLength = ((TileEntityCaveVines) oldTE).getMaxLength();
+            TileEntityCaveVines oldVine = (TileEntityCaveVines) oldTE;
+            maxLength = oldVine.getMaxLength();
+            oldAge = oldVine.getAge();
         }
         else
         {
@@ -59,7 +62,9 @@ public class BlockCaveVines extends BaseCaveVines implements IShearable, ITileEn
         TileEntity newTE = world.getTileEntity(x, y - 1, z);
         if (newTE instanceof TileEntityCaveVines)
         {
-            ((TileEntityCaveVines) newTE).setMaxLength(maxLength);
+            TileEntityCaveVines newVine = (TileEntityCaveVines) newTE;
+            newVine.setMaxLength(maxLength);
+            newVine.setAge(Math.min(25, oldAge + (manualPlace ? 0 : 1)));
         }
     }
 
@@ -128,7 +133,7 @@ public class BlockCaveVines extends BaseCaveVines implements IShearable, ITileEn
             if (te instanceof TileEntityCaveVines)
             {
                 TileEntityCaveVines teCaveVines = (TileEntityCaveVines) te;
-                if (!teCaveVines.getTipSheared() && getLength(world, x, y, z) < teCaveVines.getMaxLength())
+                if (!teCaveVines.getTipSheared() && teCaveVines.getAge() < 25)
                 {
                     growVine(world, x, y, z, false);
                 }

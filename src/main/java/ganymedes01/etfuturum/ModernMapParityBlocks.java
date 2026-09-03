@@ -546,6 +546,11 @@ public enum ModernMapParityBlocks {
         return block != null && (block == SUSPICIOUS_SAND.get() || block == SUSPICIOUS_GRAVEL.get());
     }
 
+    /** True only for EFR's eight dedicated Copper Chest block identities. */
+    public static boolean isCopperChestBlock(Block block) {
+        return block instanceof ParityCopperChestBlock;
+    }
+
     /**
      * Kept only for compatibility with older validators/callers. Modern parity rendering no
      * longer guesses a single texture per block; its exact model texture dependencies are
@@ -686,6 +691,8 @@ public enum ModernMapParityBlocks {
      * normal/trapped chest rendering.
      */
     public static final class ParityCopperChestTileEntity extends TileEntityChest {
+        // Pairing is supplied by the Pass 32c TileEntityChest mixin. The block mixin requires exact
+        // block identity, so copper oxidation/wax variants cannot cross-pair with each other or vanilla.
     }
 
     /** Text storage for the modern sign/hanging-sign compatibility families. */
@@ -704,6 +711,9 @@ public enum ModernMapParityBlocks {
      */
     public static final class ParityChiseledBookshelfTileEntity extends TileEntity implements IInventory {
         private final ItemStack[] books = new ItemStack[6];
+        // Modern chiseled-bookshelf comparator state. -1 is the safe legacy/default value when an
+        // older EFR save predates Pass 32; Backporter input uses the exact 0..5 compartment index.
+        private int lastInteractedSlot = -1;
 
         public int getOccupancyMask() {
             int mask = 0;
@@ -711,6 +721,20 @@ public enum ModernMapParityBlocks {
                 if (books[slot] != null) mask |= 1 << slot;
             }
             return mask;
+        }
+
+        public int getLastInteractedSlot() {
+            return lastInteractedSlot;
+        }
+
+        public void setLastInteractedSlot(int slot) {
+            int next = slot >= 0 && slot < books.length ? slot : -1;
+            if (lastInteractedSlot == next) return;
+            lastInteractedSlot = next;
+            // Inventory mutations own the render/update packet. Keeping comparator state separate
+            // avoids a second packet racing the occupied-slot packet during rapid insert/remove.
+            markDirty();
+            if (worldObj != null) worldObj.func_147453_f(xCoord, yCoord, zCoord, getBlockType());
         }
 
         private void markDirtyAndSync() {
@@ -776,11 +800,14 @@ public enum ModernMapParityBlocks {
             }
             tag.setTag("Items", list);
             tag.setInteger("OccupancyMask", getOccupancyMask());
+            tag.setInteger("LastInteractedSlot", lastInteractedSlot);
         }
 
         @Override
         public void readFromNBT(NBTTagCompound tag) {
             super.readFromNBT(tag);
+            lastInteractedSlot = tag.hasKey("LastInteractedSlot")
+                    ? Math.max(-1, Math.min(5, tag.getInteger("LastInteractedSlot"))) : -1;
             for (int slot = 0; slot < books.length; slot++) books[slot] = null;
             NBTTagList list = tag.getTagList("Items", 10);
             for (int i = 0; i < list.tagCount(); i++) {
@@ -830,6 +857,29 @@ public enum ModernMapParityBlocks {
 
         @Override public int getSizeInventory() { return items.length; }
         @Override public ItemStack getStackInSlot(int slot) { return slot >= 0 && slot < items.length ? items[slot] : null; }
+        public int getOccupancyMask() {
+            int mask = 0;
+            for (int slot = 0; slot < items.length; slot++) {
+                if (items[slot] != null) mask |= 1 << slot;
+            }
+            return mask;
+        }
+
+        /**
+         * Modern Shelf hotbar swaps mutate all affected slots first and then publish one
+         * block-entity update.  Keeping this primitive side-effect free prevents the 1.7
+         * client from observing a half-swapped Shelf while the player's hotbar is stale.
+         */
+        public ItemStack swapItemNoUpdate(int slot, ItemStack stack) {
+            if (slot < 0 || slot >= items.length) return stack;
+            ItemStack previous = items[slot];
+            items[slot] = stack;
+            if (items[slot] != null && items[slot].stackSize > getInventoryStackLimit()) {
+                items[slot].stackSize = getInventoryStackLimit();
+            }
+            return previous;
+        }
+
         @Override public ItemStack decrStackSize(int slot, int amount) {
             ItemStack stack = getStackInSlot(slot);
             if (stack == null) return null;
@@ -1320,7 +1370,10 @@ public enum ModernMapParityBlocks {
         private final ModernMapParityBlocks entry;
 
         ParityCopperChestBlock(ModernMapParityBlocks entry) {
-            super(0);
+            // Use a private chest type so legacy callers still distinguish Copper Chests from vanilla.
+            // Pass 32c pairing is stricter still: the BlockChest/TileEntityChest mixins require exact
+            // block identity, preventing cross-pairs between oxidation/wax variants as well.
+            super(2);
             this.entry = entry;
             setHardness(2.5F);
             setResistance(6.0F);
@@ -2093,13 +2146,20 @@ public enum ModernMapParityBlocks {
             }
         }
 
+        private static void syncPlayerInventory(EntityPlayer player) {
+            player.inventoryContainer.detectAndSendChanges();
+            if (player instanceof EntityPlayerMP) {
+                ((EntityPlayerMP) player).sendContainerToPlayer(player.inventoryContainer);
+            }
+        }
+
         private static int chiseledBookshelfSlot(int facing, float hitX, float hitY, float hitZ) {
             float horizontal;
             switch (facing & 3) {
-                case 1: horizontal = hitZ; break;
-                case 2: horizontal = hitX; break;
-                case 3: horizontal = 1.0F - hitZ; break;
-                default: horizontal = 1.0F - hitX; break;
+                case 1: horizontal = 1.0F - hitZ; break; // east: player's left is south
+                case 2: horizontal = hitX; break;        // south: player's left is west
+                case 3: horizontal = hitZ; break;        // west: player's left is north
+                default: horizontal = 1.0F - hitX; break; // north: player's left is east
             }
             int column = Math.max(0, Math.min(2, (int) (horizontal * 3.0F)));
             int row = hitY >= 0.5F ? 0 : 1;
@@ -2122,7 +2182,8 @@ public enum ModernMapParityBlocks {
         }
 
         private boolean isConnectedPoweredShelf(World world, int x, int y, int z, int facing) {
-            if (world.getBlock(x, y, z) != this) return false;
+            ModernMapParityBlocks neighborEntry = ModernMapParityBlocks.fromBlock(world.getBlock(x, y, z));
+            if (neighborEntry == null || neighborEntry.getStyle() != Style.SHELF) return false;
             int meta = world.getBlockMetadata(x, y, z) & 7;
             return (meta & 3) == facing && (meta & 4) != 0
                     && world.getTileEntity(x, y, z) instanceof ParityShelfTileEntity;
@@ -2148,19 +2209,29 @@ public enum ModernMapParityBlocks {
                 countZ += rightZ;
             }
             int shelfX = startX, shelfZ = startZ;
-            // One/two/three powered shelves exchange the rightmost 3/6/9 hotbar slots.
+            // Modern mapping is always the rightmost N slots: one disconnected powered Shelf
+            // swaps 6..8, two connected Shelves swap 3..8, and three swap 0..8.
             int hotbar = 9 - shelfCount * 3;
             for (int shelfIndex = 0; shelfIndex < shelfCount; shelfIndex++) {
                 ParityShelfTileEntity shelf = (ParityShelfTileEntity) world.getTileEntity(shelfX, y, shelfZ);
                 for (int slot = 0; slot < 3; slot++, hotbar++) {
-                    ItemStack stored = shelf.getStackInSlot(slot);
                     ItemStack carried = player.inventory.getStackInSlot(hotbar);
-                    shelf.setInventorySlotContents(slot, carried);
+                    // Remove the server-side hotbar reference before placing it into the Shelf.
+                    // This mirrors modern removeItemNoUpdate/swapItemNoUpdate semantics and avoids
+                    // a transient duplicate reference during the exchange.
+                    player.inventory.setInventorySlotContents(hotbar, null);
+                    ItemStack stored = shelf.swapItemNoUpdate(slot, carried);
                     player.inventory.setInventorySlotContents(hotbar, stored);
                 }
+                // Publish the three Shelf slot changes together instead of once per slot.
+                shelf.markDirtyAndSync();
                 shelfX += rightX; shelfZ += rightZ;
             }
             player.inventory.markDirty();
+            // 1.7 does not automatically synchronize direct InventoryPlayer mutations made by a
+            // block interaction.  Without this, only the selected/held slot is corrected client-
+            // side and the rest of the hotbar appears duplicated until another inventory update.
+            syncPlayerInventory(player);
         }
 
         @Override
@@ -2179,10 +2250,15 @@ public enum ModernMapParityBlocks {
                     } else {
                         ParityShelfTileEntity shelf = (ParityShelfTileEntity) tile;
                         int slot = shelfSlot(facing, hitX, hitZ);
-                        ItemStack stored = shelf.getStackInSlot(slot);
-                        shelf.setInventorySlotContents(slot, held);
-                        player.inventory.setInventorySlotContents(player.inventory.currentItem, stored);
+                        ItemStack stored = shelf.swapItemNoUpdate(slot, held);
+                        // Modern creative-mode single-slot placement keeps the held stack when the
+                        // Shelf slot was empty.  Swapping with an occupied slot still exchanges it.
+                        ItemStack replacement = player.capabilities.isCreativeMode && stored == null && held != null
+                                ? held.copy() : stored;
+                        player.inventory.setInventorySlotContents(player.inventory.currentItem, replacement);
+                        shelf.markDirtyAndSync();
                         player.inventory.markDirty();
+                        syncPlayerInventory(player);
                     }
                     world.playSoundEffect(x + 0.5D, y + 0.5D, z + 0.5D, "random.pop", 0.5F, 1.0F);
                 }
@@ -2245,11 +2321,13 @@ public enum ModernMapParityBlocks {
                 ItemStack stored = shelf.getStackInSlot(slot);
                 if (stored != null) {
                     if (!world.isRemote) {
+                        shelf.setLastInteractedSlot(slot);
                         ItemStack removed = shelf.getStackInSlotOnClosing(slot);
                         shelf.markDirtyAndSync();
                         if (!player.inventory.addItemStackToInventory(removed)) {
                             world.spawnEntityInWorld(new EntityItem(world, x + 0.5D, y + 0.5D, z + 0.5D, removed));
                         }
+                        syncPlayerInventory(player);
                         world.playSoundEffect(x + 0.5D, y + 0.5D, z + 0.5D, "random.pop", 0.5F, 0.85F);
                     }
                     return true;
@@ -2258,10 +2336,12 @@ public enum ModernMapParityBlocks {
                     if (!world.isRemote) {
                         ItemStack inserted = held.copy();
                         inserted.stackSize = 1;
+                        shelf.setLastInteractedSlot(slot);
                         shelf.setInventorySlotContents(slot, inserted);
                         if (!player.capabilities.isCreativeMode && --held.stackSize <= 0) {
                             player.inventory.setInventorySlotContents(player.inventory.currentItem, null);
                         }
+                        syncPlayerInventory(player);
                         world.playSoundEffect(x + 0.5D, y + 0.5D, z + 0.5D, "random.pop", 0.5F, 1.0F);
                     }
                     return true;
@@ -2659,13 +2739,22 @@ public enum ModernMapParityBlocks {
 
         @Override
         public boolean hasComparatorInputOverride() {
-            return isDecoratedPot() || isShelf() || super.hasComparatorInputOverride();
+            return isDecoratedPot() || isShelf() || isChiseledBookshelf() || super.hasComparatorInputOverride();
         }
 
         @Override
         public int getComparatorInputOverride(World world, int x, int y, int z, int side) {
-            if (isDecoratedPot() || isShelf()) {
-                TileEntity tile = world.getTileEntity(x, y, z);
+            TileEntity tile = world.getTileEntity(x, y, z);
+            if (isChiseledBookshelf()) {
+                if (!(tile instanceof ParityChiseledBookshelfTileEntity)) return 0;
+                int slot = ((ParityChiseledBookshelfTileEntity) tile).getLastInteractedSlot();
+                return slot >= 0 && slot < 6 ? slot + 1 : 0;
+            }
+            if (isShelf()) {
+                return tile instanceof ParityShelfTileEntity
+                        ? ((ParityShelfTileEntity) tile).getOccupancyMask() : 0;
+            }
+            if (isDecoratedPot()) {
                 return tile instanceof IInventory ? Container.calcRedstoneFromInventory((IInventory) tile) : 0;
             }
             return super.getComparatorInputOverride(world, x, y, z, side);

@@ -92,3 +92,9 @@ Wood continues to convert to Stripped Pale Oak Wood when bark-log support is ena
 General waterlogging remains outside this contract. Later passes must promote additional rows only
 after their exact 1.21.11 properties, storage, renderer behaviour and Backporter mapping are
 implemented and validated.
+
+## Pass 32 block-entity/import contract
+
+Pass 32 closes the reverse-engineering gap for persistent parity families.  The machine-readable target mapping is `docs/BACKPORTER_STATE_CONTRACT.json`; it separates source properties from EFR registry identity, metadata and tile-entity NBT, and records explicit partial/unsupported state rather than treating implemented families as blanket `backport_close` approximations.
+
+The capability audit now marks Chiseled Bookshelf, Decorated Pot, Campfire/Soul Campfire, Suspicious Sand/Gravel, every parity Shelf, parity Sign/Hanging Sign, and all eight Copper Chest identities as `PASS_32_CONTRACT_VERIFIED`.  Cave Vines, banners, shulkers, barrels, beehives, furnace variants and other mature tile entities are covered by the same contract/audit even though they are not all entries in the 243-block parity manifest.

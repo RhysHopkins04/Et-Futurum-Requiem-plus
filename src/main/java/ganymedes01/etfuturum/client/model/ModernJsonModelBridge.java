@@ -301,17 +301,17 @@ public final class ModernJsonModelBridge {
             case 3: leftZ--; rightZ++; break;
             default: leftX++; rightX--; break;
         }
-        boolean left = connectedPoweredShelf(entry, world, leftX, y, leftZ, facing);
-        boolean right = connectedPoweredShelf(entry, world, rightX, y, rightZ, facing);
+        boolean left = connectedPoweredShelf(world, leftX, y, leftZ, facing);
+        boolean right = connectedPoweredShelf(world, rightX, y, rightZ, facing);
         if (left && right) return 3;
         if (right) return 2;
         if (left) return 4;
         return 1;
     }
 
-    private static boolean connectedPoweredShelf(ModernMapParityBlocks entry, IBlockAccess world,
-            int x, int y, int z, int facing) {
-        if (world.getBlock(x, y, z) != entry.get()) return false;
+    private static boolean connectedPoweredShelf(IBlockAccess world, int x, int y, int z, int facing) {
+        ModernMapParityBlocks neighborEntry = ModernMapParityBlocks.fromBlock(world.getBlock(x, y, z));
+        if (neighborEntry == null || neighborEntry.getStyle() != ModernMapParityBlocks.Style.SHELF) return false;
         int meta = world.getBlockMetadata(x, y, z) & 7;
         return (meta & 3) == facing && (meta & 4) != 0;
     }

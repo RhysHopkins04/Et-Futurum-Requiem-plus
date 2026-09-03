@@ -67,6 +67,13 @@ public class EtFuturumEarlyMixins implements IFMLLoadingPlugin, IEarlyMixinLoade
 
 		List<String> mixins = new ObjectArrayList<>();
 
+		// Pass 32c: explicit modern single/left/right chest relationships. Runtime methods
+		// self-gate on enableModernMapParityBlocks so disabling the parity layer preserves 1.7 behavior.
+		mixins.add("chestpairing.MixinTileEntity");
+		mixins.add("chestpairing.MixinTileEntityChest");
+		mixins.add("chestpairing.MixinBlockChest");
+		mixins.add("chestpairing.MixinItemBlock");
+
 		if (ConfigMixins.endPortalFix) {
 			mixins.add("endportal.MixinBlockEndPortal");
 		}

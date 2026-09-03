@@ -1,0 +1,1841 @@
+{
+  "schema": 1,
+  "contract_id": "etfuturum-requiem-plus-backporter-state-contract",
+  "contract_revision": "32f",
+  "implemented_in_version": "3.5.5",
+  "implemented_in_git_ref": "refs/tags/3.5.5",
+  "source_minecraft": "1.21.11",
+  "target_minecraft": "1.7.10",
+  "target_mod": "Et Futurum Requiem Plus",
+  "target_forge": "10.13.4.1614",
+  "classification_values": [
+    "FULL_IMPORT",
+    "PARTIAL_IMPORT",
+    "VISUAL_ONLY_IMPORT",
+    "UNSUPPORTED"
+  ],
+  "conventions": {
+    "coordinates": "TileEntity NBT still requires ordinary 1.7 x/y/z fields; they are omitted from field lists below because the Backporter supplies block position generically.",
+    "item_stack": "Item fields use normal Minecraft 1.7 ItemStack NBT after the Backporter translates source item IDs/components into target items.",
+    "horizontal_facing_0_3": {
+      "north": 0,
+      "east": 1,
+      "south": 2,
+      "west": 3
+    },
+    "vanilla_horizontal_side_2_5": {
+      "north": 2,
+      "south": 3,
+      "west": 4,
+      "east": 5
+    },
+    "forge_direction_0_5": {
+      "down": 0,
+      "up": 1,
+      "north": 2,
+      "south": 3,
+      "west": 4,
+      "east": 5
+    },
+    "unsupported_global": [
+      "waterlogged unless an entry explicitly documents an existing EFR extension"
+    ],
+    "dye_mappings": {
+      "black": {
+        "legacy_dye_meta": 0,
+        "sign_rgb": "000000",
+        "banner_color": 15,
+        "shulker_color": 16
+      },
+      "red": {
+        "legacy_dye_meta": 1,
+        "sign_rgb": "FF0000",
+        "banner_color": 14,
+        "shulker_color": 15
+      },
+      "green": {
+        "legacy_dye_meta": 2,
+        "sign_rgb": "00FF00",
+        "banner_color": 13,
+        "shulker_color": 14
+      },
+      "brown": {
+        "legacy_dye_meta": 3,
+        "sign_rgb": "8B4513",
+        "banner_color": 12,
+        "shulker_color": 13
+      },
+      "blue": {
+        "legacy_dye_meta": 4,
+        "sign_rgb": "0000FF",
+        "banner_color": 11,
+        "shulker_color": 12
+      },
+      "purple": {
+        "legacy_dye_meta": 5,
+        "sign_rgb": "A020F0",
+        "banner_color": 10,
+        "shulker_color": 11
+      },
+      "cyan": {
+        "legacy_dye_meta": 6,
+        "sign_rgb": "00FFFF",
+        "banner_color": 9,
+        "shulker_color": 10
+      },
+      "light_gray": {
+        "legacy_dye_meta": 7,
+        "sign_rgb": "D3D3D3",
+        "banner_color": 8,
+        "shulker_color": 9
+      },
+      "gray": {
+        "legacy_dye_meta": 8,
+        "sign_rgb": "808080",
+        "banner_color": 7,
+        "shulker_color": 8
+      },
+      "pink": {
+        "legacy_dye_meta": 9,
+        "sign_rgb": "FF69B4",
+        "banner_color": 6,
+        "shulker_color": 7
+      },
+      "lime": {
+        "legacy_dye_meta": 10,
+        "sign_rgb": "BFFF00",
+        "banner_color": 5,
+        "shulker_color": 6
+      },
+      "yellow": {
+        "legacy_dye_meta": 11,
+        "sign_rgb": "FFFF00",
+        "banner_color": 4,
+        "shulker_color": 5
+      },
+      "light_blue": {
+        "legacy_dye_meta": 12,
+        "sign_rgb": "9AC0CD",
+        "banner_color": 3,
+        "shulker_color": 4
+      },
+      "magenta": {
+        "legacy_dye_meta": 13,
+        "sign_rgb": "FF00FF",
+        "banner_color": 2,
+        "shulker_color": 3
+      },
+      "orange": {
+        "legacy_dye_meta": 14,
+        "sign_rgb": "FF681F",
+        "banner_color": 1,
+        "shulker_color": 2
+      },
+      "white": {
+        "legacy_dye_meta": 15,
+        "sign_rgb": "FFFFFF",
+        "banner_color": 0,
+        "shulker_color": 1
+      }
+    },
+    "banner_pattern_to_legacy_id": {
+      "square_bottom_left": "bl",
+      "square_bottom_right": "br",
+      "square_top_left": "tl",
+      "square_top_right": "tr",
+      "stripe_bottom": "bs",
+      "stripe_top": "ts",
+      "stripe_left": "ls",
+      "stripe_right": "rs",
+      "stripe_center": "cs",
+      "stripe_middle": "ms",
+      "stripe_downright": "drs",
+      "stripe_downleft": "dls",
+      "small_stripes": "ss",
+      "cross": "cr",
+      "straight_cross": "sc",
+      "triangle_bottom": "bt",
+      "triangle_top": "tt",
+      "triangles_bottom": "bts",
+      "triangles_top": "tts",
+      "diagonal_left": "ld",
+      "diagonal_up_right": "rd",
+      "diagonal_up_left": "lud",
+      "diagonal_right": "rud",
+      "circle": "mc",
+      "rhombus": "mr",
+      "half_vertical": "vh",
+      "half_horizontal": "hh",
+      "half_vertical_right": "vhr",
+      "half_horizontal_bottom": "hhb",
+      "border": "bo",
+      "curly_border": "cbo",
+      "creeper": "cre",
+      "gradient": "gra",
+      "gradient_up": "gru",
+      "bricks": "bri",
+      "skull": "sku",
+      "flower": "flo",
+      "mojang": "moj"
+    },
+    "unsupported_banner_patterns": "Any modern pattern identifier absent from banner_pattern_to_legacy_id must be dropped or resolved by Backporter policy; EFR cannot render it exactly."
+  },
+  "blocks": [
+    {
+      "key": "chiseled_bookshelf",
+      "source_ids": [
+        "minecraft:chiseled_bookshelf"
+      ],
+      "target_ids": [
+        "etfuturum:chiseled_bookshelf"
+      ],
+      "classification": "FULL_IMPORT",
+      "metadata": {
+        "layout": "bits 0..1 horizontal facing",
+        "map": {
+          "north": 0,
+          "east": 1,
+          "south": 2,
+          "west": 3
+        }
+      },
+      "tile_entity": {
+        "required": true,
+        "id": "etfuturum:modern_parity_chiseled_bookshelf",
+        "fields": [
+          {
+            "name": "Items",
+            "type": "TAG_List<TAG_Compound>",
+            "required": false,
+            "note": "Up to six ItemStack compounds; each carries Slot byte 0..5."
+          },
+          {
+            "name": "OccupancyMask",
+            "type": "TAG_Int",
+            "required": true,
+            "note": "Bits 0..5 correspond to modern slot_0_occupied..slot_5_occupied. If an occupied bit has no translated item, EFR creates a placeholder minecraft:book."
+          },
+          {
+            "name": "LastInteractedSlot",
+            "type": "TAG_Int",
+            "required": true,
+            "note": "-1 means legacy/never interacted; Backporter maps modern last_interacted_slot 0..5 directly."
+          }
+        ]
+      },
+      "source_properties": {
+        "facing": "exact -> metadata",
+        "slot_0_occupied..slot_5_occupied": "exact -> OccupancyMask; slot order is visual top-left, top-mid, top-right, bottom-left, bottom-mid, bottom-right when viewed from the block front"
+      },
+      "source_block_entity": {
+        "items": "translate into Items with Slot 0..5",
+        "last_interacted_slot": "exact -> LastInteractedSlot"
+      },
+      "derived": [],
+      "unsupported": [
+        "waterlogged"
+      ],
+      "exactness": {
+        "visible_state": "exact",
+        "block_entity_display": "exact when source items are translatable",
+        "behaviour": "comparator output is LastInteractedSlot+1 (1..6), or 0 for -1; click-to-slot mapping is front-relative for all four facings"
+      }
+    },
+    {
+      "key": "cave_vines_tip",
+      "source_ids": [
+        "minecraft:cave_vines"
+      ],
+      "target_ids": [
+        "etfuturum:cave_vine"
+      ],
+      "classification": "FULL_IMPORT",
+      "metadata": {
+        "layout": "bit 0 berries",
+        "map": {
+          "berries=false": 0,
+          "berries=true": 1
+        }
+      },
+      "tile_entity": {
+        "required": true,
+        "id": "etfuturum.cave_vines",
+        "fields": [
+          {
+            "name": "Age",
+            "type": "TAG_Int",
+            "required": true,
+            "note": "Canonical Pass 32 age, clamped 0..25."
+          },
+          {
+            "name": "MaxLength",
+            "type": "TAG_Int",
+            "required": false,
+            "note": "Legacy EFR compatibility only; importer may omit it. EFR defaults it safely and writes it back."
+          },
+          {
+            "name": "TipSheared",
+            "type": "TAG_Byte boolean",
+            "required": false,
+            "note": "Legacy EFR behaviour flag; importer normally writes false unless preserving an EFR-origin map."
+          }
+        ]
+      },
+      "source_properties": {
+        "age": "exact -> Age 0..25",
+        "berries": "exact -> metadata bit 0"
+      },
+      "source_block_entity": {},
+      "derived": [],
+      "unsupported": [
+        "waterlogged"
+      ],
+      "exactness": {
+        "visible_state": "exact berries",
+        "block_entity_display": "Age exact",
+        "behaviour": "natural growth increments Age and stops at 25; legacy MaxLength/TipSheared saves remain readable"
+      }
+    },
+    {
+      "key": "cave_vines_plant",
+      "source_ids": [
+        "minecraft:cave_vines_plant"
+      ],
+      "target_ids": [
+        "etfuturum:cave_vine_plant"
+      ],
+      "classification": "FULL_IMPORT",
+      "metadata": {
+        "layout": "bit 0 berries",
+        "map": {
+          "berries=false": 0,
+          "berries=true": 1
+        }
+      },
+      "tile_entity": {
+        "required": false
+      },
+      "source_properties": {
+        "berries": "exact -> metadata bit 0"
+      },
+      "source_block_entity": {},
+      "derived": [],
+      "unsupported": [
+        "age (modern plant body has no age)",
+        "waterlogged"
+      ],
+      "exactness": {
+        "visible_state": "exact",
+        "behaviour": "body/tip distinction exact"
+      }
+    },
+    {
+      "key": "shelf_family",
+      "source_ids": [
+        "minecraft:oak_shelf",
+        "minecraft:spruce_shelf",
+        "minecraft:birch_shelf",
+        "minecraft:jungle_shelf",
+        "minecraft:acacia_shelf",
+        "minecraft:dark_oak_shelf",
+        "minecraft:mangrove_shelf",
+        "minecraft:cherry_shelf",
+        "minecraft:bamboo_shelf",
+        "minecraft:crimson_shelf",
+        "minecraft:warped_shelf",
+        "minecraft:pale_oak_shelf"
+      ],
+      "target_rule": "replace minecraft: namespace with etfuturum: and retain path",
+      "classification": "FULL_IMPORT",
+      "metadata": {
+        "layout": "bits 0..1 facing; bit 2 powered",
+        "facing": {
+          "north": 0,
+          "east": 1,
+          "south": 2,
+          "west": 3
+        },
+        "powered_false_add": 0,
+        "powered_true_add": 4
+      },
+      "tile_entity": {
+        "required": true,
+        "id": "etfuturum:modern_parity_shelf",
+        "fields": [
+          {
+            "name": "Items",
+            "type": "TAG_List<TAG_Compound>",
+            "required": false,
+            "note": "Three inventory slots; each ItemStack compound carries Slot byte 0..2."
+          }
+        ]
+      },
+      "source_properties": {
+        "facing": "stored exactly in metadata bits 0..1",
+        "powered": "stored exactly in metadata bit 2",
+        "side_chain": "do not store; DERIVED at runtime"
+      },
+      "source_block_entity": {
+        "inventory": "translate all three TE slots 0..2; never discard source inventory"
+      },
+      "derived": [
+        "side_chain is recomputed from adjacent powered same-facing Shelves of ANY wood type; each block retains its own wood model"
+      ],
+      "unsupported": [
+        "waterlogged (general 1.7.10 target limitation)"
+      ],
+      "exactness": {
+        "visible_state": "exact after neighbour-derived side_chain",
+        "block_entity_display": "exact if items are translatable",
+        "behaviour": "powered mixed-wood Shelf groups exchange the rightmost 3/6/9 hotbar slots atomically with full 1.7 player-inventory synchronization; comparator is occupied-slot bitmask 1/2/4 -> 0..7"
+      },
+      "comparator": {
+        "mode": "occupied_slot_bitmask",
+        "slot_bits": {
+          "0": 1,
+          "1": 2,
+          "2": 4
+        },
+        "output_range": "0..7",
+        "stack_size_affects_output": false
+      },
+      "powered_hotbar_swap": {
+        "single_powered_shelf": "hotbar slots 6..8 (rightmost 3)",
+        "two_connected_powered_shelves": "hotbar slots 3..8 (rightmost 6)",
+        "three_connected_powered_shelves": "hotbar slots 0..8 (all 9)",
+        "interaction_target": "any Shelf in the connected powered same-facing group",
+        "creative_mode": "same 3/6/9 exchange as survival; no infinite-material exception for powered group swaps",
+        "target_sync": "server-authoritative exchange followed by full player inventory synchronization"
+      }
+    },
+    {
+      "key": "decorated_pot",
+      "source_ids": [
+        "minecraft:decorated_pot"
+      ],
+      "target_ids": [
+        "etfuturum:decorated_pot"
+      ],
+      "classification": "PARTIAL_IMPORT",
+      "metadata": {
+        "layout": "bits 0..1 facing; bit 2 EFR stored-water compatibility extension",
+        "facing": {
+          "north": 0,
+          "east": 1,
+          "south": 2,
+          "west": 3
+        },
+        "stored_water_bit": 4
+      },
+      "tile_entity": {
+        "required": true,
+        "id": "etfuturum:modern_parity_decorated_pot",
+        "fields": [
+          {
+            "name": "sherds",
+            "type": "TAG_List<TAG_String>",
+            "required": true,
+            "note": "Exactly four item registry identities in EFR/modern order: [back, left, right, front]. Use minecraft:brick for an undecorated face."
+          },
+          {
+            "name": "item",
+            "type": "TAG_Compound ItemStack",
+            "required": false,
+            "note": "Single stored stack; EFR pot inventory limit is 64."
+          }
+        ]
+      },
+      "source_properties": {
+        "facing": "exact -> metadata bits 0..1",
+        "waterlogged": "unsupported; do not confuse with EFR stored-water bit",
+        "cracked": "no persistent cracked blockstate exists in EFR"
+      },
+      "source_block_entity": {
+        "sherds": "exact order [back,left,right,front] after item translation",
+        "item": "exact if source item is translatable"
+      },
+      "derived": [],
+      "unsupported": [
+        "waterlogged",
+        "persistent cracked blockstate"
+      ],
+      "exactness": {
+        "visible_state": "decorations/facing exact if identities translate",
+        "block_entity_display": "stored item exact",
+        "behaviour": "stored item ejects separately when broken; pot item BlockEntityTag preserves sherds; projectile shatter uses EFR behaviour"
+      }
+    },
+    {
+      "key": "campfire",
+      "source_ids": [
+        "minecraft:campfire"
+      ],
+      "target_ids": [
+        "etfuturum:campfire"
+      ],
+      "classification": "PARTIAL_IMPORT",
+      "metadata": {
+        "layout": "bits 0..1 facing; bit 2 lit",
+        "facing": {
+          "north": 0,
+          "east": 1,
+          "south": 2,
+          "west": 3
+        },
+        "lit_false_add": 0,
+        "lit_true_add": 4
+      },
+      "tile_entity": {
+        "required": true,
+        "id": "etfuturum:modern_parity_campfire",
+        "fields": [
+          {
+            "name": "CookingItems",
+            "type": "TAG_List<TAG_Compound>",
+            "required": false,
+            "note": "Up to four compounds. Each compound carries Slot byte 0..3, CookTime int, and the ItemStack payload itself."
+          }
+        ]
+      },
+      "source_properties": {
+        "facing": "exact",
+        "lit": "exact",
+        "signal_fire": "derived in EFR from a hay block directly below; do not store",
+        "waterlogged": "unsupported"
+      },
+      "source_block_entity": {
+        "Items[0..3]": "translate into CookingItems Slot 0..3",
+        "CookingTimes[0..3]": "translate each value to CookTime",
+        "CookingTotalTimes": "unsupported; EFR uses fixed COOK_TIME=600"
+      },
+      "derived": [
+        "signal-fire smoke from hay block below"
+      ],
+      "unsupported": [
+        "waterlogged",
+        "per-slot modern CookingTotalTimes"
+      ],
+      "exactness": {
+        "visible_state": "facing/lit exact",
+        "block_entity_display": "four item positions exact if items translate",
+        "behaviour": "cooking progress persists, but total cook duration is EFR fixed 600 ticks"
+      }
+    },
+    {
+      "key": "soul_campfire",
+      "source_ids": [
+        "minecraft:soul_campfire"
+      ],
+      "target_ids": [
+        "etfuturum:soul_campfire"
+      ],
+      "classification": "PARTIAL_IMPORT",
+      "metadata": {
+        "layout": "bits 0..1 facing; bit 2 lit",
+        "facing": {
+          "north": 0,
+          "east": 1,
+          "south": 2,
+          "west": 3
+        },
+        "lit_false_add": 0,
+        "lit_true_add": 4
+      },
+      "tile_entity": {
+        "required": true,
+        "id": "etfuturum:modern_parity_campfire",
+        "fields": [
+          {
+            "name": "CookingItems",
+            "type": "TAG_List<TAG_Compound>",
+            "required": false,
+            "note": "Up to four compounds. Each compound carries Slot byte 0..3, CookTime int, and the ItemStack payload itself."
+          }
+        ]
+      },
+      "source_properties": {
+        "facing": "exact",
+        "lit": "exact",
+        "signal_fire": "derived in EFR from a hay block directly below; do not store",
+        "waterlogged": "unsupported"
+      },
+      "source_block_entity": {
+        "Items[0..3]": "translate into CookingItems Slot 0..3",
+        "CookingTimes[0..3]": "translate each value to CookTime",
+        "CookingTotalTimes": "unsupported; EFR uses fixed COOK_TIME=600"
+      },
+      "derived": [
+        "signal-fire smoke from hay block below"
+      ],
+      "unsupported": [
+        "waterlogged",
+        "per-slot modern CookingTotalTimes"
+      ],
+      "exactness": {
+        "visible_state": "facing/lit exact",
+        "block_entity_display": "four item positions exact if items translate",
+        "behaviour": "cooking progress persists, but total cook duration is EFR fixed 600 ticks"
+      }
+    },
+    {
+      "key": "suspicious_sand",
+      "source_ids": [
+        "minecraft:suspicious_sand"
+      ],
+      "target_ids": [
+        "etfuturum:suspicious_sand"
+      ],
+      "classification": "PARTIAL_IMPORT",
+      "metadata": {
+        "layout": "dusted/brush progress 0..3 directly in metadata",
+        "map": "source dusted 0..3 -> metadata 0..3"
+      },
+      "tile_entity": {
+        "required": true,
+        "id": "etfuturum:modern_parity_brushable",
+        "fields": [
+          {
+            "name": "brush_count",
+            "type": "TAG_Int",
+            "required": true,
+            "note": "0..3; keep equal to target metadata for deterministic imported visuals."
+          },
+          {
+            "name": "item",
+            "type": "TAG_Compound ItemStack",
+            "required": false,
+            "note": "Concrete buried item."
+          }
+        ]
+      },
+      "source_properties": {
+        "dusted": "exact -> metadata and brush_count"
+      },
+      "source_block_entity": {
+        "item": "exact if item translates",
+        "LootTable/LootTableSeed": "EFR cannot evaluate modern loot tables; Backporter must resolve them to a concrete item before import"
+      },
+      "derived": [
+        "completion replaces block with minecraft:sand"
+      ],
+      "unsupported": [
+        "modern loot-table execution/state timers",
+        "waterlogged"
+      ],
+      "exactness": {
+        "visible_state": "dusted exact",
+        "block_entity_display": "buried item exact if pre-resolved",
+        "behaviour": "falling entity copies full TE NBT through field_145810_d, preserving item and brush_count"
+      }
+    },
+    {
+      "key": "suspicious_gravel",
+      "source_ids": [
+        "minecraft:suspicious_gravel"
+      ],
+      "target_ids": [
+        "etfuturum:suspicious_gravel"
+      ],
+      "classification": "PARTIAL_IMPORT",
+      "metadata": {
+        "layout": "dusted/brush progress 0..3 directly in metadata",
+        "map": "source dusted 0..3 -> metadata 0..3"
+      },
+      "tile_entity": {
+        "required": true,
+        "id": "etfuturum:modern_parity_brushable",
+        "fields": [
+          {
+            "name": "brush_count",
+            "type": "TAG_Int",
+            "required": true,
+            "note": "0..3; keep equal to target metadata for deterministic imported visuals."
+          },
+          {
+            "name": "item",
+            "type": "TAG_Compound ItemStack",
+            "required": false,
+            "note": "Concrete buried item."
+          }
+        ]
+      },
+      "source_properties": {
+        "dusted": "exact -> metadata and brush_count"
+      },
+      "source_block_entity": {
+        "item": "exact if item translates",
+        "LootTable/LootTableSeed": "EFR cannot evaluate modern loot tables; Backporter must resolve them to a concrete item before import"
+      },
+      "derived": [
+        "completion replaces block with minecraft:gravel"
+      ],
+      "unsupported": [
+        "modern loot-table execution/state timers",
+        "waterlogged"
+      ],
+      "exactness": {
+        "visible_state": "dusted exact",
+        "block_entity_display": "buried item exact if pre-resolved",
+        "behaviour": "falling entity copies full TE NBT through field_145810_d, preserving item and brush_count"
+      }
+    },
+    {
+      "key": "sign_family",
+      "source_ids": [
+        "minecraft:oak_sign",
+        "minecraft:oak_wall_sign",
+        "minecraft:spruce_sign",
+        "minecraft:spruce_wall_sign",
+        "minecraft:birch_sign",
+        "minecraft:birch_wall_sign",
+        "minecraft:jungle_sign",
+        "minecraft:jungle_wall_sign",
+        "minecraft:acacia_sign",
+        "minecraft:acacia_wall_sign",
+        "minecraft:dark_oak_sign",
+        "minecraft:dark_oak_wall_sign",
+        "minecraft:mangrove_sign",
+        "minecraft:mangrove_wall_sign",
+        "minecraft:cherry_sign",
+        "minecraft:cherry_wall_sign",
+        "minecraft:bamboo_sign",
+        "minecraft:bamboo_wall_sign",
+        "minecraft:crimson_sign",
+        "minecraft:crimson_wall_sign",
+        "minecraft:warped_sign",
+        "minecraft:warped_wall_sign",
+        "minecraft:pale_oak_sign",
+        "minecraft:pale_oak_wall_sign"
+      ],
+      "target_table": {
+        "oak": {
+          "standing": "minecraft:standing_sign",
+          "wall": "minecraft:wall_sign"
+        },
+        "spruce": {
+          "standing": "etfuturum:sign_spruce",
+          "wall": "etfuturum:wall_sign_spruce"
+        },
+        "birch": {
+          "standing": "etfuturum:sign_birch",
+          "wall": "etfuturum:wall_sign_birch"
+        },
+        "jungle": {
+          "standing": "etfuturum:sign_jungle",
+          "wall": "etfuturum:wall_sign_jungle"
+        },
+        "acacia": {
+          "standing": "etfuturum:sign_acacia",
+          "wall": "etfuturum:wall_sign_acacia"
+        },
+        "dark_oak": {
+          "standing": "etfuturum:sign_dark_oak",
+          "wall": "etfuturum:wall_sign_dark_oak"
+        },
+        "crimson": {
+          "standing": "etfuturum:crimson_sign",
+          "wall": "etfuturum:crimson_wall_sign"
+        },
+        "warped": {
+          "standing": "etfuturum:warped_sign",
+          "wall": "etfuturum:warped_wall_sign"
+        },
+        "mangrove": {
+          "standing": "etfuturum:mangrove_sign",
+          "wall": "etfuturum:mangrove_wall_sign"
+        },
+        "cherry": {
+          "standing": "etfuturum:cherry_sign",
+          "wall": "etfuturum:cherry_wall_sign"
+        },
+        "bamboo": {
+          "standing": "etfuturum:bamboo_sign",
+          "wall": "etfuturum:bamboo_wall_sign"
+        },
+        "pale_oak": {
+          "standing": "etfuturum:pale_oak_sign",
+          "wall": "etfuturum:pale_oak_wall_sign"
+        }
+      },
+      "classification": "PARTIAL_IMPORT",
+      "metadata": {
+        "standing": "rotation 0..15 directly",
+        "wall": "vanilla horizontal side 2=north,3=south,4=west,5=east"
+      },
+      "tile_entity": {
+        "required": true,
+        "id": "etfuturum.sign for mature/vanilla sign blocks; etfuturum:modern_parity_sign for pale_oak parity sign blocks",
+        "fields": [
+          {
+            "name": "Text1..Text4",
+            "type": "TAG_String",
+            "required": true,
+            "note": "Front side. Plain strings, each truncated by EFR to at most 15 characters."
+          },
+          {
+            "name": "BackText1..BackText4",
+            "type": "TAG_String",
+            "required": true,
+            "note": "Back side, same 15-character per-line limit."
+          },
+          {
+            "name": "FrontTextColour",
+            "type": "TAG_Int",
+            "required": true,
+            "note": "24-bit RGB; use conventions.dye_mappings[color].sign_rgb."
+          },
+          {
+            "name": "BackTextColour",
+            "type": "TAG_Int",
+            "required": true,
+            "note": "24-bit RGB."
+          },
+          {
+            "name": "FrontGlowing",
+            "type": "TAG_Byte boolean",
+            "required": true
+          },
+          {
+            "name": "BackGlowing",
+            "type": "TAG_Byte boolean",
+            "required": true
+          },
+          {
+            "name": "Waxed",
+            "type": "TAG_Byte boolean",
+            "required": true
+          }
+        ]
+      },
+      "source_properties": {
+        "rotation": "standing metadata 0..15",
+        "facing": "wall metadata side 2..5",
+        "waterlogged": "unsupported"
+      },
+      "source_block_entity": {
+        "front_text.messages": "flatten each modern text component to plain text, preserve line order, truncate to 15 chars",
+        "back_text.messages": "same",
+        "front_text.color/back_text.color": "map named dye via sign_rgb",
+        "front_text.has_glowing_text/back_text.has_glowing_text": "exact booleans",
+        "is_waxed": "exact -> Waxed"
+      },
+      "derived": [],
+      "unsupported": [
+        "rich JSON formatting, hover/click events, fonts and styling beyond flattened text",
+        "filtered_messages",
+        "waterlogged"
+      ],
+      "exactness": {
+        "visible_state": "plain text/front-back/color/glow/wax exact within 15-char limit",
+        "block_entity_display": "partial because rich text is flattened",
+        "behaviour": "two-sided editing and wax lock preserved"
+      }
+    },
+    {
+      "key": "hanging_sign_family",
+      "source_ids": [
+        "minecraft:oak_hanging_sign",
+        "minecraft:oak_wall_hanging_sign",
+        "minecraft:spruce_hanging_sign",
+        "minecraft:spruce_wall_hanging_sign",
+        "minecraft:birch_hanging_sign",
+        "minecraft:birch_wall_hanging_sign",
+        "minecraft:jungle_hanging_sign",
+        "minecraft:jungle_wall_hanging_sign",
+        "minecraft:acacia_hanging_sign",
+        "minecraft:acacia_wall_hanging_sign",
+        "minecraft:dark_oak_hanging_sign",
+        "minecraft:dark_oak_wall_hanging_sign",
+        "minecraft:mangrove_hanging_sign",
+        "minecraft:mangrove_wall_hanging_sign",
+        "minecraft:cherry_hanging_sign",
+        "minecraft:cherry_wall_hanging_sign",
+        "minecraft:bamboo_hanging_sign",
+        "minecraft:bamboo_wall_hanging_sign",
+        "minecraft:crimson_hanging_sign",
+        "minecraft:crimson_wall_hanging_sign",
+        "minecraft:warped_hanging_sign",
+        "minecraft:warped_wall_hanging_sign",
+        "minecraft:pale_oak_hanging_sign",
+        "minecraft:pale_oak_wall_hanging_sign"
+      ],
+      "target_rule": "replace minecraft: namespace with etfuturum: and retain path",
+      "classification": "PARTIAL_IMPORT",
+      "metadata": {
+        "ceiling_non_wall": "0..7 = attachment bit0 plus cardinal facing 0..3 in bits1..2; metadata=(facing<<1)|attachment",
+        "wall_identity": "2..5 horizontal side",
+        "optional_wall_form_on_obtainable_non_wall_identity": "8..11 = 8+(side-2)"
+      },
+      "tile_entity": {
+        "required": true,
+        "id": "etfuturum:modern_parity_sign",
+        "fields": [
+          {
+            "name": "Text1..Text4",
+            "type": "TAG_String",
+            "required": true
+          },
+          {
+            "name": "BackText1..BackText4",
+            "type": "TAG_String",
+            "required": true
+          },
+          {
+            "name": "FrontTextColour",
+            "type": "TAG_Int",
+            "required": true
+          },
+          {
+            "name": "BackTextColour",
+            "type": "TAG_Int",
+            "required": true
+          },
+          {
+            "name": "FrontGlowing",
+            "type": "TAG_Byte boolean",
+            "required": true
+          },
+          {
+            "name": "BackGlowing",
+            "type": "TAG_Byte boolean",
+            "required": true
+          },
+          {
+            "name": "Waxed",
+            "type": "TAG_Byte boolean",
+            "required": true
+          }
+        ]
+      },
+      "source_properties": {
+        "rotation/attachment": "map to custom hanging metadata layout",
+        "facing": "wall side 2..5",
+        "waterlogged": "unsupported"
+      },
+      "source_block_entity": {
+        "text/dye/glow/wax": "same conversion as sign_family"
+      },
+      "derived": [],
+      "unsupported": [
+        "rich text beyond flattened 15-char lines",
+        "waterlogged"
+      ],
+      "exactness": {
+        "visible_state": "attachment/orientation and two-sided plain text exact within target limits",
+        "block_entity_display": "partial rich-text fidelity"
+      }
+    },
+    {
+      "key": "vanilla_chest_family",
+      "source_ids": [
+        "minecraft:chest",
+        "minecraft:trapped_chest"
+      ],
+      "target_ids": [
+        "minecraft:chest",
+        "minecraft:trapped_chest"
+      ],
+      "classification": "FULL_IMPORT",
+      "metadata": {
+        "layout": "vanilla BlockChest facing",
+        "facing": {
+          "north": 2,
+          "south": 3,
+          "west": 4,
+          "east": 5
+        }
+      },
+      "tile_entity": {
+        "required": true,
+        "id": "Chest",
+        "inherits": "net.minecraft.tileentity.TileEntityChest",
+        "fields": [
+          {
+            "name": "Items",
+            "type": "TAG_List<TAG_Compound>",
+            "required": false,
+            "note": "Vanilla 27-slot TileEntityChest item list."
+          },
+          {
+            "name": "CustomName",
+            "type": "TAG_String",
+            "required": false
+          },
+          {
+            "name": "EFRPairDirection",
+            "type": "TAG_Byte",
+            "required": true,
+            "note": "Explicit direction from this chest to its reciprocal partner: 0=single, 1=west, 2=east, 3=north, 4=south. Both halves of a double chest must point at each other."
+          }
+        ]
+      },
+      "source_properties": {
+        "facing": "exact -> vanilla chest metadata",
+        "type": "exact -> EFRPairDirection using facing: single=0; left/right map to the lateral partner direction documented in pair_direction_mapping"
+      },
+      "pair_direction_mapping": {
+        "north": {
+          "left": "east",
+          "right": "west"
+        },
+        "south": {
+          "left": "west",
+          "right": "east"
+        },
+        "west": {
+          "left": "north",
+          "right": "south"
+        },
+        "east": {
+          "left": "south",
+          "right": "north"
+        },
+        "direction_codes": {
+          "single": 0,
+          "west": 1,
+          "east": 2,
+          "north": 3,
+          "south": 4
+        }
+      },
+      "source_block_entity": {
+        "inventory": "translate all slots",
+        "CustomName/custom_name": "preserve when representable"
+      },
+      "derived": [
+        "pre-Pass-32c saves without EFRPairDirection migrate from one unambiguous same-block lateral neighbour with matching facing"
+      ],
+      "unsupported": [],
+      "exactness": {
+        "visible_state": "facing/type exact when EFRPairDirection is supplied for both halves",
+        "block_entity_display": "inventory/name exact if items translate",
+        "behaviour": "normal and trapped chests remain mutually incompatible; explicit reciprocal pairing supports adjacent independent singles, sneaking to suppress pairing, and automatic unlink on either-half removal"
+      }
+    },
+    {
+      "key": "copper_chest_family",
+      "source_ids": [
+        "minecraft:copper_chest",
+        "minecraft:waxed_copper_chest",
+        "minecraft:exposed_copper_chest",
+        "minecraft:waxed_exposed_copper_chest",
+        "minecraft:weathered_copper_chest",
+        "minecraft:waxed_weathered_copper_chest",
+        "minecraft:oxidized_copper_chest",
+        "minecraft:waxed_oxidized_copper_chest"
+      ],
+      "target_rule": "replace minecraft: namespace with etfuturum: and retain exact weathering/waxed path",
+      "classification": "FULL_IMPORT",
+      "metadata": {
+        "layout": "vanilla BlockChest facing",
+        "facing": {
+          "north": 2,
+          "south": 3,
+          "west": 4,
+          "east": 5
+        }
+      },
+      "tile_entity": {
+        "required": true,
+        "id": "etfuturum:modern_parity_copper_chest",
+        "inherits": "net.minecraft.tileentity.TileEntityChest",
+        "fields": [
+          {
+            "name": "Items",
+            "type": "TAG_List<TAG_Compound>",
+            "required": false,
+            "note": "Vanilla 27-slot TileEntityChest item list."
+          },
+          {
+            "name": "CustomName",
+            "type": "TAG_String",
+            "required": false
+          },
+          {
+            "name": "EFRPairDirection",
+            "type": "TAG_Byte",
+            "required": true,
+            "note": "Explicit direction from this chest to its reciprocal partner: 0=single, 1=west, 2=east, 3=north, 4=south. Both halves of a double chest must point at each other."
+          }
+        ]
+      },
+      "source_properties": {
+        "facing": "exact -> vanilla chest metadata",
+        "weathering/waxed": "exact target registry identity",
+        "type": "exact -> EFRPairDirection using facing: single=0; left/right map to the lateral partner direction documented in pair_direction_mapping"
+      },
+      "source_block_entity": {
+        "inventory": "translate all slots",
+        "CustomName/custom_name": "preserve when representable"
+      },
+      "derived": [
+        "single/left/right renderer half is derived from facing plus persisted EFRPairDirection",
+        "runtime placement writes reciprocal EFRPairDirection to both halves; pre-Pass-32c saves without the field migrate from one unambiguous same-identity lateral neighbour"
+      ],
+      "unsupported": [
+        "oxidation/wax/scrape runtime transitions (Pass 34)"
+      ],
+      "exactness": {
+        "visible_state": "static identity/facing/type exact when Backporter writes reciprocal EFRPairDirection; modern single/left/right copper textures are selected from that explicit state",
+        "block_entity_display": "inventory/name exact if items translate",
+        "behaviour": "vanilla chest inventory/lid/comparator foundation with modern explicit pairing; Copper Chest pairing is exact-block-identity-only and cannot cross normal/trapped/different oxidation or wax identities"
+      },
+      "pair_direction_mapping": {
+        "north": {
+          "left": "east",
+          "right": "west"
+        },
+        "south": {
+          "left": "west",
+          "right": "east"
+        },
+        "west": {
+          "left": "north",
+          "right": "south"
+        },
+        "east": {
+          "left": "south",
+          "right": "north"
+        },
+        "direction_codes": {
+          "single": 0,
+          "west": 1,
+          "east": 2,
+          "north": 3,
+          "south": 4
+        }
+      }
+    },
+    {
+      "key": "banner_family",
+      "source_ids": [
+        "minecraft:black_banner",
+        "minecraft:black_wall_banner",
+        "minecraft:red_banner",
+        "minecraft:red_wall_banner",
+        "minecraft:green_banner",
+        "minecraft:green_wall_banner",
+        "minecraft:brown_banner",
+        "minecraft:brown_wall_banner",
+        "minecraft:blue_banner",
+        "minecraft:blue_wall_banner",
+        "minecraft:purple_banner",
+        "minecraft:purple_wall_banner",
+        "minecraft:cyan_banner",
+        "minecraft:cyan_wall_banner",
+        "minecraft:light_gray_banner",
+        "minecraft:light_gray_wall_banner",
+        "minecraft:gray_banner",
+        "minecraft:gray_wall_banner",
+        "minecraft:pink_banner",
+        "minecraft:pink_wall_banner",
+        "minecraft:lime_banner",
+        "minecraft:lime_wall_banner",
+        "minecraft:yellow_banner",
+        "minecraft:yellow_wall_banner",
+        "minecraft:light_blue_banner",
+        "minecraft:light_blue_wall_banner",
+        "minecraft:magenta_banner",
+        "minecraft:magenta_wall_banner",
+        "minecraft:orange_banner",
+        "minecraft:orange_wall_banner",
+        "minecraft:white_banner",
+        "minecraft:white_wall_banner"
+      ],
+      "target_ids": [
+        "etfuturum:banner"
+      ],
+      "classification": "PARTIAL_IMPORT",
+      "metadata": {
+        "standing": "rotation 0..15 directly",
+        "wall": "2=north,3=south,4=west,5=east"
+      },
+      "tile_entity": {
+        "required": true,
+        "id": "etfuturum.banner",
+        "fields": [
+          {
+            "name": "Base",
+            "type": "TAG_Int",
+            "required": true,
+            "note": "Use conventions.dye_mappings[source_color].banner_color (white=0 ... black=15)."
+          },
+          {
+            "name": "IsStanding",
+            "type": "TAG_Byte boolean",
+            "required": true
+          },
+          {
+            "name": "Patterns",
+            "type": "TAG_List<TAG_Compound>",
+            "required": false,
+            "note": "Each entry: Pattern legacy short string + Color int using banner_color mapping."
+          }
+        ]
+      },
+      "source_properties": {
+        "rotation": "standing metadata",
+        "facing": "wall metadata"
+      },
+      "source_block_entity": {
+        "patterns": "map pattern identifier through conventions.banner_pattern_to_legacy_id and color through banner_color"
+      },
+      "derived": [],
+      "unsupported": [
+        "modern banner patterns absent from the legacy pattern table"
+      ],
+      "exactness": {
+        "visible_state": "base/orientation and supported patterns exact",
+        "block_entity_display": "partial when source uses newer patterns"
+      }
+    },
+    {
+      "key": "shulker_box_family",
+      "source_ids": [
+        "minecraft:shulker_box",
+        "minecraft:black_shulker_box",
+        "minecraft:red_shulker_box",
+        "minecraft:green_shulker_box",
+        "minecraft:brown_shulker_box",
+        "minecraft:blue_shulker_box",
+        "minecraft:purple_shulker_box",
+        "minecraft:cyan_shulker_box",
+        "minecraft:light_gray_shulker_box",
+        "minecraft:gray_shulker_box",
+        "minecraft:pink_shulker_box",
+        "minecraft:lime_shulker_box",
+        "minecraft:yellow_shulker_box",
+        "minecraft:light_blue_shulker_box",
+        "minecraft:magenta_shulker_box",
+        "minecraft:orange_shulker_box",
+        "minecraft:white_shulker_box"
+      ],
+      "target_ids": [
+        "etfuturum:shulker_box"
+      ],
+      "classification": "PARTIAL_IMPORT",
+      "metadata": {
+        "layout": "no persistent orientation in block metadata; orientation is TE Facing"
+      },
+      "tile_entity": {
+        "required": true,
+        "id": "etfuturum.shulker_box",
+        "fields": [
+          {
+            "name": "Type",
+            "type": "TAG_Byte",
+            "required": true,
+            "note": "Use 0 (VANILLA) for normal modern shulker boxes."
+          },
+          {
+            "name": "Items",
+            "type": "TAG_List<TAG_Compound>",
+            "required": false
+          },
+          {
+            "name": "Color",
+            "type": "TAG_Byte",
+            "required": true,
+            "note": "uncolored=0; otherwise conventions.dye_mappings[color].shulker_color (white=1 ... black=16)."
+          },
+          {
+            "name": "Facing",
+            "type": "TAG_Byte",
+            "required": true,
+            "note": "0 down,1 up,2 north,3 south,4 west,5 east."
+          },
+          {
+            "name": "CustomName",
+            "type": "TAG_String",
+            "required": false
+          }
+        ]
+      },
+      "source_properties": {
+        "facing": "exact -> TE Facing",
+        "color-specific registry ID": "collapse to shared block and TE Color"
+      },
+      "source_block_entity": {
+        "inventory": "translate all 27 slots",
+        "custom_name": "preserve when representable",
+        "LootTable/LootTableSeed": "not represented by this EFR TE"
+      },
+      "derived": [],
+      "unsupported": [
+        "modern loot table state unless resolved to Items"
+      ],
+      "exactness": {
+        "visible_state": "color/facing exact",
+        "block_entity_display": "inventory exact when resolved/translatable"
+      }
+    },
+    {
+      "key": "barrel",
+      "source_ids": [
+        "minecraft:barrel"
+      ],
+      "target_ids": [
+        "etfuturum:barrel"
+      ],
+      "classification": "PARTIAL_IMPORT",
+      "metadata": {
+        "facing": {
+          "down": 0,
+          "up": 1,
+          "north": 2,
+          "south": 3,
+          "west": 4,
+          "east": 5
+        },
+        "note": "open animation may use transient metadata >=8; Backporter must not import modern open as persistent state."
+      },
+      "tile_entity": {
+        "required": true,
+        "id": "etfuturum.barrel",
+        "fields": [
+          {
+            "name": "Type",
+            "type": "TAG_Byte",
+            "required": true,
+            "note": "Use 0 (WOOD) for a normal modern barrel."
+          },
+          {
+            "name": "Items",
+            "type": "TAG_List<TAG_Compound>",
+            "required": false
+          },
+          {
+            "name": "CustomName",
+            "type": "TAG_String",
+            "required": false
+          }
+        ]
+      },
+      "source_properties": {
+        "facing": "exact",
+        "open": "derived/transient; discard"
+      },
+      "source_block_entity": {
+        "inventory": "translate",
+        "custom_name": "preserve",
+        "loot table": "resolve to Items if needed"
+      },
+      "derived": [
+        "open state from active GUI usage"
+      ],
+      "unsupported": [
+        "persistent modern open",
+        "unresolved loot tables"
+      ],
+      "exactness": {
+        "visible_state": "closed/facing exact",
+        "block_entity_display": "inventory exact if resolved"
+      }
+    },
+    {
+      "key": "beehive",
+      "source_ids": [
+        "minecraft:beehive"
+      ],
+      "target_ids": [
+        "etfuturum:beehive"
+      ],
+      "classification": "PARTIAL_IMPORT",
+      "metadata": {
+        "facing": {
+          "north": 2,
+          "south": 3,
+          "west": 4,
+          "east": 5
+        },
+        "full_honey_encoding": "when honeyLevel=5 add 6, yielding 8..11; otherwise keep 2..5"
+      },
+      "tile_entity": {
+        "required": true,
+        "id": "etfuturum.hive",
+        "fields": [
+          {
+            "name": "Bees",
+            "type": "TAG_List<TAG_Compound>",
+            "required": false,
+            "note": "Entries contain EntityData, TicksInHive, MinOccupationTicks."
+          },
+          {
+            "name": "FlowerPos",
+            "type": "TAG_Compound",
+            "required": false
+          },
+          {
+            "name": "honeyLevel",
+            "type": "TAG_Int",
+            "required": true,
+            "note": "0..5"
+          }
+        ]
+      },
+      "source_properties": {
+        "facing": "exact",
+        "honey_level": "exact -> honeyLevel plus full metadata form"
+      },
+      "source_block_entity": {
+        "bees": "requires entity-by-entity NBT translation to EFR EntityBee",
+        "flower_pos": "preserve if coordinates valid"
+      },
+      "derived": [],
+      "unsupported": [
+        "untranslated 1.21 bee entity data/components"
+      ],
+      "exactness": {
+        "visible_state": "facing and full/not-full honey model exact",
+        "block_entity_display": "honey exact; bee occupants partial unless translated"
+      }
+    },
+    {
+      "key": "bee_nest",
+      "source_ids": [
+        "minecraft:bee_nest"
+      ],
+      "target_ids": [
+        "etfuturum:bee_nest"
+      ],
+      "classification": "PARTIAL_IMPORT",
+      "metadata": {
+        "facing": {
+          "north": 2,
+          "south": 3,
+          "west": 4,
+          "east": 5
+        },
+        "full_honey_encoding": "when honeyLevel=5 add 6, yielding 8..11; otherwise keep 2..5"
+      },
+      "tile_entity": {
+        "required": true,
+        "id": "etfuturum.hive",
+        "fields": [
+          {
+            "name": "Bees",
+            "type": "TAG_List<TAG_Compound>",
+            "required": false,
+            "note": "Entries contain EntityData, TicksInHive, MinOccupationTicks."
+          },
+          {
+            "name": "FlowerPos",
+            "type": "TAG_Compound",
+            "required": false
+          },
+          {
+            "name": "honeyLevel",
+            "type": "TAG_Int",
+            "required": true,
+            "note": "0..5"
+          }
+        ]
+      },
+      "source_properties": {
+        "facing": "exact",
+        "honey_level": "exact -> honeyLevel plus full metadata form"
+      },
+      "source_block_entity": {
+        "bees": "requires entity-by-entity NBT translation to EFR EntityBee",
+        "flower_pos": "preserve if coordinates valid"
+      },
+      "derived": [],
+      "unsupported": [
+        "untranslated 1.21 bee entity data/components"
+      ],
+      "exactness": {
+        "visible_state": "facing and full/not-full honey model exact",
+        "block_entity_display": "honey exact; bee occupants partial unless translated"
+      }
+    },
+    {
+      "key": "blast_furnace",
+      "source_ids": [
+        "minecraft:blast_furnace"
+      ],
+      "target_ids": [
+        "etfuturum:blast_furnace",
+        "etfuturum:lit_blast_furnace"
+      ],
+      "classification": "PARTIAL_IMPORT",
+      "target_rule": "source lit=false -> unlit target identity; lit=true -> lit_ target identity; both use same facing metadata/TE class",
+      "metadata": {
+        "facing": {
+          "north": 2,
+          "south": 3,
+          "west": 4,
+          "east": 5
+        }
+      },
+      "tile_entity": {
+        "required": true,
+        "id": "etfuturum.blast_furnace",
+        "fields": [
+          {
+            "name": "Items",
+            "type": "TAG_List<TAG_Compound>",
+            "required": false,
+            "note": "Slots 0 input, 1 fuel, 2 output."
+          },
+          {
+            "name": "BurnTime",
+            "type": "TAG_Short",
+            "required": true
+          },
+          {
+            "name": "CookTime",
+            "type": "TAG_Short",
+            "required": true
+          },
+          {
+            "name": "CustomName",
+            "type": "TAG_String",
+            "required": false
+          }
+        ]
+      },
+      "source_properties": {
+        "facing": "exact",
+        "lit": "exact -> registry identity"
+      },
+      "source_block_entity": {
+        "inventory": "translate three slots",
+        "burn/cook progress": "map to BurnTime/CookTime where meaningful",
+        "RecipesUsed": "not represented"
+      },
+      "derived": [
+        "currentItemBurnTime recomputed from fuel slot"
+      ],
+      "unsupported": [
+        "modern RecipesUsed and differing total-cook-time semantics"
+      ],
+      "exactness": {
+        "visible_state": "facing/lit exact",
+        "block_entity_display": "inventory exact; progress partial"
+      }
+    },
+    {
+      "key": "smoker",
+      "source_ids": [
+        "minecraft:smoker"
+      ],
+      "target_ids": [
+        "etfuturum:smoker",
+        "etfuturum:lit_smoker"
+      ],
+      "classification": "PARTIAL_IMPORT",
+      "target_rule": "source lit=false -> unlit target identity; lit=true -> lit_ target identity; both use same facing metadata/TE class",
+      "metadata": {
+        "facing": {
+          "north": 2,
+          "south": 3,
+          "west": 4,
+          "east": 5
+        }
+      },
+      "tile_entity": {
+        "required": true,
+        "id": "etfuturum.smoker",
+        "fields": [
+          {
+            "name": "Items",
+            "type": "TAG_List<TAG_Compound>",
+            "required": false,
+            "note": "Slots 0 input, 1 fuel, 2 output."
+          },
+          {
+            "name": "BurnTime",
+            "type": "TAG_Short",
+            "required": true
+          },
+          {
+            "name": "CookTime",
+            "type": "TAG_Short",
+            "required": true
+          },
+          {
+            "name": "CustomName",
+            "type": "TAG_String",
+            "required": false
+          }
+        ]
+      },
+      "source_properties": {
+        "facing": "exact",
+        "lit": "exact -> registry identity"
+      },
+      "source_block_entity": {
+        "inventory": "translate three slots",
+        "burn/cook progress": "map to BurnTime/CookTime where meaningful",
+        "RecipesUsed": "not represented"
+      },
+      "derived": [
+        "currentItemBurnTime recomputed from fuel slot"
+      ],
+      "unsupported": [
+        "modern RecipesUsed and differing total-cook-time semantics"
+      ],
+      "exactness": {
+        "visible_state": "facing/lit exact",
+        "block_entity_display": "inventory exact; progress partial"
+      }
+    },
+    {
+      "key": "glow_lichen",
+      "source_ids": [
+        "minecraft:glow_lichen"
+      ],
+      "target_ids": [
+        "etfuturum:glow_lichen"
+      ],
+      "classification": "FULL_IMPORT",
+      "metadata": {
+        "layout": "none for face state"
+      },
+      "tile_entity": {
+        "required": true,
+        "id": "etfuturum.glow_lichen",
+        "fields": [
+          {
+            "name": "State",
+            "type": "TAG_Int",
+            "required": true,
+            "note": "Six-face mask using ForgeDirection bits 0 down,1 up,2 north,3 south,4 west,5 east."
+          }
+        ]
+      },
+      "source_properties": {
+        "down/up/north/south/west/east": "exact -> State face mask"
+      },
+      "source_block_entity": {},
+      "derived": [],
+      "unsupported": [
+        "waterlogged"
+      ],
+      "exactness": {
+        "visible_state": "six faces exact",
+        "block_entity_display": "exact"
+      }
+    },
+    {
+      "key": "sculk_vein",
+      "source_ids": [
+        "minecraft:sculk_vein"
+      ],
+      "target_ids": [
+        "etfuturum:sculk_vein"
+      ],
+      "classification": "FULL_IMPORT",
+      "metadata": {
+        "layout": "none for face state"
+      },
+      "tile_entity": {
+        "required": true,
+        "id": "etfuturum:modern_parity_multiface",
+        "fields": [
+          {
+            "name": "FaceMask",
+            "type": "TAG_Int",
+            "required": true,
+            "note": "bits 0 down,1 up,2 north,3 south,4 west,5 east"
+          }
+        ]
+      },
+      "source_properties": {
+        "six face booleans": "exact -> FaceMask"
+      },
+      "source_block_entity": {},
+      "derived": [],
+      "unsupported": [
+        "waterlogged",
+        "sculk spreading mechanics deferred"
+      ],
+      "exactness": {
+        "visible_state": "exact",
+        "block_entity_display": "exact"
+      }
+    },
+    {
+      "key": "resin_clump",
+      "source_ids": [
+        "minecraft:resin_clump"
+      ],
+      "target_ids": [
+        "etfuturum:resin_clump"
+      ],
+      "classification": "FULL_IMPORT",
+      "metadata": {
+        "layout": "none for face state"
+      },
+      "tile_entity": {
+        "required": true,
+        "id": "etfuturum:modern_parity_multiface",
+        "fields": [
+          {
+            "name": "FaceMask",
+            "type": "TAG_Int",
+            "required": true
+          }
+        ]
+      },
+      "source_properties": {
+        "six face booleans": "exact -> FaceMask"
+      },
+      "source_block_entity": {},
+      "derived": [],
+      "unsupported": [
+        "waterlogged"
+      ],
+      "exactness": {
+        "visible_state": "exact",
+        "block_entity_display": "exact"
+      }
+    }
+  ],
+  "tile_entity_audit": [
+    {
+      "implementation": "ParityChiseledBookshelfTileEntity",
+      "tile_entity_id": "etfuturum:modern_parity_chiseled_bookshelf",
+      "classification": "FULL_IMPORT",
+      "note": "Pass 32 LastInteractedSlot + six inventory slots."
+    },
+    {
+      "implementation": "TileEntityCaveVines",
+      "tile_entity_id": "etfuturum.cave_vines",
+      "classification": "FULL_IMPORT",
+      "note": "Pass 32 canonical Age plus old MaxLength/TipSheared migration."
+    },
+    {
+      "implementation": "ParityShelfTileEntity",
+      "tile_entity_id": "etfuturum:modern_parity_shelf",
+      "classification": "FULL_IMPORT",
+      "note": "Three slots; side_chain derived."
+    },
+    {
+      "implementation": "ParityDecoratedPotTileEntity",
+      "tile_entity_id": "etfuturum:modern_parity_decorated_pot",
+      "classification": "PARTIAL_IMPORT",
+      "note": "Four decorations and item exact; waterlogging/persistent cracked state unavailable."
+    },
+    {
+      "implementation": "ParityCampfireTileEntity",
+      "tile_entity_id": "etfuturum:modern_parity_campfire",
+      "classification": "PARTIAL_IMPORT",
+      "note": "Four cooking slots/progress represented; modern total cook times unavailable."
+    },
+    {
+      "implementation": "ParityBrushableTileEntity",
+      "tile_entity_id": "etfuturum:modern_parity_brushable",
+      "classification": "PARTIAL_IMPORT",
+      "note": "Buried concrete item/progress preserved including falling; modern loot table execution unavailable."
+    },
+    {
+      "implementation": "ParitySignTileEntity",
+      "tile_entity_id": "etfuturum:modern_parity_sign",
+      "classification": "PARTIAL_IMPORT",
+      "note": "Two-sided plain text/dye/glow/wax represented; rich text flattened."
+    },
+    {
+      "implementation": "ParityCopperChestTileEntity",
+      "tile_entity_id": "etfuturum:modern_parity_copper_chest",
+      "classification": "FULL_IMPORT",
+      "note": "Vanilla chest inventory/name with static weather identity."
+    },
+    {
+      "implementation": "ParityMultifaceTileEntity",
+      "tile_entity_id": "etfuturum:modern_parity_multiface",
+      "classification": "FULL_IMPORT",
+      "note": "FaceMask for Sculk Vein/Resin Clump."
+    },
+    {
+      "implementation": "TileEntityWoodSign",
+      "tile_entity_id": "etfuturum.sign",
+      "classification": "PARTIAL_IMPORT",
+      "note": "Mature/vanilla sign compatibility; rich text flattened."
+    },
+    {
+      "implementation": "TileEntityBanner",
+      "tile_entity_id": "etfuturum.banner",
+      "classification": "PARTIAL_IMPORT",
+      "note": "Legacy-supported pattern set only."
+    },
+    {
+      "implementation": "TileEntityShulkerBox",
+      "tile_entity_id": "etfuturum.shulker_box",
+      "classification": "PARTIAL_IMPORT",
+      "note": "Color/facing/inventory/name represented; unresolved loot tables are not."
+    },
+    {
+      "implementation": "TileEntityBarrel",
+      "tile_entity_id": "etfuturum.barrel",
+      "classification": "PARTIAL_IMPORT",
+      "note": "Inventory/facing/name represented; open is transient and modern loot tables need resolution."
+    },
+    {
+      "implementation": "TileEntityBeeHive",
+      "tile_entity_id": "etfuturum.hive",
+      "classification": "PARTIAL_IMPORT",
+      "note": "Honey/facing exact; bee entity NBT requires entity translation."
+    },
+    {
+      "implementation": "TileEntityBlastFurnace",
+      "tile_entity_id": "etfuturum.blast_furnace",
+      "classification": "PARTIAL_IMPORT",
+      "note": "Inventory/facing/lit exact; recipe/progress semantics partial."
+    },
+    {
+      "implementation": "TileEntitySmoker",
+      "tile_entity_id": "etfuturum.smoker",
+      "classification": "PARTIAL_IMPORT",
+      "note": "Inventory/facing/lit exact; recipe/progress semantics partial."
+    },
+    {
+      "implementation": "TileEntityGlowLichen",
+      "tile_entity_id": "etfuturum.glow_lichen",
+      "classification": "FULL_IMPORT",
+      "note": "Six-face State mask; waterlogging unavailable."
+    },
+    {
+      "implementation": "TileEntitySculkCatalyst",
+      "tile_entity_id": "etfuturum.sculk_catalyst",
+      "classification": "PARTIAL_IMPORT",
+      "note": "Persistent block bloom is metadata; TE bloomWithExperience remains TODO, so mechanics are partial."
+    },
+    {
+      "implementation": "TileEntityNewBrewingStand",
+      "tile_entity_id": "etfuturum.brewing_stand",
+      "classification": "PARTIAL_IMPORT",
+      "note": "Real EFR TE exists but Pass 32 does not redefine mature brewing mechanics; converter should use existing 1.7-compatible inventory NBT."
+    },
+    {
+      "implementation": "TileEntityNewBeacon",
+      "tile_entity_id": "etfuturum.beacon",
+      "classification": "PARTIAL_IMPORT",
+      "note": "Real EFR TE exists; modern component/effect representation requires translation beyond this parity pass."
+    },
+    {
+      "implementation": "TileEntityGateway",
+      "tile_entity_id": "etfuturum.end_gateway",
+      "classification": "PARTIAL_IMPORT",
+      "note": "Real EFR TE exists; not a primary 1.21.11 parity family in this pass."
+    },
+    {
+      "implementation": "TileEntityCauldronPotion",
+      "tile_entity_id": "etfuturum.potion_cauldron",
+      "classification": "PARTIAL_IMPORT",
+      "note": "EFR-specific potion cauldron TE; not a direct vanilla 1.21.11 block-entity target."
+    },
+    {
+      "implementation": "Crafter",
+      "tile_entity_id": "none",
+      "classification": "VISUAL_ONLY_IMPORT",
+      "note": "Parity block exists but no real inventory/redstone TE; mechanics deferred."
+    },
+    {
+      "implementation": "Lectern",
+      "tile_entity_id": "none",
+      "classification": "VISUAL_ONLY_IMPORT",
+      "note": "Parity block exists but no book/page/comparator TE; mechanics deferred."
+    }
+  ]
+}

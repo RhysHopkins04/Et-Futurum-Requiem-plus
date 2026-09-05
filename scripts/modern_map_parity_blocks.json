@@ -1,7 +1,7 @@
 {
   "target": "Minecraft Java 1.21.11 visual block compatibility shells",
   "note": "Only genuinely missing visual/standalone families are listed; existing EFR subtype blocks remain authoritative and are mapped by the Backporter.",
-  "count": 243,
+  "count": 244,
   "blocks": [
     {
       "ver": "1.9",
@@ -1566,7 +1566,7 @@
     {
       "ver": "1.21.4",
       "name": "pale_oak_pressure_plate",
-      "style": "LAYER",
+      "style": "PRESSURE_PLATE",
       "texture": "pale_oak_planks",
       "asset": null,
       "material": "WOOD",
@@ -2312,6 +2312,16 @@
       "material": "PLANT",
       "light": 14,
       "meta": ""
+    },
+    {
+      "ver": "1.21.9",
+      "name": "copper_wall_torch",
+      "style": "TORCH",
+      "texture": "copper_torch",
+      "asset": null,
+      "material": "PLANT",
+      "light": 14,
+      "meta": "technical wall identity; facing=2..5"
     },
     {
       "ver": "1.21.9",

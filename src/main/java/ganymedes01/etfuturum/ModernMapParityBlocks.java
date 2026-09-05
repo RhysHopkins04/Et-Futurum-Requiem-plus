@@ -21,6 +21,7 @@ import ganymedes01.etfuturum.tileentities.TileEntityWoodSign;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockChest;
 import net.minecraft.block.BlockFalling;
+import net.minecraft.block.BlockPressurePlate;
 import net.minecraft.block.BlockFence;
 import net.minecraft.block.BlockFenceGate;
 import net.minecraft.block.BlockWall;
@@ -43,6 +44,7 @@ import net.minecraft.entity.IProjectile;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.item.EntityFallingBlock;
+import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -254,7 +256,7 @@ public enum ModernMapParityBlocks {
     PALE_OAK_FENCE_GATE("1.21.4", Style.FENCE_GATE, Material.wood, "pale_oak_planks", "textures/block/pale_oak_planks.png", 0),
     PALE_OAK_DOOR("1.21.4", Style.DOOR, Material.wood, "pale_oak_door", "textures/block/pale_oak_door.png", 0),
     PALE_OAK_TRAPDOOR("1.21.4", Style.TRAPDOOR, Material.wood, "pale_oak_trapdoor", "textures/block/pale_oak_trapdoor.png", 0),
-    PALE_OAK_PRESSURE_PLATE("1.21.4", Style.LAYER, Material.wood, "pale_oak_planks", "textures/block/pale_oak_planks.png", 0),
+    PALE_OAK_PRESSURE_PLATE("1.21.4", Style.PRESSURE_PLATE, Material.wood, "pale_oak_planks", "textures/block/pale_oak_planks.png", 0),
     PALE_OAK_BUTTON("1.21.4", Style.BUTTON, Material.wood, "pale_oak_planks", "textures/block/pale_oak_planks.png", 0),
     PALE_OAK_SIGN("1.21.4", Style.SIGN, Material.wood, "pale_oak_planks", "textures/block/pale_oak_planks.png", 0),
     PALE_OAK_WALL_SIGN("1.21.4", Style.SIGN, Material.wood, "pale_oak_planks", "textures/block/pale_oak_planks.png", 0),
@@ -329,6 +331,7 @@ public enum ModernMapParityBlocks {
     WAXED_OXIDIZED_COPPER_LANTERN("1.21.9", Style.SMALL, Material.iron, "oxidized_copper_lantern", "textures/block/oxidized_copper_lantern.png", 15),
     WAXED_OXIDIZED_LIGHTNING_ROD("1.21.9", Style.SMALL, Material.iron, "oxidized_copper", "textures/block/oxidized_copper.png", 0),
     COPPER_TORCH("1.21.9", Style.TORCH, Material.plants, "copper_torch", "textures/block/copper_torch.png", 14),
+    COPPER_WALL_TORCH("1.21.9", Style.TORCH, Material.plants, "copper_torch", "textures/block/copper_torch.png", 14),
     OAK_SHELF("1.21.9", Style.SHELF, Material.wood, "oak_shelf", "textures/block/oak_shelf.png", 0),
     SPRUCE_SHELF("1.21.9", Style.SHELF, Material.wood, "spruce_shelf", "textures/block/spruce_shelf.png", 0),
     BIRCH_SHELF("1.21.9", Style.SHELF, Material.wood, "birch_shelf", "textures/block/birch_shelf.png", 0),
@@ -344,7 +347,7 @@ public enum ModernMapParityBlocks {
 
     public enum Style {
         CUBE, CUTOUT, PLANT, WALL_PLANT, VINE, LAYER, SMALL, CANDLE, CANDLE_CAKE,
-        LEAVES, LOG, SLAB, STAIRS, WALL, FENCE, FENCE_GATE, DOOR, TRAPDOOR, BUTTON,
+        LEAVES, LOG, SLAB, STAIRS, WALL, FENCE, FENCE_GATE, DOOR, TRAPDOOR, BUTTON, PRESSURE_PLATE,
         SIGN, HANGING_SIGN, PANE, TORCH, SHELF
     }
 
@@ -364,6 +367,7 @@ public enum ModernMapParityBlocks {
     private static boolean parityShelfTileRegistered;
     private static boolean parityBrushableTileRegistered;
     private static boolean parityMultifaceTileRegistered;
+    private static boolean parityButtonTileRegistered;
     private static boolean decoratedPotRecipeRegistered;
 
     /** Pass 30 bit order: DOWN, UP, NORTH, SOUTH, WEST, EAST (ForgeDirection ordinals 0..5). */
@@ -462,6 +466,11 @@ public enum ModernMapParityBlocks {
                     Tags.MOD_ID + ":modern_parity_multiface");
             parityMultifaceTileRegistered = true;
         }
+        if (!parityButtonTileRegistered) {
+            GameRegistry.registerTileEntity(ParityButtonTileEntity.class,
+                    Tags.MOD_ID + ":modern_parity_button");
+            parityButtonTileRegistered = true;
+        }
         ModernPotterySherds.init();
         ModernArchaeology.init();
         for (ModernMapParityBlocks entry : values()) {
@@ -478,7 +487,7 @@ public enum ModernMapParityBlocks {
             // tolerates removed technical ItemBlocks for older EFR saves.
             boolean technicalPlacementBlock = name.endsWith("_wall_sign")
                     || name.endsWith("_wall_hanging_sign") || name.endsWith("_coral_wall_fan")
-                    || "potted_torchflower".equals(name);
+                    || "potted_torchflower".equals(name) || "copper_wall_torch".equals(name);
             if (!technicalPlacementBlock) entry.block.setCreativeTab(EtFuturum.creativeTabBlocks);
             if (entry.lightLevel > 0 && !entry.usesDynamicLight()) entry.block.setLightLevel(entry.lightLevel / 15.0F);
             if (entry.block instanceof BaseSlab) {
@@ -487,7 +496,7 @@ public enum ModernMapParityBlocks {
             } else if (entry.block instanceof BaseDoor) {
                 GameRegistry.registerBlock(entry.block,
                         entry == PALE_OAK_DOOR ? ParityDoorItemBlock.class : ItemBlockNewDoor.class, name);
-            } else if (name.endsWith("_coral_wall_fan")) GameRegistry.registerBlock(entry.block, (Class<? extends ItemBlock>) null, name);
+            } else if (name.endsWith("_coral_wall_fan") || "copper_wall_torch".equals(name)) GameRegistry.registerBlock(entry.block, (Class<? extends ItemBlock>) null, name);
             else if ("potted_torchflower".equals(name)) {
                 GameRegistry.registerBlock(entry.block, (Class<? extends ItemBlock>) null, name);
             } else if ("torchflower".equals(name)) {
@@ -526,6 +535,7 @@ public enum ModernMapParityBlocks {
         }
         if (this == PALE_OAK_DOOR) return new ParityDoorBlock(this);
         if (this == PALE_OAK_TRAPDOOR) return new ParityTrapdoorBlock(this);
+        if (this == PALE_OAK_PRESSURE_PLATE) return new ParityPressurePlateBlock(this);
         return new ParityModelBlock(this);
     }
 
@@ -994,12 +1004,98 @@ public enum ModernMapParityBlocks {
         }
     }
 
+    /** Persistent pressed state for the 24-state Pale Oak Button orientation contract. */
+    public static final class ParityButtonTileEntity extends TileEntity {
+        private boolean powered;
+        /** Manual wooden-button countdown. Imported Powered=true without this field remains exact. */
+        private int manualReleaseTicks;
+        /** Runtime-only cause marker, persisted only so a lodged arrow survives save/reload cleanly. */
+        private boolean projectileHeld;
+
+        public boolean isPowered() { return powered; }
+        public boolean isProjectileHeld() { return projectileHeld; }
+
+        public void setPowered(boolean value) {
+            if (!value) {
+                manualReleaseTicks = 0;
+                projectileHeld = false;
+            }
+            if (powered == value) return;
+            powered = value;
+            markDirty();
+            if (worldObj != null) {
+                worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
+                worldObj.markBlockRangeForRenderUpdate(xCoord, yCoord, zCoord, xCoord, yCoord, zCoord);
+            }
+        }
+
+        public void armManualRelease(int ticks) {
+            projectileHeld = false;
+            manualReleaseTicks = Math.max(1, ticks);
+            setPowered(true);
+            markDirty();
+        }
+
+        public void holdByProjectile() {
+            manualReleaseTicks = 0;
+            projectileHeld = true;
+            setPowered(true);
+            markDirty();
+        }
+
+        @Override
+        public void updateEntity() {
+            if (worldObj == null || worldObj.isRemote || !powered) return;
+            Block block = worldObj.getBlock(xCoord, yCoord, zCoord);
+            if (projectileHeld) {
+                if (block instanceof ParityModelBlock) {
+                    ((ParityModelBlock) block).refreshPaleOakButtonProjectileState(worldObj, xCoord, yCoord, zCoord);
+                }
+                return;
+            }
+            if (manualReleaseTicks <= 0) return;
+            manualReleaseTicks--;
+            if (manualReleaseTicks == 0) {
+                if (block instanceof ParityModelBlock) {
+                    ((ParityModelBlock) block).releasePaleOakButton(worldObj, xCoord, yCoord, zCoord);
+                } else {
+                    setPowered(false);
+                }
+            }
+        }
+
+        @Override public void writeToNBT(NBTTagCompound tag) {
+            super.writeToNBT(tag);
+            tag.setBoolean("Powered", powered);
+            if (manualReleaseTicks > 0) tag.setInteger("ManualReleaseTicks", manualReleaseTicks);
+            if (projectileHeld) tag.setBoolean("ProjectileHeld", true);
+        }
+        @Override public void readFromNBT(NBTTagCompound tag) {
+            super.readFromNBT(tag);
+            powered = tag.getBoolean("Powered");
+            manualReleaseTicks = Math.max(0, tag.getInteger("ManualReleaseTicks"));
+            projectileHeld = tag.getBoolean("ProjectileHeld");
+        }
+        @Override public Packet getDescriptionPacket() {
+            NBTTagCompound tag = new NBTTagCompound(); writeToNBT(tag);
+            return new S35PacketUpdateTileEntity(xCoord, yCoord, zCoord, 6, tag);
+        }
+        @Override public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity packet) {
+            readFromNBT(packet.func_148857_g());
+            if (worldObj != null) worldObj.markBlockRangeForRenderUpdate(xCoord, yCoord, zCoord, xCoord, yCoord, zCoord);
+        }
+    }
+
     /** One-stack container plus the four modern pot-decoration identities. */
     public static final class ParityDecoratedPotTileEntity extends TileEntity implements ISidedInventory {
         private static final int[] ACCESSIBLE_SLOT = {0};
         // Modern order: back, left, right, front.
         private final String[] sherds = {"minecraft:brick", "minecraft:brick", "minecraft:brick", "minecraft:brick"};
         private ItemStack item;
+        private boolean cracked;
+
+        public boolean isCracked() { return cracked; }
+        public void setCracked(boolean value) { cracked = value; markDirtyAndSync(); }
 
         public String[] getSherds() {
             return sherds.clone();
@@ -1011,6 +1107,7 @@ public enum ModernMapParityBlocks {
             NBTTagCompound source = root.hasKey("BlockEntityTag", 10)
                     ? root.getCompoundTag("BlockEntityTag") : root;
             readSherds(source);
+            cracked = source.getBoolean("Cracked");
             markDirtyAndSync();
         }
 
@@ -1056,6 +1153,7 @@ public enum ModernMapParityBlocks {
             NBTTagList list = new NBTTagList();
             for (String sherd : sherds) list.appendTag(new net.minecraft.nbt.NBTTagString(sherd));
             tag.setTag("sherds", list);
+            tag.setBoolean("Cracked", cracked);
             if (item != null) {
                 NBTTagCompound itemTag = new NBTTagCompound();
                 item.writeToNBT(itemTag);
@@ -1067,6 +1165,7 @@ public enum ModernMapParityBlocks {
         public void readFromNBT(NBTTagCompound tag) {
             super.readFromNBT(tag);
             readSherds(tag);
+            cracked = tag.getBoolean("Cracked");
             item = tag.hasKey("item", 10) ? ItemStack.loadItemStackFromNBT(tag.getCompoundTag("item")) : null;
         }
 
@@ -1399,6 +1498,30 @@ public enum ModernMapParityBlocks {
         }
     }
 
+    /** Real wooden pressure-plate mechanics with AssetDirector-authored 1.21.11 visuals. */
+    private static final class ParityPressurePlateBlock extends BlockPressurePlate {
+        private final ModernMapParityBlocks entry;
+
+        ParityPressurePlateBlock(ModernMapParityBlocks entry) {
+            super("pale_oak_planks", Material.wood, BlockPressurePlate.Sensitivity.everything);
+            this.entry = entry;
+            setHardness(0.5F);
+            setStepSound(soundTypeWood);
+        }
+
+        @Override @SideOnly(Side.CLIENT)
+        public void registerBlockIcons(IIconRegister reg) {
+            blockIcon = reg.registerIcon("minecraft:planks_oak");
+            ModernJsonModelBridge.PreparedModels prepared = ModernJsonModelBridge.prepare(entry, reg);
+            IIcon fallback = ModernJsonModelBridge.getFallbackIcon(prepared);
+            if (fallback != null) blockIcon = fallback;
+        }
+        @Override public int getRenderType() { return RenderIDs.MODERN_MAP_PARITY; }
+        @Override public boolean renderAsNormalBlock() { return false; }
+        @Override public boolean isOpaqueCube() { return false; }
+        @Override public int damageDropped(int meta) { return 0; }
+    }
+
     private static final class ParityModelBlock extends Block implements ITileEntityProvider {
         private final ModernMapParityBlocks entry;
         private final ThreadLocal<Integer> harvestedMultifaceMask = new ThreadLocal<Integer>();
@@ -1476,6 +1599,10 @@ public enum ModernMapParityBlocks {
         private boolean isDecoratedPot() {
             return entry == DECORATED_POT;
         }
+
+        private boolean isPaleOakButton() { return entry == PALE_OAK_BUTTON; }
+        private boolean isCopperTorch() { return entry == COPPER_TORCH || entry == COPPER_WALL_TORCH; }
+        private boolean isCopperWallTorch() { return entry == COPPER_WALL_TORCH; }
 
         private boolean isSuspicious() {
             return entry == SUSPICIOUS_SAND || entry == SUSPICIOUS_GRAVEL;
@@ -1593,6 +1720,14 @@ public enum ModernMapParityBlocks {
                 setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 1.0F / 16.0F, 1.0F);
                 return;
             }
+            if (isPaleOakButton()) {
+                setBlockBounds(5.0F/16.0F, 6.0F/16.0F, 14.0F/16.0F, 11.0F/16.0F, 10.0F/16.0F, 1.0F);
+                return;
+            }
+            if (isCopperTorch()) {
+                setBlockBounds(6.0F/16.0F, 0.0F, 6.0F/16.0F, 10.0F/16.0F, 10.0F/16.0F, 10.0F/16.0F);
+                return;
+            }
             if (isLightningRod()) {
                 setBlockBounds(0.375F, 0.0F, 0.375F, 0.625F, 1.0F, 0.625F);
                 return;
@@ -1691,6 +1826,150 @@ public enum ModernMapParityBlocks {
             }
         }
 
+        private boolean buttonPowered(IBlockAccess world, int x, int y, int z) {
+            TileEntity tile = world == null ? null : world.getTileEntity(x, y, z);
+            return tile instanceof ParityButtonTileEntity && ((ParityButtonTileEntity) tile).isPowered();
+        }
+
+        /** Notifies both the button's neighbours and the neighbours of its attached support block. */
+        private void notifyPaleOakButtonNeighbors(World world, int x, int y, int z, int state) {
+            world.notifyBlocksOfNeighborChange(x, y, z, this);
+            int face = state / 4, facing = state & 3;
+            if (face == 1) world.notifyBlocksOfNeighborChange(x, y - 1, z, this);
+            else if (face == 2) world.notifyBlocksOfNeighborChange(x, y + 1, z, this);
+            else if (facing == 0) world.notifyBlocksOfNeighborChange(x, y, z + 1, this);
+            else if (facing == 1) world.notifyBlocksOfNeighborChange(x - 1, y, z, this);
+            else if (facing == 2) world.notifyBlocksOfNeighborChange(x, y, z - 1, this);
+            else world.notifyBlocksOfNeighborChange(x + 1, y, z, this);
+        }
+
+        /** Releases a runtime activation without altering imported idle Powered=true state. */
+        private void releasePaleOakButton(World world, int x, int y, int z) {
+            if (world == null || world.isRemote) return;
+            TileEntity tile = world.getTileEntity(x, y, z);
+            if (!(tile instanceof ParityButtonTileEntity)) return;
+            ParityButtonTileEntity button = (ParityButtonTileEntity) tile;
+            if (!button.isPowered()) return;
+            int state = world.getBlockMetadata(x, y, z) & 15;
+            button.setPowered(false);
+            notifyPaleOakButtonNeighbors(world, x, y, z, state);
+            world.playSoundEffect(x + 0.5D, y + 0.5D, z + 0.5D, "random.click", 0.3F, 0.5F);
+        }
+
+        private boolean paleOakButtonHasArrow(World world, int x, int y, int z) {
+            setPaleOakButtonBounds(world, x, y, z);
+            AxisAlignedBB box = AxisAlignedBB.getBoundingBox(
+                    x + minX, y + minY, z + minZ, x + maxX, y + maxY, z + maxZ);
+            return !world.getEntitiesWithinAABB(EntityArrow.class, box).isEmpty();
+        }
+
+        private void refreshPaleOakButtonProjectileState(World world, int x, int y, int z) {
+            if (world == null || world.isRemote) return;
+            TileEntity tile = world.getTileEntity(x, y, z);
+            if (!(tile instanceof ParityButtonTileEntity)) return;
+            ParityButtonTileEntity button = (ParityButtonTileEntity) tile;
+            if (paleOakButtonHasArrow(world, x, y, z)) {
+                boolean wasPowered = button.isPowered();
+                button.holdByProjectile();
+                if (!wasPowered) {
+                    int state = world.getBlockMetadata(x, y, z) & 15;
+                    notifyPaleOakButtonNeighbors(world, x, y, z, state);
+                    world.playSoundEffect(x + 0.5D, y + 0.5D, z + 0.5D, "random.click", 0.3F, 0.6F);
+                }
+            } else if (button.isProjectileHeld()) {
+                releasePaleOakButton(world, x, y, z);
+            }
+        }
+
+        private void activatePaleOakButtonFromArrow(World world, int x, int y, int z) {
+            if (world == null || world.isRemote) return;
+            TileEntity tile = world.getTileEntity(x, y, z);
+            if (!(tile instanceof ParityButtonTileEntity)) return;
+            ParityButtonTileEntity button = (ParityButtonTileEntity) tile;
+            boolean wasPowered = button.isPowered();
+            button.holdByProjectile();
+            if (!wasPowered) {
+                int state = world.getBlockMetadata(x, y, z) & 15;
+                notifyPaleOakButtonNeighbors(world, x, y, z, state);
+                world.playSoundEffect(x + 0.5D, y + 0.5D, z + 0.5D, "random.click", 0.3F, 0.6F);
+            }
+        }
+
+        private int paleOakButtonStrongPowerSide(int state) {
+            int face = state / 4, facing = state & 3;
+            if (face == 1) return 1; // attached below
+            if (face == 2) return 0; // attached above
+            switch (facing) {
+                case 0: return 2; // north-facing, attached south
+                case 1: return 5; // east-facing, attached west
+                case 2: return 3; // south-facing, attached north
+                default:return 4; // west-facing, attached east
+            }
+        }
+
+        private void setPaleOakButtonBounds(IBlockAccess world, int x, int y, int z) {
+            int state = world.getBlockMetadata(x, y, z) & 15;
+            int face = state / 4;
+            int facing = state & 3;
+            float depth = buttonPowered(world, x, y, z) ? 1.0F/16.0F : 2.0F/16.0F;
+            float a = 5.0F/16.0F, b = 11.0F/16.0F, c = 6.0F/16.0F, d = 10.0F/16.0F;
+            if (face == 1) {
+                if ((facing & 1) == 0) setBlockBounds(a, 0.0F, c, b, depth, d);
+                else setBlockBounds(c, 0.0F, a, d, depth, b);
+            } else if (face == 2) {
+                if ((facing & 1) == 0) setBlockBounds(a, 1.0F-depth, c, b, 1.0F, d);
+                else setBlockBounds(c, 1.0F-depth, a, d, 1.0F, b);
+            } else {
+                switch (facing) {
+                    case 0: setBlockBounds(a, c, 1.0F-depth, b, d, 1.0F); break; // north-facing, support south
+                    case 1: setBlockBounds(0.0F, c, a, depth, d, b); break; // east-facing, support west
+                    case 2: setBlockBounds(a, c, 0.0F, b, d, depth); break; // south-facing, support north
+                    default: setBlockBounds(1.0F-depth, c, a, 1.0F, d, b); break; // west-facing, support east
+                }
+            }
+        }
+
+        private void setCopperTorchBounds(int meta) {
+            float r = 2.0F/16.0F;
+            if (!isCopperWallTorch()) { setBlockBounds(0.5F-r, 0.0F, 0.5F-r, 0.5F+r, 10.0F/16.0F, 0.5F+r); return; }
+            switch (normaliseHorizontalSide(meta)) {
+                case 2: setBlockBounds(0.5F-r, 3.0F/16.0F, 10.0F/16.0F, 0.5F+r, 13.0F/16.0F, 1.0F); break;
+                case 3: setBlockBounds(0.5F-r, 3.0F/16.0F, 0.0F, 0.5F+r, 13.0F/16.0F, 6.0F/16.0F); break;
+                case 4: setBlockBounds(10.0F/16.0F, 3.0F/16.0F, 0.5F-r, 1.0F, 13.0F/16.0F, 0.5F+r); break;
+                default: setBlockBounds(0.0F, 3.0F/16.0F, 0.5F-r, 6.0F/16.0F, 13.0F/16.0F, 0.5F+r); break;
+            }
+        }
+
+        private int facingIndexForSide(int side) {
+            switch (side) { case 2: return 0; case 5: return 1; case 3: return 2; case 4: return 3; default: return 0; }
+        }
+
+        private boolean paleOakButtonSupported(IBlockAccess world, int x, int y, int z, int state) {
+            int face = state / 4, facing = state & 3;
+            if (face == 1) return world.isSideSolid(x, y - 1, z, ForgeDirection.UP, false);
+            if (face == 2) return world.isSideSolid(x, y + 1, z, ForgeDirection.DOWN, false);
+            switch (facing) {
+                case 0: return world.isSideSolid(x, y, z + 1, ForgeDirection.NORTH, false);
+                case 1: return world.isSideSolid(x - 1, y, z, ForgeDirection.EAST, false);
+                case 2: return world.isSideSolid(x, y, z - 1, ForgeDirection.SOUTH, false);
+                default:return world.isSideSolid(x + 1, y, z, ForgeDirection.WEST, false);
+            }
+        }
+
+        private boolean copperTorchSupported(IBlockAccess world, int x, int y, int z, int side) {
+            if (!isCopperWallTorch()) {
+                Block below = world.getBlock(x, y - 1, z);
+                return below != null && (World.doesBlockHaveSolidTopSurface(world, x, y - 1, z)
+                        || (world instanceof World && below.canPlaceTorchOnTop((World) world, x, y - 1, z)));
+            }
+            switch (normaliseHorizontalSide(side)) {
+                case 2: return world.isSideSolid(x, y, z + 1, ForgeDirection.NORTH, false);
+                case 3: return world.isSideSolid(x, y, z - 1, ForgeDirection.SOUTH, false);
+                case 4: return world.isSideSolid(x + 1, y, z, ForgeDirection.WEST, false);
+                default:return world.isSideSolid(x - 1, y, z, ForgeDirection.EAST, false);
+            }
+        }
+
         private boolean connectsTo(IBlockAccess world, int x, int y, int z, Style style) {
             if (style == Style.WALL) return ModernWallState.canConnectWallTo(this, world, x, y, z);
             Block other = world.getBlock(x, y, z);
@@ -1707,6 +1986,14 @@ public enum ModernMapParityBlocks {
 
         @Override
         public void setBlockBoundsBasedOnState(IBlockAccess world, int x, int y, int z) {
+            if (isPaleOakButton()) {
+                setPaleOakButtonBounds(world, x, y, z);
+                return;
+            }
+            if (isCopperTorch()) {
+                setCopperTorchBounds(world.getBlockMetadata(x, y, z) & 7);
+                return;
+            }
             if (entry.style == Style.WALL) {
                 ModernWallState.State state = ModernWallState.derive(this, world, x, y, z);
                 float minX = state.west.isConnected() ? 0.0F : 0.25F;
@@ -1920,6 +2207,7 @@ public enum ModernMapParityBlocks {
 
         @Override
         public Item getItemDropped(int meta, Random random, int fortune) {
+            if (isCopperWallTorch() && COPPER_TORCH.get() != null) return Item.getItemFromBlock(COPPER_TORCH.get());
             if (isCoralWallFan()) {
                 ModernMapParityBlocks floor = coralFanCompanion(false);
                 if (floor != null && floor.get() != null) return Item.getItemFromBlock(floor.get());
@@ -1929,6 +2217,7 @@ public enum ModernMapParityBlocks {
 
         @Override
         public ItemStack getPickBlock(MovingObjectPosition target, World world, int x, int y, int z, EntityPlayer player) {
+            if (isCopperWallTorch() && COPPER_TORCH.get() != null) return new ItemStack(COPPER_TORCH.get());
             if (entry == POTTED_TORCHFLOWER && TORCHFLOWER.get() != null) {
                 return new ItemStack(TORCHFLOWER.get());
             }
@@ -1959,6 +2248,15 @@ public enum ModernMapParityBlocks {
         public int onBlockPlaced(World world, int x, int y, int z, int side,
                 float hitX, float hitY, float hitZ, int meta) {
             if (isMultiface()) return side >= 0 && side < 6 ? ForgeDirection.OPPOSITES[side] : ForgeDirection.DOWN.ordinal();
+            if (isPaleOakButton()) {
+                int facing = side >= 2 && side <= 5 ? facingIndexForSide(side) : 0;
+                int face = side == 1 ? 1 : side == 0 ? 2 : 0;
+                return face * 4 + facing;
+            }
+            if (isCopperTorch()) {
+                if (isCopperWallTorch()) return side >= 2 && side <= 5 ? side : 2;
+                return side >= 2 && side <= 5 ? side : 0;
+            }
             if (isFroglight() || isCopperChain()) {
                 if (side == 4 || side == 5) return 1; // X
                 if (side == 2 || side == 3) return 2; // Z
@@ -2033,6 +2331,19 @@ public enum ModernMapParityBlocks {
                 return;
             }
             int quadrant = MathHelper.floor_double((double) (placer.rotationYaw * 4.0F / 360.0F) + 0.5D) & 3;
+            if (isPaleOakButton()) {
+                int meta = world.getBlockMetadata(x, y, z) & 15;
+                int face = meta / 4;
+                if (face != 0) world.setBlockMetadataWithNotify(x, y, z, face * 4 + ((quadrant + 2) & 3), 2);
+                return;
+            }
+            if (entry == COPPER_TORCH) {
+                int side = world.getBlockMetadata(x, y, z) & 7;
+                if (side >= 2 && side <= 5 && COPPER_WALL_TORCH.get() != null)
+                    world.setBlock(x, y, z, COPPER_WALL_TORCH.get(), side, 3);
+                else if (side != 0) world.setBlockMetadataWithNotify(x, y, z, 0, 2);
+                return;
+            }
             if (isCoralFan()) {
                 int side = world.getBlockMetadata(x, y, z) & 7;
                 if (side >= 2 && side <= 5) {
@@ -2273,6 +2584,23 @@ public enum ModernMapParityBlocks {
                     if (!player.inventory.addItemStackToInventory(flower)) {
                         world.spawnEntityInWorld(new EntityItem(world, x + 0.5D, y + 0.5D, z + 0.5D, flower));
                     }
+                }
+                return true;
+            }
+
+            if (isPaleOakButton()) {
+                TileEntity tile = world.getTileEntity(x, y, z);
+                if (!(tile instanceof ParityButtonTileEntity)) return false;
+                ParityButtonTileEntity button = (ParityButtonTileEntity) tile;
+                if (button.isPowered()) return true;
+                if (!world.isRemote) {
+                    int state = world.getBlockMetadata(x, y, z) & 15;
+                    button.armManualRelease(tickRate(world));
+                    notifyPaleOakButtonNeighbors(world, x, y, z, state);
+                    // Keep the normal scheduled block tick as a second release path. The TE countdown
+                    // makes manual release deterministic even on legacy hosts that coalesce block ticks.
+                    world.scheduleBlockUpdate(x, y, z, this, tickRate(world));
+                    world.playSoundEffect(x + 0.5D, y + 0.5D, z + 0.5D, "random.click", 0.3F, 0.6F);
                 }
                 return true;
             }
@@ -2702,7 +3030,7 @@ public enum ModernMapParityBlocks {
         public int damageDropped(int meta) {
             return (isSegmentedGroundDecal() || isCandle() || isTurtleEgg() || isCampfire() || isScaffolding()
                     || isFroglight() || isCopperChain() || isCopperLantern() || isShelf() || isChiseledBookshelf()
-                    || isDecoratedPot() || isAxisLog() || isMultiface())
+                    || isDecoratedPot() || isAxisLog() || isMultiface() || isPaleOakButton() || isCopperTorch())
                     ? 0 : super.damageDropped(meta);
         }
 
@@ -2710,14 +3038,14 @@ public enum ModernMapParityBlocks {
         public int getDamageValue(World world, int x, int y, int z) {
             return (isSegmentedGroundDecal() || isCandle() || isTurtleEgg() || isCampfire() || isScaffolding()
                     || isFroglight() || isCopperChain() || isCopperLantern() || isShelf() || isChiseledBookshelf()
-                    || isDecoratedPot() || isAxisLog() || isMultiface())
+                    || isDecoratedPot() || isAxisLog() || isMultiface() || isPaleOakButton() || isCopperTorch())
                     ? 0 : super.getDamageValue(world, x, y, z);
         }
 
         @Override
         public boolean hasTileEntity(int metadata) {
             return isSign() || isHangingSign() || isCampfire() || isChiseledBookshelf()
-                    || isDecoratedPot() || isShelf() || isSuspicious() || isMultiface();
+                    || isDecoratedPot() || isShelf() || isSuspicious() || isMultiface() || isPaleOakButton();
         }
 
         @Override
@@ -2729,6 +3057,7 @@ public enum ModernMapParityBlocks {
             if (isShelf()) return new ParityShelfTileEntity();
             if (isSuspicious()) return new ParityBrushableTileEntity();
             if (isMultiface()) return new ParityMultifaceTileEntity();
+            if (isPaleOakButton()) return new ParityButtonTileEntity();
             return null;
         }
 
@@ -2862,11 +3191,36 @@ public enum ModernMapParityBlocks {
                 int face = side >= 0 && side < 6 ? ForgeDirection.OPPOSITES[side] : -1;
                 return canAttachMultifaceFace(world, x, y, z, face);
             }
+            if (isPaleOakButton()) {
+                if (side == 1) return world.isSideSolid(x, y - 1, z, ForgeDirection.UP);
+                if (side == 0) return world.isSideSolid(x, y + 1, z, ForgeDirection.DOWN);
+                int state = facingIndexForSide(side);
+                return paleOakButtonSupported(world, x, y, z, state);
+            }
+            if (entry == COPPER_TORCH) {
+                if (side == 1) return copperTorchSupported(world, x, y, z, 0);
+                if (side == 2) return world.isSideSolid(x, y, z + 1, ForgeDirection.NORTH);
+                if (side == 3) return world.isSideSolid(x, y, z - 1, ForgeDirection.SOUTH);
+                if (side == 4) return world.isSideSolid(x + 1, y, z, ForgeDirection.WEST);
+                if (side == 5) return world.isSideSolid(x - 1, y, z, ForgeDirection.EAST);
+                return false;
+            }
+            if (isCopperWallTorch()) return side >= 2 && side <= 5 && copperTorchSupported(world, x, y, z, side);
             return super.canPlaceBlockOnSide(world, x, y, z, side);
         }
 
         @Override
         public boolean canPlaceBlockAt(World world, int x, int y, int z) {
+            if (isPaleOakButton()) {
+                for (int state = 0; state < 12; state++) if (paleOakButtonSupported(world, x, y, z, state)) return true;
+                return false;
+            }
+            if (entry == COPPER_TORCH) {
+                if (copperTorchSupported(world, x, y, z, 0)) return true;
+                return world.isSideSolid(x, y, z + 1, ForgeDirection.NORTH) || world.isSideSolid(x, y, z - 1, ForgeDirection.SOUTH)
+                        || world.isSideSolid(x + 1, y, z, ForgeDirection.WEST) || world.isSideSolid(x - 1, y, z, ForgeDirection.EAST);
+            }
+            if (isCopperWallTorch()) return copperTorchSupported(world, x, y, z, world.getBlockMetadata(x, y, z) & 7);
             if (isMultiface()) {
                 for (int face = 0; face < 6; face++) if (canAttachMultifaceFace(world, x, y, z, face)) return true;
                 return false;
@@ -2956,6 +3310,19 @@ public enum ModernMapParityBlocks {
                     }
                 }
                 return;
+            } else if (isPaleOakButton()) {
+                if (!paleOakButtonSupported(world, x, y, z, world.getBlockMetadata(x, y, z) & 15)) {
+                    if (!world.isRemote) dropBlockAsItem(world, x, y, z, 0, 0);
+                    world.setBlockToAir(x, y, z);
+                    return;
+                }
+            } else if (isCopperTorch()) {
+                int side = world.getBlockMetadata(x, y, z) & 7;
+                if (!copperTorchSupported(world, x, y, z, side)) {
+                    if (!world.isRemote) dropBlockAsItem(world, x, y, z, 0, 0);
+                    world.setBlockToAir(x, y, z);
+                    return;
+                }
             } else if (isScaffolding()) {
                 world.scheduleBlockUpdate(x, y, z, this, 1);
             } else if (isSuspicious()) {
@@ -2988,7 +3355,22 @@ public enum ModernMapParityBlocks {
         }
 
         @Override
+        public int tickRate(World world) {
+            return isPaleOakButton() ? 30 : super.tickRate(world);
+        }
+
+        @Override
         public void updateTick(World world, int x, int y, int z, Random random) {
+            if (isPaleOakButton()) {
+                TileEntity tile = world.getTileEntity(x, y, z);
+                if (tile instanceof ParityButtonTileEntity
+                        && ((ParityButtonTileEntity) tile).isProjectileHeld()) {
+                    refreshPaleOakButtonProjectileState(world, x, y, z);
+                } else {
+                    releasePaleOakButton(world, x, y, z);
+                }
+                return;
+            }
             if (isSuspicious()) {
                 fallSuspiciousBlock(world, x, y, z);
                 return;
@@ -3014,6 +3396,9 @@ public enum ModernMapParityBlocks {
 
         @Override
         public void onEntityCollidedWithBlock(World world, int x, int y, int z, Entity entity) {
+            if (isPaleOakButton() && entity instanceof EntityArrow && !world.isRemote) {
+                activatePaleOakButtonFromArrow(world, x, y, z);
+            }
             if (isDecoratedPot() && entity instanceof IProjectile && !world.isRemote) {
                 TileEntity tile = world.getTileEntity(x, y, z);
                 if (tile instanceof ParityDecoratedPotTileEntity) {
@@ -3056,6 +3441,9 @@ public enum ModernMapParityBlocks {
         @SideOnly(Side.CLIENT)
         public void randomDisplayTick(World world, int x, int y, int z, Random random) {
             int meta = world.getBlockMetadata(x, y, z) & 15;
+            if (isCopperTorch()) {
+                spawnCopperTorchFlame(world, x, y, z, meta);
+            }
             if (isCandle() && (meta & 4) != 0) {
                 spawnCandleFlames(world, x, y, z, (meta & 3) + 1, random);
             } else if (isCandleCake() && (meta & 1) != 0) {
@@ -3078,6 +3466,23 @@ public enum ModernMapParityBlocks {
                 }
             }
             super.randomDisplayTick(world, x, y, z, random);
+        }
+
+        @SideOnly(Side.CLIENT)
+        private void spawnCopperTorchFlame(World world, int x, int y, int z, int meta) {
+            double px = x + 0.5D, py = y + 0.7D, pz = z + 0.5D;
+            if (isCopperWallTorch()) {
+                final double rise = 0.22D, offset = 0.27D;
+                py += rise;
+                switch (normaliseHorizontalSide(meta & 7)) {
+                    case 2: pz += offset; break;
+                    case 3: pz -= offset; break;
+                    case 4: px += offset; break;
+                    default:px -= offset; break;
+                }
+            }
+            world.spawnParticle("smoke", px, py, pz, 0.0D, 0.0D, 0.0D);
+            CustomParticles.spawnCopperFireFlame(world, px, py, pz);
         }
 
         @SideOnly(Side.CLIENT)
@@ -3164,6 +3569,9 @@ public enum ModernMapParityBlocks {
 
         @Override
         public void breakBlock(World world, int x, int y, int z, Block block, int meta) {
+            if (isPaleOakButton() && !world.isRemote && buttonPowered(world, x, y, z)) {
+                notifyPaleOakButtonNeighbors(world, x, y, z, meta & 15);
+            }
             boolean releaseWater = isDecoratedPot() && (meta & 4) != 0;
             if (isCampfire()) {
                 TileEntity tile = world.getTileEntity(x, y, z);
@@ -3231,6 +3639,7 @@ public enum ModernMapParityBlocks {
                         list.appendTag(new net.minecraft.nbt.NBTTagString(sherd));
                     }
                     blockEntityTag.setTag("sherds", list);
+                    blockEntityTag.setBoolean("Cracked", ((ParityDecoratedPotTileEntity) tile).isCracked());
                     pot.setTagInfo("BlockEntityTag", blockEntityTag);
                 }
                 drops.add(pot);
@@ -3280,6 +3689,17 @@ public enum ModernMapParityBlocks {
             return isSculkVein() ? 1 : super.getExpDrop(world, metadata, fortune);
         }
 
+        @Override public boolean canProvidePower() { return isPaleOakButton() || super.canProvidePower(); }
+        @Override public int isProvidingWeakPower(IBlockAccess world, int x, int y, int z, int side) {
+            return isPaleOakButton() && buttonPowered(world, x, y, z) ? 15 : super.isProvidingWeakPower(world, x, y, z, side);
+        }
+        @Override public int isProvidingStrongPower(IBlockAccess world, int x, int y, int z, int side) {
+            if (!isPaleOakButton()) return super.isProvidingStrongPower(world, x, y, z, side);
+            if (!buttonPowered(world, x, y, z)) return 0;
+            int state = world.getBlockMetadata(x, y, z) & 15;
+            return side == paleOakButtonStrongPowerSide(state) ? 15 : 0;
+        }
+
         @Override public int getRenderType() { return RenderIDs.MODERN_MAP_PARITY; }
         @Override @SideOnly(Side.CLIENT)
         public int getRenderBlockPass() {
@@ -3297,7 +3717,7 @@ public enum ModernMapParityBlocks {
         public void addCollisionBoxesToList(World world, int x, int y, int z, AxisAlignedBB mask,
                 List<AxisAlignedBB> list, Entity collider) {
             if (entry.style == Style.PLANT || entry.style == Style.WALL_PLANT || entry.style == Style.VINE
-                    || isSegmentedGroundDecal()) return;
+                    || isSegmentedGroundDecal() || isPaleOakButton() || isCopperTorch()) return;
             if (isScaffolding()) {
                 boolean descending = collider instanceof EntityPlayer && ((EntityPlayer) collider).isSneaking();
                 if (descending || collider == null || collider.boundingBox == null) return;
@@ -3441,7 +3861,7 @@ public enum ModernMapParityBlocks {
         }
 
         @Override public AxisAlignedBB getCollisionBoundingBoxFromPool(World world, int x, int y, int z) {
-            if (isSegmentedGroundDecal() || isScaffolding()) return null;
+            if (isSegmentedGroundDecal() || isScaffolding() || isPaleOakButton()) return null;
             if (entry.style == Style.WALL) {
                 ModernWallState.State state = ModernWallState.derive(this, world, x, y, z);
                 double minX = state.west.isConnected() ? 0.0D : 0.25D;

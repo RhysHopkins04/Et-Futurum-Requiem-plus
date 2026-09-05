@@ -187,7 +187,16 @@ public final class ItemModernJsonModelRenderer implements IItemRenderer {
         String name = entry.getRegistryName();
         float yaw = 0.0F;
         Transform authoredGui = null;
-        if ("lectern".equals(name) || "dried_ghast".equals(name)) {
+        if ("pale_oak_pressure_plate".equals(name)) {
+            // 1.7 pressure-plate inventory rendering deliberately uses a full 16x16 footprint
+            // and a 4px-thick centred presentation even though the placed plate is 14x14x1px.
+            // Match the neighbouring legacy pressure-plate atlas icons without changing the
+            // exact modern world model: [1..15,0..1,1..15] -> [0..16,6..10,0..16].
+            OpenGLHelper.translate(0.0F, 6.0F / 16.0F, 0.0F);
+            OpenGLHelper.translate(0.5F, 0.0F, 0.5F);
+            OpenGLHelper.scale(8.0F / 7.0F, 4.0F, 8.0F / 7.0F);
+            OpenGLHelper.translate(-0.5F, 0.0F, -0.5F);
+        } else if ("lectern".equals(name) || "dried_ghast".equals(name)) {
             yaw = 180.0F;
         } else if (name.endsWith("_shelf")) {
             // Forge already supplied the standard block GUI rotation/scale. The Shelf template uses

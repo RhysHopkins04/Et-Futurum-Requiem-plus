@@ -109,6 +109,17 @@ public class CustomParticles {
 		return spawnParticle(world, particle);
 	}
 
+
+	public static EntityFX spawnCopperFireFlame(World world, double x, double y, double z, double mX, double mY, double mZ) {
+		EntityFX particle = new CopperFireFlameFX(world, x, y, z, mX, mY, mZ);
+		return spawnParticle(world, particle);
+	}
+
+	public static EntityFX spawnCopperFireFlame(World world, double x, double y, double z) {
+		EntityFX particle = new CopperFireFlameFX(world, x, y, z);
+		return spawnParticle(world, particle);
+	}
+
 	public static EntityFX spawnSoulFlame(World world, double x, double y, double z, double mX, double mY, double mZ) {
 		EntityFX particle = new SoulFlameFX(world, x, y, z, mX, mY, mZ);
 		return spawnParticle(world, particle);

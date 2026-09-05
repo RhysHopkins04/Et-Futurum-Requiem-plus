@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "contract_id": "etfuturum-requiem-plus-backporter-state-contract",
-  "contract_revision": "32f",
+  "contract_revision": "33",
   "implemented_in_version": "3.5.5",
   "implemented_in_git_ref": "refs/tags/3.5.5",
   "source_minecraft": "1.21.11",
@@ -409,6 +409,159 @@
       }
     },
     {
+      "key": "pale_oak_button",
+      "source_ids": [
+        "minecraft:pale_oak_button"
+      ],
+      "target_ids": [
+        "etfuturum:pale_oak_button"
+      ],
+      "classification": "FULL_IMPORT",
+      "metadata": {
+        "layout": "0..11 = face_index * 4 + facing_index",
+        "face_index": {
+          "wall": 0,
+          "floor": 1,
+          "ceiling": 2
+        },
+        "facing_index": {
+          "north": 0,
+          "east": 1,
+          "south": 2,
+          "west": 3
+        }
+      },
+      "tile_entity": {
+        "required": true,
+        "id": "etfuturum:modern_parity_button",
+        "fields": [
+          {
+            "name": "Powered",
+            "type": "TAG_Byte boolean",
+            "required": false,
+            "default": false
+          }
+        ]
+      },
+      "source_properties": {
+        "face": "exact -> metadata face_index",
+        "facing": "exact -> metadata facing_index",
+        "powered": "exact -> tile entity Powered"
+      },
+      "notes": [
+        "All 24 visible face/facing/powered combinations are represented.",
+        "Wooden-button 30-tick activation/redstone behaviour is implemented; projectile activation is not required by the map-state contract."
+      ]
+    },
+    {
+      "key": "pale_oak_pressure_plate",
+      "source_ids": [
+        "minecraft:pale_oak_pressure_plate"
+      ],
+      "target_ids": [
+        "etfuturum:pale_oak_pressure_plate"
+      ],
+      "classification": "FULL_IMPORT",
+      "metadata": {
+        "powered_false": 0,
+        "powered_true": 1
+      },
+      "tile_entity": {
+        "required": false
+      },
+      "source_properties": {
+        "powered": "exact -> metadata 0/1"
+      },
+      "notes": [
+        "Uses normal 1.7 wooden pressure-plate entity detection/redstone while rendering the exact 1.21.11 raised/depressed model state."
+      ]
+    },
+    {
+      "key": "copper_torch_family",
+      "source_ids": [
+        "minecraft:copper_torch",
+        "minecraft:copper_wall_torch"
+      ],
+      "target_ids": [
+        "etfuturum:copper_torch",
+        "etfuturum:copper_wall_torch"
+      ],
+      "classification": "FULL_IMPORT",
+      "metadata": {
+        "standing": "etfuturum:copper_torch metadata 0",
+        "wall_facing": {
+          "north": 2,
+          "south": 3,
+          "west": 4,
+          "east": 5
+        }
+      },
+      "tile_entity": {
+        "required": false
+      },
+      "source_properties": {
+        "minecraft:copper_torch": "no source properties; exact standing identity",
+        "minecraft:copper_wall_torch.facing": "exact -> wall block metadata 2..5"
+      },
+      "item_mapping": "Only etfuturum:copper_torch is obtainable. etfuturum:copper_wall_torch is a technical placement/import identity and picks/drops the standing Copper Torch item."
+    },
+    {
+      "key": "candle_cake_family",
+      "source_ids": [
+        "minecraft:candle_cake",
+        "minecraft:white_candle_cake",
+        "minecraft:orange_candle_cake",
+        "minecraft:magenta_candle_cake",
+        "minecraft:light_blue_candle_cake",
+        "minecraft:yellow_candle_cake",
+        "minecraft:lime_candle_cake",
+        "minecraft:pink_candle_cake",
+        "minecraft:gray_candle_cake",
+        "minecraft:light_gray_candle_cake",
+        "minecraft:cyan_candle_cake",
+        "minecraft:purple_candle_cake",
+        "minecraft:blue_candle_cake",
+        "minecraft:brown_candle_cake",
+        "minecraft:green_candle_cake",
+        "minecraft:red_candle_cake",
+        "minecraft:black_candle_cake"
+      ],
+      "target_ids": [
+        "etfuturum:candle_cake",
+        "etfuturum:white_candle_cake",
+        "etfuturum:orange_candle_cake",
+        "etfuturum:magenta_candle_cake",
+        "etfuturum:light_blue_candle_cake",
+        "etfuturum:yellow_candle_cake",
+        "etfuturum:lime_candle_cake",
+        "etfuturum:pink_candle_cake",
+        "etfuturum:gray_candle_cake",
+        "etfuturum:light_gray_candle_cake",
+        "etfuturum:cyan_candle_cake",
+        "etfuturum:purple_candle_cake",
+        "etfuturum:blue_candle_cake",
+        "etfuturum:brown_candle_cake",
+        "etfuturum:green_candle_cake",
+        "etfuturum:red_candle_cake",
+        "etfuturum:black_candle_cake"
+      ],
+      "classification": "FULL_IMPORT",
+      "metadata": {
+        "lit_false": 0,
+        "lit_true": 1
+      },
+      "tile_entity": {
+        "required": false
+      },
+      "source_properties": {
+        "lit": "exact -> metadata bit 0"
+      },
+      "notes": [
+        "All 17 candle-colour cake identities preserve exact lit/unlit model and light state.",
+        "Eating/bite conversion is runtime gameplay and remains deferred from the map-fidelity contract."
+      ]
+    },
+    {
       "key": "decorated_pot",
       "source_ids": [
         "minecraft:decorated_pot"
@@ -442,13 +595,20 @@
             "type": "TAG_Compound ItemStack",
             "required": false,
             "note": "Single stored stack; EFR pot inventory limit is 64."
+          },
+          {
+            "name": "Cracked",
+            "type": "TAG_Byte boolean",
+            "required": false,
+            "default": false,
+            "note": "Exact source cracked property. Mojang 1.21.11 does not select a different block model for this property; EFR persists it for deterministic round-trip/import state."
           }
         ]
       },
       "source_properties": {
         "facing": "exact -> metadata bits 0..1",
         "waterlogged": "unsupported; do not confuse with EFR stored-water bit",
-        "cracked": "no persistent cracked blockstate exists in EFR"
+        "cracked": "exact -> tile entity Cracked boolean; persisted even though 1.21.11 blockstate/model data makes it visually irrelevant"
       },
       "source_block_entity": {
         "sherds": "exact order [back,left,right,front] after item translation",

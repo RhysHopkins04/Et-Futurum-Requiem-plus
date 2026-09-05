@@ -71,8 +71,8 @@ except Exception as exc:
     errors.append('Backporter contract JSON invalid: ' + str(exc))
     contract = {}
 
-if contract.get('contract_revision') != '32f':
-    errors.append("contract contract_revision must be '32f'")
+if contract.get('contract_revision') not in ('32f', '33'):
+    errors.append("contract revision must remain 32f-compatible or advance to Pass 33")
 if contract.get('implemented_in_version') != '3.5.5':
     errors.append("contract implemented_in_version must remain '3.5.5'")
 if contract.get('implemented_in_git_ref') != 'refs/tags/3.5.5':
@@ -113,4 +113,4 @@ print('Fidelity Pass 32f validation PASSED')
 print(' - powered Shelf swaps mutate all affected server hotbar/Shelf slots and fully resync InventoryPlayer')
 print(' - one/two/three powered Shelf groups retain modern rightmost 3/6/9 slot mapping')
 print(' - disconnected powered Shelves remain independent one-Shelf groups targeting hotbar slots 6..8')
-print(' - contract revision 32f remains implemented in/tagged as 3.5.5')
+print(' - Pass 32f Shelf contract remains valid under contract revision ' + str(contract.get('contract_revision')))

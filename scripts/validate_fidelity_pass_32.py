@@ -138,8 +138,8 @@ if contract.get("schema") != 1:
     errors.append("Backporter contract schema must be 1")
 if contract.get("source_minecraft") != "1.21.11":
     errors.append("Backporter contract source_minecraft must be 1.21.11")
-if contract.get("contract_revision") not in ("32e", "32f"):
-    errors.append("Backporter contract contract_revision must be 32e or a later Pass 32 finalization revision")
+if contract.get("contract_revision") not in ("32e", "32f", "33"):
+    errors.append("Backporter contract contract_revision must be a Pass 32 finalization revision or forward-compatible Pass 33")
 if contract.get("implemented_in_version") != "3.5.5":
     errors.append("Backporter contract implemented_in_version must be 3.5.5")
 if contract.get("implemented_in_git_ref") != "refs/tags/3.5.5":
@@ -258,7 +258,7 @@ if audit_path.is_file():
     wanted.update(entry["name"] for entry in manifest["blocks"] if entry["style"] in {"SHELF", "SIGN", "HANGING_SIGN"})
     wanted.update(entry["name"] for entry in manifest["blocks"] if entry["name"].endswith("copper_chest"))
     by_name = {row["block"]: row for row in rows}
-    wrong = sorted(name for name in wanted if by_name.get(name, {}).get("review_status") != "PASS_32_CONTRACT_VERIFIED")
+    wrong = sorted(name for name in wanted if by_name.get(name, {}).get("review_status") not in {"PASS_32_CONTRACT_VERIFIED", "PASS_33_VERIFIED"})
     if wrong:
         errors.append("Pass 32 capability rows not promoted: " + ", ".join(wrong))
 

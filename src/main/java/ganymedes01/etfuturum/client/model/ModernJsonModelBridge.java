@@ -161,6 +161,26 @@ public final class ModernJsonModelBridge {
         }
         ModernMapParityBlocks.Style style = entry.getStyle();
         String name = entry.getRegistryName();
+        if ("pale_oak_button".equals(name)) {
+            int orientation = world.getBlockMetadata(x, y, z) & 15;
+            if (orientation >= 12) orientation = 0;
+            boolean powered = false;
+            net.minecraft.tileentity.TileEntity tile = world.getTileEntity(x, y, z);
+            if (tile instanceof ModernMapParityBlocks.ParityButtonTileEntity)
+                powered = ((ModernMapParityBlocks.ParityButtonTileEntity) tile).isPowered();
+            Model button = models.facingModels[(powered ? 12 : 0) + orientation];
+            if (button != null) return button;
+        }
+        if ("pale_oak_pressure_plate".equals(name)) {
+            Model plate = models.facingModels[world.getBlockMetadata(x, y, z) & 1];
+            if (plate != null) return plate;
+        }
+        if ("copper_wall_torch".equals(name)) {
+            int facing = world.getBlockMetadata(x, y, z) & 7;
+            if (facing < 2 || facing > 5) facing = 2;
+            Model torch = models.facingModels[facing];
+            if (torch != null) return torch;
+        }
         if ("suspicious_sand".equals(name) || "suspicious_gravel".equals(name)) {
             int dusted = world.getBlockMetadata(x, y, z) & 3;
             Model stage = models.facingModels[dusted];
@@ -831,6 +851,40 @@ public final class ModernJsonModelBridge {
                     state.put(faces[face], Boolean.toString((mask & (1 << maskFace)) != 0));
                 }
                 prepared.multifaceModels[mask] = applySpecialBlockVisual(entry, loadBlockStateModel(entry, state));
+            }
+        }
+        if ("pale_oak_button".equals(registryName)) {
+            String[] faces = {"wall", "floor", "ceiling"};
+            String[] facings = {"north", "east", "south", "west"};
+            for (int powered = 0; powered <= 1; powered++) {
+                for (int face = 0; face < faces.length; face++) {
+                    for (int facing = 0; facing < facings.length; facing++) {
+                        Map<String, String> state = defaultsFor(entry);
+                        state.put("face", faces[face]);
+                        // Mojang's wall-button variants use an X=90 state rotation. The legacy
+                        // bridge applies that wall plane on the opposite side of the cell, so only
+                        // the wall face resolves the opposite blockstate facing at this boundary.
+                        // Persisted face/facing metadata and the selection box remain canonical.
+                        state.put("facing", facings[face == 0 ? ((facing + 2) & 3) : facing]);
+                        state.put("powered", Boolean.toString(powered != 0));
+                        prepared.facingModels[powered * 12 + face * 4 + facing] = loadBlockStateModel(entry, state);
+                    }
+                }
+            }
+        }
+        if ("pale_oak_pressure_plate".equals(registryName)) {
+            for (int powered = 0; powered <= 1; powered++) {
+                Map<String, String> state = defaultsFor(entry);
+                state.put("powered", Boolean.toString(powered != 0));
+                prepared.facingModels[powered] = loadBlockStateModel(entry, state);
+            }
+        }
+        if ("copper_wall_torch".equals(registryName)) {
+            String[] facings = {null, null, "north", "south", "west", "east"};
+            for (int side = 2; side <= 5; side++) {
+                Map<String, String> state = defaultsFor(entry);
+                state.put("facing", facings[side]);
+                prepared.facingModels[side] = loadBlockStateModel(entry, state);
             }
         }
         if (registryName.endsWith("_froglight") || registryName.endsWith("copper_chain")

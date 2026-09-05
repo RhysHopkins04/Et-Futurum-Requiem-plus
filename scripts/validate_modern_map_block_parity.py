@@ -35,7 +35,7 @@ failures=[]
 manifest=json.loads(MANIFEST.read_text(encoding="utf-8")); blocks=manifest.get("blocks",[]); names=[e["name"] for e in blocks]
 if manifest.get("target") != "Minecraft Java 1.21.11 visual block compatibility shells": failures.append("manifest target is not pinned to Minecraft Java 1.21.11")
 if manifest.get("count") != len(blocks): failures.append("manifest count mismatch")
-if len(names)!=243 or len(names)!=len(set(names)): failures.append(f"expected 243 unique visual-gap identities, found {len(names)}")
+if len(names)!=244 or len(names)!=len(set(names)): failures.append(f"expected 244 unique visual-gap identities after Pass 33, found {len(names)}")
 required={"kelp","seagrass","conduit","tube_coral_block","scaffolding","bell","candle","sculk_sensor","decorated_pot","potted_torchflower","trial_spawner","vault","crafter","pale_oak_planks","resin_bricks","firefly_bush","dried_ghast","copper_chest","copper_golem_statue","oak_shelf"}
 if required-set(names): failures.append("required families missing: "+", ".join(sorted(required-set(names))))
 versions=Counter(e["ver"] for e in blocks)
@@ -273,7 +273,7 @@ for expected in (
     'final float thirteen = 13.0F / 16.0F;',
     'world.getBlockMetadata(x, y, z) & 3',
     'int amountBits = world.getBlockMetadata(x, y, z) & 12;',
-    'if (isSegmentedGroundDecal() || isScaffolding()) return null;',
+    'if (isSegmentedGroundDecal() || isScaffolding() || isPaleOakButton()) return null;',
     'style == ModernMapParityBlocks.Style.SHELF',
     'String amountProperty = "wildflowers".equals(registryName) ? "flower_amount" : "segment_amount";',
     'prepared.facingModels[(amount - 1) * 4 + facing] = loadBlockStateModel(entry, state);',

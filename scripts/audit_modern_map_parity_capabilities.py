@@ -47,6 +47,10 @@ SPECIAL_STATE_NAMES = {
     "grindstone",
     "leaf_litter",
     "wildflowers",
+    "pale_oak_button",
+    "pale_oak_pressure_plate",
+    "copper_torch",
+    "copper_wall_torch",
 }
 
 PASS_30_MULTIFACE_NAMES = {"sculk_vein", "resin_clump"}
@@ -54,6 +58,11 @@ PASS_30_MULTIFACE_NAMES = {"sculk_vein", "resin_clump"}
 PASS_32_CONTRACT_NAMES = {
     "chiseled_bookshelf", "decorated_pot", "campfire", "soul_campfire",
     "suspicious_sand", "suspicious_gravel",
+}
+
+PASS_33_VISIBLE_NAMES = {
+    "pale_oak_button", "pale_oak_pressure_plate", "copper_torch", "copper_wall_torch",
+    "decorated_pot",
 }
 
 
@@ -73,15 +82,12 @@ VISUAL_SHELL_GAPS = {
     "sculk_sensor": "No vibration, phase, cooldown or redstone implementation.",
     "calibrated_sculk_sensor": "No calibration filtering, vibration phase or redstone implementation.",
     "sculk_shrieker": "No shrieking, cooldown, can_summon or player-trigger implementation.",
-    "pale_oak_button": "Visual button shell; wooden-button power and projectile mechanics are absent.",
-    "pale_oak_pressure_plate": "Visual layer shell; entity detection and redstone mechanics are absent.",
     "powder_snow": "No sinking, leather-boots collision, freezing or bucket behaviour.",
     "frogspawn": "No water-surface survival or hatch lifecycle.",
     "sniffer_egg": "No crack/hatch lifecycle.",
     "creaking_heart": "No axis, active state, environment checks or resin response.",
     "dried_ghast": "No hydration state or timed transformation lifecycle.",
     "copper_golem_statue": "Pose/orientation state and copper lifecycle are not represented.",
-    "copper_torch": "Standing/wall identity, wall facing and support behaviour are not represented.",
 }
 
 
@@ -102,6 +108,8 @@ def concrete_class(name, style):
         return "ParityDoorBlock"
     if name == "pale_oak_trapdoor":
         return "ParityTrapdoorBlock"
+    if name == "pale_oak_pressure_plate":
+        return "ParityPressurePlateBlock"
     return "ParityModelBlock"
 
 
@@ -127,6 +135,8 @@ def is_copper_weathering_family(name):
 
 
 def profile_for(name, style):
+    if name in PASS_33_VISIBLE_NAMES or style == "CANDLE_CAKE":
+        return "PASS_33_VISIBLE_STATE"
     if name in PASS_30_MULTIFACE_NAMES:
         return "PASS_30_MULTIFACE"
     if style == "LOG":
@@ -150,6 +160,12 @@ def profile_for(name, style):
 
 
 def gap_for(name, style, profile):
+    if profile == "PASS_33_VISIBLE_STATE":
+        if name == "pale_oak_button": return "Visible face/facing/powered state and wooden-button timing are represented exactly; projectile activation remains deferred."
+        if name == "pale_oak_pressure_plate": return "Raised/depressed state and normal wooden pressure-plate mechanics are represented."
+        if name in {"copper_torch", "copper_wall_torch"}: return "Standing/wall registry split, wall facing, placement and support behaviour are represented; no separate wall item exists."
+        if name == "decorated_pot": return "Cracked is persisted exactly but is visually irrelevant in Mojang 1.21.11 assets; existing sherd/item/facing state remains Pass 32f-sensitive."
+        if name.endswith("candle_cake"): return "Lit state is exact; normal cake eating/bite conversion remains deferred."
     if profile == "PASS_30_MULTIFACE":
         return ("Six-face placement/render/support/drop/persistence parity is implemented; "
                 "waterlogging and block-specific spreading/growth mechanics remain deferred.")
@@ -199,7 +215,53 @@ def row_for(entry):
         "known_difference": gap_for(name, style, profile),
     }
 
-    if profile == "PASS_29_AXIS_LOG":
+    if profile == "PASS_33_VISIBLE_STATE":
+        if name == "pale_oak_button":
+            row.update({
+                "blockstate": "metadata 0..11 = face(wall/floor/ceiling) x facing(N/E/S/W); Powered boolean in parity TE",
+                "shape": "orientation-aware 6x4x2/1 pressed-unpressed button bounds",
+                "function": "support checks, activation, 30-tick wooden-button release and redstone output",
+                "nbt": "ParityButtonTileEntity Powered boolean",
+                "map_import": "face/facing -> metadata 0..11; powered -> TE Powered",
+                "review_status": "PASS_33_VERIFIED",
+            })
+        elif name == "pale_oak_pressure_plate":
+            row.update({
+                "blockstate": "powered=false/true in metadata 0/1",
+                "shape": "BlockPressurePlate raised/depressed bounds with exact JSON model state",
+                "function": "normal wooden pressure-plate entity detection and redstone",
+                "nbt": "none",
+                "map_import": "powered -> metadata 0/1",
+                "review_status": "PASS_33_VERIFIED",
+            })
+        elif name in {"copper_torch", "copper_wall_torch"}:
+            row.update({
+                "blockstate": "standing identity has no metadata state; wall identity uses metadata side 2=N,3=S,4=W,5=E",
+                "shape": "standing/wall torch bounds and exact Mojang JSON model",
+                "function": "single obtainable standing item; wall placement swaps to technical wall identity; support loss drops standing item",
+                "nbt": "none",
+                "map_import": "minecraft:copper_torch -> etfuturum:copper_torch; minecraft:copper_wall_torch facing -> etfuturum:copper_wall_torch metadata 2..5",
+                "review_status": "PASS_33_VERIFIED",
+            })
+        elif name == "decorated_pot":
+            row.update({
+                "blockstate": "facing metadata plus Pass 32f stored-water extension; Cracked boolean persisted in TE",
+                "shape": "existing exact decorated-pot parity model/bounds",
+                "function": "existing one-stack/shatter/sherd implementation preserved",
+                "nbt": "ParityDecoratedPotTileEntity sherds/item/Cracked",
+                "map_import": "deterministic Pass 33 contract; cracked stored exactly but classified visually irrelevant",
+                "review_status": "PASS_33_VERIFIED",
+            })
+        else:
+            row.update({
+                "blockstate": "lit=false/true in metadata 0/1",
+                "shape": "exact Candle Cake JSON model selected by lit metadata",
+                "function": "ignition/extinguishing and dynamic light retained",
+                "nbt": "none",
+                "map_import": "lit -> metadata 0/1",
+                "review_status": "PASS_33_VERIFIED",
+            })
+    elif profile == "PASS_29_AXIS_LOG":
         row.update({
             "blockstate": "axis=y/x/z in metadata 0/1/2",
             "shape": "full cube",
@@ -270,8 +332,8 @@ def build_matrix(root):
 def validate_matrix(manifest, rows):
     errors = []
     declared = manifest.get("count")
-    if declared != 243:
-        errors.append("manifest count must remain 243, found {!r}".format(declared))
+    if declared != 244:
+        errors.append("manifest count must be 244 after the Pass 33 Copper Wall Torch identity, found {!r}".format(declared))
     if len(rows) != declared:
         errors.append("generated row count {} does not match manifest {}".format(len(rows), declared))
     names = [row["block"] for row in rows]

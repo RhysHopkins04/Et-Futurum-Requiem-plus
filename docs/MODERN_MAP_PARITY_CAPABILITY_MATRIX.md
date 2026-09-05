@@ -1,6 +1,6 @@
 # Modern Map Parity Capability Matrix
 
-Et Futurum Requiem Plus exposes 243 stable modern registry identities for map conversion. A valid
+Et Futurum Requiem Plus exposes 244 stable modern registry identities for map conversion. A valid
 AssetDirector-backed model is not, by itself, proof that every modern block state or mechanic is
 represented.
 
@@ -98,3 +98,8 @@ implemented and validated.
 Pass 32 closes the reverse-engineering gap for persistent parity families.  The machine-readable target mapping is `docs/BACKPORTER_STATE_CONTRACT.json`; it separates source properties from EFR registry identity, metadata and tile-entity NBT, and records explicit partial/unsupported state rather than treating implemented families as blanket `backport_close` approximations.
 
 The capability audit now marks Chiseled Bookshelf, Decorated Pot, Campfire/Soul Campfire, Suspicious Sand/Gravel, every parity Shelf, parity Sign/Hanging Sign, and all eight Copper Chest identities as `PASS_32_CONTRACT_VERIFIED`.  Cave Vines, banners, shulkers, barrels, beehives, furnace variants and other mature tile entities are covered by the same contract/audit even though they are not all entries in the 243-block parity manifest.
+
+
+## Pass 33 small visible-state contract
+
+Pass 33 adds the technical `copper_wall_torch` identity and verifies exact map-state representation for Pale Oak Button, Pale Oak Pressure Plate, Copper Torch/Wall Torch, Decorated Pot `Cracked`, and all Candle Cake `lit` states. The new global state scanner is `scripts/validate_modern_visual_state_coverage.py`; strict mode treats previously-unclassified model-changing properties as `UNSUPPORTED` so Passes 34–36 can close the remaining debt systematically.

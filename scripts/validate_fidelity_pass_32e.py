@@ -57,8 +57,9 @@ except Exception as exc:
     errors.append('Backporter contract JSON invalid: ' + str(exc))
     contract = {}
 
-if contract.get('contract_revision') not in ('32e', '32f'):
-    errors.append("contract contract_revision must be '32e' or a later Pass 32 finalization revision")
+revision = str(contract.get('contract_revision', ''))
+if revision not in ('32e', '32f') and not (revision.isdigit() and int(revision) >= 33):
+    errors.append("contract contract_revision must be '32e' or a later fidelity pass revision")
 for key, expected in (
     ('implemented_in_version', '3.5.5'),
     ('implemented_in_git_ref', 'refs/tags/3.5.5'),

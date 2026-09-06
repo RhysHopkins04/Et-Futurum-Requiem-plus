@@ -71,8 +71,8 @@ except Exception as exc:
     errors.append('Backporter contract JSON invalid: ' + str(exc))
     contract = {}
 
-if contract.get('contract_revision') not in ('32f', '33', 34, '34'):
-    errors.append("contract revision must remain 32f-compatible or advance through Pass 33/34")
+if contract.get('contract_revision') not in ('32f', '33', 34, '34', 35, '35'):
+    errors.append("contract revision must remain 32f-compatible or advance through Pass 33/34/35")
 if contract.get('implemented_in_version') != '3.5.5':
     errors.append("contract implemented_in_version must remain '3.5.5'")
 if contract.get('implemented_in_git_ref') != 'refs/tags/3.5.5':

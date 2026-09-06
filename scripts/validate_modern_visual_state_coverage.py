@@ -20,7 +20,23 @@ WATERLOGGING_EXCEPTION = "waterlogged"
 
 EXTRA_PROPERTIES = {
     "decorated_pot": {"cracked": "VISUALLY_IRRELEVANT"},
+    # Persistent 1.21.11 properties omitted from model-selection JSON still need an explicit audit row.
+    "bell": {"powered": "VISUALLY_IRRELEVANT"},
+    "sculk_sensor": {"power": "VISUALLY_IRRELEVANT", "waterlogged": "UNSUPPORTED"},
+    "calibrated_sculk_sensor": {"power": "VISUALLY_IRRELEVANT", "waterlogged": "UNSUPPORTED"},
+    "sculk_shrieker": {"shrieking": "VISUALLY_IRRELEVANT", "waterlogged": "UNSUPPORTED"},
 }
+for _statue in (
+    "copper_golem_statue", "waxed_copper_golem_statue",
+    "exposed_copper_golem_statue", "waxed_exposed_copper_golem_statue",
+    "weathered_copper_golem_statue", "waxed_weathered_copper_golem_statue",
+    "oxidized_copper_golem_statue", "waxed_oxidized_copper_golem_statue",
+):
+    EXTRA_PROPERTIES[_statue] = {"facing": "STORED_EXACTLY", "copper_golem_pose": "STORED_EXACTLY", "waterlogged": "UNSUPPORTED"}
+
+# Vanilla 1.7 already owns command_block, so it is not part of the 244 parity manifest,
+# but Pass 35 still audits its modern visible blockstate explicitly.
+EXTRA_SOURCE_IDENTITIES = ("command_block",)
 
 def values_from_key(key):
     out = {}
@@ -90,6 +106,17 @@ def classify(name, prop, visible):
     if name == "sea_pickle" and prop == "waterlogged":
         # Bounded Pass 34 live/dead visual bit only; not a general water/fluid state.
         return "STORED_EXACTLY"
+    if name == "trial_spawner" and prop in {"ominous","trial_spawner_state"}: return "STORED_EXACTLY"
+    if name == "vault" and prop in {"facing","ominous","vault_state"}: return "STORED_EXACTLY"
+    if name == "crafter" and prop in {"orientation","triggered","crafting"}: return "STORED_EXACTLY"
+    if name == "bell" and prop in {"facing","attachment"}: return "STORED_EXACTLY"
+    if name == "respawn_anchor" and prop == "charges": return "STORED_EXACTLY"
+    if name == "sculk_sensor" and prop == "sculk_sensor_phase": return "STORED_EXACTLY"
+    if name == "calibrated_sculk_sensor" and prop in {"facing","sculk_sensor_phase"}: return "STORED_EXACTLY"
+    if name == "sculk_shrieker" and prop == "can_summon": return "STORED_EXACTLY"
+    if name == "jigsaw" and prop == "orientation": return "STORED_EXACTLY"
+    if name in {"command_block","repeating_command_block","chain_command_block"} and prop in {"facing","conditional"}: return "STORED_EXACTLY"
+    if name == "structure_block" and prop == "mode": return "STORED_EXACTLY"
     if prop == WATERLOGGING_EXCEPTION:
         return "UNSUPPORTED"
     if name == "pale_moss_carpet" and prop in {"bottom", "north", "east", "south", "west"}:
@@ -209,6 +236,16 @@ def run_self_test():
         raise AssertionError("Pass 34 tall seagrass classification mismatch")
     if classify("pitcher_plant", "half", True) != "STORED_EXACTLY":
         raise AssertionError("Pass 34d mature pitcher plant classification mismatch")
+    if classify("crafter", "orientation", True) != "STORED_EXACTLY":
+        raise AssertionError("Pass 35 crafter orientation classification mismatch")
+    if classify("command_block", "conditional", True) != "STORED_EXACTLY":
+        raise AssertionError("Pass 35 vanilla command block classification mismatch")
+    if classify("sculk_shrieker", "shrieking", False) != "VISUALLY_IRRELEVANT":
+        raise AssertionError("Pass 35 shrieker persistent non-model state classification mismatch")
+    if classify("copper_golem_statue", "copper_golem_pose", False) != "STORED_EXACTLY":
+        raise AssertionError("Pass 35 Copper Golem Statue pose classification mismatch")
+    if classify("bell", "powered", False) != "VISUALLY_IRRELEVANT":
+        raise AssertionError("Pass 35 Bell powered classification mismatch")
     if classify("some_future_block", "pose", True) != "UNSUPPORTED":
         raise AssertionError("unknown visible property must be UNSUPPORTED")
     print("Modern visual-state coverage validator self-test PASSED")
@@ -244,6 +281,16 @@ def main():
             for prop, cls in sorted(EXTRA_PROPERTIES.get(name, {}).items()):
                 if prop not in props:
                     rows.append({"block":name,"property":prop,"affects_model":False,"classification":cls,"source":"explicit persistent-state audit"})
+        for name in EXTRA_SOURCE_IDENTITIES:
+            data=reader.read_blockstate(name)
+            if data is None:
+                missing.append(name); continue
+            props=inspect_blockstate(data)
+            for prop, visible in sorted(props.items()):
+                cls=classify(name,prop,visible)
+                rows.append({"block":name,"property":prop,"affects_model":bool(visible),"classification":cls,"source":"Pass 35 vanilla-owned identity audit"})
+                if visible and cls=="UNSUPPORTED" and prop != WATERLOGGING_EXCEPTION:
+                    failures.append("%s.%s" % (name,prop))
     finally:
         reader.close()
     if args.json:

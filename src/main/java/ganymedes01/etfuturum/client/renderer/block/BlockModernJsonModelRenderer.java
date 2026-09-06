@@ -13,6 +13,7 @@ import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.init.Blocks;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.IBlockAccess;
@@ -72,9 +73,12 @@ public final class BlockModernJsonModelRenderer implements ISimpleBlockRendering
             // JSON model graph instead of maintaining a second, incomplete renderer.
             entry = ModernMapParityBlocks.WAXED_LIGHTNING_ROD;
         }
-        if (entry == null) return false;
+        boolean vanillaCommandBlock = block == Blocks.command_block;
+        if (entry == null && !vanillaCommandBlock) return false;
 
-        Model model = ModernJsonModelBridge.getWorldModel(entry, world, x, y, z);
+        Model model = vanillaCommandBlock
+                ? ModernJsonModelBridge.getVanillaCommandBlockWorldModel(world, x, y, z)
+                : ModernJsonModelBridge.getWorldModel(entry, world, x, y, z);
         if (model == null || model.quads.isEmpty()) return renderer.renderStandardBlock(block, x, y, z);
 
         Tessellator t = Tessellator.instance;
@@ -85,12 +89,12 @@ public final class BlockModernJsonModelRenderer implements ISimpleBlockRendering
 
             FaceInfo face = FaceInfo.from(q);
             t.setBrightness(sampleBrightness(block, world, x, y, z, face));
-            String registryName = entry.getRegistryName();
+            String registryName = vanillaCommandBlock ? "command_block" : entry.getRegistryName();
             boolean coralFanNoShade = registryName.endsWith("_coral_fan")
                     || registryName.endsWith("_coral_wall_fan");
             float shade = "wildflowers".equals(registryName) || coralFanNoShade
                     ? 1.0F : diffuseLight(face.nx, face.ny, face.nz);
-            int tint = tintColour(entry, q, world, x, y, z);
+            int tint = vanillaCommandBlock ? 0xFFFFFF : tintColour(entry, q, world, x, y, z);
             float red = ((tint >> 16) & 255) / 255.0F;
             float green = ((tint >> 8) & 255) / 255.0F;
             float blue = (tint & 255) / 255.0F;

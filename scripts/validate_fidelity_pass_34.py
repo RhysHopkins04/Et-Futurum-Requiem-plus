@@ -18,7 +18,7 @@ def need(ok,msg):
     if not ok: errors.append(msg)
 def has(text,*parts): return all(p in text for p in parts)
 
-need(str(CONTRACT.get('contract_revision')) == '34', 'Backporter contract revision must be 34')
+need(str(CONTRACT.get('contract_revision')) in ('34','35'), 'Backporter contract revision must be Pass 34 or forward-compatible Pass 35')
 
 # Pale Moss Carpet 2 * 3^4 and synchronized TE.
 need(has(MPB,'ParityPaleMossCarpetTileEntity','paleMossStateIndex','Bottom','North','East','South','West'), 'Pale Moss TE/state codec missing')

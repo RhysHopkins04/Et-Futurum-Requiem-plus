@@ -44,8 +44,8 @@ require(copper, 'Tags.MC_ASSET_VER + ":textures/particle/copper_fire_flame.png"'
 require(copper, 'public final class CopperFireFlameFX extends EtFuturumFXParticle', 'Copper flame particle class', errors)
 
 revision = contract.get('revision') or contract.get('contract_revision')
-if str(revision) not in ('33', '34'):
-    errors.append(f'Backporter contract revision is not Pass 33/34 compatible: {revision!r}')
+if str(revision) not in ('33', '34', '35'):
+    errors.append(f'Backporter contract revision is not Pass 33/34/35 compatible: {revision!r}')
 
 if errors:
     print('Fidelity Pass 33b validation FAILED')

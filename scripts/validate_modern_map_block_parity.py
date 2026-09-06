@@ -87,7 +87,7 @@ for expected in ('DYNAMIC_MODEL_ALIASES','registerDynamicAlias','new ResourceLoc
 
 model=MODEL.read_text(encoding="utf-8")
 for expected in (
-    'blockstates/" + entry.getRegistryName() + ".json', 'items/" + name + ".json', 'models/" + path + ".json',
+    'readJson("blockstates/" + registryName + ".json")', 'items/" + name + ".json', 'models/" + path + ".json',
     'resolveRawModel', 'element.getAsJsonObject("faces")', 'parseElementRotation', 'rotateState',
     'registerDynamicAlias', 'minecraft:entity/chest/', 'minecraft:entity/decorated_pot/', 'minecraft:entity/conduit/base',
     'minecraft:entity/signs/hanging/', 'minecraft:entity/copper_golem/', 'minecraft:builtin/generated',
@@ -221,13 +221,37 @@ for expected in (
     if expected not in asset_bridge:
         failures.append("modern Crying Obsidian AssetDirector override missing: " + expected)
 
+# Special-model fidelity: retain the authored hanging-sign board and gate the current Pass-35b
+# Copper Golem Statue implementation by meaningful state/coverage invariants rather than removed
+# implementation-detail helpers from the old transformed-Standing renderer.
+if 'addModelBox(out, 1, 0, 7, 15, 10, 9, 0, 12, 64, 32, texture);' not in model:
+    failures.append("special-model fidelity invariant missing: authored hanging-sign board")
+
+copper_statue_identities = {
+    "copper_golem_statue", "waxed_copper_golem_statue",
+    "exposed_copper_golem_statue", "waxed_exposed_copper_golem_statue",
+    "weathered_copper_golem_statue", "waxed_weathered_copper_golem_statue",
+    "oxidized_copper_golem_statue", "waxed_oxidized_copper_golem_statue",
+}
+missing_copper_statues = copper_statue_identities - set(names)
+if missing_copper_statues:
+    failures.append("Pass-35b Copper Golem Statue identities missing: " + ", ".join(sorted(missing_copper_statues)))
+
 for expected in (
-    'addModelBox(out, 1, 0, 7, 15, 10, 9, 0, 12, 64, 32, texture);',
-    'mirrorModelX(out)',
-    'addModelBoxUv(model, bx0, by0, bz0, bx1, by1, bz1',
+    'private static void addCopperGolemStandingPose(Model out, String texture)',
+    'private static void addCopperGolemSittingPose(Model out, String texture)',
+    'private static void addCopperGolemRunningPose(Model out, String texture)',
+    'private static void addCopperGolemStarPose(Model out, String texture)',
+    'if (entry.isCopperGolemStatueIdentity())',
+    'for (int pose=0; pose<4; pose++) for (int facing=0; facing<4; facing++)',
+    'rotateModelY(statue,facing*90);',
+    'prepared.facingModels[pose*4+facing]=statue;',
 ):
     if expected not in model:
-        failures.append("special-model fidelity invariant missing: " + expected)
+        failures.append("Pass-35b Copper Golem Statue invariant missing: " + expected)
+
+if 'return getRegistryName().endsWith("copper_golem_statue");' not in java:
+    failures.append("Pass-35b Copper Golem Statue family coverage predicate missing")
 
 for expected in (
     'name.endsWith("_wall_sign")',

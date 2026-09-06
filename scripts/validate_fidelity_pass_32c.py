@@ -69,7 +69,9 @@ try:
     contract=json.loads(contract_text)
 except Exception as exc:
     errors.append('Backporter contract JSON invalid: '+str(exc)); contract={}
-if contract.get('contract_revision') not in ('32c','32d','32e','32f'): errors.append('contract revision must be 32c or a later Pass 32 revision')
+revision = str(contract.get('contract_revision', ''))
+if revision not in ('32c','32d','32e','32f') and not (revision.isdigit() and int(revision) >= 33):
+    errors.append('contract revision must be 32c or a later fidelity pass revision')
 entries={e.get('key'):e for e in contract.get('blocks',[]) if isinstance(e,dict)}
 for key in ('vanilla_chest_family','copper_chest_family'):
     e=entries.get(key)

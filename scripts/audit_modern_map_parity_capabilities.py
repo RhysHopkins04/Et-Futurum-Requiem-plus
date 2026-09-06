@@ -71,6 +71,12 @@ PASS_34_VISIBLE_NAMES = {
     "sea_pickle", "tall_seagrass",
 }
 
+PASS_35_VISIBLE_NAMES = {
+    "trial_spawner", "vault", "crafter", "bell", "respawn_anchor", "sculk_sensor",
+    "calibrated_sculk_sensor", "sculk_shrieker", "jigsaw", "repeating_command_block",
+    "chain_command_block", "structure_block",
+}
+
 
 def has_pass32_contract(name, style):
     return (name in PASS_32_CONTRACT_NAMES or style in {"SHELF", "SIGN", "HANGING_SIGN"}
@@ -138,6 +144,8 @@ def is_copper_weathering_family(name):
 
 
 def profile_for(name, style):
+    if name in PASS_35_VISIBLE_NAMES or name.endswith("copper_golem_statue"):
+        return "PASS_35_VISIBLE_STATE"
     if name in PASS_34_VISIBLE_NAMES:
         return "PASS_34_VISIBLE_STATE"
     if name in PASS_33_VISIBLE_NAMES or style == "CANDLE_CAKE":
@@ -165,6 +173,8 @@ def profile_for(name, style):
 
 
 def gap_for(name, style, profile):
+    if profile == "PASS_35_VISIBLE_STATE":
+        return "Persistent visible state is represented exactly for map import; large gameplay/state-machine mechanics remain explicitly deferred."
     if profile == "PASS_34_VISIBLE_STATE":
         return "Visible/import state is represented exactly; lifecycle/entity/water mechanics remain explicitly deferred."
     if profile == "PASS_33_VISIBLE_STATE":
@@ -222,7 +232,25 @@ def row_for(entry):
         "known_difference": gap_for(name, style, profile),
     }
 
-    if profile == "PASS_34_VISIBLE_STATE":
+    if profile == "PASS_35_VISIBLE_STATE":
+        row.update({
+            "blockstate": entry.get("meta") or "Pass 35 exact technical visible state",
+            "shape": "exact AssetDirector 1.21.11 state model; Bell/statue entity-driven geometry retained",
+            "function": "state/import parity only; gameplay systems deferred",
+            "nbt": "Vault/Crafter use tiny synchronized state TEs where metadata is insufficient",
+            "map_import": "deterministic Pass 35 mapping in docs/BACKPORTER_STATE_CONTRACT.json",
+            "review_status": "PASS_35_VERIFIED",
+        })
+        if name.endswith("copper_golem_statue"):
+            row["blockstate"] = "meta=pose*4+facing; facing N/E/S/W 0..3; pose standing/sitting/running/star 0..3"
+            row["nbt"] = "none"
+        elif name == "vault":
+            row["nbt"] = "ParityVaultStateTileEntity VaultState byte 0..3"
+        elif name == "crafter":
+            row["nbt"] = "ParityCrafterStateTileEntity Triggered + Crafting booleans"
+        else:
+            row["nbt"] = "none"
+    elif profile == "PASS_34_VISIBLE_STATE":
         row.update({
             "blockstate": entry.get("meta") or "Pass 34 exact visible state",
             "shape": "exact AssetDirector 1.21.11 model state; bounded legacy selection/collision where applicable",

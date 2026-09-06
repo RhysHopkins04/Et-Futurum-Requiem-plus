@@ -11,6 +11,7 @@ import ganymedes01.etfuturum.ModernPotterySherds;
 import ganymedes01.etfuturum.Tags;
 import ganymedes01.etfuturum.blocks.ModernWallState;
 import ganymedes01.etfuturum.blocks.BlockModernSapling;
+import ganymedes01.etfuturum.core.utils.IModernCommandBlockState;
 import ganymedes01.etfuturum.client.ModernAssetResourcePack;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockFence;
@@ -43,6 +44,7 @@ import java.util.Map;
 public final class ModernJsonModelBridge {
     private static final JsonParser PARSER = new JsonParser();
     private static final Map<String, PreparedModels> CACHE = new HashMap<String, PreparedModels>();
+    private static PreparedModels VANILLA_COMMAND_BLOCK;
 
     private ModernJsonModelBridge() {}
 
@@ -112,6 +114,46 @@ public final class ModernJsonModelBridge {
         return prepared;
     }
 
+    /** Pass 35: prepare vanilla 1.7 Command Block's modern facing/conditional model matrix. */
+    public static synchronized void prepareVanillaCommandBlock(IIconRegister register) {
+        PreparedModels prepared = VANILLA_COMMAND_BLOCK;
+        if (prepared == null) {
+            prepared = new PreparedModels();
+            try {
+                String[] facings = {"down", "up", "north", "south", "west", "east"};
+                for (int conditional = 0; conditional <= 1; conditional++) {
+                    for (int facing = 0; facing < 6; facing++) {
+                        Map<String,String> state = defaultStateForRegistry("command_block");
+                        state.put("facing", facings[facing]);
+                        state.put("conditional", Boolean.toString(conditional != 0));
+                        prepared.facingModels[conditional * 6 + facing] = loadBlockStateModel("command_block", state);
+                    }
+                }
+                prepared.block = prepared.facingModels[2];
+                VANILLA_COMMAND_BLOCK = prepared;
+            } catch (Throwable ignored) {
+                prepared.block = Model.empty();
+            }
+        }
+        registerTextures(prepared.block, register);
+        for (Model model : prepared.facingModels) if (model != null) registerTextures(model, register);
+    }
+
+    public static synchronized Model getVanillaCommandBlockWorldModel(IBlockAccess world, int x, int y, int z) {
+        PreparedModels prepared = VANILLA_COMMAND_BLOCK;
+        if (prepared == null) return Model.empty();
+        int facing = 2;
+        boolean conditional = false;
+        net.minecraft.tileentity.TileEntity tile = world.getTileEntity(x,y,z);
+        if (tile instanceof IModernCommandBlockState) {
+            facing = ((IModernCommandBlockState) tile).etfu$getModernFacing();
+            conditional = ((IModernCommandBlockState) tile).etfu$isConditional();
+        }
+        if (facing < 0 || facing > 5) facing = 2;
+        Model model = prepared.facingModels[(conditional ? 6 : 0) + facing];
+        return model == null ? prepared.block : model;
+    }
+
     /**
      * Returns an atlas-safe icon already registered from the resolved modern model graph.
      * This is only a 1.7 fallback/particle icon; the JSON bridge remains authoritative
@@ -162,6 +204,36 @@ public final class ModernJsonModelBridge {
         }
         ModernMapParityBlocks.Style style = entry.getStyle();
         String name = entry.getRegistryName();
+        if (entry.isCopperGolemStatueIdentity()) {
+            int state = world.getBlockMetadata(x,y,z) & 15;
+            Model statue = models.facingModels[state];
+            if (statue != null) return statue;
+        }
+        if ("trial_spawner".equals(name)) {
+            int state=world.getBlockMetadata(x,y,z)&15; if (state>=12) state=0;
+            Model m=models.facingModels[state]; if (m!=null) return m;
+        }
+        if ("vault".equals(name)) {
+            int meta=world.getBlockMetadata(x,y,z)&7;
+            int vaultState=ModernMapParityBlocks.getVaultState(world,x,y,z);
+            Model m=models.facingModels[vaultState*8+meta]; if (m!=null) return m;
+        }
+        if ("crafter".equals(name)) {
+            int orientation=world.getBlockMetadata(x,y,z)&15; if (orientation>=12) orientation=5;
+            int flags=ModernMapParityBlocks.getCrafterVisualFlags(world,x,y,z);
+            int index=((flags&2)!=0?24:0)+((flags&1)!=0?12:0)+orientation;
+            Model m=models.facingModels[index]; if (m!=null) return m;
+        }
+        if ("bell".equals(name) || "calibrated_sculk_sensor".equals(name) || "jigsaw".equals(name)
+                || "repeating_command_block".equals(name) || "chain_command_block".equals(name)) {
+            int state=world.getBlockMetadata(x,y,z)&15;
+            Model m=models.facingModels[state]; if (m!=null) return m;
+        }
+        if ("respawn_anchor".equals(name) || "sculk_sensor".equals(name) || "sculk_shrieker".equals(name)
+                || "structure_block".equals(name)) {
+            int state=world.getBlockMetadata(x,y,z)&15;
+            Model m=models.facingModels[state]; if (m!=null) return m;
+        }
         if ("pale_oak_button".equals(name)) {
             int orientation = world.getBlockMetadata(x, y, z) & 15;
             if (orientation >= 12) orientation = 0;
@@ -488,7 +560,14 @@ public final class ModernJsonModelBridge {
     }
 
     private static Model loadBlockStateModel(ModernMapParityBlocks entry, Map<String, String> defaults) throws IOException {
-        JsonObject root = readJson("blockstates/" + entry.getRegistryName() + ".json");
+        Model model = loadBlockStateModel(entry.getRegistryName(), defaults);
+        correctSegmentedGroundDecalTopUv(entry, model);
+        correctCoralFanFaceBakeryUv(entry, model);
+        return model;
+    }
+
+    private static Model loadBlockStateModel(String registryName, Map<String, String> defaults) throws IOException {
+        JsonObject root = readJson("blockstates/" + registryName + ".json");
         ArrayList<ModelRef> refs = new ArrayList<ModelRef>();
 
         if (root.has("variants")) {
@@ -514,11 +593,8 @@ public final class ModernJsonModelBridge {
             if (refs.isEmpty() && multipart.size() > 0) addApply(refs, multipart.get(0).getAsJsonObject().get("apply"));
         }
 
-        if (refs.isEmpty()) refs.add(new ModelRef("minecraft:block/" + entry.getRegistryName(), 0, 0, false));
-        Model model = combine(refs);
-        correctSegmentedGroundDecalTopUv(entry, model);
-        correctCoralFanFaceBakeryUv(entry, model);
-        return model;
+        if (refs.isEmpty()) refs.add(new ModelRef("minecraft:block/" + registryName, 0, 0, false));
+        return combine(refs);
     }
 
     /**
@@ -823,8 +899,25 @@ public final class ModernJsonModelBridge {
         return true;
     }
 
+    private static LinkedHashMap<String,String> defaultStateForRegistry(String registryName) {
+        LinkedHashMap<String,String> p = new LinkedHashMap<String,String>();
+        p.put("conditional","false");
+        p.put("ominous","false");
+        p.put("trial_spawner_state","inactive");
+        p.put("vault_state","inactive");
+        p.put("orientation","north_up");
+        p.put("triggered","false");
+        p.put("crafting","false");
+        p.put("charges","0");
+        p.put("sculk_sensor_phase","inactive");
+        p.put("can_summon","false");
+        p.put("shrieking","false");
+        p.put("mode","save");
+        return p;
+    }
+
     private static Map<String, String> defaultsFor(ModernMapParityBlocks entry) {
-        LinkedHashMap<String, String> p = new LinkedHashMap<String, String>();
+        LinkedHashMap<String, String> p = defaultStateForRegistry(entry.getRegistryName());
         p.put("waterlogged", "sea_pickle".equals(entry.getRegistryName()) ? "true" : "false");
         p.put("lit", "false");
         p.put("powered", "false");
@@ -867,6 +960,67 @@ public final class ModernJsonModelBridge {
     private static void prepareDynamicBlockModels(ModernMapParityBlocks entry, PreparedModels prepared) throws IOException {
         ModernMapParityBlocks.Style style = entry.getStyle();
         String registryName = entry.getRegistryName();
+        if (entry.isCopperGolemStatueIdentity()) {
+            for (int pose=0; pose<4; pose++) for (int facing=0; facing<4; facing++) {
+                Model statue=copperGolemStatueModel(entry,null,pose);
+                rotateModelY(statue,facing*90);
+                prepared.facingModels[pose*4+facing]=statue;
+            }
+        }
+        if ("trial_spawner".equals(registryName)) {
+            String[] states={"inactive","waiting_for_players","active","waiting_for_reward_ejection","ejecting_reward","cooldown"};
+            for (int ominous=0; ominous<2; ominous++) for (int st=0; st<6; st++) {
+                Map<String,String> state=defaultsFor(entry); state.put("ominous",Boolean.toString(ominous!=0)); state.put("trial_spawner_state",states[st]);
+                prepared.facingModels[ominous*6+st]=loadBlockStateModel(entry,state);
+            }
+        }
+        if ("vault".equals(registryName)) {
+            String[] facings={"north","east","south","west"}; String[] states={"inactive","active","unlocking","ejecting"};
+            for (int st=0;st<4;st++) for(int ominous=0;ominous<2;ominous++) for(int facing=0;facing<4;facing++){
+                Map<String,String> state=defaultsFor(entry); state.put("facing",facings[facing]); state.put("ominous",Boolean.toString(ominous!=0)); state.put("vault_state",states[st]);
+                prepared.facingModels[st*8+ominous*4+facing]=loadBlockStateModel(entry,state);
+            }
+        }
+        if ("crafter".equals(registryName)) {
+            String[] orientations={"down_east","down_north","down_south","down_west","east_up","north_up","south_up","up_east","up_north","up_south","up_west","west_up"};
+            for(int crafting=0;crafting<2;crafting++) for(int triggered=0;triggered<2;triggered++) for(int o=0;o<12;o++){
+                Map<String,String> state=defaultsFor(entry); state.put("orientation",orientations[o]); state.put("triggered",Boolean.toString(triggered!=0)); state.put("crafting",Boolean.toString(crafting!=0));
+                prepared.facingModels[crafting*24+triggered*12+o]=loadBlockStateModel(entry,state);
+            }
+        }
+        if ("bell".equals(registryName)) {
+            String[] facings={"north","east","south","west"}; String[] attachments={"floor","ceiling","single_wall","double_wall"};
+            for(int a=0;a<4;a++) for(int f=0;f<4;f++){
+                Map<String,String> state=defaultsFor(entry); state.put("attachment",attachments[a]); state.put("facing",facings[f]);
+                prepared.facingModels[a*4+f]=applySpecialBlockVisual(entry,loadBlockStateModel(entry,state));
+            }
+        }
+        if ("respawn_anchor".equals(registryName)) {
+            for(int charges=0;charges<=4;charges++){ Map<String,String> state=defaultsFor(entry); state.put("charges",Integer.toString(charges)); prepared.facingModels[charges]=loadBlockStateModel(entry,state); }
+        }
+        if ("sculk_sensor".equals(registryName)) {
+            String[] phases={"inactive","active","cooldown"};
+            for(int phase=0;phase<3;phase++){ Map<String,String> state=defaultsFor(entry); state.put("sculk_sensor_phase",phases[phase]); prepared.facingModels[phase]=loadBlockStateModel(entry,state); }
+        }
+        if ("calibrated_sculk_sensor".equals(registryName)) {
+            String[] phases={"inactive","active","cooldown"}; String[] facings={"north","east","south","west"};
+            for(int phase=0;phase<3;phase++) for(int f=0;f<4;f++){ Map<String,String> state=defaultsFor(entry); state.put("sculk_sensor_phase",phases[phase]); state.put("facing",facings[f]); prepared.facingModels[phase*4+f]=loadBlockStateModel(entry,state); }
+        }
+        if ("sculk_shrieker".equals(registryName)) {
+            for(int shriek=0;shriek<2;shriek++) for(int summon=0;summon<2;summon++){ Map<String,String> state=defaultsFor(entry); state.put("can_summon",Boolean.toString(summon!=0)); state.put("shrieking",Boolean.toString(shriek!=0)); prepared.facingModels[(shriek<<1)|summon]=loadBlockStateModel(entry,state); }
+        }
+        if ("jigsaw".equals(registryName)) {
+            String[] orientations={"down_east","down_north","down_south","down_west","east_up","north_up","south_up","up_east","up_north","up_south","up_west","west_up"};
+            for(int o=0;o<12;o++){ Map<String,String> state=defaultsFor(entry); state.put("orientation",orientations[o]); prepared.facingModels[o]=loadBlockStateModel(entry,state); }
+        }
+        if ("repeating_command_block".equals(registryName) || "chain_command_block".equals(registryName)) {
+            String[] facings={"down","up","north","south","west","east"};
+            for(int conditional=0;conditional<2;conditional++) for(int f=0;f<6;f++){ Map<String,String> state=defaultsFor(entry); state.put("conditional",Boolean.toString(conditional!=0)); state.put("facing",facings[f]); prepared.facingModels[conditional*6+f]=loadBlockStateModel(entry,state); }
+        }
+        if ("structure_block".equals(registryName)) {
+            String[] modes={"save","load","corner","data"};
+            for(int mode=0;mode<4;mode++){ Map<String,String> state=defaultsFor(entry); state.put("mode",modes[mode]); prepared.facingModels[mode]=loadBlockStateModel(entry,state); }
+        }
         if (entry.usesMultifaceState()) {
             String[] faces = {"down", "up", "north", "south", "west", "east"};
             for (int mask = 1; mask <= ModernMapParityBlocks.MULTIFACE_ALL_FACES; mask++) {
@@ -1244,7 +1398,7 @@ public final class ModernJsonModelBridge {
         } else if ("minecraft:decorated_pot".equals(type)) {
             visual = decoratedPotModel();
         } else if ("minecraft:copper_golem_statue".equals(type)) {
-            visual = copperGolemStatueModel(entry, model.specialTexture);
+            visual = copperGolemStatueModel(entry, model.specialTexture, 0);
         } else if ("minecraft:hanging_sign".equals(type)) {
             visual = hangingSignModel(entry, 0);
         }
@@ -1292,7 +1446,7 @@ public final class ModernJsonModelBridge {
 
         if (name.endsWith("_hanging_sign")) return hangingSignModel(entry, name.endsWith("_wall_hanging_sign") ? 2 : 0);
 
-        if (name.contains("copper_golem_statue")) return copperGolemStatueModel(entry, null);
+        if (name.contains("copper_golem_statue")) return copperGolemStatueModel(entry, null, 0);
 
         // A small number of modern block models are intentionally entity-driven and therefore
         // contain particle-only JSON. Never render those as missingno/stone: preserve their exact
@@ -1477,57 +1631,172 @@ public final class ModernJsonModelBridge {
         return "minecraft:entity/copper_golem/copper_golem";
     }
 
-    private static Model copperGolemStatueModel(ModernMapParityBlocks entry, String itemTexture) {
+    private static Model copperGolemStatueModel(ModernMapParityBlocks entry, String itemTexture, int pose) {
         String texture = copperGolemTexture(entry, itemTexture);
         Model out = new Model();
         /*
-         * Exact standing CopperGolemEntityModel cuboid proportions/UV origins from 1.21.11,
-         * scaled from the entity model's 24-pixel standing height into one block.  The modern
-         * statue renderer uses this entity model rather than the particle-only block JSON.
+         * Pass 35b: use the four authored 1.21.11 CopperGolemModel layer definitions directly.
+         * The legacy bridge keeps Pass 35's established 24px -> 16px statue scale so Standing
+         * does not change size, but every pose now has its own cuboids, part hierarchy, rotations,
+         * deformations and 64x64 entity-sheet UV origins. CopperGolemStatueModel's root PI roll is
+         * folded into addGolemFace(); horizontal facing is still applied by prepareDynamicBlockModels.
          */
-        addGolemBox(out, -4, 13, -3,  4, 19,  3,  0, 15, texture); // body
-        addGolemBox(out, -4,  8, -5,  4, 13,  5,  0,  0, texture); // head
-        addGolemBox(out, -1, 11, -6,  1, 14, -4, 56,  0, texture); // nose
-        addGolemBox(out, -1,  4, -1,  1,  8,  1, 37,  8, texture); // rod
-        addGolemBox(out, -2,  0, -2,  2,  4,  2, 37,  0, texture); // top block
-        addGolemBox(out, -7, 12, -2, -4, 22,  2, 36, 16, texture); // right arm
-        addGolemBox(out,  4, 12, -2,  7, 22,  2, 50, 16, texture); // left arm
-        addGolemBox(out, -4, 19, -2,  0, 24,  2,  0, 27, texture); // right leg
-        addGolemBox(out,  0, 19, -2,  4, 24,  2, 16, 27, texture); // left leg
-        // CopperGolemStatueModel applies a PI roll to the entity model. Our Y coordinates already
-        // bake that upright conversion; mirror X as well so the entity-sheet UV orientation and
-        // left/right face assignment match the modern statue renderer.
-        mirrorModelX(out);
+        switch (pose & 3) {
+            case 1: addCopperGolemSittingPose(out, texture); break;
+            case 2: addCopperGolemRunningPose(out, texture); break;
+            case 3: addCopperGolemStarPose(out, texture); break;
+            default: addCopperGolemStandingPose(out, texture); break;
+        }
         return out;
     }
 
-    private static void mirrorModelX(Model model) {
-        for (Quad quad : model.quads) {
-            for (Vertex vertex : quad.vertices) vertex.x = 1.0D - vertex.x;
-            // Mirroring reverses winding; reverse both geometry and UV order together so faces
-            // remain outward-facing without changing which texel belongs to each vertex.
-            for (int a = 0, b = quad.vertices.length - 1; a < b; a++, b--) {
-                Vertex v = quad.vertices[a]; quad.vertices[a] = quad.vertices[b]; quad.vertices[b] = v;
-                double[] uv = quad.uv[a]; quad.uv[a] = quad.uv[b]; quad.uv[b] = uv;
-            }
-        }
+    private static void addCopperGolemStandingPose(Model out, String texture) {
+        GolemPartPose body = golemPose(0.0D, -5.0D, 0.0D, 0.0D, 0.0D, 0.0D);
+        GolemPartPose head = golemPose(0.0D, -6.0D, 0.0D, 0.0D, 0.0D, 0.0D);
+        GolemPartPose rightArm = golemPose(-4.0D, -6.0D, 0.0D, 0.0D, 0.0D, 0.0D);
+        GolemPartPose leftArm = golemPose(4.0D, -6.0D, 0.0D, 0.0D, 0.0D, 0.0D);
+        GolemPartPose rightLeg = golemPose(0.0D, -5.0D, 0.0D, 0.0D, 0.0D, 0.0D);
+        GolemPartPose leftLeg = golemPose(0.0D, -5.0D, 0.0D, 0.0D, 0.0D, 0.0D);
+
+        addGolemPartBox(out, texture, 0, 15, -4.0D, -6.0D, -3.0D, 8.0D, 6.0D, 6.0D, 0.0D, body);
+        addGolemPartBox(out, texture, 0, 0, -4.0D, -5.0D, -5.0D, 8.0D, 5.0D, 10.0D, 0.015D, head, body);
+        addGolemPartBox(out, texture, 56, 0, -1.0D, -2.0D, -6.0D, 2.0D, 3.0D, 2.0D, 0.0D, head, body);
+        addGolemPartBox(out, texture, 37, 8, -1.0D, -9.0D, -1.0D, 2.0D, 4.0D, 2.0D, -0.015D, head, body);
+        addGolemPartBox(out, texture, 37, 0, -2.0D, -13.0D, -2.0D, 4.0D, 4.0D, 4.0D, -0.015D, head, body);
+        addGolemPartBox(out, texture, 36, 16, -3.0D, -1.0D, -2.0D, 3.0D, 10.0D, 4.0D, 0.0D, rightArm, body);
+        addGolemPartBox(out, texture, 50, 16, 0.0D, -1.0D, -2.0D, 3.0D, 10.0D, 4.0D, 0.0D, leftArm, body);
+        addGolemPartBox(out, texture, 0, 27, -4.0D, 0.0D, -2.0D, 4.0D, 5.0D, 4.0D, 0.0D, rightLeg);
+        addGolemPartBox(out, texture, 16, 27, 0.0D, 0.0D, -2.0D, 4.0D, 5.0D, 4.0D, 0.0D, leftLeg);
     }
 
-    private static void addGolemBox(Model model, double x0, double yDown0, double z0,
-                                    double x1, double yDown1, double z1,
-                                    int texU, int texV, String texture) {
+    private static void addCopperGolemSittingPose(Model out, String texture) {
+        GolemPartPose body = golemPose(0.0D, -3.0D, 2.325D, 0.0D, 0.0D, 0.0D);
+        GolemPartPose bodyR1 = golemPose(0.0D, -1.0D, -4.325D, 0.0D, 0.0D, -3.1416D);
+        GolemPartPose head = golemPose(0.0D, -6.0D, -0.2D, 0.0D, 0.0D, 0.0D);
+        GolemPartPose rightArm = golemPose(-4.0D, -5.6D, -1.8D, 0.4363D, 0.0D, 0.0D);
+        GolemPartPose rightArmR1 = golemPose(0.0D, 0.0893D, 0.1198D, -1.0472D, 0.0D, 0.0D);
+        GolemPartPose leftArm = golemPose(4.0D, -5.6D, -1.7D, 0.4363D, 0.0D, 0.0D);
+        GolemPartPose leftArmR1 = golemPose(0.0D, -0.0015D, -0.0808D, -1.0472D, 0.0D, 0.0D);
+        GolemPartPose rightLeg = golemPose(-2.1D, -2.1D, -2.075D, 0.0D, 0.0D, 0.0D);
+        GolemPartPose rightLegR1 = golemPose(0.05D, -1.9D, 1.075D, -1.5708D, 0.0D, 0.0D);
+        GolemPartPose leftLeg = golemPose(2.0D, -2.0D, -2.075D, 0.0D, 0.0D, 0.0D);
+        GolemPartPose leftLegR1 = golemPose(0.05D, -2.0D, 1.075D, -1.5708D, 0.0D, 0.0D);
+
+        addGolemPartBox(out, texture, 3, 19, -3.0D, -4.0D, -4.525D, 6.0D, 1.0D, 6.0D, 0.0D, body);
+        addGolemPartBox(out, texture, 0, 15, -4.0D, -3.0D, -3.525D, 8.0D, 6.0D, 6.0D, 0.0D, body);
+        addGolemPartBox(out, texture, 3, 18, -4.0D, -3.0D, -2.2D, 8.0D, 6.0D, 3.0D, 0.0D, bodyR1, body);
+        addGolemPartBox(out, texture, 37, 8, -1.0D, -7.0D, -3.3D, 2.0D, 4.0D, 2.0D, -0.015D, head, body);
+        addGolemPartBox(out, texture, 37, 0, -2.0D, -11.0D, -4.3D, 4.0D, 4.0D, 4.0D, -0.015D, head, body);
+        addGolemPartBox(out, texture, 0, 0, -4.0D, -3.0D, -7.325D, 8.0D, 5.0D, 10.0D, 0.0D, head, body);
+        addGolemPartBox(out, texture, 56, 0, -1.0D, 0.0D, -8.325D, 2.0D, 3.0D, 2.0D, 0.0D, head, body);
+        addGolemPartBox(out, texture, 36, 16, -3.075D, -0.9733D, -1.9966D, 3.0D, 10.0D, 4.0D, 0.0D, rightArmR1, rightArm, body);
+        addGolemPartBox(out, texture, 50, 16, 0.075D, -1.0443D, -1.8997D, 3.0D, 10.0D, 4.0D, 0.0D, leftArmR1, leftArm, body);
+        addGolemPartBox(out, texture, 0, 27, -2.0D, 0.975D, 0.0D, 4.0D, 5.0D, 4.0D, 0.0D, rightLegR1, rightLeg);
+        addGolemPartBox(out, texture, 16, 27, -2.0D, 0.975D, 0.0D, 4.0D, 5.0D, 4.0D, 0.0D, leftLegR1, leftLeg);
+    }
+
+    private static void addCopperGolemRunningPose(Model out, String texture) {
+        GolemPartPose body = golemPose(-1.064D, -5.0D, 0.0D, 0.0D, 0.0D, 0.0D);
+        GolemPartPose bodyR1 = golemPose(1.1D, 0.1D, 0.7D, 0.1204D, -0.0064D, -0.0779D);
+        GolemPartPose head = golemPose(0.7D, -5.6D, -1.8D, 0.0D, 0.0D, 0.0D);
+        GolemPartPose rightArm = golemPose(-4.0D, -6.0D, 0.0D, 0.0D, 0.0D, 0.0D);
+        GolemPartPose rightArmR1 = golemPose(0.7D, -0.248D, -1.62D, 1.0036D, 0.0D, 0.0D);
+        GolemPartPose leftArm = golemPose(4.0D, -6.0D, 0.0D, 0.0D, 0.0D, 0.0D);
+        GolemPartPose leftArmR1 = golemPose(0.732D, 0.0D, 0.0D, -0.8715D, -0.0535D, -0.0449D);
+        GolemPartPose rightLeg = golemPose(-3.064D, -5.0D, 0.0D, 0.0D, 0.0D, 0.0D);
+        GolemPartPose rightLegR1 = golemPose(1.048D, 0.0D, -0.9D, -0.8727D, 0.0D, 0.0D);
+        GolemPartPose leftLeg = golemPose(0.936D, -5.0D, 0.0D, 0.0D, 0.0D, 0.0D);
+        GolemPartPose leftLegR1 = golemPose(1.0D, 0.0D, 0.0D, 0.7854D, 0.0D, 0.0D);
+
+        addGolemPartBox(out, texture, 0, 15, -4.02D, -6.116D, -3.5D, 8.0D, 6.0D, 6.0D, 0.0D, bodyR1, body);
+        addGolemPartBox(out, texture, 0, 0, -4.0D, -5.1D, -5.0D, 8.0D, 5.0D, 10.0D, 0.0D, head, body);
+        addGolemPartBox(out, texture, 56, 0, -1.02D, -2.1D, -6.0D, 2.0D, 3.0D, 2.0D, 0.0D, head, body);
+        addGolemPartBox(out, texture, 37, 8, -1.02D, -9.1D, -1.0D, 2.0D, 4.0D, 2.0D, -0.015D, head, body);
+        addGolemPartBox(out, texture, 37, 0, -2.0D, -13.1D, -2.0D, 4.0D, 4.0D, 4.0D, -0.015D, head, body);
+        addGolemPartBox(out, texture, 36, 16, -3.052D, -1.11D, -2.036D, 3.0D, 10.0D, 4.0D, 0.0D, rightArmR1, rightArm, body);
+        addGolemPartBox(out, texture, 50, 16, 0.032D, -1.1D, -2.0D, 3.0D, 10.0D, 4.0D, 0.0D, leftArmR1, leftArm, body);
+        addGolemPartBox(out, texture, 0, 27, -1.856D, -0.1D, -1.09D, 4.0D, 5.0D, 4.0D, 0.0D, rightLegR1, rightLeg);
+        addGolemPartBox(out, texture, 16, 27, -2.088D, -0.1D, -2.0D, 4.0D, 5.0D, 4.0D, 0.0D, leftLegR1, leftLeg);
+    }
+
+    private static void addCopperGolemStarPose(Model out, String texture) {
+        GolemPartPose body = golemPose(0.0D, -5.0D, 0.0D, 0.0D, 0.0D, 0.0D);
+        GolemPartPose head = golemPose(0.0D, -6.0D, 0.0D, 0.0D, 0.0D, 0.0D);
+        GolemPartPose rightArm = golemPose(-4.0D, -6.0D, 0.0D, 0.0D, 0.0D, 0.0D);
+        GolemPartPose rightArmR1 = golemPose(1.0D, 1.0D, 0.0D, 0.0D, 0.0D, 1.9199D);
+        GolemPartPose leftArm = golemPose(4.0D, -6.0D, 0.0D, 0.0D, 0.0D, 0.0D);
+        GolemPartPose leftArmR1 = golemPose(-1.0D, 1.0D, 0.0D, 0.0D, 0.0D, -1.9199D);
+        GolemPartPose rightLeg = golemPose(-3.0D, -5.0D, 0.0D, 0.0D, 0.0D, 0.0D);
+        GolemPartPose rightLegR1 = golemPose(0.35D, 2.0D, 0.01D, 0.0D, 0.0D, 0.2618D);
+        GolemPartPose leftLeg = golemPose(1.0D, -5.0D, 0.0D, 0.0D, 0.0D, 0.0D);
+        GolemPartPose leftLegR1 = golemPose(1.65D, 2.0D, 0.0D, 0.0D, 0.0D, -0.2618D);
+
+        addGolemPartBox(out, texture, 0, 15, -4.0D, -6.0D, -3.0D, 8.0D, 6.0D, 6.0D, 0.0D, body);
+        addGolemPartBox(out, texture, 0, 0, -4.0D, -5.0D, -5.0D, 8.0D, 5.0D, 10.0D, 0.0D, head, body);
+        addGolemPartBox(out, texture, 56, 0, -1.0D, -2.0D, -6.0D, 2.0D, 3.0D, 2.0D, 0.0D, head, body);
+        addGolemPartBox(out, texture, 37, 8, -1.0D, -9.0D, -1.0D, 2.0D, 4.0D, 2.0D, -0.015D, head, body);
+        addGolemPartBox(out, texture, 37, 0, -2.0D, -13.0D, -2.0D, 4.0D, 4.0D, 4.0D, -0.015D, head, body);
+        addGolemPartBox(out, texture, 36, 16, -1.5D, -5.0D, -2.0D, 3.0D, 10.0D, 4.0D, 0.0D, rightArmR1, rightArm, body);
+        addGolemPartBox(out, texture, 50, 16, -1.5D, -5.0D, -2.0D, 3.0D, 10.0D, 4.0D, 0.0D, leftArmR1, leftArm, body);
+        addGolemPartBox(out, texture, 0, 27, -2.0D, -2.5D, -2.0D, 4.0D, 5.0D, 4.0D, 0.0D, rightLegR1, rightLeg);
+        addGolemPartBox(out, texture, 16, 27, -2.0D, -2.5D, -2.0D, 4.0D, 5.0D, 4.0D, 0.0D, leftLegR1, leftLeg);
+    }
+
+    private static GolemPartPose golemPose(double x, double y, double z, double rx, double ry, double rz) {
+        return new GolemPartPose(x, y, z, rx, ry, rz);
+    }
+
+    /** Reproduces ModelPart.Cube's 64x64 entity-sheet face layout before applying the authored part hierarchy. */
+    private static void addGolemPartBox(Model model, String texture, int texU, int texV,
+                                        double x, double y, double z, double width, double height, double depth,
+                                        double deformation, GolemPartPose... hierarchy) {
+        double x0 = x - deformation, x1 = x + width + deformation;
+        double y0 = y - deformation, y1 = y + height + deformation;
+        double z0 = z - deformation, z1 = z + depth + deformation;
+        double[] p000 = {x0,y0,z0}, p100 = {x1,y0,z0}, p110 = {x1,y1,z0}, p010 = {x0,y1,z0};
+        double[] p001 = {x0,y0,z1}, p101 = {x1,y0,z1}, p111 = {x1,y1,z1}, p011 = {x0,y1,z1};
+        double u0=texU, u1=texU+depth, u2=texU+depth+width, u3=texU+depth+width+width;
+        double u4=texU+depth+width+depth, u5=texU+depth+width+depth+width;
+        double v0=texV, v1=texV+depth, v2=texV+depth+height;
+        String t=normalizeTexture(texture);
+        addGolemFace(model, Direction.DOWN,  new double[][]{p101,p001,p000,p100}, u1,v0,u2,v1,t,hierarchy);
+        addGolemFace(model, Direction.UP,    new double[][]{p110,p010,p011,p111}, u2,v1,u3,v0,t,hierarchy);
+        addGolemFace(model, Direction.WEST,  new double[][]{p000,p001,p011,p010}, u0,v1,u1,v2,t,hierarchy);
+        addGolemFace(model, Direction.NORTH, new double[][]{p100,p000,p010,p110}, u1,v1,u2,v2,t,hierarchy);
+        addGolemFace(model, Direction.EAST,  new double[][]{p101,p100,p110,p111}, u2,v1,u4,v2,t,hierarchy);
+        addGolemFace(model, Direction.SOUTH, new double[][]{p001,p101,p111,p011}, u4,v1,u5,v2,t,hierarchy);
+    }
+
+    private static void addGolemFace(Model model, Direction dir, double[][] source,
+                                     double u0, double v0, double u1, double v1, String texture,
+                                     GolemPartPose... hierarchy) {
+        double[][] xyz = new double[4][3];
+        for (int i=0;i<4;i++) xyz[i]=golemToBlockPixels(source[i], hierarchy);
+        addModelFace(model, dir, xyz, u0, v0, u1, v1, 64.0D, 64.0D, texture);
+    }
+
+    private static double[] golemToBlockPixels(double[] source, GolemPartPose... hierarchy) {
+        double x=source[0], y=source[1], z=source[2];
+        for (GolemPartPose part : hierarchy) {
+            double sx=Math.sin(part.rx), cx=Math.cos(part.rx);
+            double sy=Math.sin(part.ry), cy=Math.cos(part.ry);
+            double sz=Math.sin(part.rz), cz=Math.cos(part.rz);
+            double y1=y*cx-z*sx, z1=y*sx+z*cx; y=y1; z=z1;
+            double x1=x*cy+z*sy, z2=-x*sy+z*cy; x=x1; z=z2;
+            double x2=x*cz-y*sz, y2=x*sz+y*cz; x=x2; y=y2;
+            x += part.x; y += part.y; z += part.z;
+        }
+        // CopperGolemStatueModel.setupAnim: root.y=0 and root.zRot=PI. Facing rotation follows later.
+        x = -x; y = -y;
         final double scale = 16.0D / 24.0D;
-        double bx0 = 8.0D + x0 * scale;
-        double bx1 = 8.0D + x1 * scale;
-        double by0 = (24.0D - yDown1) * scale;
-        double by1 = (24.0D - yDown0) * scale;
-        double bz0 = 8.0D + z0 * scale;
-        double bz1 = 8.0D + z1 * scale;
-        // The statue geometry is scaled from a 24px entity into one block, but its 64x64
-        // entity texture is NOT scaled. Keep the original entity cuboid dimensions for UV
-        // layout or every face samples a compressed/wrong part of the copper-golem sheet.
-        addModelBoxUv(model, bx0, by0, bz0, bx1, by1, bz1, texU, texV, 64, 64, texture,
-                x1 - x0, yDown1 - yDown0, z1 - z0);
+        return new double[]{8.0D + x*scale, y*scale, 8.0D + z*scale};
+    }
+
+    private static final class GolemPartPose {
+        final double x,y,z,rx,ry,rz;
+        GolemPartPose(double x,double y,double z,double rx,double ry,double rz) {
+            this.x=x; this.y=y; this.z=z; this.rx=rx; this.ry=ry; this.rz=rz;
+        }
     }
 
     private static Model chestModel(String texture) {
@@ -1692,7 +1961,7 @@ public final class ModernJsonModelBridge {
         public Model block = Model.empty();
         public Model item = Model.empty();
         public final Model[] connectionModels = new Model[162];
-        public final Model[] facingModels = new Model[32];
+        public final Model[] facingModels = new Model[64];
         public final Model[] multifaceModels = new Model[64];
         public final Model[] chiseledBookshelfBase = new Model[4];
         public final Model[] chiseledBookshelfSlots = new Model[48];

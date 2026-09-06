@@ -121,3 +121,19 @@ The global model-state audit also confirmed that Tall Seagrass `half` must be st
 Kelp Plant and the separate Open/Closed Eyeblossom identities have no model-selecting blockstate
 properties in Minecraft 1.21.11. Turtle Egg and Leaf Litter/Wildflowers were already exact and were
 left regression-sensitive rather than reworked.
+
+## Pass 35 complex / technical visible-state contract
+
+Pass 35 promotes Copper Golem Statues, Trial Spawner, Vault, Crafter, Bell, Respawn Anchor, Sculk
+Sensor, Calibrated Sculk Sensor, Sculk Shrieker, Jigsaw, Repeating/Chain Command Blocks and Structure
+Block to `PASS_35_VERIFIED`. The vanilla 1.7 Command Block is audited separately because it is not a
+parity-manifest identity; a minimal TE/mixin extension preserves modern facing and conditional model
+state without repurposing its powered metadata or rewriting command execution.
+
+Vault and Crafter use tiny synchronized visual-state tile entities only where the complete modern
+state matrix cannot fit in four metadata bits. Copper Golem Statue pose/facing, Bell attachment,
+Respawn Anchor charges, Sculk phases, Jigsaw orientation, technical command-block orientation, and
+Structure Block mode remain metadata-backed. `docs/BACKPORTER_STATE_CONTRACT.json` revision 35 is
+the authoritative importer mapping.
+
+Large functional systems and general waterlogging remain explicitly deferred.

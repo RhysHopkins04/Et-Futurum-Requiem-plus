@@ -74,6 +74,11 @@ public class EtFuturumEarlyMixins implements IFMLLoadingPlugin, IEarlyMixinLoade
 		mixins.add("chestpairing.MixinBlockChest");
 		mixins.add("chestpairing.MixinItemBlock");
 
+		// Pass 35: vanilla Command Block keeps its 1.7 powered metadata and command execution,
+		// while a tiny TE extension stores modern facing/conditional visual state.
+		mixins.add("commandblockstate.MixinTileEntityCommandBlock");
+		mixins.add("commandblockstate.MixinBlockCommandBlock");
+
 		if (ConfigMixins.endPortalFix) {
 			mixins.add("endportal.MixinBlockEndPortal");
 		}

@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "contract_id": "etfuturum-requiem-plus-backporter-state-contract",
-  "contract_revision": "34",
+  "contract_revision": "35",
   "implemented_in_version": "3.5.5",
   "implemented_in_git_ref": "refs/tags/3.5.5",
   "source_minecraft": "1.21.11",
@@ -2350,6 +2350,640 @@
       "notes": [
         "Pass 34 audit confirmed these were already exact and did not rework them. Kelp/kelp_plant and open/closed eyeblossom blockstates have no model-selecting properties in 1.21.11."
       ]
+    },
+    {
+      "key": "copper_golem_statue_family",
+      "source_ids": [
+        "minecraft:copper_golem_statue",
+        "minecraft:waxed_copper_golem_statue",
+        "minecraft:exposed_copper_golem_statue",
+        "minecraft:waxed_exposed_copper_golem_statue",
+        "minecraft:weathered_copper_golem_statue",
+        "minecraft:waxed_weathered_copper_golem_statue",
+        "minecraft:oxidized_copper_golem_statue",
+        "minecraft:waxed_oxidized_copper_golem_statue"
+      ],
+      "target_ids": [
+        "etfuturum:copper_golem_statue",
+        "etfuturum:waxed_copper_golem_statue",
+        "etfuturum:exposed_copper_golem_statue",
+        "etfuturum:waxed_exposed_copper_golem_statue",
+        "etfuturum:weathered_copper_golem_statue",
+        "etfuturum:waxed_weathered_copper_golem_statue",
+        "etfuturum:oxidized_copper_golem_statue",
+        "etfuturum:waxed_oxidized_copper_golem_statue"
+      ],
+      "classification": "FULL_IMPORT",
+      "metadata": {
+        "layout": "meta=pose_index*4+facing_index",
+        "facing_index": {
+          "north": 0,
+          "east": 1,
+          "south": 2,
+          "west": 3
+        },
+        "pose_index": {
+          "standing": 0,
+          "sitting": 1,
+          "running": 2,
+          "star": 3
+        },
+        "range": "0..15"
+      },
+      "tile_entity": {
+        "required": false
+      },
+      "source_properties": {
+        "facing": "exact -> metadata bits0..1",
+        "copper_golem_pose": "exact -> metadata bits2..3",
+        "waterlogged": "unsupported general fluid state"
+      },
+      "derived": [],
+      "unsupported": [
+        "waterlogged"
+      ],
+      "exactness": {
+        "visible_state": "exact",
+        "map_state": "exact",
+        "gameplay": "deferred"
+      },
+      "visual_property_classification": {
+        "facing": "STORED_EXACTLY",
+        "copper_golem_pose": "STORED_EXACTLY",
+        "waterlogged": "UNSUPPORTED"
+      },
+      "notes": [
+        "All eight oxidation/waxed registry identities use the same 16-state metadata layout. EFR renders four separately authored 1.21.11 Copper Golem model-layer poses with their own cuboids, part transforms, deformations and 64x64 entity-sheet UV origins, plus exact identity texture and horizontal rotation; Sitting/Running/Star are not transformed Standing fallbacks.",
+        "Pick/drop/re-placement preserves the 0..15 statue state metadata. Copper Golem entity behaviour and oxidation/waxing/scraping lifecycle are deferred."
+      ]
+    },
+    {
+      "key": "trial_spawner",
+      "source_ids": [
+        "minecraft:trial_spawner"
+      ],
+      "target_ids": [
+        "etfuturum:trial_spawner"
+      ],
+      "classification": "FULL_IMPORT",
+      "metadata": {
+        "layout": "meta=ominous*6+state_index",
+        "ominous": {
+          "false": 0,
+          "true": 1
+        },
+        "state_index": {
+          "inactive": 0,
+          "waiting_for_players": 1,
+          "active": 2,
+          "waiting_for_reward_ejection": 3,
+          "ejecting_reward": 4,
+          "cooldown": 5
+        },
+        "range": "0..11"
+      },
+      "tile_entity": {
+        "required": false
+      },
+      "source_properties": {
+        "ominous": "exact -> metadata quotient /6",
+        "trial_spawner_state": "exact -> metadata remainder %6"
+      },
+      "derived": [],
+      "unsupported": [],
+      "exactness": {
+        "visible_state": "exact",
+        "map_state": "exact",
+        "gameplay": "deferred"
+      },
+      "visual_property_classification": {
+        "ominous": "STORED_EXACTLY",
+        "trial_spawner_state": "STORED_EXACTLY"
+      },
+      "notes": [
+        "All 12 source combinations remain persistent even where Mojang intentionally shares static models: within each normal/ominous family inactive=cooldown, waiting_for_players=active=waiting_for_reward_ejection, and ejecting_reward is distinct. AssetDirector resolves the corresponding 1.21.11 blockstate/model; gameplay is deferred."
+      ]
+    },
+    {
+      "key": "vault",
+      "source_ids": [
+        "minecraft:vault"
+      ],
+      "target_ids": [
+        "etfuturum:vault"
+      ],
+      "classification": "FULL_IMPORT",
+      "metadata": {
+        "layout": "bits0..1=facing_index; bit2=ominous",
+        "facing_index": {
+          "north": 0,
+          "east": 1,
+          "south": 2,
+          "west": 3
+        },
+        "ominous_bit": 4
+      },
+      "tile_entity": {
+        "required": true,
+        "id": "etfuturum:modern_parity_vault_state",
+        "fields": [
+          {
+            "name": "VaultState",
+            "type": "TAG_Byte 0..3",
+            "required": true,
+            "map": {
+              "inactive": 0,
+              "active": 1,
+              "unlocking": 2,
+              "ejecting": 3
+            }
+          }
+        ]
+      },
+      "source_properties": {
+        "facing": "exact -> metadata bits0..1",
+        "ominous": "exact -> metadata bit2",
+        "vault_state": "exact -> TE VaultState 0..3"
+      },
+      "derived": [],
+      "unsupported": [],
+      "exactness": {
+        "visible_state": "exact",
+        "map_state": "exact",
+        "gameplay": "deferred"
+      },
+      "visual_property_classification": {
+        "facing": "STORED_EXACTLY",
+        "ominous": "STORED_EXACTLY",
+        "vault_state": "STORED_EXACTLY"
+      },
+      "notes": [
+        "Metadata plus VaultState covers all 32 source combinations. Key/reward/per-player gameplay is deferred."
+      ]
+    },
+    {
+      "key": "crafter",
+      "source_ids": [
+        "minecraft:crafter"
+      ],
+      "target_ids": [
+        "etfuturum:crafter"
+      ],
+      "classification": "FULL_IMPORT",
+      "metadata": {
+        "layout": "metadata is orientation_index 0..11",
+        "orientation_index": {
+          "down_east": 0,
+          "down_north": 1,
+          "down_south": 2,
+          "down_west": 3,
+          "east_up": 4,
+          "north_up": 5,
+          "south_up": 6,
+          "up_east": 7,
+          "up_north": 8,
+          "up_south": 9,
+          "up_west": 10,
+          "west_up": 11
+        }
+      },
+      "tile_entity": {
+        "required": true,
+        "id": "etfuturum:modern_parity_crafter_state",
+        "fields": [
+          {
+            "name": "Triggered",
+            "type": "TAG_Byte boolean",
+            "required": true
+          },
+          {
+            "name": "Crafting",
+            "type": "TAG_Byte boolean",
+            "required": true
+          }
+        ]
+      },
+      "source_properties": {
+        "orientation": "exact -> metadata 0..11",
+        "triggered": "exact -> TE Triggered",
+        "crafting": "exact -> TE Crafting"
+      },
+      "derived": [],
+      "unsupported": [],
+      "exactness": {
+        "visible_state": "exact",
+        "map_state": "exact",
+        "gameplay": "deferred"
+      },
+      "visual_property_classification": {
+        "orientation": "STORED_EXACTLY",
+        "triggered": "STORED_EXACTLY",
+        "crafting": "STORED_EXACTLY"
+      },
+      "notes": [
+        "12 orientations x 2 triggered x 2 crafting = all 48 persistent source combinations. Mojang intentionally allows crafting=true,triggered=false and crafting=true,triggered=true to share the inherited crafter_crafting visual; both booleans remain stored exactly. The TE is visual-state-only: no 3x3 inventory, recipe execution or redstone crafting is implemented in Pass 35."
+      ]
+    },
+    {
+      "key": "bell",
+      "source_ids": [
+        "minecraft:bell"
+      ],
+      "target_ids": [
+        "etfuturum:bell"
+      ],
+      "classification": "FULL_IMPORT",
+      "metadata": {
+        "layout": "meta=attachment_index*4+facing_index",
+        "facing_index": {
+          "north": 0,
+          "east": 1,
+          "south": 2,
+          "west": 3
+        },
+        "attachment_index": {
+          "floor": 0,
+          "ceiling": 1,
+          "single_wall": 2,
+          "double_wall": 3
+        },
+        "range": "0..15"
+      },
+      "tile_entity": {
+        "required": false
+      },
+      "source_properties": {
+        "facing": "exact -> metadata bits0..1",
+        "attachment": "exact -> metadata bits2..3",
+        "powered": "visually irrelevant/gameplay-only in this state-parity pass; not stored"
+      },
+      "derived": [],
+      "unsupported": [],
+      "exactness": {
+        "visible_state": "exact",
+        "map_state": "exact",
+        "gameplay": "bounded placement/support only; ringing/raid gameplay deferred"
+      },
+      "visual_property_classification": {
+        "facing": "STORED_EXACTLY",
+        "attachment": "STORED_EXACTLY",
+        "powered": "VISUALLY_IRRELEVANT"
+      },
+      "notes": [
+        "All 16 attachment/facing models are resolved through AssetDirector. Floor/ceiling/wall support is enforced; a double-wall bell degrades to a single-wall state if one support is removed. Ringing/raid behaviour is deferred."
+      ]
+    },
+    {
+      "key": "respawn_anchor",
+      "source_ids": [
+        "minecraft:respawn_anchor"
+      ],
+      "target_ids": [
+        "etfuturum:respawn_anchor"
+      ],
+      "classification": "FULL_IMPORT",
+      "metadata": {
+        "layout": "metadata=charges 0..4"
+      },
+      "tile_entity": {
+        "required": false
+      },
+      "source_properties": {
+        "charges": "exact -> metadata 0..4"
+      },
+      "derived": [],
+      "unsupported": [],
+      "exactness": {
+        "visible_state": "exact",
+        "map_state": "exact",
+        "gameplay": "deferred"
+      },
+      "visual_property_classification": {
+        "charges": "STORED_EXACTLY"
+      },
+      "notes": [
+        "Charges select all five Mojang models. EFR light output is 0/3/7/11/15 for charges 0/1/2/3/4. Charging, respawn and explosion gameplay are deferred."
+      ]
+    },
+    {
+      "key": "sculk_sensor",
+      "source_ids": [
+        "minecraft:sculk_sensor"
+      ],
+      "target_ids": [
+        "etfuturum:sculk_sensor"
+      ],
+      "classification": "FULL_IMPORT",
+      "metadata": {
+        "layout": "metadata phase: 0=inactive, 1=active, 2=cooldown"
+      },
+      "tile_entity": {
+        "required": false
+      },
+      "source_properties": {
+        "sculk_sensor_phase": "exact -> metadata 0..2",
+        "power": "visually irrelevant gameplay/redstone state; not stored",
+        "waterlogged": "unsupported general fluid state"
+      },
+      "derived": [],
+      "unsupported": [
+        "waterlogged",
+        "vibration/redstone mechanics"
+      ],
+      "exactness": {
+        "visible_state": "exact",
+        "map_state": "exact",
+        "gameplay": "deferred"
+      },
+      "visual_property_classification": {
+        "sculk_sensor_phase": "STORED_EXACTLY",
+        "power": "VISUALLY_IRRELEVANT",
+        "waterlogged": "UNSUPPORTED"
+      },
+      "notes": [
+        "Modern active and cooldown both intentionally resolve the active model; the distinct persistent phase is still retained exactly."
+      ]
+    },
+    {
+      "key": "calibrated_sculk_sensor",
+      "source_ids": [
+        "minecraft:calibrated_sculk_sensor"
+      ],
+      "target_ids": [
+        "etfuturum:calibrated_sculk_sensor"
+      ],
+      "classification": "FULL_IMPORT",
+      "metadata": {
+        "layout": "meta=phase_index*4+facing_index",
+        "facing_index": {
+          "north": 0,
+          "east": 1,
+          "south": 2,
+          "west": 3
+        },
+        "phase_index": {
+          "inactive": 0,
+          "active": 1,
+          "cooldown": 2
+        },
+        "range": "0..11"
+      },
+      "tile_entity": {
+        "required": false
+      },
+      "source_properties": {
+        "facing": "exact -> metadata bits0..1",
+        "sculk_sensor_phase": "exact -> metadata quotient /4",
+        "power": "visually irrelevant gameplay/redstone state; not stored",
+        "waterlogged": "unsupported general fluid state"
+      },
+      "derived": [],
+      "unsupported": [
+        "waterlogged",
+        "vibration/filtering/redstone mechanics"
+      ],
+      "exactness": {
+        "visible_state": "exact",
+        "map_state": "exact",
+        "gameplay": "deferred"
+      },
+      "visual_property_classification": {
+        "facing": "STORED_EXACTLY",
+        "sculk_sensor_phase": "STORED_EXACTLY",
+        "power": "VISUALLY_IRRELEVANT",
+        "waterlogged": "UNSUPPORTED"
+      },
+      "notes": [
+        "All 12 facing/phase combinations are preserved. Vibration filtering/redstone mechanics are deferred."
+      ]
+    },
+    {
+      "key": "sculk_shrieker",
+      "source_ids": [
+        "minecraft:sculk_shrieker"
+      ],
+      "target_ids": [
+        "etfuturum:sculk_shrieker"
+      ],
+      "classification": "FULL_IMPORT",
+      "metadata": {
+        "layout": "bit0=can_summon; bit1=shrieking",
+        "can_summon_bit": 1,
+        "shrieking_bit": 2
+      },
+      "tile_entity": {
+        "required": false
+      },
+      "source_properties": {
+        "can_summon": "exact -> metadata bit0",
+        "shrieking": "exact -> metadata bit1 even though 1.21.11 static blockstate model ignores it",
+        "waterlogged": "unsupported general fluid state"
+      },
+      "derived": [],
+      "unsupported": [
+        "waterlogged",
+        "Warden/shriek gameplay"
+      ],
+      "exactness": {
+        "visible_state": "exact",
+        "map_state": "exact",
+        "gameplay": "deferred"
+      },
+      "visual_property_classification": {
+        "can_summon": "STORED_EXACTLY",
+        "shrieking": "VISUALLY_IRRELEVANT",
+        "waterlogged": "UNSUPPORTED"
+      },
+      "notes": [
+        "can_summon selects the exact Mojang model. shrieking is deliberately not collapsed: its persistent source boolean is retained even though it does not select a distinct static 1.21.11 model."
+      ]
+    },
+    {
+      "key": "jigsaw",
+      "source_ids": [
+        "minecraft:jigsaw"
+      ],
+      "target_ids": [
+        "etfuturum:jigsaw"
+      ],
+      "classification": "FULL_IMPORT",
+      "metadata": {
+        "layout": "metadata orientation_index 0..11",
+        "orientation_index": {
+          "down_east": 0,
+          "down_north": 1,
+          "down_south": 2,
+          "down_west": 3,
+          "east_up": 4,
+          "north_up": 5,
+          "south_up": 6,
+          "up_east": 7,
+          "up_north": 8,
+          "up_south": 9,
+          "up_west": 10,
+          "west_up": 11
+        }
+      },
+      "tile_entity": {
+        "required": false
+      },
+      "source_properties": {
+        "orientation": "exact -> metadata 0..11"
+      },
+      "derived": [],
+      "unsupported": [
+        "modern structure-generation data/behaviour"
+      ],
+      "exactness": {
+        "visible_state": "exact",
+        "map_state": "exact",
+        "gameplay": "deferred"
+      },
+      "visual_property_classification": {
+        "orientation": "STORED_EXACTLY"
+      },
+      "notes": [
+        "All 12 FrontAndTop orientations use Mojang blockstate rotations. Structure generation is deferred."
+      ]
+    },
+    {
+      "key": "vanilla_command_block",
+      "source_ids": [
+        "minecraft:command_block"
+      ],
+      "target_ids": [
+        "minecraft:command_block"
+      ],
+      "classification": "FULL_IMPORT",
+      "metadata": {
+        "layout": "vanilla 1.7 metadata remains owned by command-block powered execution state; do not encode modern facing/conditional into metadata"
+      },
+      "tile_entity": {
+        "required": true,
+        "id": "Control",
+        "fields": [
+          {
+            "name": "EFRModernFacing",
+            "type": "TAG_Byte 0..5",
+            "required": true,
+            "map": {
+              "down": 0,
+              "up": 1,
+              "north": 2,
+              "south": 3,
+              "west": 4,
+              "east": 5
+            }
+          },
+          {
+            "name": "EFRConditional",
+            "type": "TAG_Byte boolean",
+            "required": true
+          }
+        ]
+      },
+      "source_properties": {
+        "facing": "exact -> TE EFRModernFacing",
+        "conditional": "exact -> TE EFRConditional"
+      },
+      "derived": [],
+      "unsupported": [
+        "modern command execution semantics beyond existing 1.7 command block"
+      ],
+      "exactness": {
+        "visible_state": "exact",
+        "map_state": "exact",
+        "gameplay": "existing 1.7 command execution retained; modern execution semantics not rewritten"
+      },
+      "visual_property_classification": {
+        "facing": "STORED_EXACTLY",
+        "conditional": "STORED_EXACTLY"
+      },
+      "notes": [
+        "A minimal mixin extends the existing vanilla 1.7 TileEntityCommandBlock and renderer only. Existing command text/output NBT and powered metadata are not repurposed or rewritten."
+      ]
+    },
+    {
+      "key": "modern_command_block_variants",
+      "source_ids": [
+        "minecraft:repeating_command_block",
+        "minecraft:chain_command_block"
+      ],
+      "target_ids": [
+        "etfuturum:repeating_command_block",
+        "etfuturum:chain_command_block"
+      ],
+      "classification": "FULL_IMPORT",
+      "metadata": {
+        "layout": "meta=conditional*6+facing_index",
+        "facing_index": {
+          "down": 0,
+          "up": 1,
+          "north": 2,
+          "south": 3,
+          "west": 4,
+          "east": 5
+        },
+        "conditional_false": "0..5",
+        "conditional_true": "6..11"
+      },
+      "tile_entity": {
+        "required": false
+      },
+      "source_properties": {
+        "facing": "exact -> metadata %6",
+        "conditional": "exact -> metadata >=6"
+      },
+      "derived": [],
+      "unsupported": [
+        "command execution/state machine for repeating/chain families"
+      ],
+      "exactness": {
+        "visible_state": "exact",
+        "map_state": "exact",
+        "gameplay": "deferred"
+      },
+      "visual_property_classification": {
+        "facing": "STORED_EXACTLY",
+        "conditional": "STORED_EXACTLY"
+      },
+      "notes": [
+        "These are state-only EFR parity blocks in Pass 35; no modern repeating/chain command execution is introduced."
+      ]
+    },
+    {
+      "key": "structure_block",
+      "source_ids": [
+        "minecraft:structure_block"
+      ],
+      "target_ids": [
+        "etfuturum:structure_block"
+      ],
+      "classification": "FULL_IMPORT",
+      "metadata": {
+        "layout": "metadata mode: 0=save, 1=load, 2=corner, 3=data"
+      },
+      "tile_entity": {
+        "required": false
+      },
+      "source_properties": {
+        "mode": "exact -> metadata 0..3"
+      },
+      "derived": [],
+      "unsupported": [
+        "modern structure save/load/template NBT execution"
+      ],
+      "exactness": {
+        "visible_state": "exact",
+        "map_state": "exact",
+        "gameplay": "deferred"
+      },
+      "visual_property_classification": {
+        "mode": "STORED_EXACTLY"
+      },
+      "notes": [
+        "All four visible models are preserved. Structure Void exposes no additional model-selecting source state in the audited 1.21.11 blockstate data."
+      ]
     }
   ],
   "tile_entity_audit": [
@@ -2487,15 +3121,27 @@
     },
     {
       "implementation": "Crafter",
-      "tile_entity_id": "none",
+      "tile_entity_id": "etfuturum:modern_parity_crafter_state",
       "classification": "VISUAL_ONLY_IMPORT",
-      "note": "Parity block exists but no real inventory/redstone TE; mechanics deferred."
+      "note": "Pass 35 adds only Triggered/Crafting visual-state NBT. No 3x3 inventory, recipe execution or redstone crafting mechanics are implemented."
     },
     {
       "implementation": "Lectern",
       "tile_entity_id": "none",
       "classification": "VISUAL_ONLY_IMPORT",
       "note": "Parity block exists but no book/page/comparator TE; mechanics deferred."
+    },
+    {
+      "implementation": "Vault",
+      "tile_entity_id": "etfuturum:modern_parity_vault_state",
+      "classification": "VISUAL_ONLY_IMPORT",
+      "note": "Pass 35 stores only VaultState 0..3 for exact model selection; key/reward/per-player mechanics are deferred."
+    },
+    {
+      "implementation": "Vanilla Command Block visual extension",
+      "tile_entity_id": "Control (vanilla 1.7 TileEntityCommandBlock)",
+      "classification": "FULL_IMPORT",
+      "note": "Pass 35 mixin adds EFRModernFacing and EFRConditional to the existing vanilla command block TE without rewriting command execution or powered metadata."
     }
   ]
 }

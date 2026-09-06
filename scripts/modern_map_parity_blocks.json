@@ -11,7 +11,7 @@
       "asset": null,
       "material": "ROCK",
       "light": 0,
-      "meta": ""
+      "meta": "meta=conditional*6+facing; facing down/up/north/south/west/east=0..5"
     },
     {
       "ver": "1.9",
@@ -21,7 +21,7 @@
       "asset": null,
       "material": "ROCK",
       "light": 0,
-      "meta": ""
+      "meta": "meta=conditional*6+facing; facing down/up/north/south/west/east=0..5"
     },
     {
       "ver": "1.10",
@@ -31,7 +31,7 @@
       "asset": null,
       "material": "ROCK",
       "light": 0,
-      "meta": ""
+      "meta": "meta mode: 0=save,1=load,2=corner,3=data"
     },
     {
       "ver": "1.10",
@@ -541,7 +541,7 @@
       "asset": "textures/entity/bell/bell_body.png",
       "material": "METAL",
       "light": 0,
-      "meta": ""
+      "meta": "meta=attachment*4+facing; attachment floor/ceiling/single_wall/double_wall=0..3; facing N/E/S/W=0..3"
     },
     {
       "ver": "1.14",
@@ -581,7 +581,7 @@
       "asset": null,
       "material": "ROCK",
       "light": 0,
-      "meta": ""
+      "meta": "meta orientation 0..11 (FrontAndTop order documented by Pass 35 contract)"
     },
     {
       "ver": "1.16",
@@ -601,7 +601,7 @@
       "asset": null,
       "material": "ROCK",
       "light": 3,
-      "meta": ""
+      "meta": "meta charges 0..4"
     },
     {
       "ver": "1.16",
@@ -981,7 +981,7 @@
       "asset": null,
       "material": "ROCK",
       "light": 1,
-      "meta": ""
+      "meta": "meta phase 0=inactive,1=active,2=cooldown"
     },
     {
       "ver": "1.19",
@@ -991,7 +991,7 @@
       "asset": null,
       "material": "ROCK",
       "light": 0,
-      "meta": ""
+      "meta": "meta bit0=can_summon; bit1=shrieking"
     },
     {
       "ver": "1.19",
@@ -1171,7 +1171,7 @@
       "asset": null,
       "material": "ROCK",
       "light": 1,
-      "meta": ""
+      "meta": "meta=phase*4+facing; phase inactive/active/cooldown=0..2; facing N/E/S/W=0..3"
     },
     {
       "ver": "1.20",
@@ -1401,7 +1401,7 @@
       "asset": null,
       "material": "METAL",
       "light": 4,
-      "meta": ""
+      "meta": "meta=ominous*6+state; state inactive/waiting_for_players/active/waiting_for_reward_ejection/ejecting_reward/cooldown=0..5"
     },
     {
       "ver": "1.21",
@@ -1411,7 +1411,7 @@
       "asset": null,
       "material": "METAL",
       "light": 6,
-      "meta": ""
+      "meta": "meta bits0..1=facing N/E/S/W; bit2=ominous; TE VaultState=0..3"
     },
     {
       "ver": "1.21",
@@ -1421,7 +1421,7 @@
       "asset": null,
       "material": "WOOD",
       "light": 0,
-      "meta": ""
+      "meta": "meta orientation 0..11; TE Triggered/Crafting booleans"
     },
     {
       "ver": "1.21",
@@ -1851,7 +1851,7 @@
       "asset": null,
       "material": "METAL",
       "light": 0,
-      "meta": ""
+      "meta": "meta=pose*4+facing; pose standing/sitting/running/star=0..3; facing N/E/S/W=0..3"
     },
     {
       "ver": "1.21.9",
@@ -1901,7 +1901,7 @@
       "asset": null,
       "material": "METAL",
       "light": 0,
-      "meta": ""
+      "meta": "meta=pose*4+facing; pose standing/sitting/running/star=0..3; facing N/E/S/W=0..3"
     },
     {
       "ver": "1.21.9",
@@ -1961,7 +1961,7 @@
       "asset": null,
       "material": "METAL",
       "light": 0,
-      "meta": ""
+      "meta": "meta=pose*4+facing; pose standing/sitting/running/star=0..3; facing N/E/S/W=0..3"
     },
     {
       "ver": "1.21.9",
@@ -2021,7 +2021,7 @@
       "asset": null,
       "material": "METAL",
       "light": 0,
-      "meta": ""
+      "meta": "meta=pose*4+facing; pose standing/sitting/running/star=0..3; facing N/E/S/W=0..3"
     },
     {
       "ver": "1.21.9",
@@ -2081,7 +2081,7 @@
       "asset": null,
       "material": "METAL",
       "light": 0,
-      "meta": ""
+      "meta": "meta=pose*4+facing; pose standing/sitting/running/star=0..3; facing N/E/S/W=0..3"
     },
     {
       "ver": "1.21.9",
@@ -2141,7 +2141,7 @@
       "asset": null,
       "material": "METAL",
       "light": 0,
-      "meta": ""
+      "meta": "meta=pose*4+facing; pose standing/sitting/running/star=0..3; facing N/E/S/W=0..3"
     },
     {
       "ver": "1.21.9",
@@ -2201,7 +2201,7 @@
       "asset": null,
       "material": "METAL",
       "light": 0,
-      "meta": ""
+      "meta": "meta=pose*4+facing; pose standing/sitting/running/star=0..3; facing N/E/S/W=0..3"
     },
     {
       "ver": "1.21.9",
@@ -2261,7 +2261,7 @@
       "asset": null,
       "material": "METAL",
       "light": 0,
-      "meta": ""
+      "meta": "meta=pose*4+facing; pose standing/sitting/running/star=0..3; facing N/E/S/W=0..3"
     },
     {
       "ver": "1.21.9",

@@ -369,6 +369,8 @@ public enum ModernMapParityBlocks {
     private static boolean parityMultifaceTileRegistered;
     private static boolean parityButtonTileRegistered;
     private static boolean parityPaleMossCarpetTileRegistered;
+    private static boolean parityVaultStateTileRegistered;
+    private static boolean parityCrafterStateTileRegistered;
     private static boolean decoratedPotRecipeRegistered;
 
     /** Pass 30 bit order: DOWN, UP, NORTH, SOUTH, WEST, EAST (ForgeDirection ordinals 0..5). */
@@ -447,6 +449,28 @@ public enum ModernMapParityBlocks {
         return paleMossStateIndex(true, 0, 0, 0, 0);
     }
 
+    /** Pass 35 Vault visible-state index stored in a tiny synchronized TE. */
+    public static int getVaultState(IBlockAccess world, int x, int y, int z) {
+        if (world != null) {
+            TileEntity tile = world.getTileEntity(x, y, z);
+            if (tile instanceof ParityVaultStateTileEntity) return ((ParityVaultStateTileEntity) tile).getVaultState();
+        }
+        return 0;
+    }
+
+    /** Pass 35 Crafter visual booleans: bit 0=Triggered, bit 1=Crafting. */
+    public static int getCrafterVisualFlags(IBlockAccess world, int x, int y, int z) {
+        if (world != null) {
+            TileEntity tile = world.getTileEntity(x, y, z);
+            if (tile instanceof ParityCrafterStateTileEntity) return ((ParityCrafterStateTileEntity) tile).getVisualFlags();
+        }
+        return 0;
+    }
+
+    public boolean isCopperGolemStatueIdentity() {
+        return getRegistryName().endsWith("copper_golem_statue");
+    }
+
     public Block get() {
         return block;
     }
@@ -500,6 +524,16 @@ public enum ModernMapParityBlocks {
                     Tags.MOD_ID + ":modern_parity_pale_moss_carpet");
             parityPaleMossCarpetTileRegistered = true;
         }
+        if (!parityVaultStateTileRegistered) {
+            GameRegistry.registerTileEntity(ParityVaultStateTileEntity.class,
+                    Tags.MOD_ID + ":modern_parity_vault_state");
+            parityVaultStateTileRegistered = true;
+        }
+        if (!parityCrafterStateTileRegistered) {
+            GameRegistry.registerTileEntity(ParityCrafterStateTileEntity.class,
+                    Tags.MOD_ID + ":modern_parity_crafter_state");
+            parityCrafterStateTileRegistered = true;
+        }
         ModernPotterySherds.init();
         ModernArchaeology.init();
         for (ModernMapParityBlocks entry : values()) {
@@ -539,6 +573,8 @@ public enum ModernMapParityBlocks {
                 GameRegistry.registerBlock(entry.block, ParityTorchflowerItemBlock.class, name);
             } else if (entry == PALE_HANGING_MOSS) {
                 GameRegistry.registerBlock(entry.block, ParityPaleHangingMossItemBlock.class, name);
+            } else if (entry.isCopperGolemStatueIdentity()) {
+                GameRegistry.registerBlock(entry.block, ParityStatefulItemBlock.class, name);
             } else if (entry.usesMultifaceState()) {
                 GameRegistry.registerBlock(entry.block, ParityMultifaceItemBlock.class, name);
             } else {
@@ -556,7 +592,10 @@ public enum ModernMapParityBlocks {
     private boolean usesDynamicLight() {
         String name = getRegistryName();
         return style == Style.CANDLE || style == Style.CANDLE_CAKE
-                || "campfire".equals(name) || "soul_campfire".equals(name) || "sea_pickle".equals(name);
+                || "campfire".equals(name) || "soul_campfire".equals(name) || "sea_pickle".equals(name)
+                || "respawn_anchor".equals(name) || "trial_spawner".equals(name) || "vault".equals(name);
+        // Sculk Sensor / Calibrated Sculk Sensor intentionally stay static at light level 1:
+        // Minecraft Java 1.21.11 only makes their emissive-rendering predicate ACTIVE-phase-specific.
     }
 
     private Block createBlock() {
@@ -1563,6 +1602,7 @@ public enum ModernMapParityBlocks {
             // fallback/particle icon instead of leaving a misleading placeholder behind.
             blockIcon = reg.registerIcon("minecraft:stone");
             ModernJsonModelBridge.PreparedModels prepared = ModernJsonModelBridge.prepare(entry, reg);
+            if (entry == REPEATING_COMMAND_BLOCK) ModernJsonModelBridge.prepareVanillaCommandBlock(reg);
             IIcon fallback = ModernJsonModelBridge.getFallbackIcon(prepared);
             if (fallback != null) blockIcon = fallback;
         }
@@ -1654,7 +1694,92 @@ public enum ModernMapParityBlocks {
         }
     }
 
+    /** Pass 35 state-only Vault TE. Facing/ominous remain in metadata; only VaultState needs extra bits. */
+    public static final class ParityVaultStateTileEntity extends TileEntity {
+        private byte vaultState;
+        // Pass 35d1: chunk/TE validation may occur while World#getTileEntity is still installing this TE.
+        // Relighting from validate/readFromNBT re-enters getLightValue -> getVaultState -> getTileEntity and can recurse.
+        private boolean relightPending;
+        public int getVaultState() { return vaultState & 3; }
+        public void setVaultState(int state) {
+            int clamped = state < 0 ? 0 : state > 3 ? 3 : state;
+            if ((vaultState & 3) == clamped) return;
+            vaultState = (byte) clamped; sync();
+        }
+        private void relight() {
+            if (worldObj != null) worldObj.updateLightByType(EnumSkyBlock.Block, xCoord, yCoord, zCoord);
+        }
+        private void sync() {
+            markDirty();
+            if (worldObj != null) {
+                worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
+                relightPending = false;
+                relight();
+            } else {
+                relightPending = true;
+            }
+        }
+        @Override public void validate() {
+            super.validate();
+            // Defer until the TE is fully installed; never call updateLightByType from validate().
+            relightPending = true;
+        }
+        @Override public void updateEntity() {
+            if (relightPending && worldObj != null) {
+                relightPending = false;
+                relight();
+            }
+        }
+        @Override public void writeToNBT(NBTTagCompound tag) { super.writeToNBT(tag); tag.setByte("VaultState", vaultState); }
+        @Override public void readFromNBT(NBTTagCompound tag) {
+            super.readFromNBT(tag);
+            vaultState = (byte) Math.max(0, Math.min(3, tag.getByte("VaultState")));
+            // NBT may be read before/while the TE is attached to its chunk. Relight safely on the next TE tick.
+            relightPending = true;
+        }
+        @Override public Packet getDescriptionPacket() { NBTTagCompound tag=new NBTTagCompound(); writeToNBT(tag); return new S35PacketUpdateTileEntity(xCoord,yCoord,zCoord,35,tag); }
+        @Override public void onDataPacket(NetworkManager network, S35PacketUpdateTileEntity packet) {
+            readFromNBT(packet.func_148857_g());
+            if (worldObj != null) {
+                worldObj.markBlockForUpdate(xCoord,yCoord,zCoord);
+                // Packet application happens after the TE is installed, so immediate client relight is safe.
+                relightPending = false;
+                relight();
+            }
+        }
+    }
+
+    /** Pass 35 Crafter TE stores only model-affecting booleans; no inventory/crafting logic is introduced. */
+    public static final class ParityCrafterStateTileEntity extends TileEntity {
+        private boolean triggered;
+        private boolean crafting;
+        public boolean isTriggered() { return triggered; }
+        public boolean isCrafting() { return crafting; }
+        public int getVisualFlags() { return (triggered ? 1 : 0) | (crafting ? 2 : 0); }
+        public void setVisualState(boolean triggered, boolean crafting) {
+            if (this.triggered == triggered && this.crafting == crafting) return;
+            this.triggered=triggered; this.crafting=crafting; sync();
+        }
+        private void sync() { markDirty(); if (worldObj != null) worldObj.markBlockForUpdate(xCoord,yCoord,zCoord); }
+        @Override public void writeToNBT(NBTTagCompound tag) { super.writeToNBT(tag); tag.setBoolean("Triggered",triggered); tag.setBoolean("Crafting",crafting); }
+        @Override public void readFromNBT(NBTTagCompound tag) { super.readFromNBT(tag); triggered=tag.getBoolean("Triggered"); crafting=tag.getBoolean("Crafting"); }
+        @Override public Packet getDescriptionPacket() { NBTTagCompound tag=new NBTTagCompound(); writeToNBT(tag); return new S35PacketUpdateTileEntity(xCoord,yCoord,zCoord,35,tag); }
+        @Override public void onDataPacket(NetworkManager network, S35PacketUpdateTileEntity packet) { readFromNBT(packet.func_148857_g()); if (worldObj != null) worldObj.markBlockForUpdate(xCoord,yCoord,zCoord); }
+    }
+
+    /** Keeps Copper Golem Statue pose metadata through pick/drop/re-placement without creative sub-items. */
+    public static final class ParityStatefulItemBlock extends ItemBlock {
+        public ParityStatefulItemBlock(Block block) { super(block); setHasSubtypes(true); }
+        @Override public int getMetadata(int damage) { return damage & 15; }
+    }
+
     private static final class ParityModelBlock extends Block implements ITileEntityProvider {
+        // Minecraft Java 1.21.11 TrialSpawnerState.lightLevel():
+        // inactive, waiting_for_players, active, waiting_for_reward_ejection, ejecting_reward, cooldown.
+        private static final int[] TRIAL_SPAWNER_LIGHT = {0, 4, 8, 8, 8, 0};
+        // Minecraft Java 1.21.11 VaultState: HALF_LIT=6 for inactive; LIT=12 for every active state.
+        private static final int[] VAULT_LIGHT = {6, 12, 12, 12};
+
         private final ModernMapParityBlocks entry;
         private final ThreadLocal<Integer> harvestedMultifaceMask = new ThreadLocal<Integer>();
 
@@ -1745,6 +1870,18 @@ public enum ModernMapParityBlocks {
         private boolean isTallSeagrass() { return entry == TALL_SEAGRASS; }
         private boolean isCopperTorch() { return entry == COPPER_TORCH || entry == COPPER_WALL_TORCH; }
         private boolean isCopperWallTorch() { return entry == COPPER_WALL_TORCH; }
+        private boolean isCopperGolemStatue() { return entry.isCopperGolemStatueIdentity(); }
+        private boolean isTrialSpawner() { return entry == TRIAL_SPAWNER; }
+        private boolean isVault() { return entry == VAULT; }
+        private boolean isCrafter() { return entry == CRAFTER; }
+        private boolean isBell() { return entry == BELL; }
+        private boolean isRespawnAnchor() { return entry == RESPAWN_ANCHOR; }
+        private boolean isSculkSensor() { return entry == SCULK_SENSOR; }
+        private boolean isCalibratedSculkSensor() { return entry == CALIBRATED_SCULK_SENSOR; }
+        private boolean isSculkShrieker() { return entry == SCULK_SHRIEKER; }
+        private boolean isJigsaw() { return entry == JIGSAW; }
+        private boolean isModernCommandVariant() { return entry == REPEATING_COMMAND_BLOCK || entry == CHAIN_COMMAND_BLOCK; }
+        private boolean isStructureBlock() { return entry == STRUCTURE_BLOCK; }
 
         private boolean isSuspicious() {
             return entry == SUSPICIOUS_SAND || entry == SUSPICIOUS_GRAVEL;
@@ -1919,6 +2056,10 @@ public enum ModernMapParityBlocks {
             if (isCopperLantern()) {
                 setBlockBounds(5.0F / 16.0F, 0.0F, 5.0F / 16.0F,
                         11.0F / 16.0F, 7.0F / 16.0F, 11.0F / 16.0F);
+                return;
+            }
+            if (isBell()) {
+                setBlockBounds(3.0F/16.0F, 0.0F, 3.0F/16.0F, 13.0F/16.0F, 1.0F, 13.0F/16.0F);
                 return;
             }
             if ("heavy_core".equals(name)) {
@@ -2119,6 +2260,25 @@ public enum ModernMapParityBlocks {
             }
         }
 
+        /** Pass 35 Bell support contract. Attachment 0=floor, 1=ceiling, 2=single wall, 3=double wall. */
+        private boolean bellSupportAt(IBlockAccess world, int x, int y, int z, int facing) {
+            switch (facing & 3) {
+                case 0: return world.isSideSolid(x, y, z - 1, ForgeDirection.SOUTH, false);
+                case 1: return world.isSideSolid(x + 1, y, z, ForgeDirection.WEST, false);
+                case 2: return world.isSideSolid(x, y, z + 1, ForgeDirection.NORTH, false);
+                default: return world.isSideSolid(x - 1, y, z, ForgeDirection.EAST, false);
+            }
+        }
+
+        private boolean bellSupported(IBlockAccess world, int x, int y, int z, int meta) {
+            int attachment = (meta >> 2) & 3;
+            int facing = meta & 3;
+            if (attachment == 0) return world.isSideSolid(x, y - 1, z, ForgeDirection.UP, false);
+            if (attachment == 1) return world.isSideSolid(x, y + 1, z, ForgeDirection.DOWN, false);
+            if (attachment == 2) return bellSupportAt(world, x, y, z, facing);
+            return bellSupportAt(world, x, y, z, facing) && bellSupportAt(world, x, y, z, (facing + 2) & 3);
+        }
+
         private boolean copperTorchSupported(IBlockAccess world, int x, int y, int z, int side) {
             if (!isCopperWallTorch()) {
                 Block below = world.getBlock(x, y - 1, z);
@@ -2155,6 +2315,20 @@ public enum ModernMapParityBlocks {
             }
             if (isCopperTorch()) {
                 setCopperTorchBounds(world.getBlockMetadata(x, y, z) & 7);
+                return;
+            }
+            if (isBell()) {
+                int meta=world.getBlockMetadata(x,y,z)&15;
+                int attachment=(meta>>2)&3, facing=meta&3;
+                if (attachment == 0) { // floor
+                    setBlockBounds(3.0F/16.0F,0.0F,3.0F/16.0F,13.0F/16.0F,1.0F,13.0F/16.0F);
+                } else if (attachment == 1) { // ceiling
+                    setBlockBounds(3.0F/16.0F,0.0F,3.0F/16.0F,13.0F/16.0F,1.0F,13.0F/16.0F);
+                } else if ((facing & 1) == 0) {
+                    setBlockBounds(2.0F/16.0F,2.0F/16.0F,3.0F/16.0F,14.0F/16.0F,1.0F,13.0F/16.0F);
+                } else {
+                    setBlockBounds(3.0F/16.0F,2.0F/16.0F,2.0F/16.0F,13.0F/16.0F,1.0F,14.0F/16.0F);
+                }
                 return;
             }
             if (entry.style == Style.WALL) {
@@ -2459,6 +2633,33 @@ public enum ModernMapParityBlocks {
                 if (side == 1) return 0;
                 return canCopperLanternStand(world, x, y, z) ? 0 : 1;
             }
+            if (isCopperGolemStatue()) return meta & 15; // pose is carried by item; facing filled by onBlockPlacedBy
+            if (isTrialSpawner()) return meta >= 0 && meta < 12 ? meta : 0;
+            if (isVault()) return meta & 7;
+            if (isCrafter()) return meta >= 0 && meta < 12 ? meta : 5; // north_up default
+            if (isBell()) {
+                if (meta >= 0 && meta < 16 && meta != 0) return meta; // importer/stateful placement
+                if (side == 0) return 4; // ceiling,north; facing filled by player
+                if (side == 1) return 0; // floor,north
+                if (side >= 2 && side <= 5) {
+                    int facing = side == 2 ? 2 : side == 3 ? 0 : side == 4 ? 1 : 3;
+                    if (bellSupportAt(world, x, y, z, facing)
+                            && bellSupportAt(world, x, y, z, (facing + 2) & 3))
+                        return 12 + facing; // double_wall
+                    return 8 + facing; // single_wall
+                }
+                return 0;
+            }
+            if (isRespawnAnchor()) return meta >= 0 && meta <= 4 ? meta : 0;
+            if (isSculkSensor()) return meta >= 0 && meta < 3 ? meta : 0;
+            if (isCalibratedSculkSensor()) return meta >= 0 && meta < 12 ? meta : 0;
+            if (isSculkShrieker()) return meta & 3;
+            if (isJigsaw()) return meta >= 0 && meta < 12 ? meta : 5;
+            if (isModernCommandVariant()) {
+                int facing = side >= 0 && side < 6 ? side : 2;
+                return facing; // conditional=false; importer may set 6..11 directly
+            }
+            if (isStructureBlock()) return meta & 3;
             if (isCreakingHeart()) {
                 int axis = (side == 4 || side == 5) ? 0 : (side == 0 || side == 1) ? 1 : 2;
                 return axis; // dormant state index 0; x/y/z = 0/1/2
@@ -2527,6 +2728,38 @@ public enum ModernMapParityBlocks {
                 return;
             }
             int quadrant = MathHelper.floor_double((double) (placer.rotationYaw * 4.0F / 360.0F) + 0.5D) & 3;
+            if (isCopperGolemStatue()) {
+                int meta = world.getBlockMetadata(x,y,z) & 15;
+                int pose = (meta >> 2) & 3;
+                world.setBlockMetadataWithNotify(x,y,z,(pose << 2) | ((quadrant + 2) & 3),2);
+                return;
+            }
+            if (isVault()) {
+                int meta=world.getBlockMetadata(x,y,z)&15;
+                int ominous=meta&4;
+                world.setBlockMetadataWithNotify(x,y,z,ominous | ((quadrant + 2) & 3),2);
+                return;
+            }
+            if (isCrafter()) {
+                // Preserve importer-supplied vertical FrontAndTop states; normal horizontal placement
+                // uses the player's cardinal direction with TOP=up.
+                int[] horizontal = {6, 11, 5, 4}; // south_up, west_up, north_up, east_up for S/W/N/E placer quadrants
+                world.setBlockMetadataWithNotify(x,y,z,horizontal[quadrant],2);
+                return;
+            }
+            if (isBell()) {
+                int meta=world.getBlockMetadata(x,y,z)&15;
+                int attachment=(meta >> 2)&3;
+                // Wall attachment facing is determined by the support face; floor/ceiling use player facing.
+                if (attachment < 2) world.setBlockMetadataWithNotify(x,y,z,(attachment << 2) | ((quadrant + 2)&3),2);
+                return;
+            }
+            if (isCalibratedSculkSensor()) {
+                int meta=world.getBlockMetadata(x,y,z)&15;
+                int phase=(meta >> 2)&3; if (phase>2) phase=0;
+                world.setBlockMetadataWithNotify(x,y,z,(phase << 2) | ((quadrant + 2)&3),2);
+                return;
+            }
             if (isPaleOakButton()) {
                 int meta = world.getBlockMetadata(x, y, z) & 15;
                 int face = meta / 4;
@@ -3345,21 +3578,27 @@ public enum ModernMapParityBlocks {
 
         @Override
         public int damageDropped(int meta) {
+            if (isCopperGolemStatue()) return meta & 15;
             return (isSegmentedGroundDecal() || isCandle() || isTurtleEgg() || isCampfire() || isScaffolding()
                     || isFroglight() || isCopperChain() || isCopperLantern() || isShelf() || isChiseledBookshelf()
                     || isDecoratedPot() || isAxisLog() || isMultiface() || isPaleOakButton() || isCopperTorch()
                     || isPaleMossCarpet() || isPaleHangingMoss() || isCreakingHeart() || isDriedGhast()
-                    || isTorchflowerCrop() || isPitcherCrop() || isPitcherPlant() || isSnifferEgg() || isSeaPickle() || isTallSeagrass())
+                    || isTorchflowerCrop() || isPitcherCrop() || isPitcherPlant() || isSnifferEgg() || isSeaPickle() || isTallSeagrass()
+                    || isTrialSpawner() || isVault() || isCrafter() || isBell() || isRespawnAnchor() || isSculkSensor()
+                    || isCalibratedSculkSensor() || isSculkShrieker() || isJigsaw() || isModernCommandVariant() || isStructureBlock())
                     ? 0 : super.damageDropped(meta);
         }
 
         @Override
         public int getDamageValue(World world, int x, int y, int z) {
+            if (isCopperGolemStatue()) return world.getBlockMetadata(x,y,z) & 15;
             return (isSegmentedGroundDecal() || isCandle() || isTurtleEgg() || isCampfire() || isScaffolding()
                     || isFroglight() || isCopperChain() || isCopperLantern() || isShelf() || isChiseledBookshelf()
                     || isDecoratedPot() || isAxisLog() || isMultiface() || isPaleOakButton() || isCopperTorch()
                     || isPaleMossCarpet() || isPaleHangingMoss() || isCreakingHeart() || isDriedGhast()
-                    || isTorchflowerCrop() || isPitcherCrop() || isPitcherPlant() || isSnifferEgg() || isSeaPickle() || isTallSeagrass())
+                    || isTorchflowerCrop() || isPitcherCrop() || isPitcherPlant() || isSnifferEgg() || isSeaPickle() || isTallSeagrass()
+                    || isTrialSpawner() || isVault() || isCrafter() || isBell() || isRespawnAnchor() || isSculkSensor()
+                    || isCalibratedSculkSensor() || isSculkShrieker() || isJigsaw() || isModernCommandVariant() || isStructureBlock())
                     ? 0 : super.getDamageValue(world, x, y, z);
         }
 
@@ -3367,7 +3606,7 @@ public enum ModernMapParityBlocks {
         public boolean hasTileEntity(int metadata) {
             return isSign() || isHangingSign() || isCampfire() || isChiseledBookshelf()
                     || isDecoratedPot() || isShelf() || isSuspicious() || isMultiface() || isPaleOakButton()
-                    || isPaleMossCarpet();
+                    || isPaleMossCarpet() || isVault() || isCrafter();
         }
 
         @Override
@@ -3381,6 +3620,8 @@ public enum ModernMapParityBlocks {
             if (isMultiface()) return new ParityMultifaceTileEntity();
             if (isPaleOakButton()) return new ParityButtonTileEntity();
             if (isPaleMossCarpet()) return new ParityPaleMossCarpetTileEntity();
+            if (isVault()) return new ParityVaultStateTileEntity();
+            if (isCrafter()) return new ParityCrafterStateTileEntity();
             return null;
         }
 
@@ -3419,6 +3660,12 @@ public enum ModernMapParityBlocks {
             if (isCandleCake()) return (meta & 1) != 0 ? 3 : 0;
             if (isCampfire()) return (meta & 4) != 0 ? (isSoulCampfire() ? 10 : 15) : 0;
             if (isSeaPickle()) return (meta & 4) != 0 ? 6 + (meta & 3) * 3 : 0;
+            if (isRespawnAnchor()) {
+                final int[] light = {0, 3, 7, 11, 15};
+                return light[Math.min(meta, 4)];
+            }
+            if (isTrialSpawner()) return TRIAL_SPAWNER_LIGHT[meta % 6];
+            if (isVault()) return VAULT_LIGHT[getVaultState(world, x, y, z)];
             return super.getLightValue(world, x, y, z);
         }
 
@@ -3520,6 +3767,15 @@ public enum ModernMapParityBlocks {
             if (isTallSeagrass())
                 return side == 1 && world.isAirBlock(x, y + 1, z)
                         && world.isSideSolid(x, y - 1, z, ForgeDirection.UP, false);
+            if (isBell()) {
+                if (side == 1) return bellSupported(world, x, y, z, 0);
+                if (side == 0) return bellSupported(world, x, y, z, 4);
+                if (side >= 2 && side <= 5) {
+                    int facing = side == 2 ? 2 : side == 3 ? 0 : side == 4 ? 1 : 3;
+                    return bellSupported(world, x, y, z, 8 + facing);
+                }
+                return false;
+            }
             if (isMultiface()) {
                 int face = side >= 0 && side < 6 ? ForgeDirection.OPPOSITES[side] : -1;
                 return canAttachMultifaceFace(world, x, y, z, face);
@@ -3555,6 +3811,11 @@ public enum ModernMapParityBlocks {
             if (isTallSeagrass())
                 return world.isAirBlock(x, y + 1, z)
                         && world.isSideSolid(x, y - 1, z, ForgeDirection.UP, false);
+            if (isBell()) {
+                if (bellSupported(world, x, y, z, 0) || bellSupported(world, x, y, z, 4)) return true;
+                for (int facing = 0; facing < 4; facing++) if (bellSupported(world, x, y, z, 8 + facing)) return true;
+                return false;
+            }
             if (isPaleOakButton()) {
                 for (int state = 0; state < 12; state++) if (paleOakButtonSupported(world, x, y, z, state)) return true;
                 return false;
@@ -3626,6 +3887,7 @@ public enum ModernMapParityBlocks {
         @Override
         public void onBlockAdded(World world, int x, int y, int z) {
             super.onBlockAdded(world, x, y, z);
+            if (isTrialSpawner() || isVault()) world.updateLightByType(EnumSkyBlock.Block, x, y, z);
             if (isSuspicious()) world.scheduleBlockUpdate(x, y, z, this, 2);
         }
 
@@ -3705,6 +3967,33 @@ public enum ModernMapParityBlocks {
             } else if (isSeaPickle()) {
                 if (!world.isSideSolid(x, y - 1, z, ForgeDirection.UP, false)) {
                     if (!world.isRemote) dropBlockAsItem(world, x, y, z, world.getBlockMetadata(x, y, z), 0);
+                    world.setBlockToAir(x, y, z);
+                    return;
+                }
+            } else if (isBell()) {
+                int meta = world.getBlockMetadata(x, y, z) & 15;
+                int attachment = (meta >> 2) & 3;
+                int facing = meta & 3;
+                if (attachment == 2) {
+                    boolean primary = bellSupportAt(world, x, y, z, facing);
+                    boolean opposite = bellSupportAt(world, x, y, z, (facing + 2) & 3);
+                    if (primary && opposite) {
+                        // Modern Bell updateShape(): a wall bell reciprocally upgrades when its opposite support appears.
+                        world.setBlockMetadataWithNotify(x, y, z, 12 + facing, 3);
+                        return;
+                    }
+                } else if (attachment == 3) {
+                    boolean primary = bellSupportAt(world, x, y, z, facing);
+                    boolean opposite = bellSupportAt(world, x, y, z, (facing + 2) & 3);
+                    if (primary && opposite) return;
+                    if (primary || opposite) {
+                        int remainingFacing = primary ? facing : ((facing + 2) & 3);
+                        world.setBlockMetadataWithNotify(x, y, z, 8 + remainingFacing, 3);
+                        return;
+                    }
+                }
+                if (!bellSupported(world, x, y, z, meta)) {
+                    if (!world.isRemote) dropBlockAsItem(world, x, y, z, 0, 0);
                     world.setBlockToAir(x, y, z);
                     return;
                 }

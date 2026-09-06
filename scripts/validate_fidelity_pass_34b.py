@@ -13,7 +13,7 @@ def need(ok,msg):
     if not ok: errors.append(msg)
 def has(text,*parts): return all(p in text for p in parts)
 
-need(str(CONTRACT.get('contract_revision')) == '34', 'Backporter contract revision must remain 34 for the bounded 34b correction')
+need(str(CONTRACT.get('contract_revision')) in ('34','35'), 'Backporter contract revision must remain Pass 34-compatible under revision 34/35')
 
 # Pass-33 mangrove registry identity must stay registered so old saves/server registries never go missing.
 need(has(MPB,'legacyMangroveAlias','entry == MANGROVE_PROPAGULE','!technicalPlacementBlock && !legacyMangroveAlias'),

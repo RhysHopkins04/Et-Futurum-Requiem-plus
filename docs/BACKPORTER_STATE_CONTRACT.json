@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "contract_id": "etfuturum-requiem-plus-backporter-state-contract",
-  "contract_revision": "33",
+  "contract_revision": "34",
   "implemented_in_version": "3.5.5",
   "implemented_in_git_ref": "refs/tags/3.5.5",
   "source_minecraft": "1.21.11",
@@ -616,8 +616,7 @@
       },
       "derived": [],
       "unsupported": [
-        "waterlogged",
-        "persistent cracked blockstate"
+        "waterlogged"
       ],
       "exactness": {
         "visible_state": "decorations/facing exact if identities translate",
@@ -1850,6 +1849,507 @@
         "visible_state": "exact",
         "block_entity_display": "exact"
       }
+    },
+    {
+      "key": "pale_moss_carpet",
+      "source_ids": [
+        "minecraft:pale_moss_carpet"
+      ],
+      "target_ids": [
+        "etfuturum:pale_moss_carpet"
+      ],
+      "classification": "FULL_IMPORT",
+      "metadata": {
+        "layout": "metadata 0; full visible state in TE",
+        "state_code": "((((bottom?1:0)*3+north)*3+east)*3+south)*3+west; side 0=none,1=low,2=tall; 0..161"
+      },
+      "tile_entity": {
+        "required": true,
+        "id": "etfuturum:modern_parity_pale_moss_carpet",
+        "fields": [
+          {
+            "name": "Bottom",
+            "type": "TAG_Byte boolean",
+            "required": true
+          },
+          {
+            "name": "North",
+            "type": "TAG_Byte 0..2",
+            "required": true
+          },
+          {
+            "name": "East",
+            "type": "TAG_Byte 0..2",
+            "required": true
+          },
+          {
+            "name": "South",
+            "type": "TAG_Byte 0..2",
+            "required": true
+          },
+          {
+            "name": "West",
+            "type": "TAG_Byte 0..2",
+            "required": true
+          }
+        ]
+      },
+      "source_properties": {
+        "bottom": "exact -> TE Bottom",
+        "north": "exact -> TE North 0/1/2",
+        "east": "exact -> TE East 0/1/2",
+        "south": "exact -> TE South 0/1/2",
+        "west": "exact -> TE West 0/1/2"
+      },
+      "derived": [],
+      "unsupported": [
+        "waterlogged"
+      ],
+      "exactness": {
+        "visible_state": "exact",
+        "map_state": "exact",
+        "gameplay": "deferred unless explicitly stated"
+      },
+      "visual_property_classification": {
+        "bottom": "STORED_EXACTLY",
+        "north": "STORED_EXACTLY",
+        "east": "STORED_EXACTLY",
+        "south": "STORED_EXACTLY",
+        "west": "STORED_EXACTLY"
+      },
+      "notes": [
+        "All 162 bottom/side combinations resolve the real 1.21.11 multipart model graph.",
+        "Normal ItemBlock placement is floor-supported only; imported TE states remain authoritative and can reproduce all 162 source combinations."
+      ]
+    },
+    {
+      "key": "pale_hanging_moss",
+      "source_ids": [
+        "minecraft:pale_hanging_moss"
+      ],
+      "target_ids": [
+        "etfuturum:pale_hanging_moss"
+      ],
+      "classification": "FULL_IMPORT",
+      "metadata": {
+        "layout": "metadata bit0 tip; 0=false/body, 1=true/tip"
+      },
+      "tile_entity": {
+        "required": false
+      },
+      "source_properties": {
+        "tip": "exact -> metadata bit0"
+      },
+      "derived": [],
+      "unsupported": [
+        "waterlogged"
+      ],
+      "exactness": {
+        "visible_state": "exact",
+        "map_state": "exact",
+        "gameplay": "deferred unless explicitly stated"
+      },
+      "visual_property_classification": {
+        "tip": "STORED_EXACTLY"
+      },
+      "notes": [
+        "Normal placement uses tip=true for the bottom chain end and converts the previous tip above to tip=false/body; removing the bottom end promotes the block above to the tip model. Pass 34c accepts ordinary underside placement based on the actual support block above.",
+        "Backporter metadata remains authoritative; lifecycle/bonemeal growth is deferred."
+      ]
+    },
+    {
+      "key": "creaking_heart",
+      "source_ids": [
+        "minecraft:creaking_heart"
+      ],
+      "target_ids": [
+        "etfuturum:creaking_heart"
+      ],
+      "classification": "FULL_IMPORT",
+      "metadata": {
+        "layout": "meta=state_index*3+axis_index",
+        "axis_index": {
+          "x": 0,
+          "y": 1,
+          "z": 2
+        },
+        "state_index": {
+          "dormant": 0,
+          "awake": 1,
+          "uprooted": 2
+        }
+      },
+      "tile_entity": {
+        "required": false
+      },
+      "source_properties": {
+        "axis": "exact -> metadata",
+        "creaking_heart_state": "exact -> metadata"
+      },
+      "derived": [],
+      "unsupported": [],
+      "exactness": {
+        "visible_state": "exact",
+        "map_state": "exact",
+        "gameplay": "deferred unless explicitly stated"
+      },
+      "visual_property_classification": {
+        "axis": "STORED_EXACTLY",
+        "creaking_heart_state": "STORED_EXACTLY"
+      },
+      "notes": [
+        "No Creaking entity spawning/resin mechanics in Pass 34."
+      ]
+    },
+    {
+      "key": "dried_ghast",
+      "source_ids": [
+        "minecraft:dried_ghast"
+      ],
+      "target_ids": [
+        "etfuturum:dried_ghast"
+      ],
+      "classification": "FULL_IMPORT",
+      "metadata": {
+        "layout": "meta=hydration*4+facing_index",
+        "facing_index": {
+          "north": 0,
+          "east": 1,
+          "south": 2,
+          "west": 3
+        },
+        "hydration": "0..3"
+      },
+      "tile_entity": {
+        "required": false
+      },
+      "source_properties": {
+        "facing": "exact -> metadata bits0..1",
+        "hydration": "exact -> metadata bits2..3"
+      },
+      "derived": [],
+      "unsupported": [],
+      "exactness": {
+        "visible_state": "exact",
+        "map_state": "exact",
+        "gameplay": "deferred unless explicitly stated"
+      },
+      "visual_property_classification": {
+        "facing": "STORED_EXACTLY",
+        "hydration": "STORED_EXACTLY"
+      },
+      "notes": [
+        "Manual placement now preserves player-facing orientation at hydration 0; Backporter metadata remains the source of exact hydration 0..3.",
+        "No Ghastling/Happy Ghast spawning in Pass 34."
+      ]
+    },
+    {
+      "key": "torchflower_crop",
+      "source_ids": [
+        "minecraft:torchflower_crop"
+      ],
+      "target_ids": [
+        "etfuturum:torchflower_crop"
+      ],
+      "classification": "FULL_IMPORT",
+      "metadata": {
+        "layout": "metadata age 0..1"
+      },
+      "tile_entity": {
+        "required": false
+      },
+      "source_properties": {
+        "age": "exact -> metadata"
+      },
+      "derived": [],
+      "unsupported": [],
+      "exactness": {
+        "visible_state": "exact",
+        "map_state": "exact",
+        "gameplay": "deferred unless explicitly stated"
+      },
+      "visual_property_classification": {
+        "age": "STORED_EXACTLY"
+      },
+      "notes": [
+        "Pass 34c supports Bone Meal progression age 0 -> 1 -> the existing Torchflower block; random/natural growth remains deferred."
+      ]
+    },
+    {
+      "key": "pitcher_crop",
+      "source_ids": [
+        "minecraft:pitcher_crop"
+      ],
+      "target_ids": [
+        "etfuturum:pitcher_crop"
+      ],
+      "classification": "FULL_IMPORT",
+      "metadata": {
+        "layout": "lower meta=age 0..4; upper meta=5+age 5..9"
+      },
+      "tile_entity": {
+        "required": false
+      },
+      "source_properties": {
+        "age": "exact -> metadata",
+        "half": "exact -> metadata lower/upper range"
+      },
+      "derived": [],
+      "unsupported": [],
+      "exactness": {
+        "visible_state": "exact",
+        "map_state": "exact",
+        "gameplay": "deferred unless explicitly stated"
+      },
+      "visual_property_classification": {
+        "age": "STORED_EXACTLY",
+        "half": "STORED_EXACTLY"
+      },
+      "notes": [
+        "Importer must place both source halves independently with their exact metadata. Paired break cleanup is implemented. Pass 34c Bone Meal advances one age per use and creates/synchronizes the upper half from age 3; random/natural growth remains deferred."
+      ]
+    },
+    {
+      "key": "pitcher_plant",
+      "source_ids": [
+        "minecraft:pitcher_plant"
+      ],
+      "target_ids": [
+        "etfuturum:pitcher_plant"
+      ],
+      "classification": "FULL_IMPORT",
+      "metadata": {
+        "layout": "meta 0=half=lower; meta 1=half=upper"
+      },
+      "tile_entity": {
+        "required": false
+      },
+      "source_properties": {
+        "half": "exact -> metadata bit0 (0 lower, 1 upper)"
+      },
+      "derived": [],
+      "unsupported": [],
+      "exactness": {
+        "visible_state": "exact",
+        "map_state": "exact",
+        "gameplay": "bounded placement/break pairing; lifecycle not applicable"
+      },
+      "visual_property_classification": {
+        "half": "STORED_EXACTLY"
+      },
+      "notes": [
+        "Pass 34d adds the previously missing mature Pitcher Plant half state. Normal item placement creates lower+upper halves; Backporter may place each source half directly with metadata 0/1. Breaking either half removes its mate without a duplicate mate drop."
+      ]
+    },
+    {
+      "key": "sniffer_egg",
+      "source_ids": [
+        "minecraft:sniffer_egg"
+      ],
+      "target_ids": [
+        "etfuturum:sniffer_egg"
+      ],
+      "classification": "FULL_IMPORT",
+      "metadata": {
+        "layout": "metadata hatch 0..2"
+      },
+      "tile_entity": {
+        "required": false
+      },
+      "source_properties": {
+        "hatch": "exact -> metadata"
+      },
+      "derived": [],
+      "unsupported": [],
+      "exactness": {
+        "visible_state": "exact",
+        "map_state": "exact",
+        "gameplay": "deferred unless explicitly stated"
+      },
+      "visual_property_classification": {
+        "hatch": "STORED_EXACTLY"
+      },
+      "notes": [
+        "Sniffer spawning/hatching timers deferred."
+      ]
+    },
+    {
+      "key": "mangrove_propagule",
+      "source_ids": [
+        "minecraft:mangrove_propagule"
+      ],
+      "target_ids": [
+        "etfuturum:sapling"
+      ],
+      "classification": "FULL_IMPORT",
+      "metadata": {
+        "layout": "target block is mature BlockModernSapling; metadata low bits type 0=mangrove; legacy stage bit remains independent/visually irrelevant",
+        "item_damage": 0
+      },
+      "tile_entity": {
+        "required": true,
+        "id": "etfuturum:modern_mangrove_propagule",
+        "fields": [
+          {
+            "name": "Hanging",
+            "type": "TAG_Byte boolean",
+            "required": true
+          },
+          {
+            "name": "Age",
+            "type": "TAG_Byte 0..4",
+            "required": true
+          }
+        ]
+      },
+      "source_properties": {
+        "hanging": "exact -> TE Hanging",
+        "age": "exact -> TE Age 0..4",
+        "stage": "visually irrelevant legacy growth state; do not derive model from it",
+        "waterlogged": "unsupported general fluid state; does not select propagule model"
+      },
+      "derived": [],
+      "unsupported": [
+        "waterlogged"
+      ],
+      "exactness": {
+        "visible_state": "exact",
+        "map_state": "exact",
+        "gameplay": "deferred unless explicitly stated"
+      },
+      "visual_property_classification": {
+        "hanging": "STORED_EXACTLY",
+        "age": "STORED_EXACTLY",
+        "stage": "VISUALLY_IRRELEVANT",
+        "waterlogged": "UNSUPPORTED"
+      },
+      "notes": [
+        "Backporter target remains etfuturum:sapling metadata 0 with TE Hanging/Age.",
+        "The older etfuturum:mangrove_propagule registry identity remains registered as a hidden compatibility alias so Pass-33 worlds and dedicated-server handshakes do not become fatally missing; converters must not target that alias.",
+        "Tree generation/bonemeal lifecycle remains deferred."
+      ]
+    },
+    {
+      "key": "sea_pickle",
+      "source_ids": [
+        "minecraft:sea_pickle"
+      ],
+      "target_ids": [
+        "etfuturum:sea_pickle"
+      ],
+      "classification": "FULL_IMPORT",
+      "metadata": {
+        "layout": "bits0..1=pickles-1; bit2=source waterlogged/live visual compatibility; bits3 unused",
+        "pickles": {
+          "1": 0,
+          "2": 1,
+          "3": 2,
+          "4": 3
+        },
+        "live_visual_bit": 4
+      },
+      "tile_entity": {
+        "required": false
+      },
+      "source_properties": {
+        "pickles": "exact -> bits0..1",
+        "waterlogged": "exact visible compatibility -> bit2 only; true selects live model/light, false dead model/no light"
+      },
+      "derived": [],
+      "unsupported": [
+        "general water/fluid occupancy and waterlogging mechanics"
+      ],
+      "exactness": {
+        "visible_state": "exact",
+        "map_state": "exact",
+        "gameplay": "deferred unless explicitly stated"
+      },
+      "visual_property_classification": {
+        "pickles": "STORED_EXACTLY",
+        "waterlogged": "STORED_EXACTLY"
+      },
+      "notes": [
+        "bit2 is intentionally a visual compatibility bit, not a general waterlogging implementation. Live light levels are 6/9/12/15 for 1..4 pickles.",
+        "Normal EFR placement defaults to the live visual bit to retain the historical white-tipped/luminous Sea Pickle appearance; Backporter imports set bit2 from source waterlogged exactly. Pass 34c allows in-place stacking from 1..4 while preserving bit2 and requires solid floor support."
+      ]
+    },
+    {
+      "key": "tall_seagrass",
+      "source_ids": [
+        "minecraft:tall_seagrass"
+      ],
+      "target_ids": [
+        "etfuturum:tall_seagrass"
+      ],
+      "classification": "FULL_IMPORT",
+      "metadata": {
+        "layout": "metadata 0=lower,1=upper"
+      },
+      "tile_entity": {
+        "required": false
+      },
+      "source_properties": {
+        "half": "exact -> metadata"
+      },
+      "derived": [],
+      "unsupported": [
+        "waterlogged"
+      ],
+      "exactness": {
+        "visible_state": "exact",
+        "map_state": "exact",
+        "gameplay": "deferred unless explicitly stated"
+      },
+      "visual_property_classification": {
+        "half": "STORED_EXACTLY"
+      },
+      "notes": [
+        "Normal placement creates the canonical lower+upper two-block pair and breaking either half removes the mate without a duplicate drop.",
+        "Backporter may still place each source half explicitly with metadata 0/1. General underwater/waterlogging mechanics remain deferred."
+      ]
+    },
+    {
+      "key": "pass34_preexisting_small_state_audit",
+      "source_ids": [
+        "minecraft:turtle_egg",
+        "minecraft:leaf_litter",
+        "minecraft:wildflowers"
+      ],
+      "target_ids": [
+        "etfuturum:turtle_egg",
+        "etfuturum:leaf_litter",
+        "etfuturum:wildflowers"
+      ],
+      "classification": "FULL_IMPORT",
+      "metadata": {
+        "turtle_egg": "meta=hatch*4+(eggs-1)",
+        "leaf_litter/wildflowers": "meta=(amount-1)*4+facing_index; N/E/S/W=0/1/2/3"
+      },
+      "tile_entity": {
+        "required": false
+      },
+      "source_properties": {
+        "turtle_egg.eggs": "already exact",
+        "turtle_egg.hatch": "already exact",
+        "leaf_litter.segment_amount/facing": "already exact",
+        "wildflowers.flower_amount/facing": "already exact"
+      },
+      "derived": [],
+      "unsupported": [],
+      "exactness": {
+        "visible_state": "exact",
+        "map_state": "exact",
+        "gameplay": "deferred unless explicitly stated"
+      },
+      "visual_property_classification": {
+        "turtle_egg.eggs": "STORED_EXACTLY",
+        "turtle_egg.hatch": "STORED_EXACTLY",
+        "leaf_litter.segment_amount/facing": "STORED_EXACTLY",
+        "wildflowers.flower_amount/facing": "STORED_EXACTLY"
+      },
+      "notes": [
+        "Pass 34 audit confirmed these were already exact and did not rework them. Kelp/kelp_plant and open/closed eyeblossom blockstates have no model-selecting properties in 1.21.11."
+      ]
     }
   ],
   "tile_entity_audit": [

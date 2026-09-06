@@ -103,3 +103,21 @@ The capability audit now marks Chiseled Bookshelf, Decorated Pot, Campfire/Soul 
 ## Pass 33 small visible-state contract
 
 Pass 33 adds the technical `copper_wall_torch` identity and verifies exact map-state representation for Pale Oak Button, Pale Oak Pressure Plate, Copper Torch/Wall Torch, Decorated Pot `Cracked`, and all Candle Cake `lit` states. The new global state scanner is `scripts/validate_modern_visual_state_coverage.py`; strict mode treats previously-unclassified model-changing properties as `UNSUPPORTED` so Passes 34–36 can close the remaining debt systematically.
+
+## Pass 34 remaining visible-state contract
+
+Pass 34 promotes Pale Moss Carpet, Pale Hanging Moss, Creaking Heart, Dried Ghast, Torchflower Crop,
+Pitcher Crop, Pitcher Plant, Sniffer Egg, Mangrove Propagule, Sea Pickle and Tall Seagrass to `PASS_34_VERIFIED`.
+Pale Moss Carpet stores all 162 `bottom × north/east/south/west` combinations in a synchronized tile
+entity; the other new parity-shell states fit in metadata except Mangrove Propagule, which extends the
+existing mature `etfuturum:sapling` metadata-0 implementation with `Hanging` and `Age` tile data.
+
+Sea Pickle metadata bits 0..1 store `pickles-1`; bit 2 is a deliberately bounded live/dead visual bit
+copied from the source `waterlogged` property. It selects Mojang's live/dead model and 6/9/12/15 light
+for one through four live pickles, but does not create water/fluid occupancy and is not general
+waterlogging support.
+
+The global model-state audit also confirmed that Tall Seagrass `half` must be stored, while Kelp,
+Kelp Plant and the separate Open/Closed Eyeblossom identities have no model-selecting blockstate
+properties in Minecraft 1.21.11. Turtle Egg and Leaf Litter/Wildflowers were already exact and were
+left regression-sensitive rather than reworked.

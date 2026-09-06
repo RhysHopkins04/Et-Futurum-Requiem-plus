@@ -65,6 +65,12 @@ PASS_33_VISIBLE_NAMES = {
     "decorated_pot",
 }
 
+PASS_34_VISIBLE_NAMES = {
+    "pale_moss_carpet", "pale_hanging_moss", "creaking_heart", "dried_ghast",
+    "torchflower_crop", "pitcher_crop", "pitcher_plant", "sniffer_egg", "mangrove_propagule",
+    "sea_pickle", "tall_seagrass",
+}
+
 
 def has_pass32_contract(name, style):
     return (name in PASS_32_CONTRACT_NAMES or style in {"SHELF", "SIGN", "HANGING_SIGN"}
@@ -84,9 +90,6 @@ VISUAL_SHELL_GAPS = {
     "sculk_shrieker": "No shrieking, cooldown, can_summon or player-trigger implementation.",
     "powder_snow": "No sinking, leather-boots collision, freezing or bucket behaviour.",
     "frogspawn": "No water-surface survival or hatch lifecycle.",
-    "sniffer_egg": "No crack/hatch lifecycle.",
-    "creaking_heart": "No axis, active state, environment checks or resin response.",
-    "dried_ghast": "No hydration state or timed transformation lifecycle.",
     "copper_golem_statue": "Pose/orientation state and copper lifecycle are not represented.",
 }
 
@@ -135,6 +138,8 @@ def is_copper_weathering_family(name):
 
 
 def profile_for(name, style):
+    if name in PASS_34_VISIBLE_NAMES:
+        return "PASS_34_VISIBLE_STATE"
     if name in PASS_33_VISIBLE_NAMES or style == "CANDLE_CAKE":
         return "PASS_33_VISIBLE_STATE"
     if name in PASS_30_MULTIFACE_NAMES:
@@ -160,6 +165,8 @@ def profile_for(name, style):
 
 
 def gap_for(name, style, profile):
+    if profile == "PASS_34_VISIBLE_STATE":
+        return "Visible/import state is represented exactly; lifecycle/entity/water mechanics remain explicitly deferred."
     if profile == "PASS_33_VISIBLE_STATE":
         if name == "pale_oak_button": return "Visible face/facing/powered state and wooden-button timing are represented exactly; projectile activation remains deferred."
         if name == "pale_oak_pressure_plate": return "Raised/depressed state and normal wooden pressure-plate mechanics are represented."
@@ -215,7 +222,23 @@ def row_for(entry):
         "known_difference": gap_for(name, style, profile),
     }
 
-    if profile == "PASS_33_VISIBLE_STATE":
+    if profile == "PASS_34_VISIBLE_STATE":
+        row.update({
+            "blockstate": entry.get("meta") or "Pass 34 exact visible state",
+            "shape": "exact AssetDirector 1.21.11 model state; bounded legacy selection/collision where applicable",
+            "function": "persistent/import-visible state only; lifecycle mechanics deferred",
+            "nbt": "Pass 34 TE only where metadata is insufficient",
+            "map_import": "deterministic Pass 34 mapping in docs/BACKPORTER_STATE_CONTRACT.json",
+            "review_status": "PASS_34_VERIFIED",
+        })
+        if name == "pale_moss_carpet":
+            row["nbt"] = "ParityPaleMossCarpetTileEntity Bottom + four side enums"
+        elif name == "mangrove_propagule":
+            row["nbt"] = "BlockModernSapling.MangrovePropaguleStateTileEntity Hanging + Age"
+            row["parity_create_path"] = "existing ModBlocks.SAPLING metadata 0 / BlockModernSapling (no duplicate parity block)"
+        else:
+            row["nbt"] = "none"
+    elif profile == "PASS_33_VISIBLE_STATE":
         if name == "pale_oak_button":
             row.update({
                 "blockstate": "metadata 0..11 = face(wall/floor/ceiling) x facing(N/E/S/W); Powered boolean in parity TE",

@@ -138,8 +138,8 @@ if contract.get("schema") != 1:
     errors.append("Backporter contract schema must be 1")
 if contract.get("source_minecraft") != "1.21.11":
     errors.append("Backporter contract source_minecraft must be 1.21.11")
-if contract.get("contract_revision") not in ("32e", "32f", "33"):
-    errors.append("Backporter contract contract_revision must be a Pass 32 finalization revision or forward-compatible Pass 33")
+if contract.get("contract_revision") not in ("32e", "32f", "33", 34, "34"):
+    errors.append("Backporter contract contract_revision must be a Pass 32 finalization revision or forward-compatible Pass 33/34")
 if contract.get("implemented_in_version") != "3.5.5":
     errors.append("Backporter contract implemented_in_version must be 3.5.5")
 if contract.get("implemented_in_git_ref") != "refs/tags/3.5.5":

@@ -368,6 +368,7 @@ public enum ModernMapParityBlocks {
     private static boolean parityBrushableTileRegistered;
     private static boolean parityMultifaceTileRegistered;
     private static boolean parityButtonTileRegistered;
+    private static boolean parityPaleMossCarpetTileRegistered;
     private static boolean decoratedPotRecipeRegistered;
 
     /** Pass 30 bit order: DOWN, UP, NORTH, SOUTH, WEST, EAST (ForgeDirection ordinals 0..5). */
@@ -423,6 +424,29 @@ public enum ModernMapParityBlocks {
         return 1 << ForgeDirection.DOWN.ordinal();
     }
 
+    /** Stable Pass 34 Pale Moss Carpet code: ((((bottom * 3 + north) * 3 + east) * 3 + south) * 3 + west). */
+    public static int paleMossStateIndex(boolean bottom, int north, int east, int south, int west) {
+        north = clampPaleMossSide(north);
+        east = clampPaleMossSide(east);
+        south = clampPaleMossSide(south);
+        west = clampPaleMossSide(west);
+        return ((((bottom ? 1 : 0) * 3 + north) * 3 + east) * 3 + south) * 3 + west;
+    }
+
+    private static int clampPaleMossSide(int value) {
+        return value < 0 ? 0 : value > 2 ? 2 : value;
+    }
+
+    public static int getPaleMossStateIndex(IBlockAccess world, int x, int y, int z) {
+        if (world != null) {
+            TileEntity tile = world.getTileEntity(x, y, z);
+            if (tile instanceof ParityPaleMossCarpetTileEntity) {
+                return ((ParityPaleMossCarpetTileEntity) tile).getStateIndex();
+            }
+        }
+        return paleMossStateIndex(true, 0, 0, 0, 0);
+    }
+
     public Block get() {
         return block;
     }
@@ -471,10 +495,22 @@ public enum ModernMapParityBlocks {
                     Tags.MOD_ID + ":modern_parity_button");
             parityButtonTileRegistered = true;
         }
+        if (!parityPaleMossCarpetTileRegistered) {
+            GameRegistry.registerTileEntity(ParityPaleMossCarpetTileEntity.class,
+                    Tags.MOD_ID + ":modern_parity_pale_moss_carpet");
+            parityPaleMossCarpetTileRegistered = true;
+        }
         ModernPotterySherds.init();
         ModernArchaeology.init();
         for (ModernMapParityBlocks entry : values()) {
             String name = entry.getRegistryName();
+            // The mature Mangrove Propagule lives in BlockModernSapling metadata 0, but Pass 33
+            // already exposed etfuturum:mangrove_propagule as a registry identity. Keep that old
+            // identity registered as a hidden compatibility alias so dedicated-server handshakes
+            // and worlds created before Pass 34 never become fatally missing. New Backporter data
+            // still targets etfuturum:sapling metadata 0 + its synchronized visual-state TE.
+            boolean legacyMangroveAlias = entry == MANGROVE_PROPAGULE
+                    && ConfigBlocksItems.enableMangroveWoodFamily && ModBlocks.SAPLING.isEnabled();
             if (GameRegistry.findBlock("minecraft", name) != null || GameRegistry.findBlock(Tags.MOD_ID, name) != null) {
                 continue;
             }
@@ -488,7 +524,7 @@ public enum ModernMapParityBlocks {
             boolean technicalPlacementBlock = name.endsWith("_wall_sign")
                     || name.endsWith("_wall_hanging_sign") || name.endsWith("_coral_wall_fan")
                     || "potted_torchflower".equals(name) || "copper_wall_torch".equals(name);
-            if (!technicalPlacementBlock) entry.block.setCreativeTab(EtFuturum.creativeTabBlocks);
+            if (!technicalPlacementBlock && !legacyMangroveAlias) entry.block.setCreativeTab(EtFuturum.creativeTabBlocks);
             if (entry.lightLevel > 0 && !entry.usesDynamicLight()) entry.block.setLightLevel(entry.lightLevel / 15.0F);
             if (entry.block instanceof BaseSlab) {
                 GameRegistry.registerBlock(entry.block, BaseSlabItemBlock.class, name);
@@ -501,6 +537,8 @@ public enum ModernMapParityBlocks {
                 GameRegistry.registerBlock(entry.block, (Class<? extends ItemBlock>) null, name);
             } else if ("torchflower".equals(name)) {
                 GameRegistry.registerBlock(entry.block, ParityTorchflowerItemBlock.class, name);
+            } else if (entry == PALE_HANGING_MOSS) {
+                GameRegistry.registerBlock(entry.block, ParityPaleHangingMossItemBlock.class, name);
             } else if (entry.usesMultifaceState()) {
                 GameRegistry.registerBlock(entry.block, ParityMultifaceItemBlock.class, name);
             } else {
@@ -518,7 +556,7 @@ public enum ModernMapParityBlocks {
     private boolean usesDynamicLight() {
         String name = getRegistryName();
         return style == Style.CANDLE || style == Style.CANDLE_CAKE
-                || "campfire".equals(name) || "soul_campfire".equals(name);
+                || "campfire".equals(name) || "soul_campfire".equals(name) || "sea_pickle".equals(name);
     }
 
     private Block createBlock() {
@@ -1253,6 +1291,38 @@ public enum ModernMapParityBlocks {
         }
     }
 
+    /** Reliable 1.7.10 underside placement for Pale Hanging Moss and downward chain extension. */
+    public static final class ParityPaleHangingMossItemBlock extends ItemBlock {
+        public ParityPaleHangingMossItemBlock(Block block) {
+            super(block);
+        }
+
+        @Override
+        public boolean onItemUse(ItemStack stack, EntityPlayer player, World world, int x, int y, int z,
+                int side, float hitX, float hitY, float hitZ) {
+            // Modern Pale Hanging Moss is placed by clicking the underside of its support or the
+            // underside of the current chain end. 1.7's generic ItemBlock/canReplace path is not
+            // reliable for this downward-only placement, so resolve the target explicitly.
+            if (side != 0 || stack == null || stack.stackSize <= 0) return false;
+            if (!(field_150939_a instanceof ParityModelBlock)) return false;
+            ParityModelBlock block = (ParityModelBlock) field_150939_a;
+            int targetY = y - 1;
+            if (targetY < 0 || !block.canPaleHangingMossHangAt(world, x, targetY, z)) return false;
+            Block target = world.getBlock(x, targetY, z);
+            if (target == null || !target.isReplaceable(world, x, targetY, z)) return false;
+            if (!player.canPlayerEdit(x, targetY, z, side, stack)) return false;
+
+            int meta = field_150939_a.onBlockPlaced(world, x, targetY, z, side, hitX, hitY, hitZ, 0);
+            if (!placeBlockAt(stack, player, world, x, targetY, z, side, hitX, hitY, hitZ, meta)) return false;
+            world.playSoundEffect(x + 0.5D, targetY + 0.5D, z + 0.5D,
+                    field_150939_a.stepSound.func_150496_b(),
+                    (field_150939_a.stepSound.getVolume() + 1.0F) / 2.0F,
+                    field_150939_a.stepSound.getPitch() * 0.8F);
+            if (!player.capabilities.isCreativeMode) stack.stackSize--;
+            return true;
+        }
+    }
+
     private static boolean isBook(ItemStack stack) {
         if (stack == null) return false;
         Item item = stack.getItem();
@@ -1522,6 +1592,68 @@ public enum ModernMapParityBlocks {
         @Override public int damageDropped(int meta) { return 0; }
     }
 
+    /** Pass 34 full 2 x 3^4 Pale Moss Carpet visible state. */
+    public static final class ParityPaleMossCarpetTileEntity extends TileEntity {
+        private boolean bottom = true;
+        private int north;
+        private int east;
+        private int south;
+        private int west;
+
+        public boolean hasBottom() { return bottom; }
+        public int getNorth() { return north; }
+        public int getEast() { return east; }
+        public int getSouth() { return south; }
+        public int getWest() { return west; }
+        public int getStateIndex() { return paleMossStateIndex(bottom, north, east, south, west); }
+
+        public void setVisualState(boolean bottom, int north, int east, int south, int west) {
+            boolean changed = this.bottom != bottom || this.north != clampPaleMossSide(north)
+                    || this.east != clampPaleMossSide(east) || this.south != clampPaleMossSide(south)
+                    || this.west != clampPaleMossSide(west);
+            this.bottom = bottom;
+            this.north = clampPaleMossSide(north);
+            this.east = clampPaleMossSide(east);
+            this.south = clampPaleMossSide(south);
+            this.west = clampPaleMossSide(west);
+            if (changed) sync();
+        }
+
+        private void sync() {
+            markDirty();
+            if (worldObj != null) worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
+        }
+
+        @Override public void writeToNBT(NBTTagCompound tag) {
+            super.writeToNBT(tag);
+            tag.setBoolean("Bottom", bottom);
+            tag.setByte("North", (byte) north);
+            tag.setByte("East", (byte) east);
+            tag.setByte("South", (byte) south);
+            tag.setByte("West", (byte) west);
+        }
+
+        @Override public void readFromNBT(NBTTagCompound tag) {
+            super.readFromNBT(tag);
+            bottom = !tag.hasKey("Bottom") || tag.getBoolean("Bottom");
+            north = clampPaleMossSide(tag.getByte("North"));
+            east = clampPaleMossSide(tag.getByte("East"));
+            south = clampPaleMossSide(tag.getByte("South"));
+            west = clampPaleMossSide(tag.getByte("West"));
+        }
+
+        @Override public Packet getDescriptionPacket() {
+            NBTTagCompound tag = new NBTTagCompound();
+            writeToNBT(tag);
+            return new S35PacketUpdateTileEntity(xCoord, yCoord, zCoord, 34, tag);
+        }
+
+        @Override public void onDataPacket(NetworkManager network, S35PacketUpdateTileEntity packet) {
+            readFromNBT(packet.func_148857_g());
+            if (worldObj != null) worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
+        }
+    }
+
     private static final class ParityModelBlock extends Block implements ITileEntityProvider {
         private final ModernMapParityBlocks entry;
         private final ThreadLocal<Integer> harvestedMultifaceMask = new ThreadLocal<Integer>();
@@ -1601,6 +1733,16 @@ public enum ModernMapParityBlocks {
         }
 
         private boolean isPaleOakButton() { return entry == PALE_OAK_BUTTON; }
+        private boolean isPaleMossCarpet() { return entry == PALE_MOSS_CARPET; }
+        private boolean isPaleHangingMoss() { return entry == PALE_HANGING_MOSS; }
+        private boolean isCreakingHeart() { return entry == CREAKING_HEART; }
+        private boolean isDriedGhast() { return entry == DRIED_GHAST; }
+        private boolean isTorchflowerCrop() { return entry == TORCHFLOWER_CROP; }
+        private boolean isPitcherCrop() { return entry == PITCHER_CROP; }
+        private boolean isPitcherPlant() { return entry == PITCHER_PLANT; }
+        private boolean isSnifferEgg() { return entry == SNIFFER_EGG; }
+        private boolean isSeaPickle() { return entry == SEA_PICKLE; }
+        private boolean isTallSeagrass() { return entry == TALL_SEAGRASS; }
         private boolean isCopperTorch() { return entry == COPPER_TORCH || entry == COPPER_WALL_TORCH; }
         private boolean isCopperWallTorch() { return entry == COPPER_WALL_TORCH; }
 
@@ -1648,6 +1790,23 @@ public enum ModernMapParityBlocks {
                     && (world.getBlockMetadata(x, y + 1, z) & 3) == 0;
             return world.isSideSolid(x, y + 1, z, ForgeDirection.DOWN, false) || verticalCopperChain
                     || above instanceof BlockFence || above instanceof BlockWall;
+        }
+
+        private boolean canPaleHangingMossHangAt(IBlockAccess world, int x, int y, int z) {
+            Block above = world.getBlock(x, y + 1, z);
+            if (above == this) return true;
+            // Pale Hanging Moss naturally hangs from foliage as well as full cubes. Requiring a
+            // legacy "solid DOWN face" rejects valid leaf/support blocks in 1.7, so accept any
+            // real non-replaceable support and still reject air/fluids/plants.
+            return above != null && above != Blocks.air
+                    && !above.getMaterial().isLiquid()
+                    && !above.isReplaceable(world, x, y + 1, z);
+        }
+
+        private boolean canPitcherPlantStandAt(IBlockAccess world, int x, int y, int z) {
+            Block below = world.getBlock(x, y - 1, z);
+            return below != null && (below == Blocks.farmland
+                    || World.doesBlockHaveSolidTopSurface(world, x, y - 1, z));
         }
 
         private boolean isCandle() {
@@ -1767,7 +1926,11 @@ public enum ModernMapParityBlocks {
                 return;
             }
             if ("sea_pickle".equals(name)) {
-                setBlockBounds(0.375F, 0.0F, 0.375F, 0.625F, 0.375F, 0.625F);
+                setBlockBounds(6.0F/16.0F, 0.0F, 6.0F/16.0F, 10.0F/16.0F, 6.0F/16.0F, 10.0F/16.0F);
+                return;
+            }
+            if (isPaleMossCarpet()) {
+                setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 1.0F/16.0F, 1.0F);
                 return;
             }
             if ("turtle_egg".equals(name)) {
@@ -2118,6 +2281,26 @@ public enum ModernMapParityBlocks {
                 else setBlockBounds(3.0F/16.0F, 0.0F, 3.0F/16.0F, 13.0F/16.0F, 7.0F/16.0F, 13.0F/16.0F);
                 return;
             }
+            if (isPaleMossCarpet()) {
+                TileEntity tile = world.getTileEntity(x, y, z);
+                if (tile instanceof ParityPaleMossCarpetTileEntity) {
+                    ParityPaleMossCarpetTileEntity moss = (ParityPaleMossCarpetTileEntity) tile;
+                    int maxSide = Math.max(Math.max(moss.getNorth(), moss.getSouth()), Math.max(moss.getEast(), moss.getWest()));
+                    float maxY = moss.hasBottom() ? 1.0F/16.0F : 0.0F;
+                    if (maxSide == 1) maxY = Math.max(maxY, 10.0F/16.0F);
+                    else if (maxSide == 2 || (!moss.hasBottom() && maxSide == 0)) maxY = 1.0F;
+                    setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, Math.max(maxY, 1.0F/16.0F), 1.0F);
+                    return;
+                }
+            }
+            if (isSeaPickle()) {
+                int count = (world.getBlockMetadata(x, y, z) & 3) + 1;
+                if (count == 1) setBlockBounds(6.0F/16.0F,0.0F,6.0F/16.0F,10.0F/16.0F,6.0F/16.0F,10.0F/16.0F);
+                else if (count == 2) setBlockBounds(3.0F/16.0F,0.0F,3.0F/16.0F,13.0F/16.0F,6.0F/16.0F,13.0F/16.0F);
+                else if (count == 3) setBlockBounds(2.0F/16.0F,0.0F,2.0F/16.0F,14.0F/16.0F,6.0F/16.0F,14.0F/16.0F);
+                else setBlockBounds(2.0F/16.0F,0.0F,2.0F/16.0F,14.0F/16.0F,7.0F/16.0F,14.0F/16.0F);
+                return;
+            }
             if (isTurtleEgg()) {
                 int eggs = (world.getBlockMetadata(x, y, z) & 3) + 1;
                 if (eggs == 1) setBlockBounds(3.0F/16.0F,0.0F,3.0F/16.0F,12.0F/16.0F,7.0F/16.0F,12.0F/16.0F);
@@ -2207,6 +2390,8 @@ public enum ModernMapParityBlocks {
 
         @Override
         public Item getItemDropped(int meta, Random random, int fortune) {
+            if (entry == MANGROVE_PROPAGULE && ModBlocks.SAPLING.isEnabled() && ConfigBlocksItems.enableMangroveWoodFamily)
+                return ModBlocks.SAPLING.getItem();
             if (isCopperWallTorch() && COPPER_TORCH.get() != null) return Item.getItemFromBlock(COPPER_TORCH.get());
             if (isCoralWallFan()) {
                 ModernMapParityBlocks floor = coralFanCompanion(false);
@@ -2217,6 +2402,8 @@ public enum ModernMapParityBlocks {
 
         @Override
         public ItemStack getPickBlock(MovingObjectPosition target, World world, int x, int y, int z, EntityPlayer player) {
+            if (entry == MANGROVE_PROPAGULE && ModBlocks.SAPLING.isEnabled() && ConfigBlocksItems.enableMangroveWoodFamily)
+                return new ItemStack(ModBlocks.SAPLING.get(), 1, 0);
             if (isCopperWallTorch() && COPPER_TORCH.get() != null) return new ItemStack(COPPER_TORCH.get());
             if (entry == POTTED_TORCHFLOWER && TORCHFLOWER.get() != null) {
                 return new ItemStack(TORCHFLOWER.get());
@@ -2272,6 +2459,15 @@ public enum ModernMapParityBlocks {
                 if (side == 1) return 0;
                 return canCopperLanternStand(world, x, y, z) ? 0 : 1;
             }
+            if (isCreakingHeart()) {
+                int axis = (side == 4 || side == 5) ? 0 : (side == 0 || side == 1) ? 1 : 2;
+                return axis; // dormant state index 0; x/y/z = 0/1/2
+            }
+            if (isDriedGhast()) return 0; // hydration 0; facing is filled by onBlockPlacedBy
+            if (isPaleHangingMoss()) return 1; // a newly placed chain end is the visible tip
+            if (isPitcherPlant()) return 0; // lower half; onBlockPlacedBy creates the upper half
+            if (isSeaPickle()) return 4; // one live pickle by default; bit 2 is bounded live/dead visual state
+            if (isTorchflowerCrop() || isPitcherCrop() || isSnifferEgg() || isTallSeagrass()) return 0;
             if (isCandle() || isCandleCake() || isTurtleEgg()) return 0;
             if (isCampfire()) return 4; // facing is filled by onBlockPlacedBy; campfires start lit.
             if (isScaffolding()) return computeScaffoldingMeta(world, x, y, z);
@@ -2335,6 +2531,38 @@ public enum ModernMapParityBlocks {
                 int meta = world.getBlockMetadata(x, y, z) & 15;
                 int face = meta / 4;
                 if (face != 0) world.setBlockMetadataWithNotify(x, y, z, face * 4 + ((quadrant + 2) & 3), 2);
+                return;
+            }
+            if (isPaleHangingMoss()) {
+                // Normal placement creates the bottom tip. If it extends an existing chain, the
+                // former tip immediately becomes the body model. Imported metadata remains exact:
+                // only player ItemBlock placement enters this path.
+                world.setBlockMetadataWithNotify(x, y, z, 1, 2);
+                if (world.getBlock(x, y + 1, z) == this)
+                    world.setBlockMetadataWithNotify(x, y + 1, z, 0, 3);
+                return;
+            }
+            if (isPitcherPlant()) {
+                // The obtainable mature Pitcher Plant is itself a modern double-height block.
+                // Normal item placement creates lower+upper; importers may still set either half
+                // directly by metadata 0/1 when reconstructing a source map.
+                world.setBlockMetadataWithNotify(x, y, z, 0, 2);
+                if (!world.isRemote && world.isAirBlock(x, y + 1, z))
+                    world.setBlock(x, y + 1, z, this, 1, 3);
+                return;
+            }
+            if (isDriedGhast()) {
+                int hydration = (world.getBlockMetadata(x, y, z) >> 2) & 3;
+                int facing = (quadrant + 2) & 3; // N/E/S/W model index, matching campfire convention
+                world.setBlockMetadataWithNotify(x, y, z, (hydration << 2) | facing, 2);
+                return;
+            }
+            if (isTallSeagrass()) {
+                // The parity identity represents both modern HALF states. Normal placement creates
+                // the canonical two-block pair; Backporter placement may still set either half
+                // directly by metadata without this ItemBlock callback.
+                if (!world.isRemote && world.isAirBlock(x, y + 1, z))
+                    world.setBlock(x, y + 1, z, this, 1, 3);
                 return;
             }
             if (entry == COPPER_TORCH) {
@@ -2549,6 +2777,28 @@ public enum ModernMapParityBlocks {
         public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int side,
                 float hitX, float hitY, float hitZ) {
             ItemStack held = player.getHeldItem();
+
+            if ((isTorchflowerCrop() || isPitcherCrop()) && isBoneMeal(held)) {
+                return applyAncientCropBoneMeal(world, x, y, z, player, held);
+            }
+
+            if (isSeaPickle() && held != null && held.getItem() == Item.getItemFromBlock(this)) {
+                int meta = world.getBlockMetadata(x, y, z) & 7;
+                int count = (meta & 3) + 1;
+                if (count >= 4) return false;
+                if (!world.isRemote) {
+                    int nextMeta = (meta & 4) | count;
+                    world.setBlockMetadataWithNotify(x, y, z, nextMeta, 3);
+                    if (!player.capabilities.isCreativeMode && --held.stackSize <= 0)
+                        player.inventory.setInventorySlotContents(player.inventory.currentItem, null);
+                    world.updateLightByType(EnumSkyBlock.Block, x, y, z);
+                    world.playSoundEffect(x + 0.5D, y + 0.5D, z + 0.5D,
+                            stepSound.func_150496_b(),
+                            (stepSound.getVolume() + 1.0F) / 2.0F,
+                            stepSound.getPitch() * 0.8F);
+                }
+                return true;
+            }
 
             if (isShelf()) {
                 int facing = world.getBlockMetadata(x, y, z) & 3;
@@ -3019,9 +3269,76 @@ public enum ModernMapParityBlocks {
             world.updateLightByType(EnumSkyBlock.Block, x, y, z);
         }
 
+        private static boolean isBoneMeal(ItemStack stack) {
+            return stack != null && stack.getItem() == Items.dye && stack.getItemDamage() == 15;
+        }
+
+        private static void consumeBoneMeal(EntityPlayer player, ItemStack stack) {
+            if (player == null || stack == null || player.capabilities.isCreativeMode) return;
+            if (--stack.stackSize <= 0) player.inventory.setInventorySlotContents(player.inventory.currentItem, null);
+        }
+
+        /**
+         * Bounded Pass-34c crop acceleration. 1.21.11 uses a one-stage bonemeal increment for
+         * both ancient crops. Torchflower's two crop states are followed by the ordinary
+         * Torchflower block; Pitcher becomes two blocks tall from age 3 onward.
+         */
+        private boolean applyAncientCropBoneMeal(World world, int x, int y, int z, EntityPlayer player, ItemStack held) {
+            if (!isBoneMeal(held)) return false;
+
+            if (isTorchflowerCrop()) {
+                int age = world.getBlockMetadata(x, y, z) & 1;
+                if (!world.isRemote) {
+                    if (age == 0) {
+                        world.setBlockMetadataWithNotify(x, y, z, 1, 3);
+                    } else if (TORCHFLOWER.get() != null) {
+                        world.setBlock(x, y, z, TORCHFLOWER.get(), 0, 3);
+                    } else {
+                        return false;
+                    }
+                    consumeBoneMeal(player, held);
+                    world.playAuxSFX(2005, x, y, z, 0);
+                }
+                return true;
+            }
+
+            if (isPitcherCrop()) {
+                int meta = world.getBlockMetadata(x, y, z) & 15;
+                boolean upper = meta >= 5;
+                int lowerY = upper ? y - 1 : y;
+                if (world.getBlock(x, lowerY, z) != this) return false;
+                int lowerMeta = world.getBlockMetadata(x, lowerY, z) & 15;
+                int age = lowerMeta >= 5 ? lowerMeta - 5 : lowerMeta;
+                if (age >= 4) return false;
+
+                int nextAge = age + 1;
+                if (nextAge >= 3 && world.getBlock(x, lowerY + 1, z) != this
+                        && !world.isAirBlock(x, lowerY + 1, z)) {
+                    return false;
+                }
+
+                if (!world.isRemote) {
+                    world.setBlockMetadataWithNotify(x, lowerY, z, nextAge, 3);
+                    if (nextAge >= 3) {
+                        world.setBlock(x, lowerY + 1, z, this, 5 + nextAge, 3);
+                    } else if (world.getBlock(x, lowerY + 1, z) == this) {
+                        int upperMeta = world.getBlockMetadata(x, lowerY + 1, z) & 15;
+                        if (upperMeta >= 5) world.setBlockToAir(x, lowerY + 1, z);
+                    }
+                    consumeBoneMeal(player, held);
+                    world.playAuxSFX(2005, x, lowerY, z, 0);
+                }
+                return true;
+            }
+
+            return false;
+        }
+
         @Override
         public int quantityDropped(int meta, int fortune, Random random) {
+            if (isPitcherPlant()) return 1;
             if (isSegmentedGroundDecal()) return ((meta >> 2) & 3) + 1;
+            if (isSeaPickle()) return (meta & 3) + 1;
             if (isCandle() || isTurtleEgg()) return (meta & 3) + 1;
             return super.quantityDropped(meta, fortune, random);
         }
@@ -3030,7 +3347,9 @@ public enum ModernMapParityBlocks {
         public int damageDropped(int meta) {
             return (isSegmentedGroundDecal() || isCandle() || isTurtleEgg() || isCampfire() || isScaffolding()
                     || isFroglight() || isCopperChain() || isCopperLantern() || isShelf() || isChiseledBookshelf()
-                    || isDecoratedPot() || isAxisLog() || isMultiface() || isPaleOakButton() || isCopperTorch())
+                    || isDecoratedPot() || isAxisLog() || isMultiface() || isPaleOakButton() || isCopperTorch()
+                    || isPaleMossCarpet() || isPaleHangingMoss() || isCreakingHeart() || isDriedGhast()
+                    || isTorchflowerCrop() || isPitcherCrop() || isPitcherPlant() || isSnifferEgg() || isSeaPickle() || isTallSeagrass())
                     ? 0 : super.damageDropped(meta);
         }
 
@@ -3038,14 +3357,17 @@ public enum ModernMapParityBlocks {
         public int getDamageValue(World world, int x, int y, int z) {
             return (isSegmentedGroundDecal() || isCandle() || isTurtleEgg() || isCampfire() || isScaffolding()
                     || isFroglight() || isCopperChain() || isCopperLantern() || isShelf() || isChiseledBookshelf()
-                    || isDecoratedPot() || isAxisLog() || isMultiface() || isPaleOakButton() || isCopperTorch())
+                    || isDecoratedPot() || isAxisLog() || isMultiface() || isPaleOakButton() || isCopperTorch()
+                    || isPaleMossCarpet() || isPaleHangingMoss() || isCreakingHeart() || isDriedGhast()
+                    || isTorchflowerCrop() || isPitcherCrop() || isPitcherPlant() || isSnifferEgg() || isSeaPickle() || isTallSeagrass())
                     ? 0 : super.getDamageValue(world, x, y, z);
         }
 
         @Override
         public boolean hasTileEntity(int metadata) {
             return isSign() || isHangingSign() || isCampfire() || isChiseledBookshelf()
-                    || isDecoratedPot() || isShelf() || isSuspicious() || isMultiface() || isPaleOakButton();
+                    || isDecoratedPot() || isShelf() || isSuspicious() || isMultiface() || isPaleOakButton()
+                    || isPaleMossCarpet();
         }
 
         @Override
@@ -3058,6 +3380,7 @@ public enum ModernMapParityBlocks {
             if (isSuspicious()) return new ParityBrushableTileEntity();
             if (isMultiface()) return new ParityMultifaceTileEntity();
             if (isPaleOakButton()) return new ParityButtonTileEntity();
+            if (isPaleMossCarpet()) return new ParityPaleMossCarpetTileEntity();
             return null;
         }
 
@@ -3095,6 +3418,7 @@ public enum ModernMapParityBlocks {
             if (isCandle()) return (meta & 4) != 0 ? ((meta & 3) + 1) * 3 : 0;
             if (isCandleCake()) return (meta & 1) != 0 ? 3 : 0;
             if (isCampfire()) return (meta & 4) != 0 ? (isSoulCampfire() ? 10 : 15) : 0;
+            if (isSeaPickle()) return (meta & 4) != 0 ? 6 + (meta & 3) * 3 : 0;
             return super.getLightValue(world, x, y, z);
         }
 
@@ -3187,6 +3511,15 @@ public enum ModernMapParityBlocks {
 
         @Override
         public boolean canPlaceBlockOnSide(World world, int x, int y, int z, int side) {
+            if (isPaleMossCarpet())
+                return side == 1 && world.isSideSolid(x, y - 1, z, ForgeDirection.UP, false);
+            if (isPaleHangingMoss())
+                return canPaleHangingMossHangAt(world, x, y, z);
+            if (isPitcherPlant())
+                return side == 1 && world.isAirBlock(x, y + 1, z) && canPitcherPlantStandAt(world, x, y, z);
+            if (isTallSeagrass())
+                return side == 1 && world.isAirBlock(x, y + 1, z)
+                        && world.isSideSolid(x, y - 1, z, ForgeDirection.UP, false);
             if (isMultiface()) {
                 int face = side >= 0 && side < 6 ? ForgeDirection.OPPOSITES[side] : -1;
                 return canAttachMultifaceFace(world, x, y, z, face);
@@ -3211,6 +3544,17 @@ public enum ModernMapParityBlocks {
 
         @Override
         public boolean canPlaceBlockAt(World world, int x, int y, int z) {
+            if (isPaleMossCarpet())
+                return world.isSideSolid(x, y - 1, z, ForgeDirection.UP, false);
+            if (isPaleHangingMoss())
+                return canPaleHangingMossHangAt(world, x, y, z);
+            if (isPitcherPlant())
+                return world.isAirBlock(x, y + 1, z) && canPitcherPlantStandAt(world, x, y, z);
+            if (isSeaPickle())
+                return world.isSideSolid(x, y - 1, z, ForgeDirection.UP, false);
+            if (isTallSeagrass())
+                return world.isAirBlock(x, y + 1, z)
+                        && world.isSideSolid(x, y - 1, z, ForgeDirection.UP, false);
             if (isPaleOakButton()) {
                 for (int state = 0; state < 12; state++) if (paleOakButtonSupported(world, x, y, z, state)) return true;
                 return false;
@@ -3247,6 +3591,36 @@ public enum ModernMapParityBlocks {
             // horizontally colliding with a solid face and also prevents sneaking descent. Modern
             // scaffolding has open sides, so its vertical motion is handled explicitly below.
             return !isScaffolding() && super.isLadder(world, x, y, z, entity);
+        }
+
+        @Override
+        public void onBlockHarvested(World world, int x, int y, int z, int meta, EntityPlayer player) {
+            super.onBlockHarvested(world, x, y, z, meta, player);
+            if (world.isRemote) return;
+            if (isPitcherPlant()) {
+                boolean upper = (meta & 1) != 0;
+                int otherY = upper ? y - 1 : y + 1;
+                if (world.getBlock(x, otherY, z) == this
+                        && ((world.getBlockMetadata(x, otherY, z) & 1) != 0) != upper)
+                    world.setBlockToAir(x, otherY, z);
+                return;
+            }
+            if (isPitcherCrop()) {
+                boolean upper = (meta & 15) >= 5;
+                int otherY = upper ? y - 1 : y + 1;
+                if (world.getBlock(x, otherY, z) == this) {
+                    int other = world.getBlockMetadata(x, otherY, z) & 15;
+                    if (upper != (other >= 5)) world.setBlockToAir(x, otherY, z);
+                }
+                return;
+            }
+            if (isTallSeagrass()) {
+                boolean upper = (meta & 1) != 0;
+                int otherY = upper ? y - 1 : y + 1;
+                if (world.getBlock(x, otherY, z) == this
+                        && ((world.getBlockMetadata(x, otherY, z) & 1) != 0) != upper)
+                    world.setBlockToAir(x, otherY, z);
+            }
         }
 
         @Override
@@ -3310,6 +3684,30 @@ public enum ModernMapParityBlocks {
                     }
                 }
                 return;
+            } else if (isPaleHangingMoss()) {
+                if (!canPaleHangingMossHangAt(world, x, y, z)) {
+                    if (!world.isRemote) dropBlockAsItem(world, x, y, z, 0, 0);
+                    world.setBlockToAir(x, y, z);
+                    return;
+                }
+            } else if (isPitcherPlant()) {
+                int meta = world.getBlockMetadata(x, y, z) & 1;
+                if (meta == 0 && !canPitcherPlantStandAt(world, x, y, z)) {
+                    if (!world.isRemote) dropBlockAsItem(world, x, y, z, 0, 0);
+                    world.setBlockToAir(x, y, z);
+                    if (world.getBlock(x, y + 1, z) == this) world.setBlockToAir(x, y + 1, z);
+                    return;
+                }
+                if (meta == 1 && world.getBlock(x, y - 1, z) != this) {
+                    world.setBlockToAir(x, y, z);
+                    return;
+                }
+            } else if (isSeaPickle()) {
+                if (!world.isSideSolid(x, y - 1, z, ForgeDirection.UP, false)) {
+                    if (!world.isRemote) dropBlockAsItem(world, x, y, z, world.getBlockMetadata(x, y, z), 0);
+                    world.setBlockToAir(x, y, z);
+                    return;
+                }
             } else if (isPaleOakButton()) {
                 if (!paleOakButtonSupported(world, x, y, z, world.getBlockMetadata(x, y, z) & 15)) {
                     if (!world.isRemote) dropBlockAsItem(world, x, y, z, 0, 0);
@@ -3569,6 +3967,8 @@ public enum ModernMapParityBlocks {
 
         @Override
         public void breakBlock(World world, int x, int y, int z, Block block, int meta) {
+            boolean promotePaleHangingMossTip = isPaleHangingMoss() && !world.isRemote
+                    && world.getBlock(x, y + 1, z) == this;
             if (isPaleOakButton() && !world.isRemote && buttonPowered(world, x, y, z)) {
                 notifyPaleOakButtonNeighbors(world, x, y, z, meta & 15);
             }
@@ -3606,6 +4006,10 @@ public enum ModernMapParityBlocks {
                 }
             }
             super.breakBlock(world, x, y, z, block, meta);
+            if (promotePaleHangingMossTip && world.getBlock(x, y + 1, z) == this) {
+                // Removing the chain end exposes the block above as the new tip.
+                world.setBlockMetadataWithNotify(x, y + 1, z, 1, 3);
+            }
             if (releaseWater && !world.isRemote && world.getBlock(x, y, z) == Blocks.air) {
                 world.setBlock(x, y, z, Blocks.water, 0, 3);
             }
@@ -3862,6 +4266,12 @@ public enum ModernMapParityBlocks {
 
         @Override public AxisAlignedBB getCollisionBoundingBoxFromPool(World world, int x, int y, int z) {
             if (isSegmentedGroundDecal() || isScaffolding() || isPaleOakButton()) return null;
+            if (isPaleMossCarpet()) {
+                TileEntity tile = world.getTileEntity(x, y, z);
+                if (tile instanceof ParityPaleMossCarpetTileEntity
+                        && !((ParityPaleMossCarpetTileEntity) tile).hasBottom()) return null;
+                return AxisAlignedBB.getBoundingBox(x, y, z, x + 1.0D, y + 1.0D/16.0D, z + 1.0D);
+            }
             if (entry.style == Style.WALL) {
                 ModernWallState.State state = ModernWallState.derive(this, world, x, y, z);
                 double minX = state.west.isConnected() ? 0.0D : 0.25D;

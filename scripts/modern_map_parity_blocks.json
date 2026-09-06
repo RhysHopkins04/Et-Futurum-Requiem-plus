@@ -91,7 +91,7 @@
       "asset": null,
       "material": "PLANT",
       "light": 0,
-      "meta": ""
+      "meta": "meta 0=lower,1=upper"
     },
     {
       "ver": "1.13",
@@ -101,7 +101,7 @@
       "asset": null,
       "material": "PLANT",
       "light": 6,
-      "meta": ""
+      "meta": "meta bits0..1 pickles-1; bit2 source-live/waterlogged visual compatibility only"
     },
     {
       "ver": "1.13",
@@ -1061,7 +1061,7 @@
       "asset": null,
       "material": "PLANT",
       "light": 0,
-      "meta": ""
+      "meta": "mature target etfuturum:sapling meta0; TE Hanging bool + Age 0..4"
     },
     {
       "ver": "1.20",
@@ -1121,7 +1121,7 @@
       "asset": null,
       "material": "PLANT",
       "light": 0,
-      "meta": ""
+      "meta": "meta age 0..1"
     },
     {
       "ver": "1.20",
@@ -1141,7 +1141,7 @@
       "asset": null,
       "material": "PLANT",
       "light": 0,
-      "meta": ""
+      "meta": "meta 0=lower, 1=upper; normal item placement creates both halves"
     },
     {
       "ver": "1.20",
@@ -1151,7 +1151,7 @@
       "asset": null,
       "material": "PLANT",
       "light": 0,
-      "meta": ""
+      "meta": "meta age 0..4 lower; 5+age upper"
     },
     {
       "ver": "1.20",
@@ -1161,7 +1161,7 @@
       "asset": null,
       "material": "ROCK",
       "light": 0,
-      "meta": ""
+      "meta": "meta hatch 0..2"
     },
     {
       "ver": "1.20",
@@ -1641,7 +1641,7 @@
       "asset": null,
       "material": "PLANT",
       "light": 0,
-      "meta": ""
+      "meta": "TE Bottom bool + North/East/South/West 0=none,1=low,2=tall; all 162 states exact"
     },
     {
       "ver": "1.21.4",
@@ -1651,7 +1651,7 @@
       "asset": null,
       "material": "PLANT",
       "light": 0,
-      "meta": ""
+      "meta": "meta 0=tip false/body, 1=tip true"
     },
     {
       "ver": "1.21.4",
@@ -1661,7 +1661,7 @@
       "asset": null,
       "material": "WOOD",
       "light": 0,
-      "meta": ""
+      "meta": "meta = state_index*3+axis_index; state dormant/awake/uprooted=0/1/2; axis x/y/z=0/1/2"
     },
     {
       "ver": "1.21.4",
@@ -1831,7 +1831,7 @@
       "asset": null,
       "material": "ROCK",
       "light": 0,
-      "meta": ""
+      "meta": "meta = hydration*4+facing; facing N/E/S/W=0/1/2/3"
     },
     {
       "ver": "1.21.9",

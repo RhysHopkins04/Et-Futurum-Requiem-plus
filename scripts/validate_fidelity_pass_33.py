@@ -38,7 +38,7 @@ for token in (
     'state.put("facing", facings[side]);',
     'style == ModernMapParityBlocks.Style.CANDLE_CAKE',
 ): req(model,token,'ModernJsonModelBridge')
-if contract.get('contract_revision')!='33': errors.append('Backporter contract revision must be 33')
+if str(contract.get('contract_revision')) not in ('33','34'): errors.append('Backporter contract revision must be Pass 33 or forward-compatible Pass 34')
 entries={e.get('key'):e for e in contract.get('blocks',[]) if isinstance(e,dict)}
 for key in ('pale_oak_button','pale_oak_pressure_plate','copper_torch_family','candle_cake_family','decorated_pot'):
     if key not in entries: errors.append('Backporter contract missing '+key)

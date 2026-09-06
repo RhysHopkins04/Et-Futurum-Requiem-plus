@@ -20,6 +20,7 @@ import ganymedes01.etfuturum.core.utils.Logger;
 import ganymedes01.etfuturum.core.utils.Utils;
 import ganymedes01.etfuturum.entities.*;
 import ganymedes01.etfuturum.inventory.*;
+import ganymedes01.etfuturum.blocks.BlockModernSapling;
 import ganymedes01.etfuturum.lib.GUIIDs;
 import ganymedes01.etfuturum.tileentities.*;
 import net.minecraft.entity.EnumCreatureType;
@@ -68,6 +69,10 @@ public class CommonProxy implements IGuiHandler {
 	}
 
 	public void registerEntities() {
+		if (ModBlocks.SAPLING.isEnabled() && ConfigBlocksItems.enableMangroveWoodFamily) {
+			GameRegistry.registerTileEntity(BlockModernSapling.MangrovePropaguleStateTileEntity.class,
+					Utils.getUnlocalisedName("modern_mangrove_propagule"));
+		}
 		if (ModBlocks.BREWING_STAND.isEnabled()) {
 			GameRegistry.registerTileEntity(TileEntityNewBrewingStand.class, Utils.getUnlocalisedName("brewing_stand"));
 		}

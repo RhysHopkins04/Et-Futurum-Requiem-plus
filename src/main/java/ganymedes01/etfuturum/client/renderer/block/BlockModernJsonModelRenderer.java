@@ -31,6 +31,17 @@ public final class BlockModernJsonModelRenderer implements ISimpleBlockRendering
 
     @Override
     public void renderInventoryBlock(Block block, int metadata, int modelId, RenderBlocks renderer) {
+        // BlockModernSapling historically used vanilla crossed-square inventory rendering. Its
+        // world render ID is redirected here only so Mangrove Propagule can select modern
+        // hanging/age models; preserve the existing Mangrove/Cherry item presentation.
+        if (ModBlocks.SAPLING.isEnabled() && block == ModBlocks.SAPLING.get()) {
+            Tessellator t = Tessellator.instance;
+            t.startDrawingQuads();
+            t.setNormal(0.0F, -1.0F, 0.0F);
+            renderer.drawCrossedSquares(block.getIcon(0, metadata), -0.5D, -0.5D, -0.5D, 1.0F);
+            t.draw();
+            return;
+        }
         // Normal parity items use ItemModernJsonModelRenderer. This path only exists for callers
         // that bypass Forge's IItemRenderer hook, so keep a conservative vanilla cube fallback.
         renderer.setRenderBoundsFromBlock(block);
@@ -43,7 +54,18 @@ public final class BlockModernJsonModelRenderer implements ISimpleBlockRendering
     @Override
     public boolean renderWorldBlock(IBlockAccess world, int x, int y, int z, Block block, int modelId,
             RenderBlocks renderer) {
-        ModernMapParityBlocks entry = ModernMapParityBlocks.fromBlock(block);
+        ModernMapParityBlocks entry;
+        if (ModBlocks.SAPLING.isEnabled() && block == ModBlocks.SAPLING.get()) {
+            int saplingMeta = world.getBlockMetadata(x, y, z);
+            if ((saplingMeta & 7) == 0) {
+                entry = ModernMapParityBlocks.MANGROVE_PROPAGULE;
+            } else {
+                renderer.renderCrossedSquares(block, x, y, z);
+                return true;
+            }
+        } else {
+            entry = ModernMapParityBlocks.fromBlock(block);
+        }
         if (entry == null && ModBlocks.LIGHTNING_ROD.isEnabled() && block == ModBlocks.LIGHTNING_ROD.get()) {
             // The historical Et Futurum lightning_rod registry identity predates the parity layer.
             // Its waxed-default modern sibling is visually identical, so use that exact 1.21.11

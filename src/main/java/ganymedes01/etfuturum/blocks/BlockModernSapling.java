@@ -3,6 +3,9 @@ package ganymedes01.etfuturum.blocks;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import ganymedes01.etfuturum.EtFuturum;
+import ganymedes01.etfuturum.ModernMapParityBlocks;
+import ganymedes01.etfuturum.client.model.ModernJsonModelBridge;
+import ganymedes01.etfuturum.lib.RenderIDs;
 import ganymedes01.etfuturum.client.sound.ModSounds;
 import ganymedes01.etfuturum.configuration.configs.ConfigBlocksItems;
 import ganymedes01.etfuturum.world.generate.decorate.WorldGenCherryTrees;
@@ -14,6 +17,12 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.NetworkManager;
+import net.minecraft.network.Packet;
+import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
 import net.minecraft.world.gen.feature.WorldGenAbstractTree;
@@ -52,6 +61,72 @@ public class BlockModernSapling extends BlockSapling implements ISubBlocksBlock,
 	public void registerBlockIcons(IIconRegister reg) {
 		for (int i = 0; i < icons.length; ++i) {
 			icons[i] = reg.registerIcon(types[i]);
+		}
+		if (ConfigBlocksItems.enableMangroveWoodFamily) ModernJsonModelBridge.prepare(ModernMapParityBlocks.MANGROVE_PROPAGULE, reg);
+	}
+
+	@Override
+	public int getRenderType() {
+		return RenderIDs.MODERN_MAP_PARITY;
+	}
+
+	public static int getMangroveAge(IBlockAccess world, int x, int y, int z) {
+		TileEntity tile = world == null ? null : world.getTileEntity(x, y, z);
+		return tile instanceof MangrovePropaguleStateTileEntity ? ((MangrovePropaguleStateTileEntity) tile).getAge() : 0;
+	}
+
+	public static boolean isMangroveHanging(IBlockAccess world, int x, int y, int z) {
+		TileEntity tile = world == null ? null : world.getTileEntity(x, y, z);
+		return tile instanceof MangrovePropaguleStateTileEntity && ((MangrovePropaguleStateTileEntity) tile).isHanging();
+	}
+
+	@Override
+	public boolean hasTileEntity(int metadata) {
+		return ConfigBlocksItems.enableMangroveWoodFamily && (metadata & 7) == 0;
+	}
+
+	@Override
+	public TileEntity createTileEntity(World world, int metadata) {
+		return hasTileEntity(metadata) ? new MangrovePropaguleStateTileEntity() : null;
+	}
+
+	@Override
+	public void updateTick(World world, int x, int y, int z, Random random) {
+		if ((world.getBlockMetadata(x, y, z) & 7) == 0 && isMangroveHanging(world, x, y, z)) return;
+		super.updateTick(world, x, y, z, random);
+	}
+
+	@Override
+	public void onNeighborBlockChange(World world, int x, int y, int z, Block neighbor) {
+		if ((world.getBlockMetadata(x, y, z) & 7) == 0 && isMangroveHanging(world, x, y, z)) return;
+		super.onNeighborBlockChange(world, x, y, z, neighbor);
+	}
+
+	public static final class MangrovePropaguleStateTileEntity extends TileEntity {
+		private boolean hanging;
+		private int age;
+
+		public boolean isHanging() { return hanging; }
+		public int getAge() { return age; }
+		public void setVisualState(boolean hanging, int age) {
+			this.hanging = hanging;
+			this.age = Math.max(0, Math.min(4, age));
+			markDirty();
+			if (worldObj != null) worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
+		}
+		@Override public void writeToNBT(NBTTagCompound tag) {
+			super.writeToNBT(tag); tag.setBoolean("Hanging", hanging); tag.setByte("Age", (byte) age);
+		}
+		@Override public void readFromNBT(NBTTagCompound tag) {
+			super.readFromNBT(tag); hanging = tag.getBoolean("Hanging"); age = Math.max(0, Math.min(4, tag.getByte("Age")));
+		}
+		@Override public Packet getDescriptionPacket() {
+			NBTTagCompound tag = new NBTTagCompound(); writeToNBT(tag);
+			return new S35PacketUpdateTileEntity(xCoord, yCoord, zCoord, 34, tag);
+		}
+		@Override public void onDataPacket(NetworkManager network, S35PacketUpdateTileEntity packet) {
+			readFromNBT(packet.func_148857_g());
+			if (worldObj != null) worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
 		}
 	}
 

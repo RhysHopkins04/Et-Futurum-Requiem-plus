@@ -87,8 +87,33 @@ def classify(name, prop, visible):
         return EXTRA_PROPERTIES[name][prop]
     if not visible:
         return "VISUALLY_IRRELEVANT"
+    if name == "sea_pickle" and prop == "waterlogged":
+        # Bounded Pass 34 live/dead visual bit only; not a general water/fluid state.
+        return "STORED_EXACTLY"
     if prop == WATERLOGGING_EXCEPTION:
         return "UNSUPPORTED"
+    if name == "pale_moss_carpet" and prop in {"bottom", "north", "east", "south", "west"}:
+        return "STORED_EXACTLY"
+    if name == "pale_hanging_moss" and prop == "tip":
+        return "STORED_EXACTLY"
+    if name == "creaking_heart" and prop in {"axis", "creaking_heart_state"}:
+        return "STORED_EXACTLY"
+    if name == "dried_ghast" and prop in {"facing", "hydration"}:
+        return "STORED_EXACTLY"
+    if name == "torchflower_crop" and prop == "age":
+        return "STORED_EXACTLY"
+    if name == "pitcher_crop" and prop in {"age", "half"}:
+        return "STORED_EXACTLY"
+    if name == "pitcher_plant" and prop == "half":
+        return "STORED_EXACTLY"
+    if name == "sniffer_egg" and prop == "hatch":
+        return "STORED_EXACTLY"
+    if name == "mangrove_propagule" and prop in {"hanging", "age"}:
+        return "STORED_EXACTLY"
+    if name == "sea_pickle" and prop == "pickles":
+        return "STORED_EXACTLY"
+    if name == "tall_seagrass" and prop == "half":
+        return "STORED_EXACTLY"
     if name == "pale_oak_button" and prop in {"face", "facing", "powered"}:
         return "STORED_EXACTLY"
     if name == "pale_oak_pressure_plate" and prop == "powered":
@@ -176,6 +201,14 @@ def run_self_test():
             raise AssertionError("button classification mismatch for " + prop)
     if classify("decorated_pot", "cracked", True) != "VISUALLY_IRRELEVANT":
         raise AssertionError("decorated pot cracked classification mismatch")
+    if classify("pale_moss_carpet", "north", True) != "STORED_EXACTLY":
+        raise AssertionError("Pass 34 pale moss classification mismatch")
+    if classify("sea_pickle", "waterlogged", True) != "STORED_EXACTLY":
+        raise AssertionError("Pass 34 bounded sea-pickle live/dead classification mismatch")
+    if classify("tall_seagrass", "half", True) != "STORED_EXACTLY":
+        raise AssertionError("Pass 34 tall seagrass classification mismatch")
+    if classify("pitcher_plant", "half", True) != "STORED_EXACTLY":
+        raise AssertionError("Pass 34d mature pitcher plant classification mismatch")
     if classify("some_future_block", "pose", True) != "UNSUPPORTED":
         raise AssertionError("unknown visible property must be UNSUPPORTED")
     print("Modern visual-state coverage validator self-test PASSED")

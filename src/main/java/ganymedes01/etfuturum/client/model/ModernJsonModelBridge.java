@@ -10,6 +10,7 @@ import ganymedes01.etfuturum.ModernMapParityBlocks;
 import ganymedes01.etfuturum.ModernPotterySherds;
 import ganymedes01.etfuturum.Tags;
 import ganymedes01.etfuturum.blocks.ModernWallState;
+import ganymedes01.etfuturum.blocks.BlockModernSapling;
 import ganymedes01.etfuturum.client.ModernAssetResourcePack;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockFence;
@@ -230,6 +231,29 @@ public final class ModernJsonModelBridge {
             int state = world.getBlockMetadata(x, y, z) & 1;
             Model candleCake = models.facingModels[state];
             if (candleCake != null) return candleCake;
+        }
+        if ("pale_moss_carpet".equals(name)) {
+            int state = ModernMapParityBlocks.getPaleMossStateIndex(world, x, y, z);
+            Model moss = models.connectionModels[state];
+            if (moss != null) return moss;
+        }
+        if ("pale_hanging_moss".equals(name) || "torchflower_crop".equals(name)
+                || "pitcher_plant".equals(name) || "sniffer_egg".equals(name) || "tall_seagrass".equals(name)) {
+            int state = world.getBlockMetadata(x, y, z) & 15;
+            Model staged = models.facingModels[state];
+            if (staged != null) return staged;
+        }
+        if ("creaking_heart".equals(name) || "dried_ghast".equals(name)
+                || "pitcher_crop".equals(name) || "sea_pickle".equals(name)) {
+            int state = world.getBlockMetadata(x, y, z) & 15;
+            Model staged = models.facingModels[state];
+            if (staged != null) return staged;
+        }
+        if ("mangrove_propagule".equals(name)) {
+            int age = BlockModernSapling.getMangroveAge(world, x, y, z);
+            boolean hanging = BlockModernSapling.isMangroveHanging(world, x, y, z);
+            Model propagule = models.facingModels[(hanging ? 5 : 0) + age];
+            if (propagule != null) return propagule;
         }
         if ("turtle_egg".equals(name)) {
             int state = world.getBlockMetadata(x, y, z) & 15;
@@ -825,6 +849,11 @@ public final class ModernJsonModelBridge {
         p.put("powered", "false");
         p.put("side_chain", "unconnected");
         p.put("dusted", "0");
+        p.put("tip", "false");
+        p.put("age", "0");
+        p.put("hydration", "0");
+        p.put("hanging", "false");
+        p.put("creaking_heart_state", "dormant");
         for (int slot = 0; slot < 6; slot++) p.put("slot_" + slot + "_occupied", "false");
         p.put("north", entry.getStyle() == ModernMapParityBlocks.Style.WALL ? "none" : "false");
         p.put("east", entry.getStyle() == ModernMapParityBlocks.Style.WALL ? "none" : "false");
@@ -1026,6 +1055,91 @@ public final class ModernJsonModelBridge {
                 Map<String, String> state = defaultsFor(entry);
                 state.put("lit", Boolean.toString(lit != 0));
                 prepared.facingModels[lit] = loadBlockStateModel(entry, state);
+            }
+        }
+        if ("pale_moss_carpet".equals(registryName)) {
+            String[] sides = {"none", "low", "tall"};
+            for (int bottom = 0; bottom <= 1; bottom++) {
+                for (int north = 0; north < 3; north++) for (int east = 0; east < 3; east++)
+                    for (int south = 0; south < 3; south++) for (int west = 0; west < 3; west++) {
+                        Map<String, String> state = defaultsFor(entry);
+                        state.put("bottom", Boolean.toString(bottom != 0));
+                        state.put("north", sides[north]);
+                        state.put("east", sides[east]);
+                        state.put("south", sides[south]);
+                        state.put("west", sides[west]);
+                        prepared.connectionModels[ModernMapParityBlocks.paleMossStateIndex(bottom != 0, north, east, south, west)]
+                                = loadBlockStateModel(entry, state);
+                    }
+            }
+        }
+        if ("pale_hanging_moss".equals(registryName)) {
+            for (int tip = 0; tip <= 1; tip++) {
+                Map<String, String> state = defaultsFor(entry); state.put("tip", Boolean.toString(tip != 0));
+                prepared.facingModels[tip] = loadBlockStateModel(entry, state);
+            }
+        }
+        if ("creaking_heart".equals(registryName)) {
+            String[] axes = {"x", "y", "z"};
+            String[] heartStates = {"dormant", "awake", "uprooted"};
+            for (int hs = 0; hs < 3; hs++) for (int axis = 0; axis < 3; axis++) {
+                Map<String, String> state = defaultsFor(entry);
+                state.put("axis", axes[axis]); state.put("creaking_heart_state", heartStates[hs]);
+                prepared.facingModels[hs * 3 + axis] = loadBlockStateModel(entry, state);
+            }
+        }
+        if ("dried_ghast".equals(registryName)) {
+            String[] facings = {"north", "east", "south", "west"};
+            for (int hydration = 0; hydration < 4; hydration++) for (int facing = 0; facing < 4; facing++) {
+                Map<String, String> state = defaultsFor(entry);
+                state.put("facing", facings[facing]); state.put("hydration", Integer.toString(hydration));
+                prepared.facingModels[hydration * 4 + facing] = loadBlockStateModel(entry, state);
+            }
+        }
+        if ("torchflower_crop".equals(registryName)) {
+            for (int age = 0; age <= 1; age++) {
+                Map<String, String> state = defaultsFor(entry); state.put("age", Integer.toString(age));
+                prepared.facingModels[age] = loadBlockStateModel(entry, state);
+            }
+        }
+        if ("pitcher_plant".equals(registryName)) {
+            for (int half = 0; half <= 1; half++) {
+                Map<String, String> state = defaultsFor(entry);
+                state.put("half", half == 0 ? "lower" : "upper");
+                prepared.facingModels[half] = loadBlockStateModel(entry, state);
+            }
+        }
+        if ("pitcher_crop".equals(registryName)) {
+            for (int half = 0; half <= 1; half++) for (int age = 0; age <= 4; age++) {
+                Map<String, String> state = defaultsFor(entry);
+                state.put("age", Integer.toString(age)); state.put("half", half == 0 ? "lower" : "upper");
+                prepared.facingModels[(half == 0 ? 0 : 5) + age] = loadBlockStateModel(entry, state);
+            }
+        }
+        if ("sniffer_egg".equals(registryName)) {
+            for (int hatch = 0; hatch <= 2; hatch++) {
+                Map<String, String> state = defaultsFor(entry); state.put("hatch", Integer.toString(hatch));
+                prepared.facingModels[hatch] = loadBlockStateModel(entry, state);
+            }
+        }
+        if ("sea_pickle".equals(registryName)) {
+            for (int live = 0; live <= 1; live++) for (int pickles = 1; pickles <= 4; pickles++) {
+                Map<String, String> state = defaultsFor(entry);
+                state.put("pickles", Integer.toString(pickles)); state.put("waterlogged", Boolean.toString(live != 0));
+                prepared.facingModels[(live << 2) | (pickles - 1)] = loadBlockStateModel(entry, state);
+            }
+        }
+        if ("tall_seagrass".equals(registryName)) {
+            for (int half = 0; half <= 1; half++) {
+                Map<String, String> state = defaultsFor(entry); state.put("half", half == 0 ? "lower" : "upper");
+                prepared.facingModels[half] = loadBlockStateModel(entry, state);
+            }
+        }
+        if ("mangrove_propagule".equals(registryName)) {
+            for (int hanging = 0; hanging <= 1; hanging++) for (int age = 0; age <= 4; age++) {
+                Map<String, String> state = defaultsFor(entry);
+                state.put("hanging", Boolean.toString(hanging != 0)); state.put("age", Integer.toString(age));
+                prepared.facingModels[(hanging != 0 ? 5 : 0) + age] = loadBlockStateModel(entry, state);
             }
         }
         if ("turtle_egg".equals(registryName)) {

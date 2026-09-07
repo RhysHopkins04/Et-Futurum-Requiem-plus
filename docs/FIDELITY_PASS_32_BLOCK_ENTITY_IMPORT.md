@@ -49,6 +49,7 @@ Runtime acceptance after Pass 32 exposed two assumptions that the original stati
 
 - Chiseled Bookshelf slot columns are front-relative for every facing. East/west hit coordinates are mirrored so visual slot 0..5 remains `top_left`, `top_mid`, `top_right`, `bottom_left`, `bottom_mid`, `bottom_right` as seen by the player facing the shelf. Inventory synchronization remains owned by the inventory mutation; `LastInteractedSlot` only dirties persistent/comparator state.
 - Copper Chest pairing is exact-identity-only. Pass 32c stores the reciprocal relationship as `EFRPairDirection`; vanilla 1.7 raw type-based adjacency must not pair Copper Chests with normal/trapped chests or with another oxidation/wax block identity. The renderer uses the persisted pair plus facing to select the 1.21.11 single/left/right 64x64 chest texture contract.
+  - **Pass 36 supersession:** runtime Copper Chest pairing now follows 1.21.11 copper-chest family semantics across oxidation/wax identities while still rejecting normal/trapped chests. `EFRPairDirection` remains the persisted reciprocal relation and lifecycle replacements preserve the TileEntity NBT.
 
 The bookshelf rule remains an implementation invariant. Pass 32c promotes chest pairing to an explicit Backporter field because modern adjacent singles cannot be reconstructed safely from raw 1.7 adjacency alone.
 

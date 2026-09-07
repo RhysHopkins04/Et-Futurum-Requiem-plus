@@ -7,14 +7,18 @@ import ganymedes01.etfuturum.client.model.ModernJsonModelBridge;
 import ganymedes01.etfuturum.client.sound.ModSounds;
 import ganymedes01.etfuturum.lib.RenderIDs;
 import ganymedes01.etfuturum.tileentities.TileEntityLightningRod;
+import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
-public class BlockLightningRod extends BaseBlock {
+import java.util.Random;
+
+public class BlockLightningRod extends BaseBlock implements IDegradable {
 
 	public BlockLightningRod() {
 		super(Material.iron);
@@ -31,8 +35,18 @@ public class BlockLightningRod extends BaseBlock {
 	public int onBlockPlaced(World world, int x, int y, int z, int side,
 			float hitX, float hitY, float hitZ, int meta) {
 		// Same compact facing convention used by the modern lightning-rod parity variants:
-		// 0 down, 1 up, 2 north, 3 south, 4 west, 5 east.
-		return side >= 0 && side <= 5 ? side : 1;
+		// 0 down, 1 up, 2 north, 3 south, 4 west, 5 east. The legacy clicked-side
+		// convention renders horizontal modern rod models 180 degrees inward, so invert only
+		// wall placement; floor/ceiling placement is already correct.
+		switch (side) {
+			case 2: return 3;
+			case 3: return 2;
+			case 4: return 5;
+			case 5: return 4;
+			case 0: return 0;
+			case 1: return 1;
+			default: return 1;
+		}
 	}
 
 	@Override
@@ -45,6 +59,32 @@ public class BlockLightningRod extends BaseBlock {
 		} else {
 			setBlockBounds(0.375F, 0.0F, 0.375F, 0.625F, 1.0F, 0.625F);
 		}
+	}
+
+	@Override
+	public void updateTick(World world, int x, int y, int z, Random random) {
+		tickDegradation(world, x, y, z, random);
+	}
+
+	@Override
+	public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int side,
+			float hitX, float hitY, float hitZ) {
+		return tryWaxOnWaxOff(world, x, y, z, player);
+	}
+
+	@Override
+	public int getCopperMeta(int meta) {
+		return 0;
+	}
+
+	@Override
+	public Block getCopperBlockFromMeta(int meta) {
+		return ModernMapParityBlocks.getPass36CopperBlock(this, meta);
+	}
+
+	@Override
+	public int getFinalCopperMeta(IBlockAccess world, int x, int y, int z, int meta, int worldMeta) {
+		return worldMeta;
 	}
 
 	@Override

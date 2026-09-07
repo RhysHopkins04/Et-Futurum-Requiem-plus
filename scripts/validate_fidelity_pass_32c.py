@@ -32,9 +32,11 @@ for token in (
     '@Inject(method = "checkForAdjacentChests"',
     'this.etfu$migrateLegacyPair()',
     'other.etfu$setPairDirection(expectedOther)',
-    'ownBlock == null || this.worldObj.getBlock(x, this.yCoord, z) != ownBlock',
     'ownMeta != otherMeta',
 ): req(tile, token, 'TileEntityChest explicit pairing')
+if ('ownBlock == null || this.worldObj.getBlock(x, this.yCoord, z) != ownBlock' not in tile
+        and 'ModernChestPairing.areCompatibleChestBlocks(ownBlock' not in tile):
+    errors.append('TileEntityChest explicit pairing: missing exact-or-Pass36-compatible partner identity gate')
 for token in (
     'getDescriptionPacket',
     '@Inject(method = "onDataPacket", at = @At("HEAD"), cancellable = true, remap = false)',
@@ -49,12 +51,14 @@ for token in (
     'cir.setReturnValue(true)',
     '@Inject(method = "func_149954_e"',
     'placer.isSneaking()',
-    'world.getBlock(nx, y, nz) != self',
     'other.etfu$setPairDirection(ModernChestPairing.opposite(candidate))',
     '@Inject(method = "breakBlock"',
     '@Inject(method = "func_149951_m"',
     'new InventoryLargeChest("container.chestDouble"',
 ): req(block, token, 'BlockChest modern placement/inventory')
+if ('world.getBlock(nx, y, nz) != self' not in block
+        and 'ModernChestPairing.areCompatibleChestBlocks' not in block):
+    errors.append('BlockChest modern placement/inventory: missing exact-or-Pass36-compatible chest identity gate')
 for token in (
     'syncPlayerInventory(player);',
     '((EntityPlayerMP) player).sendContainerToPlayer(player.inventoryContainer);',

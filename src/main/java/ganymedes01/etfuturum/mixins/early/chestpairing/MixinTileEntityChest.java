@@ -149,7 +149,7 @@ public abstract class MixinTileEntityChest extends TileEntity implements IChestP
         int x = this.xCoord + ModernChestPairing.offsetX(direction);
         int z = this.zCoord + ModernChestPairing.offsetZ(direction);
         Block ownBlock = this.getBlockType();
-        if (ownBlock == null || this.worldObj.getBlock(x, this.yCoord, z) != ownBlock) return null;
+        if (ownBlock == null || !ModernChestPairing.areCompatibleChestBlocks(ownBlock, this.worldObj.getBlock(x, this.yCoord, z))) return null;
         int ownMeta = this.worldObj.getBlockMetadata(this.xCoord, this.yCoord, this.zCoord);
         int otherMeta = this.worldObj.getBlockMetadata(x, this.yCoord, z);
         if (ownMeta != otherMeta || !ModernChestPairing.isLateralForFacing(direction, ownMeta)) return null;

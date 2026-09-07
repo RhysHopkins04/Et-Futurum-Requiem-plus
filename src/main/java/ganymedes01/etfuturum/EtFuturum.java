@@ -900,6 +900,15 @@ public class EtFuturum {
 		config.addSoundEvent(ver, "block.copper_chest_weathered.close", "block");
 		config.addSoundEvent(ver, "block.copper_chest_oxidized.open", "block");
 		config.addSoundEvent(ver, "block.copper_chest_oxidized.close", "block");
+		// Pass 36c1: Mojang 1.21.11 registers this event as entity.copper_golem_become_statue
+		// (underscore before "become"), not entity.copper_golem.become_statue. Request the exact
+		// event and also the four backing OGG objects explicitly. The explicit objects make the
+		// dynamic versioned sounds.json independent of AssetDirector event-expansion details.
+		config.addSoundEvent(ver, "entity.copper_golem_become_statue", "block");
+		config.addObject(ver, "minecraft/sounds/block/copper_statue/become_statue1.ogg");
+		config.addObject(ver, "minecraft/sounds/block/copper_statue/become_statue2.ogg");
+		config.addObject(ver, "minecraft/sounds/block/copper_statue/become_statue3.ogg");
+		config.addObject(ver, "minecraft/sounds/block/copper_statue/become_statue4.ogg");
 		config.addSoundEvent(ver, "block.ender_chest.open", "block");
 		config.addSoundEvent(ver, "block.ender_chest.close", "block");
 		config.addSoundEvent(ver, "block.composter.empty", "block");

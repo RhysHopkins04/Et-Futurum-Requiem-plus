@@ -96,7 +96,6 @@ VISUAL_SHELL_GAPS = {
     "sculk_shrieker": "No shrieking, cooldown, can_summon or player-trigger implementation.",
     "powder_snow": "No sinking, leather-boots collision, freezing or bucket behaviour.",
     "frogspawn": "No water-surface survival or hatch lifecycle.",
-    "copper_golem_statue": "Pose/orientation state and copper lifecycle are not represented.",
 }
 
 
@@ -144,6 +143,8 @@ def is_copper_weathering_family(name):
 
 
 def profile_for(name, style):
+    if is_copper_weathering_family(name):
+        return "PASS_36_COPPER_LIFECYCLE"
     if name in PASS_35_VISIBLE_NAMES or name.endswith("copper_golem_statue"):
         return "PASS_35_VISIBLE_STATE"
     if name in PASS_34_VISIBLE_NAMES:
@@ -173,6 +174,10 @@ def profile_for(name, style):
 
 
 def gap_for(name, style, profile):
+    if profile == "PASS_36_COPPER_LIFECYCLE":
+        if name.endswith("copper_golem_statue"):
+            return "Block-local lifecycle, pose cycling and comparator output are implemented; Copper Golem entity reanimation and general waterlogging remain deferred."
+        return "Oxidation, waxing, wax-off, scraping and lightning cleaning are implemented through shared IDegradable state-preserving transitions; general waterlogging remains deferred."
     if profile == "PASS_35_VISIBLE_STATE":
         return "Persistent visible state is represented exactly for map import; large gameplay/state-machine mechanics remain explicitly deferred."
     if profile == "PASS_34_VISIBLE_STATE":
@@ -232,7 +237,29 @@ def row_for(entry):
         "known_difference": gap_for(name, style, profile),
     }
 
-    if profile == "PASS_35_VISIBLE_STATE":
+    if profile == "PASS_36_COPPER_LIFECYCLE":
+        row.update({
+            "blockstate": entry.get("meta") or "existing Pass 29-35 metadata preserved across copper identity transitions",
+            "shape": "existing AssetDirector model/bounds; state is preserved through lifecycle replacement",
+            "function": "shared IDegradable natural oxidation + wax on/off + one-stage scrape + lightning cleaning",
+            "nbt": "none unless family already owns a TileEntity; Copper Chest snapshots/restores full TileEntityChest NBT",
+            "map_import": "static registry/metadata mapping remains authoritative; Pass 36 adds runtime lifecycle without re-encoding importer state",
+            "review_status": "PASS_36_VERIFIED",
+            "mechanics_review_status": "PASS_36_VERIFIED",
+        })
+        if name.endswith("copper_chest"):
+            row["review_status"] = "PASS_32_CONTRACT_VERIFIED"
+            row["blockstate"] = "vanilla chest facing plus exact weathering/waxed registry identity and persisted EFRPairDirection"
+            row["function"] = "IDegradable lifecycle plus copper-family pairing; normal/trapped chests stay incompatible"
+            row["nbt"] = "TileEntityChest Items/CustomName plus EFRPairDirection preserved during identity replacement"
+        elif name.endswith("copper_golem_statue"):
+            row["review_status"] = "PASS_35_VERIFIED"
+            row["blockstate"] = "meta=pose*4+facing; lifecycle preserves all 16 states"
+            row["function"] = "IDegradable lifecycle; non-axe pose cycling; comparator 1..4; entity reanimation deferred"
+            row["nbt"] = "none"
+        else:
+            row["nbt"] = "none"
+    elif profile == "PASS_35_VISIBLE_STATE":
         row.update({
             "blockstate": entry.get("meta") or "Pass 35 exact technical visible state",
             "shape": "exact AssetDirector 1.21.11 state model; Bell/statue entity-driven geometry retained",
@@ -343,7 +370,7 @@ def row_for(entry):
             "shape": "vanilla chest bounds and renderer",
             "function": "vanilla chest inventory/lid/comparator foundation",
             "nbt": "TileEntityChest-compatible Items plus optional CustomName",
-            "map_import": "deterministic Pass 32 contract in docs/BACKPORTER_STATE_CONTRACT.json; lifecycle remains Pass 34",
+            "map_import": "deterministic static Pass 32 contract plus Pass 36 runtime lifecycle",
             "review_status": "PASS_32_CONTRACT_VERIFIED",
         })
     elif profile == "DEDICATED_GEOMETRY":

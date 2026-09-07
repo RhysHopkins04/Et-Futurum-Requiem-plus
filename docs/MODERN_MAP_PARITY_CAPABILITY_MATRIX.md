@@ -137,3 +137,26 @@ Structure Block mode remain metadata-backed. `docs/BACKPORTER_STATE_CONTRACT.jso
 the authoritative importer mapping.
 
 Large functional systems and general waterlogging remain explicitly deferred.
+
+## Pass 36 modern copper lifecycle contract
+
+Pass 36 extends the mature `IDegradable` copper framework to the modern Copper Chest, Copper Golem
+Statue, Copper Bars, Copper Chain, Copper Lantern and Lightning Rod families. Unwaxed identities
+participate in the same neighbourhood age calculation as existing EFR copper; honeycomb/wax, axe
+wax-off and one-stage scraping use the same shared interaction path. All transitions retain each
+family's existing metadata rather than re-encoding map state. Copper Torch/Wall Torch are explicitly
+excluded because Minecraft Java 1.21.11 does not include them in `WeatheringCopper.NEXT_BY_BLOCK`.
+
+Copper Chest transitions preserve inventory, CustomName and reciprocal `EFRPairDirection` across
+block-identity replacement. All eight Copper Chest identities are one compatible pairing family,
+matching the modern `#copper_chests` rule, while vanilla/trapped chests remain incompatible. Pair
+placement converges mixed weathering to the least-oxidized stage and removes mixed wax state before
+choosing the common identity. Copper Golem Statues retain the Pass-35 `pose*4+facing` metadata, cycle
+Standing -> Sitting -> Running -> Star on non-axe interaction, and output comparator levels 1..4.
+The axe action which would reanimate an unoxidized statue remains deferred with the Copper Golem entity.
+
+Lightning uses the existing 1.7 lightning entity and applies the modern copper-cleaning algorithm:
+the struck unwaxed `IDegradable` block is reset to its first stage and 3..5 random walks of 1..8 steps
+remove one stage from nearby unwaxed copper. Waxed blocks can start the nearby cleaning walks but are
+not themselves de-waxed by lightning. General waterlogging and Copper Golem entity mechanics remain
+outside Pass 36. See `docs/FIDELITY_PASS_36_COPPER_LIFECYCLE.md`.

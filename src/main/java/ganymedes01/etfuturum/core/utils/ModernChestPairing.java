@@ -39,9 +39,9 @@ public final class ModernChestPairing {
             int placedZ) {
         PlacementClick click = PLACEMENT_CLICK.get();
         PLACEMENT_CLICK.remove();
-        if (click == null || click.world != world || click.placedBlock != placedBlock) return IChestPairingState.NONE;
+        if (click == null || click.world != world || !areCompatibleChestBlocks(click.placedBlock, placedBlock)) return IChestPairingState.NONE;
         if (click.clickedSide < 2 || click.clickedSide > 5 || click.clickedY != placedY) return IChestPairingState.NONE;
-        if (world.getBlock(click.clickedX, click.clickedY, click.clickedZ) != placedBlock) {
+        if (!areCompatibleChestBlocks(world.getBlock(click.clickedX, click.clickedY, click.clickedZ), placedBlock)) {
             return IChestPairingState.NONE;
         }
 
@@ -93,6 +93,16 @@ public final class ModernChestPairing {
     public static boolean isManagedChestBlock(Block block) {
         return block == Blocks.chest || block == Blocks.trapped_chest
                 || ModernMapParityBlocks.isCopperChestBlock(block);
+    }
+
+    /**
+     * Modern copper chests form one pairing tag across oxidation/wax identities. Vanilla normal
+     * and trapped chests remain exact-identity-only and never pair with copper.
+     */
+    public static boolean areCompatibleChestBlocks(Block first, Block second) {
+        if (first == second) return first != null && isManagedChestBlock(first);
+        return ModernMapParityBlocks.isCopperChestBlock(first)
+                && ModernMapParityBlocks.isCopperChestBlock(second);
     }
 
     public static boolean isStoredDirection(byte direction) {

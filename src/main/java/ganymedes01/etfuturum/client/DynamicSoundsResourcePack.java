@@ -138,6 +138,18 @@ public class DynamicSoundsResourcePack implements IResourcePack {
 		}
 
 		public JsonObject getModernAliasJson() {
+			/*
+			 * Pass 36c1: AssetDirector supplies the four modern OGGs in the versioned namespace,
+			 * but this dynamic pack owns that namespace's sounds.json. Define the event here so
+			 * SoundHandler can resolve minecraft_1.21.11:entity.copper_golem_become_statue.
+			 * Bare sound paths intentionally inherit the containing sounds.json domain in 1.7.10.
+			 */
+			addSoundsToCategory("entity.copper_golem_become_statue",
+					"block/copper_statue/become_statue1",
+					"block/copper_statue/become_statue2",
+					"block/copper_statue/become_statue3",
+					"block/copper_statue/become_statue4");
+
 			// Vanilla 1.21.11: block.hanging_sign.waxed_interact_fail ->
 			// { name: block.sign.waxed_interact_fail, type: event }. Minecraft 1.7 already
 			// resolves bare type=event names inside the containing sounds.json namespace.

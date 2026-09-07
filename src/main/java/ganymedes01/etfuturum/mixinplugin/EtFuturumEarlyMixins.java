@@ -79,6 +79,9 @@ public class EtFuturumEarlyMixins implements IFMLLoadingPlugin, IEarlyMixinLoade
 		mixins.add("commandblockstate.MixinTileEntityCommandBlock");
 		mixins.add("commandblockstate.MixinBlockCommandBlock");
 
+		// Pass 36: reuse 1.7 lightning while applying the modern IDegradable copper-cleaning walk.
+		mixins.add("copperlifecycle.MixinEntityLightningBolt");
+
 		if (ConfigMixins.endPortalFix) {
 			mixins.add("endportal.MixinBlockEndPortal");
 		}

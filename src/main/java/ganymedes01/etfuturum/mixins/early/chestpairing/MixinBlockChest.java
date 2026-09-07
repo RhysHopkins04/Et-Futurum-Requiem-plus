@@ -1,5 +1,6 @@
 package ganymedes01.etfuturum.mixins.early.chestpairing;
 
+import ganymedes01.etfuturum.ModernMapParityBlocks;
 import ganymedes01.etfuturum.configuration.configs.ConfigBlocksItems;
 import ganymedes01.etfuturum.core.utils.IChestPairingState;
 import ganymedes01.etfuturum.core.utils.ModernChestPairing;
@@ -85,7 +86,7 @@ public abstract class MixinBlockChest {
             int nx = x + ModernChestPairing.offsetX(clickedPartner);
             int nz = z + ModernChestPairing.offsetZ(clickedPartner);
             TileEntity otherTile = world.getTileEntity(nx, y, nz);
-            if (world.getBlock(nx, y, nz) == self
+            if (ModernChestPairing.areCompatibleChestBlocks(world.getBlock(nx, y, nz), self)
                     && otherTile instanceof TileEntityChest && otherTile instanceof IChestPairingState) {
                 IChestPairingState other = (IChestPairingState) otherTile;
                 other.etfu$resolvePairing();
@@ -109,7 +110,7 @@ public abstract class MixinBlockChest {
                     int nx = x + ModernChestPairing.offsetX(candidate);
                     int nz = z + ModernChestPairing.offsetZ(candidate);
                     TileEntity otherTile = world.getTileEntity(nx, y, nz);
-                    if (world.getBlock(nx, y, nz) == self && otherTile instanceof IChestPairingState) {
+                    if (ModernChestPairing.areCompatibleChestBlocks(world.getBlock(nx, y, nz), self) && otherTile instanceof IChestPairingState) {
                         IChestPairingState other = (IChestPairingState) otherTile;
                         other.etfu$resolvePairing();
                         if (other.etfu$getPairDirection() == IChestPairingState.NONE) {
@@ -121,7 +122,13 @@ public abstract class MixinBlockChest {
             }
         }
 
-        chest.checkForAdjacentChests();
+        if (ModernMapParityBlocks.isCopperChestBlock(self)) {
+            ModernMapParityBlocks.normalizeCopperChestPairIdentity(world, x, y, z);
+            TileEntity refreshed = world.getTileEntity(x, y, z);
+            if (refreshed instanceof TileEntityChest) ((TileEntityChest) refreshed).checkForAdjacentChests();
+        } else {
+            chest.checkForAdjacentChests();
+        }
         ci.cancel();
     }
 
@@ -217,7 +224,7 @@ public abstract class MixinBlockChest {
         int nz = z + ModernChestPairing.offsetZ(direction);
         TileEntity otherTile = world.getTileEntity(nx, y, nz);
         if (!(otherTile instanceof TileEntityChest) || !(otherTile instanceof IChestPairingState)
-                || world.getBlock(nx, y, nz) != (Block) (Object) this) {
+                || !ModernChestPairing.areCompatibleChestBlocks(world.getBlock(nx, y, nz), (Block) (Object) this)) {
             pairing.etfu$setPairDirection(IChestPairingState.NONE);
             cir.setReturnValue(chest);
             return;
@@ -277,7 +284,7 @@ public abstract class MixinBlockChest {
             int x, int y, int z, int facing, byte direction) {
         int nx = x + ModernChestPairing.offsetX(direction);
         int nz = z + ModernChestPairing.offsetZ(direction);
-        if (world.getBlock(nx, y, nz) != self || world.getBlockMetadata(nx, y, nz) != facing) return false;
+        if (!ModernChestPairing.areCompatibleChestBlocks(world.getBlock(nx, y, nz), self) || world.getBlockMetadata(nx, y, nz) != facing) return false;
         TileEntity tile = world.getTileEntity(nx, y, nz);
         if (!(tile instanceof TileEntityChest) || !(tile instanceof IChestPairingState)) return false;
         IChestPairingState pairing = (IChestPairingState) tile;

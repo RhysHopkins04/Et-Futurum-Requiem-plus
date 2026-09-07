@@ -32,10 +32,13 @@ for token in (
     'consumeClickedPartnerDirection',
     'clearPlacementClick',
     'click.clickedSide < 2 || click.clickedSide > 5',
-    'world.getBlock(click.clickedX, click.clickedY, click.clickedZ) != placedBlock',
     'direction != directionToClickedBlock(click.clickedSide)',
 ):
     req(util, token, 'placement click context')
+
+if ('world.getBlock(click.clickedX, click.clickedY, click.clickedZ) != placedBlock' not in util
+        and '!areCompatibleChestBlocks(world.getBlock(click.clickedX, click.clickedY, click.clickedZ), placedBlock)' not in util):
+    errors.append('placement click context: missing exact-id or compatible-family clicked chest gate')
 
 for token in (
     '@Mixin(ItemBlock.class)',

@@ -1,9 +1,10 @@
 {
   "schema": 1,
   "contract_id": "etfuturum-requiem-plus-backporter-state-contract",
-  "contract_revision": "35",
-  "implemented_in_version": "3.5.5",
-  "implemented_in_git_ref": "refs/tags/3.5.5",
+  "contract_revision": "36",
+  "implemented_in_version": "3.5.8",
+  "implemented_in_git_ref": null,
+  "release_status": "unreleased",
   "source_minecraft": "1.21.11",
   "target_minecraft": "1.7.10",
   "target_mod": "Et Futurum Requiem Plus",
@@ -1229,15 +1230,13 @@
       },
       "derived": [
         "single/left/right renderer half is derived from facing plus persisted EFRPairDirection",
-        "runtime placement writes reciprocal EFRPairDirection to both halves; pre-Pass-32c saves without the field migrate from one unambiguous same-identity lateral neighbour"
+        "runtime placement writes reciprocal EFRPairDirection to both halves; pre-Pass-32c saves without the field migrate from one unambiguous compatible lateral neighbour"
       ],
-      "unsupported": [
-        "oxidation/wax/scrape runtime transitions (Pass 34)"
-      ],
+      "unsupported": [],
       "exactness": {
         "visible_state": "static identity/facing/type exact when Backporter writes reciprocal EFRPairDirection; modern single/left/right copper textures are selected from that explicit state",
         "block_entity_display": "inventory/name exact if items translate",
-        "behaviour": "vanilla chest inventory/lid/comparator foundation with modern explicit pairing; Copper Chest pairing is exact-block-identity-only and cannot cross normal/trapped/different oxidation or wax identities"
+        "behaviour": "vanilla chest inventory/lid/comparator foundation with modern explicit pairing; Pass 36 treats every Copper Chest oxidation/wax identity as one compatible family while normal/trapped chests remain incompatible, and lifecycle identity changes preserve TileEntity NBT plus reciprocal EFRPairDirection"
       },
       "pair_direction_mapping": {
         "north": {
@@ -2405,7 +2404,7 @@
       "exactness": {
         "visible_state": "exact",
         "map_state": "exact",
-        "gameplay": "deferred"
+        "gameplay": "Pass 36 block-local pose cycling, comparator output, and oxidation/wax/scrape lifecycle implemented; Copper Golem entity/reanimation deferred"
       },
       "visual_property_classification": {
         "facing": "STORED_EXACTLY",
@@ -2414,7 +2413,7 @@
       },
       "notes": [
         "All eight oxidation/waxed registry identities use the same 16-state metadata layout. EFR renders four separately authored 1.21.11 Copper Golem model-layer poses with their own cuboids, part transforms, deformations and 64x64 entity-sheet UV origins, plus exact identity texture and horizontal rotation; Sitting/Running/Star are not transformed Standing fallbacks.",
-        "Pick/drop/re-placement preserves the 0..15 statue state metadata. Copper Golem entity behaviour and oxidation/waxing/scraping lifecycle are deferred."
+        "Pick/drop/re-placement and Pass 36 oxidation/waxing/scraping preserve the 0..15 statue state metadata. Non-axe interaction cycles standing/sitting/running/star and comparator output is 1/2/3/4. Copper Golem entity spawning/reanimation remains deferred."
       ]
     },
     {

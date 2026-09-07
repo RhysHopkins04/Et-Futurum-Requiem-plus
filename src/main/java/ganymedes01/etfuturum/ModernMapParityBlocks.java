@@ -11,10 +11,13 @@ import ganymedes01.etfuturum.blocks.BaseDoor;
 import ganymedes01.etfuturum.blocks.BaseSlab;
 import ganymedes01.etfuturum.blocks.BaseStairs;
 import ganymedes01.etfuturum.blocks.BaseTrapdoor;
+import ganymedes01.etfuturum.blocks.IDegradable;
 import ganymedes01.etfuturum.blocks.ModernWallState;
 import ganymedes01.etfuturum.blocks.itemblocks.BaseSlabItemBlock;
 import ganymedes01.etfuturum.blocks.itemblocks.ItemBlockNewDoor;
 import ganymedes01.etfuturum.lib.RenderIDs;
+import ganymedes01.etfuturum.core.utils.IChestPairingState;
+import ganymedes01.etfuturum.core.utils.ModernChestPairing;
 import ganymedes01.etfuturum.network.WoodSignOpenMessage;
 import ganymedes01.etfuturum.recipes.crafting.RecipeDecoratedPot;
 import ganymedes01.etfuturum.tileentities.TileEntityWoodSign;
@@ -471,6 +474,77 @@ public enum ModernMapParityBlocks {
         return getRegistryName().endsWith("copper_golem_statue");
     }
 
+    /** Pass 36 families participating in the shared IDegradable copper lifecycle. */
+    public boolean isPass36CopperLifecycleIdentity() {
+        String family = copperLifecycleFamily(getRegistryName());
+        return "copper_chest".equals(family) || "copper_golem_statue".equals(family)
+                || "copper_bars".equals(family) || "copper_chain".equals(family)
+                || "copper_lantern".equals(family) || "lightning_rod".equals(family);
+    }
+
+    public boolean isWaxedCopperLifecycleIdentity() {
+        return isPass36CopperLifecycleIdentity() && getRegistryName().startsWith("waxed_");
+    }
+
+    public int getCopperLifecycleStage() {
+        String name = getRegistryName();
+        if (name.startsWith("waxed_")) name = name.substring(6);
+        if (name.startsWith("exposed_")) return 1;
+        if (name.startsWith("weathered_")) return 2;
+        if (name.startsWith("oxidized_")) return 3;
+        return 0;
+    }
+
+    private static String copperLifecycleFamily(String name) {
+        if (name == null) return "";
+        if (name.startsWith("waxed_")) name = name.substring(6);
+        if (name.startsWith("exposed_")) name = name.substring(8);
+        else if (name.startsWith("weathered_")) name = name.substring(10);
+        else if (name.startsWith("oxidized_")) name = name.substring(9);
+        return name;
+    }
+
+    /** Synthetic IDegradable metadata for Pass-36 registry-identity copper families. */
+    public static int getPass36CopperMeta(Block block) {
+        if (block == null) return -1;
+        if (ModBlocks.LIGHTNING_ROD.isEnabled() && block == ModBlocks.LIGHTNING_ROD.get()) return 0;
+        ModernMapParityBlocks entry = fromBlock(block);
+        if (entry == null || !entry.isPass36CopperLifecycleIdentity()) return -1;
+        return entry.getCopperLifecycleStage() + (entry.isWaxedCopperLifecycleIdentity() ? 8 : 0);
+    }
+
+    /** Resolves an oxidation/wax transition while keeping every family's existing metadata untouched. */
+    public static Block getPass36CopperBlock(Block source, int copperMeta) {
+        if (source == null) return null;
+        String family;
+        if (ModBlocks.LIGHTNING_ROD.isEnabled() && source == ModBlocks.LIGHTNING_ROD.get()) {
+            family = "lightning_rod";
+        } else {
+            ModernMapParityBlocks sourceEntry = fromBlock(source);
+            if (sourceEntry == null || !sourceEntry.isPass36CopperLifecycleIdentity()) return null;
+            family = copperLifecycleFamily(sourceEntry.getRegistryName());
+        }
+        int stage = copperMeta & 3;
+        boolean waxed = (copperMeta & 8) != 0;
+        if ("lightning_rod".equals(family) && stage == 0 && !waxed) {
+            return ModBlocks.LIGHTNING_ROD.isEnabled() ? ModBlocks.LIGHTNING_ROD.get() : null;
+        }
+        String stagePrefix = stage == 1 ? "exposed_" : stage == 2 ? "weathered_" : stage == 3 ? "oxidized_" : "";
+        String targetName = (waxed ? "waxed_" : "") + stagePrefix + family;
+        for (ModernMapParityBlocks candidate : values()) {
+            if (candidate.getRegistryName().equals(targetName)) return candidate.get();
+        }
+        return null;
+    }
+
+    /** Pass 36b: cycles Statue pose while preserving the lower two facing bits exactly. */
+    public static int cycleCopperGolemStatuePoseMeta(int metadata) {
+        int state = metadata & 15;
+        int facing = state & 3;
+        int pose = (state >> 2) & 3;
+        return (((pose + 1) & 3) << 2) | facing;
+    }
+
     public Block get() {
         return block;
     }
@@ -600,6 +674,7 @@ public enum ModernMapParityBlocks {
 
     private Block createBlock() {
         if (getRegistryName().endsWith("copper_chest")) return new ParityCopperChestBlock(this);
+        if (isPass36CopperLifecycleIdentity()) return new ParityCopperLifecycleModelBlock(this);
         if (style == Style.STAIRS) {
             Block base = this == PALE_OAK_STAIRS ? PALE_OAK_PLANKS.get() : RESIN_BRICKS.get();
             return new ParityStairBlock(this, base);
@@ -636,6 +711,41 @@ public enum ModernMapParityBlocks {
     /** True only for EFR's eight dedicated Copper Chest block identities. */
     public static boolean isCopperChestBlock(Block block) {
         return block instanceof ParityCopperChestBlock;
+    }
+
+    /**
+     * 1.21.11 Copper Chest placement/updateShape converges a paired chest to the least oxidized
+     * identity; mixed wax state is first unwaxed. Keep the Pass-32 explicit pair direction while
+     * applying that same family-level identity rule.
+     */
+    public static void normalizeCopperChestPairIdentity(World world, int x, int y, int z) {
+        if (world == null || world.isRemote) return;
+        Block firstBlock = world.getBlock(x, y, z);
+        if (!(firstBlock instanceof ParityCopperChestBlock)) return;
+        TileEntity tile = world.getTileEntity(x, y, z);
+        if (!(tile instanceof IChestPairingState)) return;
+        IChestPairingState pairing = (IChestPairingState) tile;
+        pairing.etfu$resolvePairing();
+        byte direction = pairing.etfu$getPairDirection();
+        if (!ModernChestPairing.isPair(direction)) return;
+        int px = x + ModernChestPairing.offsetX(direction);
+        int pz = z + ModernChestPairing.offsetZ(direction);
+        Block partnerBlock = world.getBlock(px, y, pz);
+        if (!ModernChestPairing.areCompatibleChestBlocks(firstBlock, partnerBlock)
+                || !(partnerBlock instanceof ParityCopperChestBlock)) return;
+
+        int firstCopper = getPass36CopperMeta(firstBlock);
+        int partnerCopper = getPass36CopperMeta(partnerBlock);
+        if (firstCopper < 0 || partnerCopper < 0) return;
+        boolean bothWaxed = firstCopper >= 8 && partnerCopper >= 8;
+        boolean waxMismatch = (firstCopper >= 8) != (partnerCopper >= 8);
+        int stage = Math.min(firstCopper & 3, partnerCopper & 3);
+        int targetCopper = stage + (bothWaxed && !waxMismatch ? 8 : 0);
+        Block target = getPass36CopperBlock(firstBlock, targetCopper);
+        if (!(target instanceof ParityCopperChestBlock)) return;
+        if (firstBlock == target && partnerBlock == target) return;
+        ParityCopperChestBlock.transitionCopperChestPair(world, x, y, z,
+                (ParityCopperChestBlock) target, world.getBlockMetadata(x, y, z));
     }
 
     /**
@@ -778,8 +888,9 @@ public enum ModernMapParityBlocks {
      * normal/trapped chest rendering.
      */
     public static final class ParityCopperChestTileEntity extends TileEntityChest {
-        // Pairing is supplied by the Pass 32c TileEntityChest mixin. The block mixin requires exact
-        // block identity, so copper oxidation/wax variants cannot cross-pair with each other or vanilla.
+        // Pairing is supplied by the shared chest-pairing mixins. Pass 36 treats every Copper Chest
+        // oxidation/wax identity as one compatible family while normal/trapped chests remain incompatible;
+        // reciprocal pairing is persisted through EFRPairDirection on both halves.
     }
 
     /** Text storage for the modern sign/hanging-sign compatibility families. */
@@ -1574,15 +1685,16 @@ public enum ModernMapParityBlocks {
         }
     }
 
-    private static final class ParityCopperChestBlock extends BlockChest {
+    private static final class ParityCopperChestBlock extends BlockChest implements IDegradable {
         private final ModernMapParityBlocks entry;
 
         ParityCopperChestBlock(ModernMapParityBlocks entry) {
             // Use a private chest type so legacy callers still distinguish Copper Chests from vanilla.
-            // Pass 32c pairing is stricter still: the BlockChest/TileEntityChest mixins require exact
-            // block identity, preventing cross-pairs between oxidation/wax variants as well.
+            // Pass 36 keeps normal/trapped incompatibility while treating every Copper Chest
+            // oxidation/wax identity as one modern-compatible pairing family.
             super(2);
             this.entry = entry;
+            setTickRandomly(!entry.isWaxedCopperLifecycleIdentity() && entry.getCopperLifecycleStage() < 3);
             setHardness(2.5F);
             setResistance(6.0F);
             setStepSound(soundTypeMetal);
@@ -1592,6 +1704,122 @@ public enum ModernMapParityBlocks {
         @Override
         public TileEntity createNewTileEntity(World world, int meta) {
             return new ParityCopperChestTileEntity();
+        }
+
+        @Override
+        public void updateTick(World world, int x, int y, int z, Random random) {
+            if (!entry.isWaxedCopperLifecycleIdentity()) tickDegradation(world, x, y, z, random);
+        }
+
+        @Override
+        public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int side,
+                float hitX, float hitY, float hitZ) {
+            if (tryWaxOnWaxOff(world, x, y, z, player)) return true;
+            return super.onBlockActivated(world, x, y, z, player, side, hitX, hitY, hitZ);
+        }
+
+        @Override public int getCopperMeta(int meta) { return getPass36CopperMeta(this); }
+        @Override public Block getCopperBlockFromMeta(int meta) { return getPass36CopperBlock(this, meta); }
+        @Override public int getFinalCopperMeta(IBlockAccess world, int x, int y, int z, int meta, int worldMeta) { return worldMeta; }
+
+        @Override
+        public void setCopperBlock(Block newBlock, int newMeta, World world, int x, int y, int z) {
+            if (!(newBlock instanceof ParityCopperChestBlock) || world.isRemote) {
+                IDegradable.super.setCopperBlock(newBlock, newMeta, world, x, y, z);
+                return;
+            }
+            transitionCopperChestPair(world, x, y, z, (ParityCopperChestBlock) newBlock, newMeta);
+        }
+
+        private static void transitionCopperChestPair(World world, int x, int y, int z,
+                ParityCopperChestBlock target, int targetMeta) {
+            TileEntity firstTile = world.getTileEntity(x, y, z);
+            if (!(firstTile instanceof TileEntityChest)) {
+                // BlockChest.onBlockAdded() recalculates legacy chest facing when the registry
+                // identity changes. Restore the exact pre-transition metadata after replacement.
+                if (world.setBlock(x, y, z, target, targetMeta, 3))
+                    world.setBlockMetadataWithNotify(x, y, z, targetMeta, 2);
+                return;
+            }
+            byte pairDirection = IChestPairingState.NONE;
+            if (firstTile instanceof IChestPairingState) {
+                IChestPairingState state = (IChestPairingState) firstTile;
+                state.etfu$resolvePairing();
+                pairDirection = state.etfu$getPairDirection();
+            }
+            int px = x + ModernChestPairing.offsetX(pairDirection);
+            int pz = z + ModernChestPairing.offsetZ(pairDirection);
+            boolean hasPartner = ModernChestPairing.isPair(pairDirection)
+                    && ModernChestPairing.areCompatibleChestBlocks(world.getBlock(x, y, z), world.getBlock(px, y, pz))
+                    && world.getTileEntity(px, y, pz) instanceof TileEntityChest;
+
+            ChestSnapshot first = ChestSnapshot.capture(world, x, y, z);
+            ChestSnapshot partner = hasPartner ? ChestSnapshot.capture(world, px, y, pz) : null;
+            if (first == null) return;
+            first.clearInventory();
+            if (partner != null) partner.clearInventory();
+
+            if (!world.setBlock(x, y, z, target, targetMeta, 2)) {
+                first.restoreIntoExisting();
+                if (partner != null) partner.restoreIntoExisting();
+                return;
+            }
+            if (partner != null && !world.setBlock(px, y, pz, target, partner.metadata, 2)) {
+                // Extremely defensive rollback: restore the original identities and NBT if the second half fails.
+                world.setBlock(x, y, z, first.block, first.metadata, 2);
+                world.setBlockMetadataWithNotify(x, y, z, first.metadata, 2);
+                first.restoreIntoExisting();
+                partner.restoreIntoExisting();
+                return;
+            }
+
+            // 1.7 BlockChest.onBlockAdded() overwrites orientation whenever the block identity is
+            // swapped. Re-apply each half's exact saved metadata only after both replacements have
+            // completed, then restore the TileEntity NBT/pair state.
+            world.setBlockMetadataWithNotify(x, y, z, first.metadata, 2);
+            if (partner != null) world.setBlockMetadataWithNotify(px, y, pz, partner.metadata, 2);
+
+            first.restoreIntoReplacement();
+            if (partner != null) partner.restoreIntoReplacement();
+            first.resolveRestoredPair();
+            if (partner != null) partner.resolveRestoredPair();
+            world.markBlockForUpdate(x, y, z);
+            world.notifyBlocksOfNeighborChange(x, y, z, target);
+            if (partner != null) {
+                world.markBlockForUpdate(px, y, pz);
+                world.notifyBlocksOfNeighborChange(px, y, pz, target);
+            }
+        }
+
+        private static final class ChestSnapshot {
+            final World world; final int x, y, z; final Block block; final int metadata; final NBTTagCompound tag;
+            final TileEntityChest original;
+            private ChestSnapshot(World world, int x, int y, int z, Block block, int metadata,
+                    NBTTagCompound tag, TileEntityChest original) {
+                this.world=world; this.x=x; this.y=y; this.z=z; this.block=block; this.metadata=metadata; this.tag=tag; this.original=original;
+            }
+            static ChestSnapshot capture(World world, int x, int y, int z) {
+                TileEntity tile=world.getTileEntity(x,y,z);
+                if (!(tile instanceof TileEntityChest)) return null;
+                NBTTagCompound tag=new NBTTagCompound(); tile.writeToNBT(tag);
+                return new ChestSnapshot(world,x,y,z,world.getBlock(x,y,z),world.getBlockMetadata(x,y,z),tag,(TileEntityChest)tile);
+            }
+            void clearInventory() {
+                for (int slot=0; slot<original.getSizeInventory(); slot++) original.setInventorySlotContents(slot,null);
+            }
+            void restoreIntoExisting() { original.readFromNBT(tag); original.markDirty(); }
+            void restoreIntoReplacement() {
+                TileEntity tile=world.getTileEntity(x,y,z);
+                if (!(tile instanceof TileEntityChest)) {
+                    tile=new ParityCopperChestTileEntity(); world.setTileEntity(x,y,z,tile);
+                }
+                tile.readFromNBT(tag); tile.markDirty();
+                if (tile instanceof TileEntityChest) ((TileEntityChest)tile).updateContainingBlockInfo();
+            }
+            void resolveRestoredPair() {
+                TileEntity tile=world.getTileEntity(x,y,z);
+                if (tile instanceof IChestPairingState) ((IChestPairingState)tile).etfu$resolvePairing();
+            }
         }
 
         @Override
@@ -1767,13 +1995,21 @@ public enum ModernMapParityBlocks {
         @Override public void onDataPacket(NetworkManager network, S35PacketUpdateTileEntity packet) { readFromNBT(packet.func_148857_g()); if (worldObj != null) worldObj.markBlockForUpdate(xCoord,yCoord,zCoord); }
     }
 
+    /** Pass 36 applies IDegradable only to actual copper lifecycle identities, never every parity shell. */
+    private static final class ParityCopperLifecycleModelBlock extends ParityModelBlock implements IDegradable {
+        ParityCopperLifecycleModelBlock(ModernMapParityBlocks entry) { super(entry); }
+        @Override public int getCopperMeta(int meta) { return getPass36CopperMeta(this); }
+        @Override public Block getCopperBlockFromMeta(int meta) { return getPass36CopperBlock(this, meta); }
+        @Override public int getFinalCopperMeta(IBlockAccess world, int x, int y, int z, int meta, int worldMeta) { return worldMeta; }
+    }
+
     /** Keeps Copper Golem Statue pose metadata through pick/drop/re-placement without creative sub-items. */
     public static final class ParityStatefulItemBlock extends ItemBlock {
         public ParityStatefulItemBlock(Block block) { super(block); setHasSubtypes(true); }
         @Override public int getMetadata(int damage) { return damage & 15; }
     }
 
-    private static final class ParityModelBlock extends Block implements ITileEntityProvider {
+    private static class ParityModelBlock extends Block implements ITileEntityProvider {
         // Minecraft Java 1.21.11 TrialSpawnerState.lightLevel():
         // inactive, waiting_for_players, active, waiting_for_reward_ejection, ejecting_reward, cooldown.
         private static final int[] TRIAL_SPAWNER_LIGHT = {0, 4, 8, 8, 8, 0};
@@ -1786,6 +2022,8 @@ public enum ModernMapParityBlocks {
         ParityModelBlock(ModernMapParityBlocks entry) {
             super(entry.material);
             this.entry = entry;
+            if (entry.isPass36CopperLifecycleIdentity() && !entry.isWaxedCopperLifecycleIdentity()
+                    && entry.getCopperLifecycleStage() < 3) setTickRandomly(true);
             // Block's constructor invokes isOpaqueCube() virtually before this field can be assigned.
             // Recompute the cached vanilla opacity values now that the parity entry is available.
             this.opaque = isOpaqueCube();
@@ -1871,6 +2109,7 @@ public enum ModernMapParityBlocks {
         private boolean isCopperTorch() { return entry == COPPER_TORCH || entry == COPPER_WALL_TORCH; }
         private boolean isCopperWallTorch() { return entry == COPPER_WALL_TORCH; }
         private boolean isCopperGolemStatue() { return entry.isCopperGolemStatueIdentity(); }
+        private boolean isPass36CopperLifecycle() { return entry.isPass36CopperLifecycleIdentity(); }
         private boolean isTrialSpawner() { return entry == TRIAL_SPAWNER; }
         private boolean isVault() { return entry == VAULT; }
         private boolean isCrafter() { return entry == CRAFTER; }
@@ -2705,13 +2944,16 @@ public enum ModernMapParityBlocks {
             }
             if (!isLightningRod()) return meta;
             // Metadata convention: 0 down, 1 up, 2 north, 3 south, 4 west, 5 east.
+            // The 1.7 ItemBlock clicked-side convention is opposite the modern JSON rod's
+            // horizontal head direction at this renderer compatibility boundary. Vertical
+            // placement is already correct; invert only wall placement.
             switch (side) {
                 case 0: return 0;
                 case 1: return 1;
-                case 2: return 2;
-                case 3: return 3;
-                case 4: return 4;
-                case 5: return 5;
+                case 2: return 3;
+                case 3: return 2;
+                case 4: return 5;
+                case 5: return 4;
                 default: return 1;
             }
         }
@@ -3010,6 +3252,30 @@ public enum ModernMapParityBlocks {
         public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int side,
                 float hitX, float hitY, float hitZ) {
             ItemStack held = player.getHeldItem();
+
+            if (isPass36CopperLifecycle()) {
+                if (((IDegradable) this).tryWaxOnWaxOff(world, x, y, z, player)) return true;
+                if (isCopperGolemStatue()) {
+                    // Modern uses the axe interaction for Copper Golem reanimation. The entity phase is deferred,
+                    // so an otherwise-inert axe must not accidentally cycle the statue pose.
+                    if (held != null && held.getItem().getToolClasses(held).contains("axe")) return false;
+                    if (!world.isRemote) {
+                        int oldMeta = world.getBlockMetadata(x, y, z) & 15;
+                        int facing = oldMeta & 3;
+                        int nextMeta = cycleCopperGolemStatuePoseMeta(oldMeta);
+                        // Flag 3 already notifies neighbours and refreshes comparator output for
+                        // blocks with hasComparatorInputOverride(); do not call func_147453_f a
+                        // second time. Reassert only the exact state client-side if a legacy
+                        // neighbour callback touched our facing bits during that notification.
+                        world.setBlockMetadataWithNotify(x, y, z, nextMeta, 3);
+                        if ((world.getBlockMetadata(x, y, z) & 3) != facing)
+                            world.setBlockMetadataWithNotify(x, y, z, nextMeta, 2);
+                        world.playSoundEffect(x + 0.5D, y + 0.5D, z + 0.5D,
+                                Tags.MC_ASSET_VER + ":entity.copper_golem_become_statue", 1.0F, 1.0F);
+                    }
+                    return true;
+                }
+            }
 
             if ((isTorchflowerCrop() || isPitcherCrop()) && isBoneMeal(held)) {
                 return applyAncientCropBoneMeal(world, x, y, z, player, held);
@@ -3632,12 +3898,13 @@ public enum ModernMapParityBlocks {
 
         @Override
         public boolean hasComparatorInputOverride() {
-            return isDecoratedPot() || isShelf() || isChiseledBookshelf() || super.hasComparatorInputOverride();
+            return isCopperGolemStatue() || isDecoratedPot() || isShelf() || isChiseledBookshelf() || super.hasComparatorInputOverride();
         }
 
         @Override
         public int getComparatorInputOverride(World world, int x, int y, int z, int side) {
             TileEntity tile = world.getTileEntity(x, y, z);
+            if (isCopperGolemStatue()) return ((world.getBlockMetadata(x, y, z) >> 2) & 3) + 1;
             if (isChiseledBookshelf()) {
                 if (!(tile instanceof ParityChiseledBookshelfTileEntity)) return 0;
                 int slot = ((ParityChiseledBookshelfTileEntity) tile).getLastInteractedSlot();
@@ -4076,6 +4343,10 @@ public enum ModernMapParityBlocks {
                     && world.canLightningStrikeAt(x, y + 1, z)) {
                 setMetadataAndRelight(world, x, y, z, world.getBlockMetadata(x, y, z) & 3);
                 playModernSound(world, x, y, z, "block.fire.extinguish", 1.0F, 1.0F);
+                return;
+            }
+            if (isPass36CopperLifecycle() && !entry.isWaxedCopperLifecycleIdentity()) {
+                ((IDegradable) this).tickDegradation(world, x, y, z, random);
                 return;
             }
             super.updateTick(world, x, y, z, random);

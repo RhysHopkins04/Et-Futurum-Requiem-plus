@@ -28,8 +28,11 @@ for token in (
 req(pair_utils, 'EFRPairDirection', 'Pass 32c successor chest state')
 for token in ('checkForAdjacentChests', 'etfu$partnerAt', 'getBlockType()'):
     req(pair_mixin, token, 'Pass 32c successor chest state')
-for token in ('world.getBlock(nx, y, nz) != self', 'placer.isSneaking()', 'IChestPairingState.NONE'):
+for token in ('placer.isSneaking()', 'IChestPairingState.NONE'):
     req(block_mixin, token, 'Pass 32c successor chest placement')
+if ('world.getBlock(nx, y, nz) != self' not in block_mixin
+        and 'ModernChestPairing.areCompatibleChestBlocks' not in block_mixin):
+    errors.append('Pass 32c successor chest placement: missing exact-or-Pass36-compatible chest identity gate')
 for token in (
     'private enum Half { SINGLE, LEFT, RIGHT }',
     'new ModelCopperChestHalf(true)',

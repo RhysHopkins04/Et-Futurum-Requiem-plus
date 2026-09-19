@@ -39,11 +39,12 @@ need(has(MPB, 'applyAncientCropBoneMeal',
          'world.setBlockMetadataWithNotify(x, y, z, 1, 3)',
          'world.setBlock(x, y, z, TORCHFLOWER.get(), 0, 3)'),
      'Torchflower bonemeal age/final-flower progression missing')
-need(has(MPB, 'if (isPitcherCrop())',
-         'int nextAge = age + 1',
-         'if (nextAge >= 3)',
-         'world.setBlock(x, lowerY + 1, z, this, 5 + nextAge, 3)'),
-     'Pitcher one-age bonemeal and upper-half growth missing')
+need(
+    has(MPB, 'if (isPitcherCrop())', 'int nextAge = age + 1',
+        'growPitcher(world, x, lowerY, z, 1)')
+    and has(MPB, 'private boolean growPitcher', 'int next = Math.min(4, age + increase)',
+        'if (next >= 3)', 'world.setBlock(x,ly+1,z,this,5+next,3)'),
+    'Pitcher one-age bonemeal and upper-half growth missing')
 need('Creaking Heart state, Dried Ghast hydration, and Sniffer Egg hatch remain import/persistent visual states only' in DOC,
      '34c lifecycle deferral boundary is not documented')
 need('Pass 34c supports Bone Meal progression age 0 -> 1 -> the existing Torchflower block' in CONTRACT,

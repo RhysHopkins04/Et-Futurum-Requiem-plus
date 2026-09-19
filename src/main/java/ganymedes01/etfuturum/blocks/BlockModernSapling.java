@@ -4,11 +4,13 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import ganymedes01.etfuturum.EtFuturum;
 import ganymedes01.etfuturum.ModernMapParityBlocks;
+import ganymedes01.etfuturum.ModBlocks;
 import ganymedes01.etfuturum.client.model.ModernJsonModelBridge;
 import ganymedes01.etfuturum.lib.RenderIDs;
 import ganymedes01.etfuturum.client.sound.ModSounds;
 import ganymedes01.etfuturum.configuration.configs.ConfigBlocksItems;
 import ganymedes01.etfuturum.world.generate.decorate.WorldGenCherryTrees;
+import ganymedes01.etfuturum.world.generate.decorate.WorldGenPass37MangroveTree;
 import lombok.NonNull;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockSapling;
@@ -17,6 +19,7 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;
@@ -33,6 +36,7 @@ import java.util.List;
 import java.util.Random;
 
 public class BlockModernSapling extends BlockSapling implements ISubBlocksBlock, IMultiBlockSound {
+	private static final ThreadLocal<Boolean> PASS37_HANGING_PLACEMENT = new ThreadLocal<Boolean>();
 	private final String[] types = new String[]{"mangrove_propagule", "cherry_sapling"};
 	private final IIcon[] icons = new IIcon[types.length];
 
@@ -90,16 +94,108 @@ public class BlockModernSapling extends BlockSapling implements ISubBlocksBlock,
 		return hasTileEntity(metadata) ? new MangrovePropaguleStateTileEntity() : null;
 	}
 
+	private boolean isMangroveLeaves(World world, int x, int y, int z) {
+		return ModBlocks.LEAVES.isEnabled() && world.getBlock(x, y, z) == ModBlocks.LEAVES.get()
+				&& (world.getBlockMetadata(x, y, z) & 3) == 0;
+	}
+
+	public static void setMangroveVisualState(World world, int x, int y, int z, boolean hanging, int age) {
+		if (world == null || !ModBlocks.SAPLING.isEnabled() || world.getBlock(x, y, z) != ModBlocks.SAPLING.get()
+				|| (world.getBlockMetadata(x, y, z) & 7) != 0) return;
+		TileEntity tile = world.getTileEntity(x, y, z);
+		if (tile instanceof MangrovePropaguleStateTileEntity)
+			((MangrovePropaguleStateTileEntity) tile).setVisualState(hanging, age);
+	}
+
+	/**
+	 * Places the mature EFR sapling identity as a hanging propagule without exposing the
+	 * transient pre-TE state to BlockBush/BlockSapling survival checks. This is used only by
+	 * Mangrove Leaves bonemeal and the manual Pass-37 tree decorator.
+	 */
+	public static boolean placeHangingPropagule(World world, int x, int y, int z, int age) {
+		if (world == null || world.isRemote || !ModBlocks.SAPLING.isEnabled()) return false;
+		PASS37_HANGING_PLACEMENT.set(Boolean.TRUE);
+		try {
+			if (!world.setBlock(x, y, z, ModBlocks.SAPLING.get(), 0, 3)) return false;
+			setMangroveVisualState(world, x, y, z, true, age);
+			return world.getBlock(x, y, z) == ModBlocks.SAPLING.get() && isMangroveHanging(world, x, y, z);
+		} finally {
+			PASS37_HANGING_PLACEMENT.remove();
+		}
+	}
+
+	@Override
+	public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase placer, ItemStack stack) {
+		super.onBlockPlacedBy(world, x, y, z, placer, stack);
+		if ((world.getBlockMetadata(x, y, z) & 7) == 0) setMangroveVisualState(world, x, y, z, false, 4);
+	}
+
+	@Override
+	public boolean canBlockStay(World world, int x, int y, int z) {
+		if ((world.getBlockMetadata(x, y, z) & 7) == 0) {
+			if (Boolean.TRUE.equals(PASS37_HANGING_PLACEMENT.get())) return isMangroveLeaves(world, x, y + 1, z);
+			if (isMangroveHanging(world, x, y, z)) return isMangroveLeaves(world, x, y + 1, z);
+			Block ground = world.getBlock(x, y - 1, z);
+			return super.canBlockStay(world, x, y, z) || ground == Blocks.clay
+					|| (ModBlocks.MUD.isEnabled() && ground == ModBlocks.MUD.get())
+					|| (ModBlocks.MUDDY_MANGROVE_ROOTS.isEnabled() && ground == ModBlocks.MUDDY_MANGROVE_ROOTS.get())
+					|| (ModBlocks.MOSS_BLOCK.isEnabled() && ground == ModBlocks.MOSS_BLOCK.get())
+					|| (ModernMapParityBlocks.PALE_MOSS_BLOCK.get() != null && ground == ModernMapParityBlocks.PALE_MOSS_BLOCK.get());
+		}
+		return super.canBlockStay(world, x, y, z);
+	}
+
 	@Override
 	public void updateTick(World world, int x, int y, int z, Random random) {
-		if ((world.getBlockMetadata(x, y, z) & 7) == 0 && isMangroveHanging(world, x, y, z)) return;
+		if ((world.getBlockMetadata(x, y, z) & 7) == 0 && isMangroveHanging(world, x, y, z)) {
+			if (!world.isRemote) {
+				if (!isMangroveLeaves(world, x, y + 1, z)) {
+					dropBlockAsItem(world, x, y, z, 0, 0);
+					world.setBlockToAir(x, y, z);
+				} else {
+					int age = getMangroveAge(world, x, y, z);
+					if (age < 4) setMangroveVisualState(world, x, y, z, true, age + 1);
+				}
+			}
+			return;
+		}
 		super.updateTick(world, x, y, z, random);
 	}
 
 	@Override
 	public void onNeighborBlockChange(World world, int x, int y, int z, Block neighbor) {
-		if ((world.getBlockMetadata(x, y, z) & 7) == 0 && isMangroveHanging(world, x, y, z)) return;
+		if ((world.getBlockMetadata(x, y, z) & 7) == 0 && isMangroveHanging(world, x, y, z)) {
+			if (!world.isRemote && !isMangroveLeaves(world, x, y + 1, z)) {
+				dropBlockAsItem(world, x, y, z, 0, 0);
+				world.setBlockToAir(x, y, z);
+			}
+			return;
+		}
 		super.onNeighborBlockChange(world, x, y, z, neighbor);
+	}
+
+	@Override
+	public boolean func_149851_a(World world, int x, int y, int z, boolean isClient) {
+		if ((world.getBlockMetadata(x, y, z) & 7) == 0 && isMangroveHanging(world, x, y, z))
+			return getMangroveAge(world, x, y, z) < 4;
+		return super.func_149851_a(world, x, y, z, isClient);
+	}
+
+	@Override
+	public boolean func_149852_a(World world, Random random, int x, int y, int z) {
+		if ((world.getBlockMetadata(x, y, z) & 7) == 0 && isMangroveHanging(world, x, y, z))
+			return getMangroveAge(world, x, y, z) < 4;
+		return super.func_149852_a(world, random, x, y, z);
+	}
+
+	@Override
+	public void func_149853_b(World world, Random random, int x, int y, int z) {
+		if ((world.getBlockMetadata(x, y, z) & 7) == 0 && isMangroveHanging(world, x, y, z)) {
+			int age = getMangroveAge(world, x, y, z);
+			if (age < 4) setMangroveVisualState(world, x, y, z, true, age + 1);
+			return;
+		}
+		super.func_149853_b(world, random, x, y, z);
 	}
 
 	public static final class MangrovePropaguleStateTileEntity extends TileEntity {
@@ -131,6 +227,7 @@ public class BlockModernSapling extends BlockSapling implements ISubBlocksBlock,
 	}
 
 	private static final WorldGenAbstractTree cherry = new WorldGenCherryTrees(true);
+	private static final WorldGenAbstractTree mangrove = new WorldGenPass37MangroveTree(true);
 
 	/**
 	 * MCP name: {@code growTree}
@@ -145,6 +242,9 @@ public class BlockModernSapling extends BlockSapling implements ISubBlocksBlock,
 		WorldGenAbstractTree tree = null;
 
 		switch (l) {
+			case 0:
+				if (ConfigBlocksItems.enableMangroveWoodFamily) tree = mangrove;
+				break;
 			case 1:
 				if (ConfigBlocksItems.enableCherryBlocks) {
 					tree = cherry;

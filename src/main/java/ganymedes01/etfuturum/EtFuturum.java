@@ -909,6 +909,23 @@ public class EtFuturum {
 		config.addObject(ver, "minecraft/sounds/block/copper_statue/become_statue2.ogg");
 		config.addObject(ver, "minecraft/sounds/block/copper_statue/become_statue3.ogg");
 		config.addObject(ver, "minecraft/sounds/block/copper_statue/become_statue4.ogg");
+
+		// Pass 37: Eyeblossom is a block-local day/night lifecycle. Request both the exact
+		// 1.21.11 events and their backing OGGs explicitly because DynamicSoundsResourcePack
+		// owns the versioned sounds.json namespace.
+		for (String event : new String[] {
+				"block.eyeblossom.open_long", "block.eyeblossom.open",
+				"block.eyeblossom.close_long", "block.eyeblossom.close",
+				"block.eyeblossom.idle"
+		}) config.addSoundEvent(ver, event, "block");
+		for (String sound : new String[] {
+				"eyeblossom_open_long",
+				"eyeblossom_open1", "eyeblossom_open2", "eyeblossom_open3", "eyeblossom_open4",
+				"eyeblossom_close_long",
+				"eyeblossom_close1", "eyeblossom_close2", "eyeblossom_close3",
+				"eyeblossom_idle1", "eyeblossom_idle2", "eyeblossom_idle3",
+				"eyeblossom_idle4", "eyeblossom_idle5", "eyeblossom_idle6"
+		}) config.addObject(ver, "minecraft/sounds/block/eyeblossom/" + sound + ".ogg");
 		config.addSoundEvent(ver, "block.ender_chest.open", "block");
 		config.addSoundEvent(ver, "block.ender_chest.close", "block");
 		config.addSoundEvent(ver, "block.composter.empty", "block");

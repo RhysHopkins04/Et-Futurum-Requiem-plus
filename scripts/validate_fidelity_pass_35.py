@@ -22,7 +22,7 @@ def need(ok,msg):
     if not ok: errors.append(msg)
 def has(text,*parts): return all(p in text for p in parts)
 
-need(str(CONTRACT.get('contract_revision')) == '35', 'Backporter contract revision must be 35')
+need(str(CONTRACT.get('contract_revision')) in ('35','36','37'), 'Backporter contract revision must be Pass 35 or a forward-compatible later fidelity revision')
 need('PASS_35_VISIBLE_STATE' in AUDIT and 'PASS_35_VERIFIED' in AUDIT,
      'capability audit does not promote Pass 35 rows')
 need('facingModels = new Model[64]' in BRIDGE, 'model-state array is too small for 48-state Crafter matrix')

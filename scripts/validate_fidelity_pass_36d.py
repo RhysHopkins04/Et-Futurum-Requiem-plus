@@ -18,16 +18,18 @@ def need(cond, msg):
     if not cond:
         errors.append(msg)
 
-need(str(CONTRACT.get("contract_revision")) == "36",
-     "Backporter contract revision must be Pass 36")
-need(CONTRACT.get("implemented_in_version") == "3.5.8",
-     "Pass 36 contract must record planned development version 3.5.8")
+need(str(CONTRACT.get("contract_revision")) in ("36", "37"),
+     "Backporter contract revision must be Pass 36 or forward-compatible Pass 37")
+if str(CONTRACT.get("contract_revision")) == "36":
+    need(CONTRACT.get("implemented_in_version") == "3.5.8", "Pass 36 contract must record planned development version 3.5.8")
+else:
+    need(CONTRACT.get("implemented_in_version") == "3.5.9", "Pass 37 contract must record planned development version 3.5.9")
 need(CONTRACT.get("implemented_in_git_ref") is None,
      "unreleased Pass 36 contract must not self-reference a commit or claim a release tag")
 need(CONTRACT.get("release_status") == "unreleased",
      "Pass 36 contract must explicitly record unreleased status")
-need('String stagingVersion = "3.5.8"' in BUILD,
-     "build.gradle stagingVersion must be 3.5.8 for the Pass 36 development state")
+need(('String stagingVersion = "3.5.8"' in BUILD) or ('String stagingVersion = "3.5.9"' in BUILD),
+     "build.gradle stagingVersion must remain compatible with the Pass 36/37 development state")
 need(CONTRACT.get("implemented_in_version") != "3.5.5",
      "stale 3.5.5 implementation provenance remains in the Pass 36 contract")
 need(CONTRACT.get("implemented_in_git_ref") != "refs/tags/3.5.5",
@@ -63,8 +65,8 @@ if errors:
     sys.exit(1)
 
 print("Fidelity Pass 36d validation PASSED")
-print(" - Backporter contract provenance is revision 36, planned version 3.5.8 and unreleased")
+print(" - Backporter contract provenance remains valid through the current Pass 36/37 unreleased development state")
 print(" - unreleased provenance uses no self-referential git SHA/tag and stale 3.5.5 provenance is removed")
-print(" - build.gradle stagingVersion is 3.5.8")
+print(" - build.gradle stagingVersion remains consistent with the current development revision")
 print(" - Copper Chest cross-stage/wax family compatibility is documented")
 print(" - normal/trapped incompatibility and reciprocal EFRPairDirection remain documented")

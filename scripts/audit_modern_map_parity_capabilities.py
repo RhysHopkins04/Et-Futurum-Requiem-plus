@@ -77,6 +77,17 @@ PASS_35_VISIBLE_NAMES = {
     "chain_command_block", "structure_block",
 }
 
+PASS_37_VEGETATION_NAMES = {
+    "kelp", "kelp_plant", "seagrass", "tall_seagrass", "sea_pickle",
+    "torchflower_crop", "pitcher_crop", "pitcher_plant", "mangrove_propagule",
+    "mangrove_leaves", "pale_oak_sapling", "pale_oak_leaves",
+    "pale_hanging_moss", "pale_moss_carpet", "leaf_litter", "wildflowers",
+    "open_eyeblossom", "closed_eyeblossom",
+}
+
+def is_pass37_vegetation(name):
+    return name in PASS_37_VEGETATION_NAMES or "coral" in name
+
 
 def has_pass32_contract(name, style):
     return (name in PASS_32_CONTRACT_NAMES or style in {"SHELF", "SIGN", "HANGING_SIGN"}
@@ -143,6 +154,8 @@ def is_copper_weathering_family(name):
 
 
 def profile_for(name, style):
+    if is_pass37_vegetation(name):
+        return "PASS_37_VEGETATION_LIFECYCLE"
     if is_copper_weathering_family(name):
         return "PASS_36_COPPER_LIFECYCLE"
     if name in PASS_35_VISIBLE_NAMES or name.endswith("copper_golem_statue"):
@@ -174,6 +187,12 @@ def profile_for(name, style):
 
 
 def gap_for(name, style, profile):
+    if profile == "PASS_37_VEGETATION_LIFECYCLE":
+        if name in {"mangrove_propagule", "mangrove_leaves", "pale_oak_sapling", "pale_oak_leaves"}:
+            return "Manual/random-tick/bonemeal lifecycle is implemented without enabling biome generation; entity-coupled endpoints remain out of scope."
+        if "coral" in name or name in {"kelp", "kelp_plant", "seagrass", "tall_seagrass", "sea_pickle"}:
+            return "Block-local aquatic lifecycle is implemented with bounded source-water compatibility; general waterlogging remains deferred."
+        return "Block-local survival, growth/bonemeal/state transitions and drops are implemented; biome/world generation and entity-dependent effects remain deferred."
     if profile == "PASS_36_COPPER_LIFECYCLE":
         if name.endswith("copper_golem_statue"):
             return "Block-local lifecycle, pose cycling and comparator output are implemented; Copper Golem entity reanimation and general waterlogging remain deferred."
@@ -237,7 +256,27 @@ def row_for(entry):
         "known_difference": gap_for(name, style, profile),
     }
 
-    if profile == "PASS_36_COPPER_LIFECYCLE":
+    if profile == "PASS_37_VEGETATION_LIFECYCLE":
+        row.update({
+            "blockstate": entry.get("meta") or "Pass 34/37 imported state preserved; lifecycle-only state stored in bounded metadata/TE where required",
+            "shape": "existing exact AssetDirector 1.21.11 model state and Pass 34 bounds preserved",
+            "function": "Pass 37 block-local survival/growth/bonemeal/maturation/drying/stacking lifecycle",
+            "nbt": "Kelp AGE and Pass 34 Mangrove/Pale Moss state TEs only where four-bit metadata is insufficient",
+            "map_import": "Pass 34 static mappings remain authoritative; Pass 37 adds lifecycle state without re-encoding established visible-state mappings",
+            "review_status": "PASS_37_VERIFIED",
+            "mechanics_review_status": "PASS_37_VERIFIED",
+        })
+        if name == "kelp":
+            row["blockstate"] = "head identity plus synchronized AGE 0..25 TE; body uses kelp_plant identity"
+            row["nbt"] = "ParityKelpStateTileEntity Age byte 0..25"
+        elif name == "mangrove_propagule":
+            row["parity_create_path"] = "existing ModBlocks.SAPLING metadata 0 / BlockModernSapling"
+            row["nbt"] = "MangrovePropaguleStateTileEntity Hanging + Age 0..4"
+        elif name == "pale_moss_carpet":
+            row["nbt"] = "ParityPaleMossCarpetTileEntity Bottom + N/E/S/W none/low/tall"
+        else:
+            row["nbt"] = "none"
+    elif profile == "PASS_36_COPPER_LIFECYCLE":
         row.update({
             "blockstate": entry.get("meta") or "existing Pass 29-35 metadata preserved across copper identity transitions",
             "shape": "existing AssetDirector model/bounds; state is preserved through lifecycle replacement",

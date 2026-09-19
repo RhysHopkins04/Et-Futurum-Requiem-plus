@@ -84,7 +84,7 @@ need(has(DOC,'inactive` shares with `cooldown`','waiting_for_players`, `active`,
      'Pass 35 documentation no longer distinguishes persistent state from intentional static-model sharing')
 
 # Backporter contract mapping stays deterministic and revision stays Pass 35 because encoding did not change.
-need(str(CONTRACT.get('contract_revision')) == '35', 'Pass 35b must not bump contract revision when encoding is unchanged')
+need(str(CONTRACT.get('contract_revision')) in ('35','36','37'), 'Pass 35b state contract must remain valid under later fidelity revisions')
 bykey={b.get('key'):b for b in CONTRACT.get('blocks',[]) if isinstance(b,dict)}
 copper=bykey.get('copper_golem_statue_family',{})
 need(copper.get('metadata',{}).get('layout')=='meta=pose_index*4+facing_index', 'Copper Golem metadata layout changed')

@@ -3,12 +3,14 @@ package ganymedes01.etfuturum.blocks;
 import cpw.mods.fml.client.FMLClientHandler;
 import ganymedes01.etfuturum.EtFuturum;
 import ganymedes01.etfuturum.ModBlocks;
+import ganymedes01.etfuturum.blocks.BlockModernSapling;
 import ganymedes01.etfuturum.client.particle.CustomParticles;
 import ganymedes01.etfuturum.client.sound.ModSounds;
 import ganymedes01.etfuturum.configuration.configs.ConfigBlocksItems;
 import lombok.NonNull;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.IGrowable;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -19,7 +21,7 @@ import ganymedes01.etfuturum.api.IMultiBlockSound;
 import java.util.List;
 import java.util.Random;
 
-public class BlockModernLeaves extends BaseLeaves implements IMultiBlockSound {
+public class BlockModernLeaves extends BaseLeaves implements IMultiBlockSound, IGrowable {
 
 	public BlockModernLeaves() {
 		super("mangrove", "cherry");
@@ -81,6 +83,24 @@ public class BlockModernLeaves extends BaseLeaves implements IMultiBlockSound {
 			return;
 		}
 		super.randomDisplayTick(world, x, y, z, rand);
+	}
+
+
+	@Override
+	public boolean func_149851_a(World world, int x, int y, int z, boolean isClient) {
+		return (world.getBlockMetadata(x, y, z) & 3) == 0 && ModBlocks.SAPLING.isEnabled()
+				&& world.isAirBlock(x, y - 1, z);
+	}
+
+	@Override
+	public boolean func_149852_a(World world, Random random, int x, int y, int z) {
+		return func_149851_a(world, x, y, z, false);
+	}
+
+	@Override
+	public void func_149853_b(World world, Random random, int x, int y, int z) {
+		if (!func_149851_a(world, x, y, z, false) || world.isRemote) return;
+		BlockModernSapling.placeHangingPropagule(world, x, y - 1, z, 0);
 	}
 
 	@Override

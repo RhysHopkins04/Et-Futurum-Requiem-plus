@@ -1,8 +1,8 @@
 {
   "schema": 1,
   "contract_id": "etfuturum-requiem-plus-backporter-state-contract",
-  "contract_revision": "36",
-  "implemented_in_version": "3.5.8",
+  "contract_revision": "37",
+  "implemented_in_version": "3.5.9",
   "implemented_in_git_ref": null,
   "release_status": "unreleased",
   "source_minecraft": "1.21.11",
@@ -1907,7 +1907,7 @@
       "exactness": {
         "visible_state": "exact",
         "map_state": "exact",
-        "gameplay": "deferred unless explicitly stated"
+        "gameplay": "Pass 37 block-local placement/support/topper/bonemeal lifecycle implemented; arbitrary imported TE state remains authoritative until a real neighbour update"
       },
       "visual_property_classification": {
         "bottom": "STORED_EXACTLY",
@@ -1917,8 +1917,8 @@
         "west": "STORED_EXACTLY"
       },
       "notes": [
-        "All 162 bottom/side combinations resolve the real 1.21.11 multipart model graph.",
-        "Normal ItemBlock placement is floor-supported only; imported TE states remain authoritative and can reproduce all 162 source combinations."
+        "All 162 bottom/side combinations remain exact and Backporter-authored TE state is not globally normalized on load.",
+        "Pass 37 implements support-derived placement, selective neighbour recomputation and the modern bonemeal-created sides-only topper without enabling Pale Garden generation."
       ]
     },
     {
@@ -1946,14 +1946,14 @@
       "exactness": {
         "visible_state": "exact",
         "map_state": "exact",
-        "gameplay": "deferred unless explicitly stated"
+        "gameplay": "Pass 37 support/tip/body/bonemeal lifecycle implemented"
       },
       "visual_property_classification": {
         "tip": "STORED_EXACTLY"
       },
       "notes": [
-        "Normal placement uses tip=true for the bottom chain end and converts the previous tip above to tip=false/body; removing the bottom end promotes the block above to the tip model. Pass 34c accepts ordinary underside placement based on the actual support block above.",
-        "Backporter metadata remains authoritative; lifecycle/bonemeal growth is deferred."
+        "Normal placement and neighbour changes maintain the bottom TIP state while imported tip/body metadata remains exact until an actual update.",
+        "Pass 37 implements support loss and exact one-block downward bonemeal extension; modern HangingMossBlock has no autonomous random downward growth."
       ]
     },
     {
@@ -2065,13 +2065,15 @@
       "exactness": {
         "visible_state": "exact",
         "map_state": "exact",
-        "gameplay": "deferred unless explicitly stated"
+        "gameplay": "Pass 37 farmland survival, random growth, bonemeal, mature Torchflower transition and seed drops implemented"
       },
       "visual_property_classification": {
         "age": "STORED_EXACTLY"
       },
       "notes": [
-        "Pass 34c supports Bone Meal progression age 0 -> 1 -> the existing Torchflower block; random/natural growth remains deferred."
+        "Pass 34c supports Bone Meal progression age 0 -> 1 -> the existing Torchflower block; Pass 37 adds random growth, farmland survival and drops.",
+        "Metadata age 0/1 remains the Pass 34 import contract.",
+        "Pass 37 uses modern crop growth-speed rules with Torchflower random-tick 1-in-3 skip; one-stage bonemeal advances age 0 -> 1 -> ordinary Torchflower and immature crop drops one Torchflower Seed."
       ]
     },
     {
@@ -2098,14 +2100,17 @@
       "exactness": {
         "visible_state": "exact",
         "map_state": "exact",
-        "gameplay": "deferred unless explicitly stated"
+        "gameplay": "Pass 37 farmland survival, random growth, bonemeal, synchronized halves and mature drops implemented"
       },
       "visual_property_classification": {
         "age": "STORED_EXACTLY",
         "half": "STORED_EXACTLY"
       },
       "notes": [
-        "Importer must place both source halves independently with their exact metadata. Paired break cleanup is implemented. Pass 34c Bone Meal advances one age per use and creates/synchronizes the upper half from age 3; random/natural growth remains deferred."
+        "Pass 34c Bone Meal advances one age per use and creates/synchronizes the upper half from age 3; Pass 37 adds random growth, support and mature drops.",
+        "Importer still places lower age 0..4 as meta 0..4 and upper age 0..4 as meta 5..9 exactly.",
+        "Pass 37 creates/synchronizes the upper half from age 3, advances one age per bonemeal, uses CropBlock growth probability, and safely removes the mate when either half breaks.",
+        "Modern age 4 remains the pitcher_crop block identity; breaking the mature lower crop yields the Pitcher Plant item rather than replacing the crop block with pitcher_plant."
       ]
     },
     {
@@ -2214,7 +2219,7 @@
       "exactness": {
         "visible_state": "exact",
         "map_state": "exact",
-        "gameplay": "deferred unless explicitly stated"
+        "gameplay": "Pass 37 hanging age/support plus planted sapling/manual tree-growth lifecycle implemented"
       },
       "visual_property_classification": {
         "hanging": "STORED_EXACTLY",
@@ -2223,9 +2228,10 @@
         "waterlogged": "UNSUPPORTED"
       },
       "notes": [
-        "Backporter target remains etfuturum:sapling metadata 0 with TE Hanging/Age.",
-        "The older etfuturum:mangrove_propagule registry identity remains registered as a hidden compatibility alias so Pass-33 worlds and dedicated-server handshakes do not become fatally missing; converters must not target that alias.",
-        "Tree generation/bonemeal lifecycle remains deferred."
+        "The hidden etfuturum:mangrove_propagule registry identity is a compatibility alias only; Backporter must not target it.",
+        "Backporter target remains etfuturum:sapling metadata 0 with TE Hanging/Age; the hidden legacy alias remains compatibility-only.",
+        "Hanging propagules require Mangrove Leaves, age 0..4 on random ticks and bonemeal, and planted propagules use the existing sapling stage/growth flow with a manual-only 1.7-compatible Mangrove generator.",
+        "Mangrove Leaves bonemeal can create an age-0 hanging propagule below; no Mangrove biome generation is registered."
       ]
     },
     {
@@ -2261,15 +2267,17 @@
       "exactness": {
         "visible_state": "exact",
         "map_state": "exact",
-        "gameplay": "deferred unless explicitly stated"
+        "gameplay": "Pass 37 stacking/support/live-light/bonemeal-spread/water-restoration lifecycle implemented"
       },
       "visual_property_classification": {
         "pickles": "STORED_EXACTLY",
         "waterlogged": "STORED_EXACTLY"
       },
       "notes": [
-        "bit2 is intentionally a visual compatibility bit, not a general waterlogging implementation. Live light levels are 6/9/12/15 for 1..4 pickles.",
-        "Normal EFR placement defaults to the live visual bit to retain the historical white-tipped/luminous Sea Pickle appearance; Backporter imports set bit2 from source waterlogged exactly. Pass 34c allows in-place stacking from 1..4 while preserving bit2 and requires solid floor support."
+        "Pass 34c allows in-place stacking from 1..4 while preserving bit2; Pass 37 extends this with support, live-light and bounded bonemeal lifecycle behavior.",
+        "Normal runtime placement defaults to the live visual bit while imported maps preserve the exact source waterlogged visual bit.",
+        "bits0..1 remain pickles-1 and bit2 remains the bounded source-water/live compatibility bit, not general waterlogging.",
+        "Pass 37 supports in-place 1..4 stacking, 6/9/12/15 live light, support loss, count drops, and the bounded modern coral-block bonemeal spread algorithm."
       ]
     },
     {
@@ -2297,14 +2305,15 @@
       "exactness": {
         "visible_state": "exact",
         "map_state": "exact",
-        "gameplay": "deferred unless explicitly stated"
+        "gameplay": "Pass 37 underwater support, paired placement/break and Seagrass bonemeal lifecycle implemented"
       },
       "visual_property_classification": {
         "half": "STORED_EXACTLY"
       },
       "notes": [
-        "Normal placement creates the canonical lower+upper two-block pair and breaking either half removes the mate without a duplicate drop.",
-        "Backporter may still place each source half explicitly with metadata 0/1. General underwater/waterlogging mechanics remain deferred."
+        "Normal placement creates the canonical lower+upper two-block pair while Backporter may still import either half exactly.",
+        "Metadata 0=lower and 1=upper remains authoritative for imported halves.",
+        "Pass 37 requires source water for normal placement, restores source water on removal, removes the counterpart safely, and yields two Seagrass only when harvested with shears."
       ]
     },
     {
@@ -2338,7 +2347,7 @@
       "exactness": {
         "visible_state": "exact",
         "map_state": "exact",
-        "gameplay": "deferred unless explicitly stated"
+        "gameplay": "mixed: Turtle Egg entity lifecycle deferred; Leaf Litter/Wildflowers Pass 37 block-local stacking/support/drops implemented"
       },
       "visual_property_classification": {
         "turtle_egg.eggs": "STORED_EXACTLY",
@@ -2347,7 +2356,9 @@
         "wildflowers.flower_amount/facing": "STORED_EXACTLY"
       },
       "notes": [
-        "Pass 34 audit confirmed these were already exact and did not rework them. Kelp/kelp_plant and open/closed eyeblossom blockstates have no model-selecting properties in 1.21.11."
+        "Turtle Egg remains entity-coupled and deferred.",
+        "Leaf Litter and Wildflowers retain meta=(amount-1)*4+facing_index with N/E/S/W=0/1/2/3. Pass 37 adds placement stacking, support and amount-count drops; Wildflowers bonemeal increments to four then drops one extra item, while Leaf Litter is not bonemealable in 1.21.11.",
+        "Kelp/kelp_plant and Open/Closed Eyeblossom have no model-selecting properties, but Pass 37 adds their block-local lifecycle separately."
       ]
     },
     {
@@ -2982,6 +2993,306 @@
       },
       "notes": [
         "All four visible models are preserved. Structure Void exposes no additional model-selecting source state in the audited 1.21.11 blockstate data."
+      ]
+    },
+    {
+      "key": "kelp",
+      "source_ids": [
+        "minecraft:kelp"
+      ],
+      "target_ids": [
+        "etfuturum:kelp"
+      ],
+      "classification": "FULL_IMPORT",
+      "metadata": {
+        "layout": "metadata 0; AGE is stored in synchronized TE"
+      },
+      "tile_entity": {
+        "required": true,
+        "id": "etfuturum:modern_parity_kelp_state",
+        "fields": [
+          {
+            "name": "Age",
+            "type": "TAG_Byte 0..25",
+            "required": true
+          }
+        ]
+      },
+      "source_properties": {
+        "age": "exact -> TE Age 0..25"
+      },
+      "derived": [],
+      "unsupported": [
+        "water/fluid state is bounded block-family compatibility, not general waterlogging"
+      ],
+      "exactness": {
+        "visible_state": "exact",
+        "map_state": "exact",
+        "gameplay": "Pass 37 tip/body conversion, 14% random growth, one-block bonemeal growth and support lifecycle implemented"
+      },
+      "visual_property_classification": {
+        "age": "STORED_EXACTLY_NON_VISUAL"
+      },
+      "notes": [
+        "Kelp head AGE is gameplay-persistent even though it does not select a model. Kelp Plant bodies carry no age TE.",
+        "Normal placement requires source water; breaking/support updates restore source water through the bounded aquatic compatibility path."
+      ]
+    },
+    {
+      "key": "kelp_plant",
+      "source_ids": [
+        "minecraft:kelp_plant"
+      ],
+      "target_ids": [
+        "etfuturum:kelp_plant"
+      ],
+      "classification": "FULL_IMPORT",
+      "metadata": {
+        "layout": "metadata 0; body identity only"
+      },
+      "tile_entity": {
+        "required": false
+      },
+      "source_properties": {},
+      "derived": [
+        "tip/body role from column neighbours"
+      ],
+      "unsupported": [
+        "general waterlogging"
+      ],
+      "exactness": {
+        "visible_state": "exact",
+        "map_state": "exact",
+        "gameplay": "Pass 37 body survival and exposed-body -> Kelp head promotion implemented"
+      },
+      "visual_property_classification": {},
+      "notes": [
+        "Breaking a Kelp column promotes the highest surviving body below the break to a Kelp head with the modern random placement-age range 0..24."
+      ]
+    },
+    {
+      "key": "seagrass",
+      "source_ids": [
+        "minecraft:seagrass"
+      ],
+      "target_ids": [
+        "etfuturum:seagrass"
+      ],
+      "classification": "FULL_IMPORT",
+      "metadata": {
+        "layout": "metadata 0"
+      },
+      "tile_entity": {
+        "required": false
+      },
+      "source_properties": {},
+      "derived": [
+        "source-water occupancy and support are runtime-only"
+      ],
+      "unsupported": [
+        "general waterlogging"
+      ],
+      "exactness": {
+        "visible_state": "exact",
+        "map_state": "exact",
+        "gameplay": "Pass 37 underwater support, water restoration, shears drop and bonemeal -> Tall Seagrass implemented"
+      },
+      "visual_property_classification": {},
+      "notes": [
+        "Normal placement requires a source-water block and a sturdy non-Magma support."
+      ]
+    },
+    {
+      "key": "pass37_coral_family",
+      "source_ids": [
+        "minecraft:tube_coral_block",
+        "minecraft:tube_coral",
+        "minecraft:tube_coral_fan",
+        "minecraft:tube_coral_wall_fan",
+        "minecraft:dead_tube_coral_block",
+        "minecraft:dead_tube_coral",
+        "minecraft:dead_tube_coral_fan",
+        "minecraft:dead_tube_coral_wall_fan",
+        "minecraft:brain_coral_block",
+        "minecraft:brain_coral",
+        "minecraft:brain_coral_fan",
+        "minecraft:brain_coral_wall_fan",
+        "minecraft:dead_brain_coral_block",
+        "minecraft:dead_brain_coral",
+        "minecraft:dead_brain_coral_fan",
+        "minecraft:dead_brain_coral_wall_fan",
+        "minecraft:bubble_coral_block",
+        "minecraft:bubble_coral",
+        "minecraft:bubble_coral_fan",
+        "minecraft:bubble_coral_wall_fan",
+        "minecraft:dead_bubble_coral_block",
+        "minecraft:dead_bubble_coral",
+        "minecraft:dead_bubble_coral_fan",
+        "minecraft:dead_bubble_coral_wall_fan",
+        "minecraft:fire_coral_block",
+        "minecraft:fire_coral",
+        "minecraft:fire_coral_fan",
+        "minecraft:fire_coral_wall_fan",
+        "minecraft:dead_fire_coral_block",
+        "minecraft:dead_fire_coral",
+        "minecraft:dead_fire_coral_fan",
+        "minecraft:dead_fire_coral_wall_fan",
+        "minecraft:horn_coral_block",
+        "minecraft:horn_coral",
+        "minecraft:horn_coral_fan",
+        "minecraft:horn_coral_wall_fan",
+        "minecraft:dead_horn_coral_block",
+        "minecraft:dead_horn_coral",
+        "minecraft:dead_horn_coral_fan",
+        "minecraft:dead_horn_coral_wall_fan"
+      ],
+      "target_ids": [
+        "etfuturum:tube_coral_block",
+        "etfuturum:tube_coral",
+        "etfuturum:tube_coral_fan",
+        "etfuturum:tube_coral_wall_fan",
+        "etfuturum:dead_tube_coral_block",
+        "etfuturum:dead_tube_coral",
+        "etfuturum:dead_tube_coral_fan",
+        "etfuturum:dead_tube_coral_wall_fan",
+        "etfuturum:brain_coral_block",
+        "etfuturum:brain_coral",
+        "etfuturum:brain_coral_fan",
+        "etfuturum:brain_coral_wall_fan",
+        "etfuturum:dead_brain_coral_block",
+        "etfuturum:dead_brain_coral",
+        "etfuturum:dead_brain_coral_fan",
+        "etfuturum:dead_brain_coral_wall_fan",
+        "etfuturum:bubble_coral_block",
+        "etfuturum:bubble_coral",
+        "etfuturum:bubble_coral_fan",
+        "etfuturum:bubble_coral_wall_fan",
+        "etfuturum:dead_bubble_coral_block",
+        "etfuturum:dead_bubble_coral",
+        "etfuturum:dead_bubble_coral_fan",
+        "etfuturum:dead_bubble_coral_wall_fan",
+        "etfuturum:fire_coral_block",
+        "etfuturum:fire_coral",
+        "etfuturum:fire_coral_fan",
+        "etfuturum:fire_coral_wall_fan",
+        "etfuturum:dead_fire_coral_block",
+        "etfuturum:dead_fire_coral",
+        "etfuturum:dead_fire_coral_fan",
+        "etfuturum:dead_fire_coral_wall_fan",
+        "etfuturum:horn_coral_block",
+        "etfuturum:horn_coral",
+        "etfuturum:horn_coral_fan",
+        "etfuturum:horn_coral_wall_fan",
+        "etfuturum:dead_horn_coral_block",
+        "etfuturum:dead_horn_coral",
+        "etfuturum:dead_horn_coral_fan",
+        "etfuturum:dead_horn_coral_wall_fan"
+      ],
+      "classification": "FULL_IMPORT",
+      "metadata": {
+        "coral_block": "metadata 0",
+        "coral": "bit3=bounded source-water occupancy; lower bits 0",
+        "coral_fan": "bit3=bounded source-water occupancy; lower bits 0",
+        "coral_wall_fan": "bits0..2=Forge horizontal side 2..5; bit3=bounded source-water occupancy"
+      },
+      "tile_entity": {
+        "required": false
+      },
+      "source_properties": {
+        "waterlogged": "for coral/coral_fan/coral_wall_fan -> metadata bit3",
+        "facing": "wall fan -> metadata side 2..5"
+      },
+      "derived": [
+        "live identities schedule dry/death when neither internal source-water bit nor adjacent water is present"
+      ],
+      "unsupported": [
+        "general waterlogging/fluid simulation"
+      ],
+      "exactness": {
+        "visible_state": "exact",
+        "map_state": "exact",
+        "gameplay": "Pass 37 all five live/dead block/coral/fan/wall-fan drying/support lifecycle implemented"
+      },
+      "visual_property_classification": {
+        "facing": "STORED_EXACTLY",
+        "waterlogged": "STORED_EXACTLY_NON_VISUAL_FOR_RUNTIME"
+      },
+      "notes": [
+        "Live coral schedules death after 60+rand(0..39) ticks without water and converts to the matching dead identity.",
+        "Wall-fan facing is preserved through death. The high metadata bit is a bounded source-water compatibility bit only and does not enable general waterlogging."
+      ]
+    },
+    {
+      "key": "pass37_pale_oak_lifecycle",
+      "source_ids": [
+        "minecraft:pale_oak_sapling",
+        "minecraft:pale_oak_leaves"
+      ],
+      "target_ids": [
+        "etfuturum:pale_oak_sapling",
+        "etfuturum:pale_oak_leaves"
+      ],
+      "classification": "FULL_IMPORT",
+      "metadata": {
+        "pale_oak_sapling": "bit0 runtime sapling stage; imported default stage may remain 0",
+        "pale_oak_leaves": "bit3 marks leaves produced by the Pass 37 manual tree generator for bounded decay; imported leaves default persistent/unmarked"
+      },
+      "tile_entity": {
+        "required": false
+      },
+      "source_properties": {},
+      "derived": [
+        "generated-leaf decay marker is runtime-only and is not required for static import"
+      ],
+      "unsupported": [
+        "Pale Garden biome generation",
+        "Creaking/entity mechanics"
+      ],
+      "exactness": {
+        "visible_state": "exact",
+        "map_state": "exact",
+        "gameplay": "Pass 37 2x2 sapling random/bonemeal manual tree growth and generated-leaf decay implemented"
+      },
+      "visual_property_classification": {},
+      "notes": [
+        "Manual Pale Oak uses a 1.7 canopy-tree compatibility generator reflecting the modern DarkOakTrunkPlacer/DarkOakFoliagePlacer family; no Pale Moss or Creaking decorator is added to bonemeal trees.",
+        "Imported leaves are not retroactively marked for decay."
+      ]
+    },
+    {
+      "key": "pass37_eyeblossom_lifecycle",
+      "source_ids": [
+        "minecraft:open_eyeblossom",
+        "minecraft:closed_eyeblossom"
+      ],
+      "target_ids": [
+        "etfuturum:open_eyeblossom",
+        "etfuturum:closed_eyeblossom"
+      ],
+      "classification": "FULL_IMPORT",
+      "metadata": {
+        "layout": "identity encodes open/closed; bit0 is transient Pass 37 scheduled-propagation marker only and is cleared after evaluation"
+      },
+      "tile_entity": {
+        "required": false
+      },
+      "source_properties": {},
+      "derived": [
+        "Overworld environment timeline opens at ticks 12600..23400",
+        "neighbour propagation schedules matching old-state Eyeblossoms in X/Z +/-3,Y +/-2"
+      ],
+      "unsupported": [
+        "bee poison/entity interaction"
+      ],
+      "exactness": {
+        "visible_state": "exact",
+        "map_state": "exact",
+        "gameplay": "Pass 37 non-entity open/closed timeline, propagation, sounds and particles implemented"
+      },
+      "visual_property_classification": {},
+      "notes": [
+        "Non-Overworld legacy dimensions retain their imported identity because 1.7 has no modern environment-attribute timeline override.",
+        "Bee-specific effects remain explicitly deferred to the entity phase."
       ]
     }
   ],

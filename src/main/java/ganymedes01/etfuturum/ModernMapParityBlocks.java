@@ -21,6 +21,7 @@ import ganymedes01.etfuturum.core.utils.ModernChestPairing;
 import ganymedes01.etfuturum.network.WoodSignOpenMessage;
 import ganymedes01.etfuturum.recipes.crafting.RecipeDecoratedPot;
 import ganymedes01.etfuturum.tileentities.TileEntityWoodSign;
+import ganymedes01.etfuturum.world.generate.decorate.WorldGenPass37PaleOakTree;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockChest;
 import net.minecraft.block.BlockFalling;
@@ -78,6 +79,7 @@ import net.minecraft.util.Vec3;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.oredict.RecipeSorter;
@@ -374,6 +376,7 @@ public enum ModernMapParityBlocks {
     private static boolean parityPaleMossCarpetTileRegistered;
     private static boolean parityVaultStateTileRegistered;
     private static boolean parityCrafterStateTileRegistered;
+    private static boolean parityKelpStateTileRegistered;
     private static boolean decoratedPotRecipeRegistered;
 
     /** Pass 30 bit order: DOWN, UP, NORTH, SOUTH, WEST, EAST (ForgeDirection ordinals 0..5). */
@@ -608,6 +611,11 @@ public enum ModernMapParityBlocks {
                     Tags.MOD_ID + ":modern_parity_crafter_state");
             parityCrafterStateTileRegistered = true;
         }
+        if (!parityKelpStateTileRegistered) {
+            GameRegistry.registerTileEntity(ParityKelpStateTileEntity.class,
+                    Tags.MOD_ID + ":modern_parity_kelp_state");
+            parityKelpStateTileRegistered = true;
+        }
         ModernPotterySherds.init();
         ModernArchaeology.init();
         for (ModernMapParityBlocks entry : values()) {
@@ -647,6 +655,8 @@ public enum ModernMapParityBlocks {
                 GameRegistry.registerBlock(entry.block, ParityTorchflowerItemBlock.class, name);
             } else if (entry == PALE_HANGING_MOSS) {
                 GameRegistry.registerBlock(entry.block, ParityPaleHangingMossItemBlock.class, name);
+            } else if (entry == KELP || entry == SEAGRASS || entry == TALL_SEAGRASS || entry == SEA_PICKLE || entry.isCoralItemIdentity()) {
+                GameRegistry.registerBlock(entry.block, ParityAquaticItemBlock.class, name);
             } else if (entry.isCopperGolemStatueIdentity()) {
                 GameRegistry.registerBlock(entry.block, ParityStatefulItemBlock.class, name);
             } else if (entry.usesMultifaceState()) {
@@ -655,12 +665,40 @@ public enum ModernMapParityBlocks {
                 GameRegistry.registerBlock(entry.block, name);
             }
         }
+        ModernVegetationItems.init();
         if (!decoratedPotRecipeRegistered && DECORATED_POT.get() != null) {
             RecipeSorter.register(Tags.MOD_ID + ".RecipeDecoratedPot", RecipeDecoratedPot.class,
                     RecipeSorter.Category.SHAPED, "after:minecraft:shaped");
             CraftingManager.getInstance().getRecipeList().add(new RecipeDecoratedPot());
             decoratedPotRecipeRegistered = true;
         }
+    }
+
+    private boolean isCoralItemIdentity() {
+        String name = getRegistryName();
+        return (name.endsWith("_coral_block") || name.endsWith("_coral") || name.endsWith("_coral_fan"))
+                && !name.endsWith("_coral_wall_fan");
+    }
+
+    public static int getKelpAge(IBlockAccess world, int x, int y, int z) {
+        TileEntity tile = world == null ? null : world.getTileEntity(x, y, z);
+        return tile instanceof ParityKelpStateTileEntity ? ((ParityKelpStateTileEntity) tile).getAge() : 0;
+    }
+
+    public static void setKelpAge(World world, int x, int y, int z, int age) {
+        if (world == null || world.getBlock(x, y, z) != KELP.get()) return;
+        TileEntity tile = world.getTileEntity(x, y, z);
+        if (tile instanceof ParityKelpStateTileEntity) ((ParityKelpStateTileEntity) tile).setAge(age);
+    }
+
+    private static boolean isWater(IBlockAccess world, int x, int y, int z) {
+        if (world == null || y < 0 || y > 255) return false;
+        Block block = world.getBlock(x, y, z);
+        return block == Blocks.water || block == Blocks.flowing_water;
+    }
+
+    private static boolean isSourceWater(IBlockAccess world, int x, int y, int z) {
+        return isWater(world, x, y, z) && (world.getBlockMetadata(x, y, z) & 15) == 0;
     }
 
     private boolean usesDynamicLight() {
@@ -1995,12 +2033,103 @@ public enum ModernMapParityBlocks {
         @Override public void onDataPacket(NetworkManager network, S35PacketUpdateTileEntity packet) { readFromNBT(packet.func_148857_g()); if (worldObj != null) worldObj.markBlockForUpdate(xCoord,yCoord,zCoord); }
     }
 
+    /** Pass 37 stores Kelp head AGE 0..25 without disturbing frozen block metadata mappings. */
+    public static final class ParityKelpStateTileEntity extends TileEntity {
+        private byte age;
+        public int getAge() { return age & 0xFF; }
+        public void setAge(int value) {
+            int next = Math.max(0, Math.min(25, value));
+            if (getAge() == next) return;
+            age = (byte) next;
+            markDirty();
+            if (worldObj != null) worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
+        }
+        @Override public void writeToNBT(NBTTagCompound tag) { super.writeToNBT(tag); tag.setByte("Age", age); }
+        @Override public void readFromNBT(NBTTagCompound tag) {
+            super.readFromNBT(tag); age = (byte)Math.max(0, Math.min(25, tag.getByte("Age") & 0xFF));
+        }
+        @Override public Packet getDescriptionPacket() {
+            NBTTagCompound tag = new NBTTagCompound(); writeToNBT(tag);
+            return new S35PacketUpdateTileEntity(xCoord, yCoord, zCoord, 37, tag);
+        }
+        @Override public void onDataPacket(NetworkManager network, S35PacketUpdateTileEntity packet) {
+            readFromNBT(packet.func_148857_g());
+            if (worldObj != null) worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
+        }
+    }
+
     /** Pass 36 applies IDegradable only to actual copper lifecycle identities, never every parity shell. */
     private static final class ParityCopperLifecycleModelBlock extends ParityModelBlock implements IDegradable {
         ParityCopperLifecycleModelBlock(ModernMapParityBlocks entry) { super(entry); }
         @Override public int getCopperMeta(int meta) { return getPass36CopperMeta(this); }
         @Override public Block getCopperBlockFromMeta(int meta) { return getPass36CopperBlock(this, meta); }
         @Override public int getFinalCopperMeta(IBlockAccess world, int x, int y, int z, int meta, int worldMeta) { return worldMeta; }
+    }
+
+    /**
+     * Bounded aquatic placement bridge for 1.7, whose vanilla ItemBlock refuses to replace water.
+     * This is intentionally limited to the Pass-37 aquatic families and does not make water
+     * globally replaceable or introduce general waterlogging.
+     */
+    public static final class ParityAquaticItemBlock extends ItemBlock {
+        public ParityAquaticItemBlock(Block block) { super(block); }
+
+        @Override
+        public boolean onItemUse(ItemStack stack, EntityPlayer player, World world, int x, int y, int z,
+                int side, float hitX, float hitY, float hitZ) {
+            if (stack == null || stack.stackSize <= 0) return false;
+            Block clicked = world.getBlock(x, y, z);
+            if (clicked == null || !clicked.isReplaceable(world, x, y, z)) {
+                ForgeDirection dir = ForgeDirection.getOrientation(side);
+                x += dir.offsetX; y += dir.offsetY; z += dir.offsetZ;
+            }
+            if (!player.canPlayerEdit(x, y, z, side, stack)) return false;
+            Block target = world.getBlock(x, y, z);
+            boolean sourceWater = isSourceWater(world, x, y, z);
+            if (target != Blocks.air && !sourceWater && !target.isReplaceable(world, x, y, z)) return false;
+            if (!(field_150939_a instanceof ParityModelBlock)) return false;
+            ParityModelBlock parity = (ParityModelBlock) field_150939_a;
+            if ((parity.isKelp() || parity.isKelpPlant() || parity.isSeagrass() || parity.isTallSeagrass()) && !sourceWater) return false;
+            if (parity.isTallSeagrass() && !isSourceWater(world, x, y + 1, z)) return false;
+            if (!parity.canSurviveAtPlacement(world, x, y, z, side)) return false;
+
+            int meta = field_150939_a.onBlockPlaced(world, x, y, z, side, hitX, hitY, hitZ, getMetadata(stack.getItemDamage()));
+            meta = parity.pass37AquaticPlacementMeta(meta, sourceWater);
+
+            // A Coral Fan is the one obtainable item for both floor and wall forms. Do not first
+            // publish the floor identity on horizontal placement: a 1.7 flag-3 setBlock can notify
+            // neighbours before onBlockPlacedBy gets a chance to swap it, and the temporary floor
+            // fan then correctly rejects the missing block below and deletes itself. Publish the
+            // technical wall-fan identity atomically so its actual wall support is validated.
+            Block placementBlock = field_150939_a;
+            ParityModelBlock placementParity = parity;
+            if (parity.isCoralFan() && side >= 2 && side <= 5) {
+                ModernMapParityBlocks wallEntry = parity.coralFanCompanion(true);
+                if (wallEntry == null || !(wallEntry.get() instanceof ParityModelBlock)) return false;
+                placementBlock = wallEntry.get();
+                placementParity = (ParityModelBlock) placementBlock;
+            }
+
+            if (world.isRemote) return true;
+            if (parity.isTallSeagrass()) {
+                // Publish the lower half without neighbour notification first, then the upper half.
+                // A lower-half flag-3 write would let 1.7 validate it before the upper exists.
+                if (!world.setBlock(x, y, z, field_150939_a, 0, 2)) return false;
+                if (!world.setBlock(x, y + 1, z, field_150939_a, 1, 3)) {
+                    world.setBlock(x, y, z, Blocks.water, 0, 3);
+                    return false;
+                }
+            } else if (!world.setBlock(x, y, z, placementBlock, meta, 3)) return false;
+            placementParity.initializePass37AquaticPlacement(world, x, y, z, sourceWater);
+            placementBlock.onBlockPlacedBy(world, x, y, z, player, stack);
+            world.playSoundEffect(x + 0.5D, y + 0.5D, z + 0.5D,
+                    placementBlock.stepSound.func_150496_b(),
+                    (placementBlock.stepSound.getVolume() + 1.0F) / 2.0F,
+                    placementBlock.stepSound.getPitch() * 0.8F);
+            if (!player.capabilities.isCreativeMode && --stack.stackSize <= 0)
+                player.inventory.setInventorySlotContents(player.inventory.currentItem, null);
+            return true;
+        }
     }
 
     /** Keeps Copper Golem Statue pose metadata through pick/drop/re-placement without creative sub-items. */
@@ -2015,13 +2144,20 @@ public enum ModernMapParityBlocks {
         private static final int[] TRIAL_SPAWNER_LIGHT = {0, 4, 8, 8, 8, 0};
         // Minecraft Java 1.21.11 VaultState: HALF_LIT=6 for inactive; LIT=12 for every active state.
         private static final int[] VAULT_LIGHT = {6, 12, 12, 12};
+        private static final WorldGenPass37PaleOakTree PASS37_PALE_OAK_TREE = new WorldGenPass37PaleOakTree(true);
 
+        private static final ThreadLocal<Boolean> PASS37_INTERNAL_KELP_REPLACE = new ThreadLocal<Boolean>();
         private final ModernMapParityBlocks entry;
         private final ThreadLocal<Integer> harvestedMultifaceMask = new ThreadLocal<Integer>();
 
         ParityModelBlock(ModernMapParityBlocks entry) {
             super(entry.material);
             this.entry = entry;
+            // 1.7 flowing water destroys Material.plants blocks. Modern aquatic vegetation instead
+            // occupies a source-water cell (waterlogged/contained fluid). Use vanilla's non-colliding
+            // coral material only for the bounded Pass-37 aquatic identities so legacy liquid flow
+            // treats the occupied cell as blocked while our explicit collision methods remain empty.
+            if (isPass37AquaticContainedWaterBlock()) this.blockMaterial = Material.coral;
             if (entry.isPass36CopperLifecycleIdentity() && !entry.isWaxedCopperLifecycleIdentity()
                     && entry.getCopperLifecycleStage() < 3) setTickRandomly(true);
             // Block's constructor invokes isOpaqueCube() virtually before this field can be assigned.
@@ -2050,7 +2186,8 @@ public enum ModernMapParityBlocks {
                 setStepSound(entry.material == Material.wood ? soundTypeWood : entry.material == Material.iron ? soundTypeMetal
                         : entry.material == Material.plants || entry.material == Material.leaves ? soundTypeGrass : soundTypeStone);
             }
-            if (isCampfire() || isScaffolding()) setTickRandomly(true);
+            if (isCampfire() || isScaffolding() || isKelp() || isTorchflowerCrop() || isPitcherCrop()
+                    || isPaleOakSapling() || isPaleOakLeaves() || isEyeblossom()) setTickRandomly(true);
             applyBounds(entry.style);
         }
 
@@ -2096,16 +2233,38 @@ public enum ModernMapParityBlocks {
         }
 
         private boolean isPaleOakButton() { return entry == PALE_OAK_BUTTON; }
+        private boolean isPaleMossBlock() { return entry == PALE_MOSS_BLOCK; }
         private boolean isPaleMossCarpet() { return entry == PALE_MOSS_CARPET; }
         private boolean isPaleHangingMoss() { return entry == PALE_HANGING_MOSS; }
         private boolean isCreakingHeart() { return entry == CREAKING_HEART; }
         private boolean isDriedGhast() { return entry == DRIED_GHAST; }
+        private boolean isKelp() { return entry == KELP; }
+        private boolean isKelpPlant() { return entry == KELP_PLANT; }
+        private boolean isSeagrass() { return entry == SEAGRASS; }
         private boolean isTorchflowerCrop() { return entry == TORCHFLOWER_CROP; }
+        private boolean isTorchflower() { return entry == TORCHFLOWER; }
         private boolean isPitcherCrop() { return entry == PITCHER_CROP; }
         private boolean isPitcherPlant() { return entry == PITCHER_PLANT; }
         private boolean isSnifferEgg() { return entry == SNIFFER_EGG; }
         private boolean isSeaPickle() { return entry == SEA_PICKLE; }
         private boolean isTallSeagrass() { return entry == TALL_SEAGRASS; }
+        private boolean isPaleOakSapling() { return entry == PALE_OAK_SAPLING; }
+        private boolean isPaleOakLeaves() { return entry == PALE_OAK_LEAVES; }
+        private boolean isEyeblossom() { return entry == OPEN_EYEBLOSSOM || entry == CLOSED_EYEBLOSSOM; }
+        private boolean isOpenEyeblossom() { return entry == OPEN_EYEBLOSSOM; }
+        private boolean isWildflowers() { return entry == WILDFLOWERS; }
+        private boolean isLeafLitter() { return entry == LEAF_LITTER; }
+        private boolean isCoralBlockForm() { return entry.getRegistryName().endsWith("_coral_block"); }
+        private boolean isCoralPlantForm() {
+            String n = entry.getRegistryName();
+            return n.endsWith("_coral") && !n.endsWith("_coral_block");
+        }
+        private boolean isCoralFamily() { return isCoralBlockForm() || isCoralPlantForm() || isCoralFan() || isCoralWallFan(); }
+        private boolean isPass37AquaticContainedWaterBlock() {
+            return isKelp() || isKelpPlant() || isSeagrass() || isTallSeagrass() || isSeaPickle()
+                    || isCoralPlantForm() || isCoralFan() || isCoralWallFan();
+        }
+        private boolean isLiveCoral() { return isCoralFamily() && !entry.getRegistryName().startsWith("dead_"); }
         private boolean isCopperTorch() { return entry == COPPER_TORCH || entry == COPPER_WALL_TORCH; }
         private boolean isCopperWallTorch() { return entry == COPPER_WALL_TORCH; }
         private boolean isCopperGolemStatue() { return entry.isCopperGolemStatueIdentity(); }
@@ -2180,9 +2339,9 @@ public enum ModernMapParityBlocks {
         }
 
         private boolean canPitcherPlantStandAt(IBlockAccess world, int x, int y, int z) {
-            Block below = world.getBlock(x, y - 1, z);
-            return below != null && (below == Blocks.farmland
-                    || World.doesBlockHaveSolidTopSurface(world, x, y - 1, z));
+            // Pitcher Plant inherits modern VegetationBlock substrate rules; being a full-height
+            // decorative plant does not make arbitrary stone/solid-top blocks valid soil.
+            return canGroundVegetationSurvive(world, x, y, z);
         }
 
         private boolean isCandle() {
@@ -2229,6 +2388,409 @@ public enum ModernMapParityBlocks {
                 return ModernMapParityBlocks.valueOf(target.toUpperCase(Locale.ROOT));
             } catch (IllegalArgumentException ignored) {
                 return null;
+            }
+        }
+
+        private ModernMapParityBlocks deadCoralCompanion() {
+            if (!isLiveCoral()) return entry;
+            try {
+                return ModernMapParityBlocks.valueOf(("DEAD_" + entry.getRegistryName()).toUpperCase(Locale.ROOT));
+            } catch (IllegalArgumentException ignored) {
+                return null;
+            }
+        }
+
+        private boolean coralHasWater(IBlockAccess world, int x, int y, int z) {
+            if (!isLiveCoral()) return true;
+            int meta = world.getBlockMetadata(x, y, z) & 15;
+            if (!isCoralBlockForm() && (meta & 8) != 0) return true;
+            final int[][] dirs = {{0,-1,0},{0,1,0},{0,0,-1},{0,0,1},{-1,0,0},{1,0,0}};
+            for (int[] d : dirs) if (isWater(world, x+d[0], y+d[1], z+d[2])) return true;
+            return false;
+        }
+
+        private void scheduleCoralDeath(World world, int x, int y, int z) {
+            if (!world.isRemote && isLiveCoral() && !coralHasWater(world, x, y, z))
+                world.scheduleBlockUpdate(x, y, z, this, 60 + world.rand.nextInt(40));
+        }
+
+        private void dieCoral(World world, int x, int y, int z) {
+            if (!isLiveCoral() || coralHasWater(world, x, y, z)) return;
+            ModernMapParityBlocks dead = deadCoralCompanion();
+            if (dead == null || dead.get() == null) return;
+            int old = world.getBlockMetadata(x, y, z) & 15;
+            int next = isCoralWallFan() ? (old & 7) : 0;
+            world.setBlock(x, y, z, dead.get(), next, 3);
+        }
+
+        private boolean canSupportPlantFace(IBlockAccess world, int x, int y, int z, ForgeDirection face) {
+            if (world.isSideSolid(x, y, z, face, false)) return true;
+            // All parity blocks use the custom JSON renderer and therefore report
+            // renderAsNormalBlock=false to Forge. Full authored cubes such as Coral Blocks would
+            // otherwise fail Forge's default isSideSolid test despite having sturdy modern faces.
+            Block support = world.getBlock(x, y, z);
+            return support instanceof ParityModelBlock && ((ParityModelBlock) support).isFullOpaqueModel();
+        }
+
+        private boolean canSupportPlantTop(IBlockAccess world, int x, int y, int z) {
+            return y > 0 && canSupportPlantFace(world, x, y - 1, z, ForgeDirection.UP);
+        }
+
+        private boolean isMagma(IBlockAccess world, int x, int y, int z) {
+            Block b = world.getBlock(x, y, z);
+            return b != null && "magma".equals(b.getUnlocalizedName().replace("tile.", ""));
+        }
+
+        private boolean canKelpSurvive(IBlockAccess world, int x, int y, int z) {
+            Block below = world.getBlock(x, y - 1, z);
+            return below == KELP.get() || below == KELP_PLANT.get()
+                    || (!isMagma(world, x, y - 1, z) && canSupportPlantTop(world, x, y, z));
+        }
+
+        private boolean canSeagrassSurvive(IBlockAccess world, int x, int y, int z) {
+            return !isMagma(world, x, y - 1, z) && canSupportPlantTop(world, x, y, z);
+        }
+
+        private boolean canCoralSurvive(IBlockAccess world, int x, int y, int z) {
+            if (isCoralBlockForm()) return true;
+            if (isCoralWallFan()) {
+                int side = normaliseHorizontalSide(world.getBlockMetadata(x, y, z) & 7);
+                ForgeDirection dir = ForgeDirection.getOrientation(side);
+                return canSupportPlantFace(world, x - dir.offsetX, y - dir.offsetY, z - dir.offsetZ, dir);
+            }
+            return canSupportPlantTop(world, x, y, z);
+        }
+
+        private boolean canGroundVegetationSurvive(IBlockAccess world, int x, int y, int z) {
+            Block below = world.getBlock(x, y - 1, z);
+            return below == Blocks.grass || below == Blocks.dirt || below == Blocks.farmland
+                    || below == Blocks.mycelium || below == ModBlocks.MUD.get() || below == ModBlocks.MOSS_BLOCK.get()
+                    || (ModBlocks.MUDDY_MANGROVE_ROOTS.isEnabled() && below == ModBlocks.MUDDY_MANGROVE_ROOTS.get())
+                    || below == PALE_MOSS_BLOCK.get();
+        }
+
+        private boolean canSurviveAtPlacement(World world, int x, int y, int z, int side) {
+            if (isKelp()) return isSourceWater(world, x, y, z) && canKelpSurvive(world, x, y, z);
+            if (isSeagrass()) return isSourceWater(world, x, y, z) && canSeagrassSurvive(world, x, y, z);
+            if (isTallSeagrass()) return isSourceWater(world, x, y, z) && isSourceWater(world, x, y + 1, z)
+                    && canSeagrassSurvive(world, x, y, z);
+            if (isSeaPickle()) return canSupportPlantTop(world, x, y, z);
+            if (isCoralWallFan()) {
+                ForgeDirection clicked = ForgeDirection.getOrientation(side);
+                return side >= 2 && side <= 5 && canSupportPlantFace(world, x - clicked.offsetX, y, z - clicked.offsetZ, clicked);
+            }
+            if (isCoralFan() && side>=2 && side<=5) {
+                ForgeDirection d=ForgeDirection.getOrientation(side);
+                return canSupportPlantFace(world,x-d.offsetX,y,z-d.offsetZ,d);
+            }
+            if (isCoralPlantForm() || isCoralFan()) return canSupportPlantTop(world, x, y, z);
+            return true;
+        }
+
+        private int pass37AquaticPlacementMeta(int meta, boolean sourceWater) {
+            if (isSeaPickle()) return (meta & 3) | (sourceWater ? 4 : 0);
+            if (isCoralPlantForm() || isCoralFan() || isCoralWallFan()) return (meta & 7) | (sourceWater ? 8 : 0);
+            return meta;
+        }
+
+        private void initializePass37AquaticPlacement(World world, int x, int y, int z, boolean sourceWater) {
+            if (isKelp()) {
+                setKelpAge(world, x, y, z, world.rand.nextInt(25));
+                if (world.getBlock(x, y - 1, z) == KELP.get())
+                    replaceKelpBlock(world, x, y - 1, z, KELP_PLANT.get(), 0, 3);
+            }
+            if (isLiveCoral()) scheduleCoralDeath(world, x, y, z);
+            if (isSeaPickle()) world.updateLightByType(EnumSkyBlock.Block, x, y, z);
+        }
+
+        private boolean replaceKelpBlock(World world, int x, int y, int z, Block block, int meta, int flags) {
+            PASS37_INTERNAL_KELP_REPLACE.set(Boolean.TRUE);
+            try {
+                return world.setBlock(x, y, z, block, meta, flags);
+            } finally {
+                PASS37_INTERNAL_KELP_REPLACE.remove();
+            }
+        }
+
+        private boolean growKelpOne(World world, int x, int y, int z) {
+            int hy = y;
+            while (hy < 255 && (world.getBlock(x, hy + 1, z) == KELP.get() || world.getBlock(x, hy + 1, z) == KELP_PLANT.get())) hy++;
+            if (world.getBlock(x, hy, z) != KELP.get()) {
+                if (world.getBlock(x, hy, z) == KELP_PLANT.get()) {
+                    replaceKelpBlock(world, x, hy, z, KELP.get(), 0, 3);
+                    setKelpAge(world, x, hy, z, world.rand.nextInt(25));
+                } else return false;
+            }
+            int age = getKelpAge(world, x, hy, z);
+            if (age >= 25 || !isSourceWater(world, x, hy + 1, z)) return false;
+            replaceKelpBlock(world, x, hy, z, KELP_PLANT.get(), 0, 3);
+            if (!replaceKelpBlock(world, x, hy + 1, z, KELP.get(), 0, 3)) {
+                replaceKelpBlock(world, x, hy, z, KELP.get(), 0, 3);
+                setKelpAge(world, x, hy, z, age);
+                return false;
+            }
+            setKelpAge(world, x, hy + 1, z, age + 1);
+            return true;
+        }
+
+        private float ancientCropGrowthSpeed(World world, int x, int y, int z) {
+            float speed = 1.0F;
+            for (int dx=-1; dx<=1; dx++) for (int dz=-1; dz<=1; dz++) {
+                float f = 0.0F;
+                if (world.getBlock(x+dx, y-1, z+dz) == Blocks.farmland)
+                    f = world.getBlockMetadata(x+dx, y-1, z+dz) > 0 ? 3.0F : 1.0F;
+                if (dx != 0 || dz != 0) f /= 4.0F;
+                speed += f;
+            }
+            boolean ew = world.getBlock(x-1,y,z)==this || world.getBlock(x+1,y,z)==this;
+            boolean ns = world.getBlock(x,y,z-1)==this || world.getBlock(x,y,z+1)==this;
+            if (ew && ns) speed /= 2.0F;
+            else if (world.getBlock(x-1,y,z-1)==this || world.getBlock(x+1,y,z-1)==this
+                    || world.getBlock(x+1,y,z+1)==this || world.getBlock(x-1,y,z+1)==this) speed /= 2.0F;
+            return speed;
+        }
+
+        private boolean growTorchflower(World world, int x, int y, int z) {
+            int age = world.getBlockMetadata(x,y,z) & 1;
+            if (age == 0) { world.setBlockMetadataWithNotify(x,y,z,1,3); return true; }
+            if (TORCHFLOWER.get() != null) { world.setBlock(x,y,z,TORCHFLOWER.get(),0,3); return true; }
+            return false;
+        }
+
+        private boolean growPitcher(World world, int x, int y, int z, int increase) {
+            int meta = world.getBlockMetadata(x,y,z)&15;
+            int ly = meta >= 5 ? y-1 : y;
+            if (world.getBlock(x,ly,z) != this) return false;
+            int lower = world.getBlockMetadata(x,ly,z)&15;
+            if (lower >= 5) return false;
+            int age = lower;
+            if (age >= 4 || world.getBlockLightValue(x,ly,z) < 8) return false;
+            int next = Math.min(4, age + increase);
+            Block upper = world.getBlock(x,ly+1,z);
+            if (next >= 3 && upper != this && !world.isAirBlock(x,ly+1,z)) return false;
+
+            // Match 1.21.11 PitcherCropBlock.grow(): publish the lower state with update flag 2,
+            // then create/update the upper half with flag 3. Using flag 3 on the lower first lets
+            // 1.7 notify the old upper age before it has been synchronized; age 3 -> 4 can then
+            // recursively delete upper and lower as a mismatched double plant.
+            world.setBlockMetadataWithNotify(x,ly,z,next,2);
+            if (next >= 3) {
+                world.setBlock(x,ly+1,z,this,5+next,3);
+            } else if (upper == this && (world.getBlockMetadata(x,ly+1,z)&15)>=5) {
+                world.setBlockToAir(x,ly+1,z);
+            }
+            return world.getBlock(x,ly,z)==this && (world.getBlockMetadata(x,ly,z)&15)==next
+                    && (next < 3 || (world.getBlock(x,ly+1,z)==this
+                    && (world.getBlockMetadata(x,ly+1,z)&15)==5+next));
+        }
+
+        private boolean isCoralBlockBelow(IBlockAccess world, int x, int y, int z) {
+            ModernMapParityBlocks below = ModernMapParityBlocks.fromBlock(world.getBlock(x,y-1,z));
+            return below != null && below.getRegistryName().endsWith("_coral_block");
+        }
+
+        private void bonemealSeaPickles(World world, int x, int y, int z) {
+            int zSpan=1, zOffset=0, count=0, xStart=x-2;
+            for (int xi=0; xi<5; xi++) {
+                for (int zi=0; zi<zSpan; zi++) {
+                    int endY=y+1;
+                    for (int yy=endY-2; yy<endY; yy++) {
+                        int px=xStart+xi, pz=z-zOffset+zi;
+                        if (px==x && yy==y && pz==z) continue;
+                        if (world.rand.nextInt(6)==0 && isSourceWater(world,px,yy,pz)) {
+                            ModernMapParityBlocks below=ModernMapParityBlocks.fromBlock(world.getBlock(px,yy-1,pz));
+                            if (below != null && below.getRegistryName().endsWith("_coral_block"))
+                                world.setBlock(px,yy,pz,this,4 | world.rand.nextInt(4),3);
+                        }
+                    }
+                }
+                if (count<2) { zSpan+=2; zOffset++; } else { zSpan-=2; zOffset--; }
+                count++;
+            }
+            world.setBlockMetadataWithNotify(x,y,z,7,3);
+            world.updateLightByType(EnumSkyBlock.Block,x,y,z);
+        }
+
+        private boolean paleMossSideSupported(IBlockAccess world, int x, int y, int z, int dir) {
+            switch (dir) {
+                case 0: return world.isSideSolid(x, y, z-1, ForgeDirection.SOUTH, false);
+                case 1: return world.isSideSolid(x+1, y, z, ForgeDirection.WEST, false);
+                case 2: return world.isSideSolid(x, y, z+1, ForgeDirection.NORTH, false);
+                default:return world.isSideSolid(x-1, y, z, ForgeDirection.EAST, false);
+            }
+        }
+
+        private int paleMossSide(ParityPaleMossCarpetTileEntity te, int dir) {
+            return dir==0?te.getNorth():dir==1?te.getEast():dir==2?te.getSouth():te.getWest();
+        }
+
+        private void updatePaleMossCarpet(World world, int x, int y, int z, boolean createSides) {
+            TileEntity raw=world.getTileEntity(x,y,z);
+            if (!(raw instanceof ParityPaleMossCarpetTileEntity)) return;
+            ParityPaleMossCarpetTileEntity te=(ParityPaleMossCarpetTileEntity)raw;
+            boolean bottom=te.hasBottom();
+            int[] side={te.getNorth(),te.getEast(),te.getSouth(),te.getWest()};
+            for (int d=0; d<4; d++) {
+                boolean support=paleMossSideSupported(world,x,y,z,d);
+                if (!support) side[d]=0; else if (createSides) side[d]=1;
+            }
+            if (!bottom) {
+                TileEntity below=world.getTileEntity(x,y-1,z);
+                if (!(world.getBlock(x,y-1,z)==this && below instanceof ParityPaleMossCarpetTileEntity
+                        && ((ParityPaleMossCarpetTileEntity)below).hasBottom())) {
+                    world.setBlockToAir(x,y,z); return;
+                }
+                ParityPaleMossCarpetTileEntity base=(ParityPaleMossCarpetTileEntity)below;
+                for (int d=0; d<4; d++) if (paleMossSide(base,d)==0) side[d]=0;
+                boolean any=false; for (int v:side) if (v!=0) any=true;
+                if (!any) { world.setBlockToAir(x,y,z); return; }
+            } else {
+                TileEntity above=world.getTileEntity(x,y+1,z);
+                if (world.getBlock(x,y+1,z)==this && above instanceof ParityPaleMossCarpetTileEntity
+                        && !((ParityPaleMossCarpetTileEntity)above).hasBottom()) {
+                    ParityPaleMossCarpetTileEntity top=(ParityPaleMossCarpetTileEntity)above;
+                    for (int d=0; d<4; d++) if (side[d]==1 && paleMossSide(top,d)!=0) side[d]=2;
+                }
+            }
+            te.setVisualState(bottom,side[0],side[1],side[2],side[3]);
+        }
+
+        private boolean isPaleMossReplaceableGround(Block block) {
+            if (block == null) return false;
+            if (block == PALE_MOSS_BLOCK.get() || block == Blocks.stone || block == Blocks.dirt
+                    || block == Blocks.grass || block == Blocks.mycelium) return true;
+            if (ModBlocks.DEEPSLATE.isEnabled() && block == ModBlocks.DEEPSLATE.get()) return true;
+            return ModBlocks.COARSE_DIRT.isEnabled() && block == ModBlocks.COARSE_DIRT.get();
+        }
+
+        /**
+         * Bounded port of PALE_MOSS_PATCH_BONEMEAL. 1.21.11 uses a vegetation-patch configured
+         * feature with x/z radius 1..2 (+1), vertical search 5, 0.75 edge chance and 0.60
+         * vegetation chance. Keep those block-local parameters without registering biome/worldgen.
+         */
+        private boolean bonemealPaleMossBlock(World world, int x, int y, int z) {
+            if (!world.isAirBlock(x, y + 1, z)) return false;
+            int xRadius = 2 + world.rand.nextInt(2);
+            int zRadius = 2 + world.rand.nextInt(2);
+            for (int dx = -xRadius; dx <= xRadius; dx++) {
+                boolean xEdge = dx == -xRadius || dx == xRadius;
+                for (int dz = -zRadius; dz <= zRadius; dz++) {
+                    boolean zEdge = dz == -zRadius || dz == zRadius;
+                    boolean corner = xEdge && zEdge;
+                    boolean edge = xEdge || zEdge;
+                    if (corner || (edge && world.rand.nextFloat() > 0.75F)) continue;
+                    int px = x + dx, pz = z + dz, py = y + 1;
+                    int scan = 0;
+                    while (py > 0 && world.isAirBlock(px, py, pz) && scan++ < 5) py--;
+                    scan = 0;
+                    while (py < 255 && !world.isAirBlock(px, py, pz) && scan++ < 5) py++;
+                    int groundY = py - 1;
+                    if (groundY < 0 || !world.isAirBlock(px, py, pz)) continue;
+                    Block ground = world.getBlock(px, groundY, pz);
+                    if (!isPaleMossReplaceableGround(ground)) continue;
+                    if (ground != PALE_MOSS_BLOCK.get())
+                        world.setBlock(px, groundY, pz, PALE_MOSS_BLOCK.get(), 0, 2);
+
+                    if (world.rand.nextFloat() >= 0.60F || !world.isAirBlock(px, py, pz)) continue;
+                    int vegetation = world.rand.nextInt(60); // modern weighted provider: 25 carpet, 25 short grass, 10 tall grass
+                    if (vegetation < 25 && PALE_MOSS_CARPET.get() != null) {
+                        world.setBlock(px, py, pz, PALE_MOSS_CARPET.get(), 0, 3);
+                        updatePaleMossCarpet(world, px, py, pz, true);
+                    } else if (vegetation < 50) {
+                        world.setBlock(px, py, pz, Blocks.tallgrass, 1, 3);
+                    } else if (py < 255 && world.isAirBlock(px, py + 1, pz)) {
+                        Blocks.double_plant.func_149889_c(world, px, py, pz, 2, 3);
+                    }
+                }
+            }
+            return true;
+        }
+
+        private boolean maybeCreatePaleMossTopper(World world, int x, int y, int z, boolean randomSides) {
+            if (world.getBlock(x,y,z)!=this) return false;
+            TileEntity baseRaw=world.getTileEntity(x,y,z);
+            if (!(baseRaw instanceof ParityPaleMossCarpetTileEntity) || !((ParityPaleMossCarpetTileEntity)baseRaw).hasBottom()) return false;
+            if (!world.isAirBlock(x,y+1,z) && world.getBlock(x,y+1,z)!=this) return false;
+            int[] side=new int[4]; boolean any=false;
+            for (int d=0; d<4; d++) {
+                if (paleMossSideSupported(world,x,y+1,z,d) && (!randomSides || world.rand.nextBoolean())) { side[d]=1; any=true; }
+            }
+            if (!any) return false;
+            if (world.getBlock(x,y+1,z)!=this) world.setBlock(x,y+1,z,this,0,3);
+            TileEntity topRaw=world.getTileEntity(x,y+1,z);
+            if (!(topRaw instanceof ParityPaleMossCarpetTileEntity)) return false;
+            ((ParityPaleMossCarpetTileEntity)topRaw).setVisualState(false,side[0],side[1],side[2],side[3]);
+            updatePaleMossCarpet(world,x,y,z,false);
+            return true;
+        }
+
+        private void advancePaleOak(World world, int x, int y, int z, Random random) {
+            int stage=world.getBlockMetadata(x,y,z)&1;
+            if (stage==0) { world.setBlockMetadataWithNotify(x,y,z,1,3); return; }
+            for (int ox=0; ox>=-1; ox--) for (int oz=0; oz>=-1; oz--) {
+                int bx=x+ox,bz=z+oz;
+                if (world.getBlock(bx,y,bz)!=this || world.getBlock(bx+1,y,bz)!=this
+                        || world.getBlock(bx,y,bz+1)!=this || world.getBlock(bx+1,y,bz+1)!=this) continue;
+                int[] old={world.getBlockMetadata(bx,y,bz),world.getBlockMetadata(bx+1,y,bz),
+                        world.getBlockMetadata(bx,y,bz+1),world.getBlockMetadata(bx+1,y,bz+1)};
+                world.setBlockToAir(bx,y,bz); world.setBlockToAir(bx+1,y,bz);
+                world.setBlockToAir(bx,y,bz+1); world.setBlockToAir(bx+1,y,bz+1);
+                if (!PASS37_PALE_OAK_TREE.generate(world,random,bx,y,bz)) {
+                    world.setBlock(bx,y,bz,this,old[0],3); world.setBlock(bx+1,y,bz,this,old[1],3);
+                    world.setBlock(bx,y,bz+1,this,old[2],3); world.setBlock(bx+1,y,bz+1,this,old[3],3);
+                }
+                return;
+            }
+        }
+
+        private boolean paleOakLogNearby(IBlockAccess world, int x, int y, int z, int radius) {
+            Block log=PALE_OAK_LOG.get(); if (log==null) return false;
+            for (int dx=-radius;dx<=radius;dx++) for(int dy=-radius;dy<=radius;dy++) for(int dz=-radius;dz<=radius;dz++)
+                if (world.getBlock(x+dx,y+dy,z+dz)==log) return true;
+            return false;
+        }
+
+        private boolean eyeblossomShouldBeOpen(World world) {
+            // 1.21.11 obtains this from the dimension environment timeline. In the standard
+            // Overworld timeline EYEBLOSSOM_OPEN is true from tick 12600 through 23400; other
+            // legacy 1.7 dimensions have no corresponding override, matching TriState.DEFAULT
+            // by retaining the block's current identity.
+            if (world.provider == null || world.provider.dimensionId != 0) return isOpenEyeblossom();
+            long time=world.getWorldTime()%24000L;
+            return time>=12600L && time<23401L;
+        }
+
+        private void tickEyeblossom(World world, int x, int y, int z, Random random) {
+            boolean propagated=(world.getBlockMetadata(x,y,z)&1)!=0;
+            boolean shouldOpen=eyeblossomShouldBeOpen(world);
+            if (shouldOpen==isOpenEyeblossom()) {
+                if (propagated) world.setBlockMetadataWithNotify(x,y,z,0,2);
+                return;
+            }
+            ModernMapParityBlocks target=shouldOpen?OPEN_EYEBLOSSOM:CLOSED_EYEBLOSSOM;
+            if (target.get()==null) return;
+            Block old=this;
+            world.setBlock(x,y,z,target.get(),0,3);
+            String sound="block.eyeblossom."+(shouldOpen?"open":"close")+(propagated?"":"_long");
+            playModernSound(world,x,y,z,sound,1.0F,1.0F);
+            int color=shouldOpen?0xFC9B12:0x5F627F;
+            double r=((color>>16)&255)/255.0D,g=((color>>8)&255)/255.0D,b=(color&255)/255.0D;
+            if (world instanceof WorldServer) {
+                // World.spawnParticle is client-local in 1.7. Send the bounded transform particles
+                // from the server so dedicated clients can actually see the state transition.
+                ((WorldServer)world).func_147487_a("reddust", x+0.5D, y+0.5D, z+0.5D, 4, 0.25D, 0.25D, 0.25D, 0.0D);
+            } else {
+                for(int i=0;i<4;i++) world.spawnParticle("reddust",x+0.25D+random.nextDouble()*0.5D,y+0.3D+random.nextDouble()*0.5D,z+0.25D+random.nextDouble()*0.5D,r,g,b);
+            }
+            for(int dx=-3;dx<=3;dx++) for(int dy=-2;dy<=2;dy++) for(int dz=-3;dz<=3;dz++) {
+                if(dx==0&&dy==0&&dz==0) continue;
+                int px=x+dx,py=y+dy,pz=z+dz;
+                if(world.getBlock(px,py,pz)!=old) continue;
+                double distance=Math.sqrt(dx*dx+dy*dy+dz*dz);
+                int min=(int)(distance*5.0D), max=(int)(distance*10.0D);
+                int delay=min+(max>min?random.nextInt(max-min+1):0);
+                world.setBlockMetadataWithNotify(px,py,pz,(world.getBlockMetadata(px,py,pz)&14)|1,2);
+                world.scheduleBlockUpdate(px,py,pz,old,Math.max(1,delay));
             }
         }
 
@@ -2803,6 +3365,10 @@ public enum ModernMapParityBlocks {
 
         @Override
         public Item getItemDropped(int meta, Random random, int fortune) {
+            if (isKelpPlant() && KELP.get()!=null) return Item.getItemFromBlock(KELP.get());
+            if (isTorchflowerCrop()) return ModernVegetationItems.getTorchflowerSeeds();
+            if (isPitcherCrop()) return null; // Pass 37 uses age/half-aware getDrops below.
+            if (isSeagrass() || isTallSeagrass()) return null; // modern drops require shears; no ordinary break drop
             if (entry == MANGROVE_PROPAGULE && ModBlocks.SAPLING.isEnabled() && ConfigBlocksItems.enableMangroveWoodFamily)
                 return ModBlocks.SAPLING.getItem();
             if (isCopperWallTorch() && COPPER_TORCH.get() != null) return Item.getItemFromBlock(COPPER_TORCH.get());
@@ -2815,6 +3381,8 @@ public enum ModernMapParityBlocks {
 
         @Override
         public ItemStack getPickBlock(MovingObjectPosition target, World world, int x, int y, int z, EntityPlayer player) {
+            if (isPitcherCrop() && ModernVegetationItems.getPitcherPod() != null)
+                return new ItemStack(ModernVegetationItems.getPitcherPod());
             if (entry == MANGROVE_PROPAGULE && ModBlocks.SAPLING.isEnabled() && ConfigBlocksItems.enableMangroveWoodFamily)
                 return new ItemStack(ModBlocks.SAPLING.get(), 1, 0);
             if (isCopperWallTorch() && COPPER_TORCH.get() != null) return new ItemStack(COPPER_TORCH.get());
@@ -3026,6 +3594,11 @@ public enum ModernMapParityBlocks {
                     world.setBlock(x, y + 1, z, this, 1, 3);
                 return;
             }
+            if (isPaleMossCarpet() && !world.isRemote) {
+                updatePaleMossCarpet(world, x, y, z, true);
+                maybeCreatePaleMossTopper(world, x, y, z, true);
+                return;
+            }
             if (isDriedGhast()) {
                 int hydration = (world.getBlockMetadata(x, y, z) >> 2) & 3;
                 int facing = (quadrant + 2) & 3; // N/E/S/W model index, matching campfire convention
@@ -3036,7 +3609,7 @@ public enum ModernMapParityBlocks {
                 // The parity identity represents both modern HALF states. Normal placement creates
                 // the canonical two-block pair; Backporter placement may still set either half
                 // directly by metadata without this ItemBlock callback.
-                if (!world.isRemote && world.isAirBlock(x, y + 1, z))
+                if (!world.isRemote && (world.isAirBlock(x, y + 1, z) || isSourceWater(world, x, y + 1, z)))
                     world.setBlock(x, y + 1, z, this, 1, 3);
                 return;
             }
@@ -3048,11 +3621,13 @@ public enum ModernMapParityBlocks {
                 return;
             }
             if (isCoralFan()) {
-                int side = world.getBlockMetadata(x, y, z) & 7;
+                int raw = world.getBlockMetadata(x, y, z) & 15;
+                int side = raw & 7;
+                int wet = raw & 8;
                 if (side >= 2 && side <= 5) {
                     ModernMapParityBlocks wallEntry = coralFanCompanion(true);
                     if (wallEntry != null && wallEntry.get() != null) {
-                        world.setBlock(x, y, z, wallEntry.get(), side, 3);
+                        world.setBlock(x, y, z, wallEntry.get(), side | wet, 3);
                     } else {
                         world.setBlockMetadataWithNotify(x, y, z, 0, 2);
                     }
@@ -3277,8 +3852,64 @@ public enum ModernMapParityBlocks {
                 }
             }
 
-            if ((isTorchflowerCrop() || isPitcherCrop()) && isBoneMeal(held)) {
-                return applyAncientCropBoneMeal(world, x, y, z, player, held);
+            if (isBoneMeal(held)) {
+                if (isKelp() || isKelpPlant()) {
+                    if (world.isRemote) return true;
+                    if (!growKelpOne(world, x, y, z)) return false;
+                    consumeBoneMeal(player, held); world.playAuxSFX(2005,x,y,z,0); return true;
+                }
+                if (isSeagrass()) {
+                    if (!isSourceWater(world,x,y+1,z) || TALL_SEAGRASS.get()==null) return false;
+                    if (!world.isRemote) {
+                        // Match DoublePlant placement ordering: lower first without neighbour
+                        // notification, then upper with full notification.
+                        world.setBlock(x,y,z,TALL_SEAGRASS.get(),0,2);
+                        world.setBlock(x,y+1,z,TALL_SEAGRASS.get(),1,3);
+                        consumeBoneMeal(player,held); world.playAuxSFX(2005,x,y,z,0);
+                    }
+                    return true;
+                }
+                if (isSeaPickle()) {
+                    if ((world.getBlockMetadata(x,y,z)&4)==0 || !isCoralBlockBelow(world,x,y,z)) return false;
+                    if (!world.isRemote) { bonemealSeaPickles(world,x,y,z); consumeBoneMeal(player,held); world.playAuxSFX(2005,x,y,z,0); }
+                    return true;
+                }
+                if (isTorchflowerCrop() || isPitcherCrop()) return applyAncientCropBoneMeal(world,x,y,z,player,held);
+                if (isPaleHangingMoss()) {
+                    if (world.isRemote) return true;
+                    int tipY=y; while (tipY>0 && world.getBlock(x,tipY-1,z)==this) tipY--;
+                    if (!world.isAirBlock(x,tipY-1,z)) return false;
+                    world.setBlockMetadataWithNotify(x,tipY,z,0,3);
+                    world.setBlock(x,tipY-1,z,this,1,3);
+                    consumeBoneMeal(player,held); world.playAuxSFX(2005,x,tipY-1,z,0); return true;
+                }
+                if (isPaleMossBlock()) {
+                    if (!world.isAirBlock(x,y+1,z)) return false;
+                    if (world.isRemote) return true;
+                    if (!bonemealPaleMossBlock(world,x,y,z)) return false;
+                    consumeBoneMeal(player,held); world.playAuxSFX(2005,x,y+1,z,0); return true;
+                }
+                if (isPaleMossCarpet()) {
+                    TileEntity te=world.getTileEntity(x,y,z);
+                    if (!(te instanceof ParityPaleMossCarpetTileEntity) || !((ParityPaleMossCarpetTileEntity)te).hasBottom()) return false;
+                    if (world.isRemote) return true;
+                    if (!maybeCreatePaleMossTopper(world,x,y,z,false)) return false;
+                    consumeBoneMeal(player,held); world.playAuxSFX(2005,x,y+1,z,0); return true;
+                }
+                if (isWildflowers()) {
+                    if (world.isRemote) return true;
+                    int meta=world.getBlockMetadata(x,y,z)&15, amount=((meta>>2)&3)+1;
+                    if (amount<4) world.setBlockMetadataWithNotify(x,y,z,(meta&3)|(amount<<2),3);
+                    else dropBlockAsItem(world,x,y,z,new ItemStack(Item.getItemFromBlock(this),1,0));
+                    consumeBoneMeal(player,held); world.playAuxSFX(2005,x,y,z,0); return true;
+                }
+                if (isPaleOakSapling()) {
+                    // Vanilla SaplingBlock: bonemeal succeeds 45%, then stage 0->1 or attempts the 2x2 tree.
+                    if (world.isRemote) return true;
+                    consumeBoneMeal(player,held);
+                    if (world.rand.nextFloat() < 0.45F) advancePaleOak(world,x,y,z,world.rand);
+                    world.playAuxSFX(2005,x,y,z,0); return true;
+                }
             }
 
             if (isSeaPickle() && held != null && held.getItem() == Item.getItemFromBlock(this)) {
@@ -3816,14 +4447,9 @@ public enum ModernMapParityBlocks {
                     return false;
                 }
 
+                if (world.getBlockLightValue(x, lowerY, z) < 8) return false;
                 if (!world.isRemote) {
-                    world.setBlockMetadataWithNotify(x, lowerY, z, nextAge, 3);
-                    if (nextAge >= 3) {
-                        world.setBlock(x, lowerY + 1, z, this, 5 + nextAge, 3);
-                    } else if (world.getBlock(x, lowerY + 1, z) == this) {
-                        int upperMeta = world.getBlockMetadata(x, lowerY + 1, z) & 15;
-                        if (upperMeta >= 5) world.setBlockToAir(x, lowerY + 1, z);
-                    }
+                    if (!growPitcher(world, x, lowerY, z, 1)) return false;
                     consumeBoneMeal(player, held);
                     world.playAuxSFX(2005, x, lowerY, z, 0);
                 }
@@ -3872,7 +4498,7 @@ public enum ModernMapParityBlocks {
         public boolean hasTileEntity(int metadata) {
             return isSign() || isHangingSign() || isCampfire() || isChiseledBookshelf()
                     || isDecoratedPot() || isShelf() || isSuspicious() || isMultiface() || isPaleOakButton()
-                    || isPaleMossCarpet() || isVault() || isCrafter();
+                    || isPaleMossCarpet() || isVault() || isCrafter() || isKelp();
         }
 
         @Override
@@ -3888,6 +4514,7 @@ public enum ModernMapParityBlocks {
             if (isPaleMossCarpet()) return new ParityPaleMossCarpetTileEntity();
             if (isVault()) return new ParityVaultStateTileEntity();
             if (isCrafter()) return new ParityCrafterStateTileEntity();
+            if (isKelp()) return new ParityKelpStateTileEntity();
             return null;
         }
 
@@ -3962,12 +4589,12 @@ public enum ModernMapParityBlocks {
 
         private static ForgeDirection horizontalFacing(EntityPlayer player) {
             int facing = MathHelper.floor_double(player.rotationYaw * 4.0F / 360.0F + 0.5D) & 3;
-            return switch (facing) {
-                case 0 -> ForgeDirection.SOUTH;
-                case 1 -> ForgeDirection.WEST;
-                case 2 -> ForgeDirection.NORTH;
-                default -> ForgeDirection.EAST;
-            };
+            switch (facing) {
+                case 0: return ForgeDirection.SOUTH;
+                case 1: return ForgeDirection.WEST;
+                case 2: return ForgeDirection.NORTH;
+                default: return ForgeDirection.EAST;
+            }
         }
 
         private boolean canAttachMultifaceFace(IBlockAccess world, int x, int y, int z, int face) {
@@ -4032,8 +4659,8 @@ public enum ModernMapParityBlocks {
             if (isPitcherPlant())
                 return side == 1 && world.isAirBlock(x, y + 1, z) && canPitcherPlantStandAt(world, x, y, z);
             if (isTallSeagrass())
-                return side == 1 && world.isAirBlock(x, y + 1, z)
-                        && world.isSideSolid(x, y - 1, z, ForgeDirection.UP, false);
+                return side == 1 && isSourceWater(world, x, y, z) && isSourceWater(world, x, y + 1, z)
+                        && canSeagrassSurvive(world, x, y, z);
             if (isBell()) {
                 if (side == 1) return bellSupported(world, x, y, z, 0);
                 if (side == 0) return bellSupported(world, x, y, z, 4);
@@ -4062,22 +4689,47 @@ public enum ModernMapParityBlocks {
                 return false;
             }
             if (isCopperWallTorch()) return side >= 2 && side <= 5 && copperTorchSupported(world, x, y, z, side);
+            // ItemBlock.func_150936_a performs a client-side placement preflight through
+            // World.canPlaceEntityOnSide -> Block.canReplace -> canPlaceBlockOnSide before
+            // ParityAquaticItemBlock.onItemUse is allowed to run.  The obtainable Coral Fan
+            // identity therefore has to expose its horizontal wall-support rule here too; if it
+            // falls through to Block.canPlaceBlockOnSide, canPlaceBlockAt applies the floor-fan
+            // support rule and the client suppresses the placement packet whenever there is no
+            // block below the target.  Reuse the same placement predicate as the server path so
+            // wall-only placement and floor placement cannot disagree.
+            if (isCoralFan()) return canSurviveAtPlacement(world, x, y, z, side);
             return super.canPlaceBlockOnSide(world, x, y, z, side);
         }
 
         @Override
         public boolean canPlaceBlockAt(World world, int x, int y, int z) {
+            if (isKelp()) return isSourceWater(world,x,y,z) && canKelpSurvive(world,x,y,z);
+            if (isKelpPlant()) return isSourceWater(world,x,y,z) && canKelpSurvive(world,x,y,z);
+            if (isSeagrass()) return isSourceWater(world,x,y,z) && canSeagrassSurvive(world,x,y,z);
+            if (isTorchflowerCrop() || isPitcherCrop())
+                return world.getBlock(x,y-1,z)==Blocks.farmland && world.getBlockLightValue(x,y,z)>=8;
+            if (isTorchflower() || isPaleOakSapling() || isEyeblossom() || isWildflowers())
+                return canGroundVegetationSurvive(world,x,y,z);
+            if (isLeafLitter()) return canSupportPlantTop(world,x,y,z);
+            if (isCoralPlantForm() || isCoralFan()) return canSupportPlantTop(world,x,y,z);
+            if (isCoralWallFan()) {
+                for (int side=2;side<=5;side++) {
+                    ForgeDirection d=ForgeDirection.getOrientation(side);
+                    if (canSupportPlantFace(world,x-d.offsetX,y,z-d.offsetZ,d)) return true;
+                }
+                return false;
+            }
             if (isPaleMossCarpet())
-                return world.isSideSolid(x, y - 1, z, ForgeDirection.UP, false);
+                return y>0 && world.getBlock(x,y-1,z)!=Blocks.air;
             if (isPaleHangingMoss())
                 return canPaleHangingMossHangAt(world, x, y, z);
             if (isPitcherPlant())
                 return world.isAirBlock(x, y + 1, z) && canPitcherPlantStandAt(world, x, y, z);
             if (isSeaPickle())
-                return world.isSideSolid(x, y - 1, z, ForgeDirection.UP, false);
+                return canSupportPlantTop(world, x, y, z);
             if (isTallSeagrass())
-                return world.isAirBlock(x, y + 1, z)
-                        && world.isSideSolid(x, y - 1, z, ForgeDirection.UP, false);
+                return isSourceWater(world, x, y, z) && isSourceWater(world, x, y + 1, z)
+                        && canSeagrassSurvive(world, x, y, z);
             if (isBell()) {
                 if (bellSupported(world, x, y, z, 0) || bellSupported(world, x, y, z, 4)) return true;
                 for (int facing = 0; facing < 4; facing++) if (bellSupported(world, x, y, z, 8 + facing)) return true;
@@ -4133,22 +4785,9 @@ public enum ModernMapParityBlocks {
                     world.setBlockToAir(x, otherY, z);
                 return;
             }
-            if (isPitcherCrop()) {
-                boolean upper = (meta & 15) >= 5;
-                int otherY = upper ? y - 1 : y + 1;
-                if (world.getBlock(x, otherY, z) == this) {
-                    int other = world.getBlockMetadata(x, otherY, z) & 15;
-                    if (upper != (other >= 5)) world.setBlockToAir(x, otherY, z);
-                }
-                return;
-            }
-            if (isTallSeagrass()) {
-                boolean upper = (meta & 1) != 0;
-                int otherY = upper ? y - 1 : y + 1;
-                if (world.getBlock(x, otherY, z) == this
-                        && ((world.getBlockMetadata(x, otherY, z) & 1) != 0) != upper)
-                    world.setBlockToAir(x, otherY, z);
-            }
+            // Pitcher Crop and Tall Seagrass counterpart removal is intentionally neighbour-driven.
+            // Removing the clicked half first lets the surviving half see the exact modern missing-mate
+            // update and disappear/restore water without 1.7 pre-break ordering recreating or duplicating it.
         }
 
         @Override
@@ -4156,6 +4795,8 @@ public enum ModernMapParityBlocks {
             super.onBlockAdded(world, x, y, z);
             if (isTrialSpawner() || isVault()) world.updateLightByType(EnumSkyBlock.Block, x, y, z);
             if (isSuspicious()) world.scheduleBlockUpdate(x, y, z, this, 2);
+            if (isLiveCoral()) scheduleCoralDeath(world,x,y,z);
+            if (isEyeblossom() && !world.isRemote) world.scheduleBlockUpdate(x, y, z, this, 20);
         }
 
         /** Mirrors BlockFalling while retaining the buried item/progress block-entity data. */
@@ -4213,12 +4854,68 @@ public enum ModernMapParityBlocks {
                     }
                 }
                 return;
+            } else if (isKelp() || isKelpPlant()) {
+                if (!canKelpSurvive(world,x,y,z)) {
+                    if (!world.isRemote) dropBlockAsItem(world,x,y,z,0,0);
+                    world.setBlock(x,y,z,Blocks.water,0,3); return;
+                }
+                if (isKelp() && (world.getBlock(x,y+1,z)==KELP.get() || world.getBlock(x,y+1,z)==KELP_PLANT.get())) {
+                    replaceKelpBlock(world,x,y,z,KELP_PLANT.get(),0,3); return;
+                }
+                if (isKelpPlant() && world.getBlock(x,y+1,z)!=KELP.get() && world.getBlock(x,y+1,z)!=KELP_PLANT.get()) {
+                    replaceKelpBlock(world,x,y,z,KELP.get(),0,3); setKelpAge(world,x,y,z,world.rand.nextInt(25)); return;
+                }
+            } else if (isSeagrass()) {
+                if (!canSeagrassSurvive(world,x,y,z)) {
+                    if (!world.isRemote) dropBlockAsItem(world,x,y,z,0,0);
+                    world.setBlock(x,y,z,Blocks.water,0,3); return;
+                }
+            } else if (isTallSeagrass()) {
+                int meta=world.getBlockMetadata(x,y,z)&1;
+                boolean okay=meta==0 ? canSeagrassSurvive(world,x,y,z) && world.getBlock(x,y+1,z)==this
+                        : world.getBlock(x,y-1,z)==this && (world.getBlockMetadata(x,y-1,z)&1)==0;
+                if (!okay) { world.setBlock(x,y,z,Blocks.water,0,3); return; }
+            } else if (isCoralFamily()) {
+                if (!canCoralSurvive(world,x,y,z)) {
+                    if (!world.isRemote) dropBlockAsItem(world,x,y,z,world.getBlockMetadata(x,y,z),0);
+                    boolean wet=!isCoralBlockForm() && (world.getBlockMetadata(x,y,z)&8)!=0;
+                    if (wet) world.setBlock(x,y,z,Blocks.water,0,3); else world.setBlockToAir(x,y,z);
+                    return;
+                }
+                scheduleCoralDeath(world,x,y,z);
+            } else if (isTorchflowerCrop() || isPitcherCrop()) {
+                int ly=isPitcherCrop() && (world.getBlockMetadata(x,y,z)&15)>=5 ? y-1 : y;
+                if (world.getBlock(x,ly-1,z)!=Blocks.farmland || world.getBlockLightValue(x,ly,z)<8) {
+                    if (!world.isRemote && ly==y) dropBlockAsItem(world,x,y,z,world.getBlockMetadata(x,y,z),0);
+                    world.setBlockToAir(x,y,z); return;
+                }
+                if (isPitcherCrop()) {
+                    int meta=world.getBlockMetadata(x,y,z)&15;
+                    if (meta>=5 && (world.getBlock(x,y-1,z)!=this || (world.getBlockMetadata(x,y-1,z)&15)!=meta-5)) { world.setBlockToAir(x,y,z); return; }
+                    if (meta<5 && meta>=3 && (world.getBlock(x,y+1,z)!=this || (world.getBlockMetadata(x,y+1,z)&15)!=meta+5)) {
+                        // Modern DoublePlantBlock updateShape removes a double Pitcher Crop whose
+                        // counterpart is missing. Only the growth path creates the upper half.
+                        world.setBlockToAir(x,y,z); return;
+                    }
+                }
+            } else if (isTorchflower() || isPaleOakSapling() || isEyeblossom() || isSegmentedGroundDecal()) {
+                boolean okay=isLeafLitter()?canSupportPlantTop(world,x,y,z):canGroundVegetationSurvive(world,x,y,z);
+                if (!okay) { if(!world.isRemote) dropBlockAsItem(world,x,y,z,world.getBlockMetadata(x,y,z),0); world.setBlockToAir(x,y,z); return; }
+            } else if (isPaleMossCarpet()) {
+                TileEntity tile=world.getTileEntity(x,y,z);
+                if (tile instanceof ParityPaleMossCarpetTileEntity) {
+                    boolean bottom=((ParityPaleMossCarpetTileEntity)tile).hasBottom();
+                    if (bottom && world.getBlock(x,y-1,z)==Blocks.air) { dropBlockAsItem(world,x,y,z,0,0); world.setBlockToAir(x,y,z); return; }
+                    updatePaleMossCarpet(world,x,y,z,false);
+                }
             } else if (isPaleHangingMoss()) {
                 if (!canPaleHangingMossHangAt(world, x, y, z)) {
                     if (!world.isRemote) dropBlockAsItem(world, x, y, z, 0, 0);
                     world.setBlockToAir(x, y, z);
                     return;
                 }
+                int desired=world.getBlock(x,y-1,z)==this?0:1;
+                if ((world.getBlockMetadata(x,y,z)&1)!=desired) world.setBlockMetadataWithNotify(x,y,z,desired,3);
             } else if (isPitcherPlant()) {
                 int meta = world.getBlockMetadata(x, y, z) & 1;
                 if (meta == 0 && !canPitcherPlantStandAt(world, x, y, z)) {
@@ -4232,7 +4929,7 @@ public enum ModernMapParityBlocks {
                     return;
                 }
             } else if (isSeaPickle()) {
-                if (!world.isSideSolid(x, y - 1, z, ForgeDirection.UP, false)) {
+                if (!canSupportPlantTop(world, x, y, z)) {
                     if (!world.isRemote) dropBlockAsItem(world, x, y, z, world.getBlockMetadata(x, y, z), 0);
                     world.setBlockToAir(x, y, z);
                     return;
@@ -4315,6 +5012,51 @@ public enum ModernMapParityBlocks {
 
         @Override
         public void updateTick(World world, int x, int y, int z, Random random) {
+            if (isKelp()) {
+                if (!world.isRemote && getKelpAge(world,x,y,z)<25 && random.nextDouble()<0.14D) growKelpOne(world,x,y,z);
+                return;
+            }
+            if (isLiveCoral()) {
+                if (!world.isRemote) dieCoral(world,x,y,z);
+                return;
+            }
+            if (isTorchflowerCrop()) {
+                if (!world.isRemote && world.getBlockLightValue(x,y,z)>=9 && random.nextInt(3)!=0) {
+                    float speed=ancientCropGrowthSpeed(world,x,y,z);
+                    if (random.nextInt((int)(25.0F/speed)+1)==0) growTorchflower(world,x,y,z);
+                }
+                return;
+            }
+            if (isPitcherCrop()) {
+                int meta=world.getBlockMetadata(x,y,z)&15;
+                if (!world.isRemote && meta<5 && meta<4 && world.getBlockLightValue(x,y,z)>=8) {
+                    float speed=ancientCropGrowthSpeed(world,x,y,z);
+                    if (random.nextInt((int)(25.0F/speed)+1)==0) growPitcher(world,x,y,z,1);
+                }
+                return;
+            }
+            if (isPaleOakSapling()) {
+                if (!world.isRemote && world.getBlockLightValue(x,y+1,z)>=9 && random.nextInt(7)==0) advancePaleOak(world,x,y,z,random);
+                return;
+            }
+            if (isPaleOakLeaves()) {
+                if (!world.isRemote && (world.getBlockMetadata(x,y,z)&8)!=0 && !paleOakLogNearby(world,x,y,z,6)) {
+                    if (PALE_OAK_SAPLING.get()!=null && random.nextInt(20)==0)
+                        dropBlockAsItem(world,x,y,z,new ItemStack(Item.getItemFromBlock(PALE_OAK_SAPLING.get())));
+                    world.setBlockToAir(x,y,z);
+                }
+                return;
+            }
+            if (isEyeblossom()) {
+                if (!world.isRemote) {
+                    tickEyeblossom(world,x,y,z,random);
+                    Block current = world.getBlock(x,y,z);
+                    ModernMapParityBlocks currentParity = ModernMapParityBlocks.fromBlock(current);
+                    if (currentParity == OPEN_EYEBLOSSOM || currentParity == CLOSED_EYEBLOSSOM)
+                        world.scheduleBlockUpdate(x,y,z,current,20);
+                }
+                return;
+            }
             if (isPaleOakButton()) {
                 TileEntity tile = world.getTileEntity(x, y, z);
                 if (tile instanceof ParityButtonTileEntity
@@ -4407,6 +5149,9 @@ public enum ModernMapParityBlocks {
             } else if (isCandleCake() && (meta & 1) != 0) {
                 // The cake candle is centered on the cake; its wick sits just above the frosting.
                 spawnSmallFlame(world, x + 0.5D, y + 0.94D, z + 0.5D, random);
+            }
+            if (isOpenEyeblossom() && random.nextInt(700)==0 && world.getBlock(x,y-1,z)==PALE_MOSS_BLOCK.get()) {
+                world.playSound(x+0.5F,y+0.5F,z+0.5F,Tags.MC_ASSET_VER+":block.eyeblossom.idle",1.0F,1.0F,false);
             }
             if (isCampfire() && (meta & 4) != 0) {
                 boolean signal = world.getBlock(x, y - 1, z) == Blocks.hay_block;
@@ -4529,6 +5274,13 @@ public enum ModernMapParityBlocks {
         public void breakBlock(World world, int x, int y, int z, Block block, int meta) {
             boolean promotePaleHangingMossTip = isPaleHangingMoss() && !world.isRemote
                     && world.getBlock(x, y + 1, z) == this;
+            boolean internalKelpReplace = (isKelp() || isKelpPlant())
+                    && Boolean.TRUE.equals(PASS37_INTERNAL_KELP_REPLACE.get());
+            boolean promoteKelpTip = (isKelp() || isKelpPlant()) && !internalKelpReplace && !world.isRemote
+                    && world.getBlock(x,y-1,z)==KELP_PLANT.get();
+            boolean restoreAquaticWater = !internalKelpReplace && (isKelp() || isKelpPlant() || isSeagrass() || isTallSeagrass()
+                    || (isSeaPickle() && (meta&4)!=0)
+                    || (!isCoralBlockForm() && isCoralFamily() && (meta&8)!=0));
             if (isPaleOakButton() && !world.isRemote && buttonPowered(world, x, y, z)) {
                 notifyPaleOakButtonNeighbors(world, x, y, z, meta & 15);
             }
@@ -4570,6 +5322,14 @@ public enum ModernMapParityBlocks {
                 // Removing the chain end exposes the block above as the new tip.
                 world.setBlockMetadataWithNotify(x, y + 1, z, 1, 3);
             }
+            if (promoteKelpTip && world.getBlock(x,y-1,z)==KELP_PLANT.get()) {
+                replaceKelpBlock(world,x,y-1,z,KELP.get(),0,3);
+                setKelpAge(world,x,y-1,z,world.rand.nextInt(25));
+            }
+            if (restoreAquaticWater && !world.isRemote && world.getBlock(x,y,z)==Blocks.air) {
+                world.setBlock(x,y,z,Blocks.water,0,3);
+            }
+            if (isSeaPickle() && !world.isRemote) world.updateLightByType(EnumSkyBlock.Block,x,y,z);
             if (releaseWater && !world.isRemote && world.getBlock(x, y, z) == Blocks.air) {
                 world.setBlock(x, y, z, Blocks.water, 0, 3);
             }
@@ -4577,6 +5337,22 @@ public enum ModernMapParityBlocks {
 
         @Override
         public ArrayList<ItemStack> getDrops(World world, int x, int y, int z, int metadata, int fortune) {
+            if (isPitcherCrop()) {
+                ArrayList<ItemStack> drops=new ArrayList<ItemStack>();
+                int meta=metadata&15;
+                if (meta<5) {
+                    int age=meta;
+                    Item item=age>=4 && PITCHER_PLANT.get()!=null ? Item.getItemFromBlock(PITCHER_PLANT.get()) : ModernVegetationItems.getPitcherPod();
+                    if (item!=null) drops.add(new ItemStack(item));
+                }
+                return drops;
+            }
+            if (isTorchflowerCrop()) {
+                ArrayList<ItemStack> drops=new ArrayList<ItemStack>();
+                if (ModernVegetationItems.getTorchflowerSeeds()!=null) drops.add(new ItemStack(ModernVegetationItems.getTorchflowerSeeds()));
+                return drops;
+            }
+            if (isSeagrass() || isTallSeagrass()) return new ArrayList<ItemStack>();
             if (isSuspicious()) return new ArrayList<ItemStack>();
             if (isMultiface()) {
                 ArrayList<ItemStack> drops = new ArrayList<ItemStack>();
@@ -4622,6 +5398,16 @@ public enum ModernMapParityBlocks {
 
         @Override
         public void harvestBlock(World world, EntityPlayer player, int x, int y, int z, int meta) {
+            if (isSeagrass() || isTallSeagrass()) {
+                player.addStat(StatList.mineBlockStatArray[getIdFromBlock(this)], 1);
+                player.addExhaustion(0.025F);
+                ItemStack tool = player.getCurrentEquippedItem();
+                if (tool != null && tool.getItem() == Items.shears && SEAGRASS.get() != null) {
+                    int count = isTallSeagrass() ? 2 : 1;
+                    dropBlockAsItem(world, x, y, z, new ItemStack(Item.getItemFromBlock(SEAGRASS.get()), count, 0));
+                }
+                return;
+            }
             if (!isMultiface()) {
                 super.harvestBlock(world, player, x, y, z, meta);
                 return;

@@ -60,13 +60,15 @@ except Exception as exc:
 revision = str(contract.get('contract_revision', ''))
 if revision not in ('32e', '32f') and not (revision.isdigit() and int(revision) >= 33):
     errors.append("contract contract_revision must be '32e' or a later fidelity pass revision")
-for key, expected in (
-    ('implemented_in_version', '3.5.5'),
-    ('implemented_in_git_ref', 'refs/tags/3.5.5'),
-    ('source_minecraft', '1.21.11'),
-):
-    if contract.get(key) != expected:
-        errors.append(f'contract {key} must be {expected!r}')
+if revision == '37':
+    if contract.get('implemented_in_version') != '3.5.9' or contract.get('implemented_in_git_ref') is not None or contract.get('release_status') != 'unreleased':
+        errors.append('Pass 37 contract provenance must be unreleased 3.5.9 with no git ref')
+else:
+    for key, expected in (('implemented_in_version', '3.5.5'), ('implemented_in_git_ref', 'refs/tags/3.5.5')):
+        if contract.get(key) != expected:
+            errors.append(f'contract {key} must be {expected!r}')
+if contract.get('source_minecraft') != '1.21.11':
+    errors.append("contract source_minecraft must be '1.21.11'")
 for stale in ('authoritative_source_commit', 'generated_by_pass'):
     if stale in contract:
         errors.append('contract still contains stale provenance field ' + stale)
@@ -99,4 +101,4 @@ if errors:
 print('Fidelity Pass 32e validation PASSED')
 print(' - Shelf comparator is occupancy bitmask 1/2/4 -> 0..7, stack-size independent')
 print(' - powered same-facing Shelves chain and group across mixed wood variants')
-print(' - Backporter contract provenance remains on version/tag 3.5.5 with Pass 32e-or-later finalization revision')
+print(' - Backporter contract provenance remains valid under the current forward-compatible fidelity revision')

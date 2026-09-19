@@ -160,3 +160,36 @@ the struck unwaxed `IDegradable` block is reset to its first stage and 3..5 rand
 remove one stage from nearby unwaxed copper. Waxed blocks can start the nearby cleaning walks but are
 not themselves de-waxed by lightning. General waterlogging and Copper Golem entity mechanics remain
 outside Pass 36. See `docs/FIDELITY_PASS_36_COPPER_LIFECYCLE.md`.
+
+## Pass 37 vegetation / plant lifecycle contract
+
+Pass 37 promotes the non-entity vegetation families established by Passes 34–35 from persistent/model-state
+parity to bounded Java 1.21.11 lifecycle parity. Kelp/Kelp Plant, Seagrass/Tall Seagrass, the five Coral
+colours in block/plant/fan/wall-fan forms, Sea Pickles, Torchflower Crop, Pitcher Crop, Mangrove Propagule,
+Pale Oak Saplings/Leaves, Pale Hanging Moss, Pale Moss Carpet, Leaf Litter, Wildflowers and Open/Closed
+Eyeblossom are classified as `PASS_37_VEGETATION_LIFECYCLE` / `PASS_37_VERIFIED` by the capability audit.
+
+The existing Pass-34 import encodings remain authoritative. Pass 37 adds only the runtime storage needed where
+1.7 metadata cannot represent modern lifecycle data: a synchronized Kelp-head AGE tile entity for `age=0..25`,
+the existing Mangrove Propagule and Pale Moss Carpet tile data, and bounded high metadata bits used only for
+source-water occupancy / generated-leaf bookkeeping. Static imported model states are not globally recomputed.
+
+Aquatic compatibility is intentionally family-scoped. A dedicated ItemBlock bridge lets the covered aquatic
+plants replace source-water blocks and restores source water when appropriate; it does not make vanilla water
+globally replaceable and does not implement general waterlogging. Coral drying uses the modern 60..99 tick
+schedule and maps every live identity to the matching dead identity while retaining wall-fan facing.
+
+Torchflower and Pitcher use modern crop growth-speed rules on farmland. Pitcher remains `pitcher_crop` through
+age 4, creates the upper half from age 3, and owns two-block cleanup without duplicating drops. Mangrove and
+Pale Oak tree generation is callable only from planted/bonemealed saplings; the Pass-37 generators are not
+registered with biome/world generation. Pale Oak remains a 2x2 grower and generated leaves alone receive the
+bounded decay marker, leaving imported/player-placed leaves persistent.
+
+Pale Hanging Moss grows downward only from Bone Meal, matching the modern block implementation. Leaf Litter is
+segmentable but not bonemealable; Wildflowers are segmentable and bonemeal from amount 1..4, with an extra item
+at four. Eyeblossom follows the standard Overworld day timeline (`12600 <= dayTime < 23401`), propagates block
+changes within modern ±3 X/Z and ±2 Y bounds with distance-scaled scheduled ticks, and uses the versioned modern
+open/close/idle sounds. Bee effects remain deferred with the entity phase.
+
+Entity-spawning endpoints, biome/world generation, structure generation and general waterlogging remain outside
+Pass 37. The Backporter contract revision is 37 and the unreleased development version is 3.5.9.

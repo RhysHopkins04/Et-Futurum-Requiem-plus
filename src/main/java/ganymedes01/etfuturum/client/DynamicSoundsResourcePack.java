@@ -150,6 +150,29 @@ public class DynamicSoundsResourcePack implements IResourcePack {
 					"block/copper_statue/become_statue3",
 					"block/copper_statue/become_statue4");
 
+			// Pass 37: define the exact 1.21.11 Eyeblossom events in the same versioned
+			// namespace as their AssetDirector-fetched OGGs.
+			addSoundsToCategory("block.eyeblossom.open_long",
+					"block/eyeblossom/eyeblossom_open_long");
+			addSoundsToCategory("block.eyeblossom.open",
+					"block/eyeblossom/eyeblossom_open1",
+					"block/eyeblossom/eyeblossom_open2",
+					"block/eyeblossom/eyeblossom_open3",
+					"block/eyeblossom/eyeblossom_open4");
+			addSoundsToCategory("block.eyeblossom.close_long",
+					"block/eyeblossom/eyeblossom_close_long");
+			addSoundsToCategory("block.eyeblossom.close",
+					"block/eyeblossom/eyeblossom_close1",
+					"block/eyeblossom/eyeblossom_close2",
+					"block/eyeblossom/eyeblossom_close3");
+			addSoundsToCategory("block.eyeblossom.idle",
+					"block/eyeblossom/eyeblossom_idle1",
+					"block/eyeblossom/eyeblossom_idle2",
+					"block/eyeblossom/eyeblossom_idle3",
+					"block/eyeblossom/eyeblossom_idle4",
+					"block/eyeblossom/eyeblossom_idle5",
+					"block/eyeblossom/eyeblossom_idle6");
+
 			// Vanilla 1.21.11: block.hanging_sign.waxed_interact_fail ->
 			// { name: block.sign.waxed_interact_fail, type: event }. Minecraft 1.7 already
 			// resolves bare type=event names inside the containing sounds.json namespace.

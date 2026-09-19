@@ -138,12 +138,11 @@ if contract.get("schema") != 1:
     errors.append("Backporter contract schema must be 1")
 if contract.get("source_minecraft") != "1.21.11":
     errors.append("Backporter contract source_minecraft must be 1.21.11")
-if contract.get("contract_revision") not in ("32e", "32f", "33", 34, "34", 35, "35"):
-    errors.append("Backporter contract contract_revision must be a Pass 32 finalization revision or forward-compatible Pass 33/34/35")
-if contract.get("implemented_in_version") != "3.5.5":
-    errors.append("Backporter contract implemented_in_version must be 3.5.5")
-if contract.get("implemented_in_git_ref") != "refs/tags/3.5.5":
-    errors.append("Backporter contract implemented_in_git_ref must be refs/tags/3.5.5")
+if str(contract.get("contract_revision")) not in ("32e", "32f", "33", "34", "35", "36", "37"):
+    errors.append("Backporter contract contract_revision must be Pass 32e or a forward-compatible later fidelity revision")
+if str(contract.get("contract_revision")) == "37":
+    if contract.get("implemented_in_version") != "3.5.9" or contract.get("implemented_in_git_ref") is not None or contract.get("release_status") != "unreleased":
+        errors.append("Pass 37 contract provenance must be unreleased 3.5.9 with no git ref")
 if "authoritative_source_commit" in contract or "generated_by_pass" in contract:
     errors.append("Backporter contract must not retain stale Pass 31/32c provenance fields")
 

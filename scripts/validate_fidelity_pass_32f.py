@@ -71,12 +71,12 @@ except Exception as exc:
     errors.append('Backporter contract JSON invalid: ' + str(exc))
     contract = {}
 
-if contract.get('contract_revision') not in ('32f', '33', 34, '34', 35, '35'):
-    errors.append("contract revision must remain 32f-compatible or advance through Pass 33/34/35")
-if contract.get('implemented_in_version') != '3.5.5':
-    errors.append("contract implemented_in_version must remain '3.5.5'")
-if contract.get('implemented_in_git_ref') != 'refs/tags/3.5.5':
-    errors.append("contract implemented_in_git_ref must remain 'refs/tags/3.5.5'")
+revision = str(contract.get('contract_revision'))
+if revision not in ('32f','33','34','35','36','37'):
+    errors.append('contract revision must remain 32f-compatible or advance through later fidelity passes')
+if revision == '37':
+    if contract.get('implemented_in_version') != '3.5.9' or contract.get('implemented_in_git_ref') is not None or contract.get('release_status') != 'unreleased':
+        errors.append('Pass 37 contract provenance must be unreleased 3.5.9 with no git ref')
 
 entries = {e.get('key'): e for e in contract.get('blocks', []) if isinstance(e, dict)}
 shelf = entries.get('shelf_family', {})

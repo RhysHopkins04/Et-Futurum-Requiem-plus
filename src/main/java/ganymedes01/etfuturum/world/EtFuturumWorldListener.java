@@ -92,6 +92,12 @@ public class EtFuturumWorldListener implements IWorldAccess {
 	@Override
 	public void markBlockForUpdate(int x, int y, int z) {
 
+		// IWorldAccess callbacks may fire while a TileEntity is still being installed during
+		// asynchronous/synchronous chunk stage-2 loading (ChickenChunks is a common example).
+		// World#getBlock will synchronously request a missing chunk, which re-enters this callback
+		// and can recurse until StackOverflowError. Never make this listener a chunk-loading edge.
+		if (!world.blockExists(x, y, z)) return;
+
 		Block currentBlock = world.getBlock(x, y, z);
 		int currentMeta = world.getBlockMetadata(x, y, z);
 		handleBasaltFromLava(x, y, z, currentBlock);
@@ -130,10 +136,15 @@ public class EtFuturumWorldListener implements IWorldAccess {
 	private void handleBasaltFromLava(int x, int y, int z, Block currentBlock) { //Don't support Netherlicious blocks, this can be handled on their end
 		if (ModBlocks.BASALT.isEnabled()) {
 			if (currentBlock.getMaterial() == Material.lava) {
+				if (!world.blockExists(x, y - 1, z)) return;
 				if (world.getBlock(x, y - 1, z) == soulsand) {
 					for (EnumFacing facing : Utils.ENUM_FACING_VALUES) {
 						if (facing == EnumFacing.DOWN) continue;
-						if (world.getBlock(x + facing.getFrontOffsetX(), y + facing.getFrontOffsetY(), z + facing.getFrontOffsetZ()) == ice) {
+						int nx = x + facing.getFrontOffsetX();
+						int ny = y + facing.getFrontOffsetY();
+						int nz = z + facing.getFrontOffsetZ();
+						if (!world.blockExists(nx, ny, nz)) continue;
+						if (world.getBlock(nx, ny, nz) == ice) {
 							world.playSoundEffect((float) x + 0.5F, (float) y + 0.5F, (float) z + 0.5F, "random.fizz", 0.5F, 2.6F + (world.rand.nextFloat() - world.rand.nextFloat()) * 0.8F);
 							for (int l = 0; l < 8; ++l) {
 								world.spawnParticle("largesmoke", (double) x + Math.random(), (double) y + 1.2D, (double) z + Math.random(), 0.0D, 0.0D, 0.0D);
@@ -159,6 +170,7 @@ public class EtFuturumWorldListener implements IWorldAccess {
 				|| !ModBlocks.BUBBLE_COLUMN.isEnabled()) {
 			return;
 		}
+		if (!world.blockExists(x, y - 1, z) || !world.blockExists(x, y + 1, z)) return;
 		Block below = world.getBlock(x, y - 1, z);
 		if (currentBlock.getMaterial().isLiquid() && !below.getMaterial().isLiquid()) {
 			handleBubbleColumnCreation(x, y - 1, z, below, world.getBlockMetadata(x, y - 1, z));

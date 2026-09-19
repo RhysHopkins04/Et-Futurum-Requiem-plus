@@ -64,7 +64,7 @@ for token in (
     '((EntityPlayerMP) player).sendContainerToPlayer(player.inventoryContainer);',
     'public static boolean isCopperChestBlock(Block block)',
     'public static final class ParityCopperChestTileEntity extends TileEntityChest',
-    'Pairing is supplied by the Pass 32c TileEntityChest mixin',
+    'Pairing is supplied by the shared chest-pairing mixins',
 ): req(parity, token, 'Parity runtime integration')
 if 'public void checkForAdjacentChests()' in parity[parity.find('ParityCopperChestTileEntity'):parity.find('/** Text storage', parity.find('ParityCopperChestTileEntity'))]:
     errors.append('Copper Chest must not retain its old raw-adjacency checkForAdjacentChests override')

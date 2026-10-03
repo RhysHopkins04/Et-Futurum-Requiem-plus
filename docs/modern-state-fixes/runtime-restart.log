@@ -1,0 +1,734 @@
+Reusing configuration cache.
+> Task :downloadVanillaJars SKIPPED
+> Task :extractDependencyATs SKIPPED
+> Task :generateForgeSrgMappings SKIPPED
+> Task :downloadFernflower SKIPPED
+> Task :processApiResources NO-SOURCE
+> Task :processMcLauncherResources NO-SOURCE
+> Task :injectTags UP-TO-DATE
+> Task :processInjectedTagsResources NO-SOURCE
+> Task :processInjectedInterfacesResources NO-SOURCE
+> Task :compileInjectedInterfacesJava NO-SOURCE
+> Task :injectedInterfacesClasses UP-TO-DATE
+> Task :extractNatives2 UP-TO-DATE
+> Task :createMcLauncherFiles UP-TO-DATE
+> Task :compileInjectedTagsJava UP-TO-DATE
+> Task :injectedTagsClasses UP-TO-DATE
+> Task :compileMcLauncherJava UP-TO-DATE
+> Task :mcLauncherClasses UP-TO-DATE
+> Task :packageMcLauncher UP-TO-DATE
+> Task :mergeVanillaSidedJars SKIPPED
+> Task :deobfuscateMergedJarToSrg SKIPPED
+> Task :decompileSrgJar SKIPPED
+> Task :cleanupDecompSrgJar SKIPPED
+> Task :patchDecompiledJar SKIPPED
+> Task :applyJST SKIPPED
+> Task :remapDecompiledJar SKIPPED
+> Task :decompressDecompiledSources UP-TO-DATE
+> Task :processPatchedMcResources UP-TO-DATE
+> Task :compilePatchedMcJava UP-TO-DATE
+> Task :patchedMcClasses UP-TO-DATE
+> Task :compileApiJava NO-SOURCE
+> Task :apiClasses UP-TO-DATE
+> Task :packagePatchedMc UP-TO-DATE
+> Task :compileJava UP-TO-DATE
+> Task :processResources UP-TO-DATE
+> Task :classes UP-TO-DATE
+> Task :jar UP-TO-DATE
+> Task :compileModernStateTests UP-TO-DATE
+
+> Task :runServer
+[07:19:03] [main/INFO] [GradleStart]: Extra: [nogui]
+[07:19:03] [main/INFO] [GradleStart]: Found and added coremod: ganymedes01.etfuturum.mixinplugin.EtFuturumEarlyMixins
+[07:19:03] [main/INFO] [GradleStart]: Found and added cascading tweaker: org.spongepowered.asm.launch.MixinTweaker
+[07:19:03] [main/INFO] [GradleStart]: Found and added coremod: com.gtnewhorizon.gtnhlib.core.GTNHLibCore
+[07:19:03] [main/INFO] [GradleStart]: Found and added coremod: io.github.legacymoddingmc.unimixins.all.AllCore
+[07:19:03] [main/INFO] [GradleStart]: Found and added coremod: com.gtnewhorizons.gtnhextlib.core.GTNHExtLibCore
+[07:19:03] [main/INFO] [GradleStart]: Running with arguments: [--tweakClass, cpw.mods.fml.common.launcher.FMLServerTweaker, nogui, --tweakClass, org.spongepowered.asm.launch.MixinTweaker, --tweakClass, net.minecraftforge.gradle.tweakers.CoremodTweaker]
+[07:19:03] [main/INFO] [LaunchWrapper]: Loading tweak class name cpw.mods.fml.common.launcher.FMLServerTweaker
+[07:19:03] [main/INFO] [LaunchWrapper]: Using primary tweak class name cpw.mods.fml.common.launcher.FMLServerTweaker
+[07:19:03] [main/INFO] [LaunchWrapper]: Loading tweak class name org.spongepowered.asm.launch.MixinTweaker
+[07:19:03] [main/INFO] [mixin]: SpongePowered MIXIN Subsystem Version=0.8.7 Source=file:/Users/rhysh/.gradle/caches/modules-2/files-2.1/io.github.legacymoddingmc/unimixins/0.2.1/98c0d7ad48c77c008842ca03b793d0a09d83ed4e/unimixins-0.2.1-dev.jar Service=LaunchWrapper Env=SERVER
+/*************************************************************************************************************************************************************************************************************************/
+/*                                                                                    SpongePowered MIXIN (Verbose debugging enabled)                                                                                    */
+/*************************************************************************************************************************************************************************************************************************/
+/*                                         Code source : file:/Users/rhysh/.gradle/caches/modules-2/files-2.1/io.github.legacymoddingmc/unimixins/0.2.1/98c0d7ad48c77c008842ca03b793d0a09d83ed4e/unimixins-0.2.1-dev.jar */
+/*                                    Internal Version : 0.8.7                                                                                                                                                           */
+/*                                        Java Version : 1.8 (supports compatibility 6-8)                                                                                                                                */
+/*                         Default Compatibility Level : JAVA_6                                                                                                                                                          */
+/*                   Max Effective Compatibility Level : JAVA_8                                                                                                                                                          */
+/*                                Detected ASM Version : ASM 9.0 (ASM10_EXPERIMENTAL)                                                                                                                                    */
+/*                          Detected ASM Supports Java : Up to Java 26 (class file version 70.0)                                                                                                                         */
+/*************************************************************************************************************************************************************************************************************************/
+/*                                        Service Name : LaunchWrapper                                                                                                                                                   */
+/*                                 Mixin Service Class : org.spongepowered.asm.service.mojang.MixinServiceLaunchWrapper                                                                                                  */
+/*                       Global Property Service Class : org.spongepowered.asm.service.mojang.Blackboard                                                                                                                 */
+/*                                 Logger Adapter Type : Log4j2 (via LaunchWrapper)                                                                                                                                      */
+/*************************************************************************************************************************************************************************************************************************/
+/*                                         mixin.debug : <false>                                                                                                                                                         */
+/*                                  mixin.debug.export : - <true>                                                                                                                                                        */
+/*                           mixin.debug.export.filter : - - <null>                                                                                                                                                      */
+/*                        mixin.debug.export.decompile : - - <true>                                                                                                                                                      */
+/*                  mixin.debug.export.decompile.async : - - - <true>                                                                                                                                                    */
+/* mixin.debug.export.decompile.mergeGenericSignatures : - - - <true>                                                                                                                                                    */
+/*                                  mixin.debug.verify : - <false>                                                                                                                                                       */
+/*                                 mixin.debug.verbose : - <true>                                                                                                                                                        */
+/*                         mixin.debug.countInjections : - <true>                                                                                                                                                        */
+/*                                  mixin.debug.strict : - <false>                                                                                                                                                       */
+/*                           mixin.debug.strict.unique : - - <false>                                                                                                                                                     */
+/*                          mixin.debug.strict.targets : - - <false>                                                                                                                                                     */
+/*                                mixin.debug.profiler : - <false>                                                                                                                                                       */
+/*                           mixin.dumpTargetOnFailure : <false>                                                                                                                                                         */
+/*                                        mixin.checks : <false>                                                                                                                                                         */
+/*                             mixin.checks.interfaces : - <false>                                                                                                                                                       */
+/*                      mixin.checks.interfaces.strict : - - <false>                                                                                                                                                     */
+/*                             mixin.ignoreConstraints : <false>                                                                                                                                                         */
+/*                                       mixin.hotSwap : <false>                                                                                                                                                         */
+/*                                       mixin.env.obf : - <false>                                                                                                                                                       */
+/*                             mixin.env.disableRefMap : - <false>                                                                                                                                                       */
+/*                               mixin.env.remapRefMap : - <true>                                                                                                                                                        */
+/*                       mixin.env.refMapRemappingFile : - <>                                                                                                                                                            */
+/*                        mixin.env.refMapRemappingEnv : - <searge>                                                                                                                                                      */
+/*                      mixin.env.allowPermissiveMatch : - <false>                                                                                                                                                       */
+/*                            mixin.env.ignoreRequired : - <false>                                                                                                                                                       */
+/*                               mixin.env.compatLevel : - <false>                                                                                                                                                       */
+/*                          mixin.env.shiftByViolation : - <warn>                                                                                                                                                        */
+/*                      mixin.initialiserInjectionMode : <default>                                                                                                                                                       */
+/*               mixin.tunable.classReaderExpandFrames : - <false>                                                                                                                                                       */
+/*************************************************************************************************************************************************************************************************************************/
+/*                                    UNSAFE_INJECTION : available=<true> enabled=<true>                                                                                                                                 */
+/*                       INJECTORS_IN_INTERFACE_MIXINS : available=<true> enabled=<false>                                                                                                                                */
+/*************************************************************************************************************************************************************************************************************************/
+/*                                       Detected Side : SERVER                                                                                                                                                          */
+/*************************************************************************************************************************************************************************************************************************/
+[07:19:03] [main/INFO] [mixin]: Attempting to load Fernflower decompiler (Threaded mode)
+[07:19:03] [main/INFO] [mixin]: Fernflower decompiler was successfully initialised from intellij-fernflower-1.2.1.16.jar, exported classes will be decompiled in a separate thread
+[07:19:03] [main/INFO] [LaunchWrapper]: Loading tweak class name net.minecraftforge.gradle.tweakers.CoremodTweaker
+[07:19:03] [main/INFO] [LaunchWrapper]: Calling tweak class cpw.mods.fml.common.launcher.FMLServerTweaker
+[07:19:03] [main/INFO] [FML]: Forge Mod Loader version 7.99.40.1614 for Minecraft 1.7.10 loading
+[07:19:03] [main/INFO] [FML]: Java is OpenJDK 64-Bit Server VM, version 1.8.0_472, running on Mac OS X:aarch64:26.3, installed at /Library/Java/JavaVirtualMachines/zulu-8.jdk/Contents/Home/jre
+[07:19:03] [main/INFO] [FML]: Managed to load a deobfuscated Minecraft name- we are in a deobfuscated environment. Skipping runtime deobfuscation
+[07:19:04] [main/INFO] [FML]: Found a command line coremod : com.gtnewhorizons.gtnhextlib.core.GTNHExtLibCore
+[07:19:04] [main/INFO] [mixin]: Preparing mixins for MixinEnvironment[PREINIT]
+[07:19:04] [main/INFO] [FalsePatternLib DepLoader]: [LetsEncryptHelper] Starting patcher
+[07:19:04] [main/INFO] [FalsePatternLib DepLoader]: [LetsEncryptHelper] Added certificates to trust store.
+[07:19:04] [main/INFO] [FalsePatternLib DepLoader]: Found dependency: it.unimi.dsi:fastutil:8.5.15 from jar:file:/Users/rhysh/.gradle/caches/modules-2/files-2.1/com.github.GTNewHorizons/GTNHLib/0.11.4/f0ebbf9b2c59a820a221eb415599550bdc46cb98/GTNHLib-0.11.4-dev.jar!/META-INF/gtnhlib_deps.json
+[07:19:04] [main/INFO] [FalsePatternLib DepLoader]: Found dependency: org.joml:joml:1.10.8 from jar:file:/Users/rhysh/.gradle/caches/modules-2/files-2.1/com.github.GTNewHorizons/GTNHLib/0.11.4/f0ebbf9b2c59a820a221eb415599550bdc46cb98/GTNHLib-0.11.4-dev.jar!/META-INF/gtnhlib_deps.json
+[07:19:04] [main/INFO] [FalsePatternLib DepLoader]: Found dependency: com.mojang:brigadier:1.0.18 from jar:file:/Users/rhysh/.gradle/caches/modules-2/files-2.1/com.github.GTNewHorizons/GTNHLib/0.11.4/f0ebbf9b2c59a820a221eb415599550bdc46cb98/GTNHLib-0.11.4-dev.jar!/META-INF/gtnhlib_deps.json
+[07:19:04] [main/INFO] [FalsePatternLib DepLoader]: Found dependency: it.unimi.dsi:fastutil:8.5.16 from jar:file:/Users/rhysh/.gradle/caches/modules-2/files-2.1/com.github.GTNewHorizons/GTNHExtLib/1.0.1/cc95b418efba185b70813107d045536094a63acd/GTNHExtLib-1.0.1.jar!/META-INF/gtnhextlib_deps.json
+[07:19:04] [main/INFO] [FalsePatternLib DepLoader]: Found dependency: org.joml:joml:1.10.8 from jar:file:/Users/rhysh/.gradle/caches/modules-2/files-2.1/com.github.GTNewHorizons/GTNHExtLib/1.0.1/cc95b418efba185b70813107d045536094a63acd/GTNHExtLib-1.0.1.jar!/META-INF/gtnhextlib_deps.json
+[07:19:04] [main/INFO] [FalsePatternLib DepLoader]: Found dependency: com.mojang:brigadier:1.0.18 from jar:file:/Users/rhysh/.gradle/caches/modules-2/files-2.1/com.github.GTNewHorizons/GTNHExtLib/1.0.1/cc95b418efba185b70813107d045536094a63acd/GTNHExtLib-1.0.1.jar!/META-INF/gtnhextlib_deps.json
+[07:19:04] [main/INFO] [FalsePatternLib DepLoader]: Found dependency: xyz.wagyourtail.jvmdowngrader:jvmdowngrader-java-api:1.3.5:downgraded-8 from jar:file:/Users/rhysh/.gradle/caches/modules-2/files-2.1/com.github.GTNewHorizons/GTNHLib/0.11.4/f0ebbf9b2c59a820a221eb415599550bdc46cb98/GTNHLib-0.11.4-dev.jar!/META-INF/gtnhlib_deps8.json
+[07:19:04] [main/INFO] [FalsePatternLib DepLoader]: Found dependency: xyz.wagyourtail.jvmdowngrader:jvmdowngrader-java-api:1.3.6:downgraded-8 from jar:file:/Users/rhysh/.gradle/caches/modules-2/files-2.1/com.github.GTNewHorizons/GTNHExtLib/1.0.1/cc95b418efba185b70813107d045536094a63acd/GTNHExtLib-1.0.1.jar!/META-INF/gtnhextlib_deps8.json
+[07:19:04] [main/INFO] [FalsePatternLib DepLoader]: Replacing dependency xyz.wagyourtail.jvmdowngrader:jvmdowngrader-java-api:1.3.5 from jar:file:/Users/rhysh/.gradle/caches/modules-2/files-2.1/com.github.GTNewHorizons/GTNHLib/0.11.4/f0ebbf9b2c59a820a221eb415599550bdc46cb98/GTNHLib-0.11.4-dev.jar!/META-INF/gtnhlib_deps8.json with version 1.3.6 from jar:file:/Users/rhysh/.gradle/caches/modules-2/files-2.1/com.github.GTNewHorizons/GTNHExtLib/1.0.1/cc95b418efba185b70813107d045536094a63acd/GTNHExtLib-1.0.1.jar!/META-INF/gtnhextlib_deps8.json
+[07:19:04] [main/INFO] [FalsePatternLib DepLoader]: Replacing dependency it.unimi.dsi:fastutil:8.5.15 from jar:file:/Users/rhysh/.gradle/caches/modules-2/files-2.1/com.github.GTNewHorizons/GTNHLib/0.11.4/f0ebbf9b2c59a820a221eb415599550bdc46cb98/GTNHLib-0.11.4-dev.jar!/META-INF/gtnhlib_deps.json with version 8.5.16 from jar:file:/Users/rhysh/.gradle/caches/modules-2/files-2.1/com.github.GTNewHorizons/GTNHExtLib/1.0.1/cc95b418efba185b70813107d045536094a63acd/GTNHExtLib-1.0.1.jar!/META-INF/gtnhextlib_deps.json
+[07:19:04] [main/INFO] [FalsePatternLib DepLoader]: -----------------------------------------------------------
+[07:19:04] [main/INFO] [FalsePatternLib DepLoader]: FalsePatternLib is downloading dependencies. Please wait...
+[07:19:04] [main/INFO] [FalsePatternLib DepLoader]: -----------------------------------------------------------
+[07:19:04] [main/INFO] [FalsePatternLib DepLoader]: MacOS detected, not creating progress window (your OS is buggy)
+[07:19:04] [Dependency Download Thread/INFO] [FalsePatternLib DepLoader]: Adding library com.mojang:brigadier:1.0.18, requested by mod jar:file:/Users/rhysh/.gradle/caches/modules-2/files-2.1/com.github.GTNewHorizons/GTNHExtLib/1.0.1/cc95b418efba185b70813107d045536094a63acd/GTNHExtLib-1.0.1.jar!/META-INF/gtnhextlib_deps.json
+[07:19:04] [Dependency Download Thread/INFO] [FalsePatternLib DepLoader]: Adding library xyz.wagyourtail.jvmdowngrader:jvmdowngrader-java-api:1.3.6-downgraded-8, requested by mod jar:file:/Users/rhysh/.gradle/caches/modules-2/files-2.1/com.github.GTNewHorizons/GTNHExtLib/1.0.1/cc95b418efba185b70813107d045536094a63acd/GTNHExtLib-1.0.1.jar!/META-INF/gtnhextlib_deps8.json
+[07:19:04] [Dependency Download Thread/INFO] [FalsePatternLib DepLoader]: Adding library it.unimi.dsi:fastutil:8.5.16, requested by mod jar:file:/Users/rhysh/.gradle/caches/modules-2/files-2.1/com.github.GTNewHorizons/GTNHExtLib/1.0.1/cc95b418efba185b70813107d045536094a63acd/GTNHExtLib-1.0.1.jar!/META-INF/gtnhextlib_deps.json
+[07:19:04] [Dependency Download Thread/INFO] [FalsePatternLib DepLoader]: Adding library org.joml:joml:1.10.8, requested by mod jar:file:/Users/rhysh/.gradle/caches/modules-2/files-2.1/com.github.GTNewHorizons/GTNHExtLib/1.0.1/cc95b418efba185b70813107d045536094a63acd/GTNHExtLib-1.0.1.jar!/META-INF/gtnhextlib_deps.json
+[07:19:04] [main/INFO] [GTNHExtLib]: Mirrored jvmdg stub file:/Users/rhysh/Documents/GitHub/Et-Futurum-Requiem-plus/build/modern-state-tests/server/./falsepattern/xyz.wagyourtail.jvmdowngrader-jvmdowngrader-java-api-1.3.6-downgraded-8.jar onto system classloader
+[07:19:04] [main/INFO] [FML]: Found a command line coremod : io.github.legacymoddingmc.unimixins.all.AllCore
+[07:19:04] [main/INFO] [MixinBooter]: MixinBootstrap Initializing...
+[07:19:04] [main/INFO] [mixin]: Compatibility level set to JAVA_8
+[07:19:04] [main/INFO] [mixin]: Checking for additional mixins for MixinEnvironment[PREINIT]
+[07:19:04] [main/INFO] [mixin]: Selecting config mixin.mixinbooterlegacy.json
+[07:19:04] [main/INFO] [mixin]: Preparing mixin.mixinbooterlegacy.json (1)
+[07:19:04] [main/INFO] [unimixins]: Instantiating AllCore
+[07:19:04] [main/INFO] [unimixins]: Instantiating CompatCore
+[07:19:04] [main/INFO] [unimixins-mixinextras]: Instantiating MixinExtrasCore
+[07:19:04] [main/INFO] [FML]: Found a command line coremod : ganymedes01.etfuturum.mixinplugin.EtFuturumEarlyMixins
+[07:19:04] [main/INFO] [FML]: Found a command line coremod : com.gtnewhorizon.gtnhlib.core.GTNHLibCore
+[07:19:04] [main/INFO] [LaunchWrapper]: Calling tweak class org.spongepowered.asm.launch.MixinTweaker
+[07:19:04] [main/INFO] [mixin]: Checking for additional mixins for MixinEnvironment[PREINIT]
+[07:19:04] [main/INFO] [mixin]: Selecting config mixins.gtnhmixins.json
+[07:19:04] [main/INFO] [mixin]: Preparing mixins.gtnhmixins.json (1)
+[07:19:04] [main/INFO] [mixin]: Initialised Mixin FML Remapper Adapter with cpw.mods.fml.common.asm.transformers.deobf.FMLDeobfuscatingRemapper@ebaa6cb
+[07:19:04] [main/INFO] [mixin]: Initialised Legacy FML Dev Remapper
+[07:19:04] [main/INFO] [LaunchWrapper]: Calling tweak class net.minecraftforge.gradle.tweakers.CoremodTweaker
+[07:19:04] [main/INFO] [GradleStart]: Injecting location in coremod cpw.mods.fml.relauncher.FMLCorePlugin
+[07:19:04] [main/INFO] [GradleStart]: Injecting location in coremod net.minecraftforge.classloading.FMLForgePlugin
+[07:19:04] [main/INFO] [GradleStart]: Injecting location in coremod com.gtnewhorizons.gtnhextlib.core.GTNHExtLibCore
+[07:19:04] [main/INFO] [GradleStart]: Injecting location in coremod io.github.legacymoddingmc.unimixins.all.AllCore
+[07:19:04] [main/INFO] [GradleStart]: Injecting location in coremod ganymedes01.etfuturum.mixinplugin.EtFuturumEarlyMixins
+[07:19:04] [main/INFO] [GradleStart]: Injecting location in coremod com.gtnewhorizon.gtnhlib.core.GTNHLibCore
+[07:19:04] [main/INFO] [LaunchWrapper]: Loading tweak class name cpw.mods.fml.common.launcher.FMLInjectionAndSortingTweaker
+[07:19:04] [main/INFO] [LaunchWrapper]: Loading tweak class name cpw.mods.fml.common.launcher.FMLDeobfTweaker
+[07:19:04] [main/INFO] [LaunchWrapper]: Loading tweak class name org.spongepowered.asm.mixin.EnvironmentStateTweaker
+[07:19:04] [main/INFO] [LaunchWrapper]: Loading tweak class name net.minecraftforge.gradle.tweakers.AccessTransformerTweaker
+[07:19:04] [main/INFO] [LaunchWrapper]: Calling tweak class cpw.mods.fml.common.launcher.FMLInjectionAndSortingTweaker
+[07:19:04] [main/INFO] [LaunchWrapper]: Calling tweak class cpw.mods.fml.common.launcher.FMLInjectionAndSortingTweaker
+[07:19:04] [main/INFO] [LaunchWrapper]: Calling tweak class cpw.mods.fml.relauncher.CoreModManager$FMLPluginWrapper
+[07:19:04] [main/ERROR] [FML]: The binary patch set is missing. Either you are in a development environment, or things are not going to work!
+[07:19:04] [main/ERROR] [FML]: FML appears to be missing any signature data. This is not a good thing
+[07:19:04] [main/INFO] [LaunchWrapper]: Calling tweak class cpw.mods.fml.relauncher.CoreModManager$FMLPluginWrapper
+[07:19:04] [main/INFO] [LaunchWrapper]: Calling tweak class cpw.mods.fml.relauncher.CoreModManager$FMLPluginWrapper
+[07:19:04] [main/INFO] [LaunchWrapper]: Calling tweak class cpw.mods.fml.relauncher.CoreModManager$FMLPluginWrapper
+[07:19:04] [main/INFO] [GTNHMixins]: Searching coremodList for IEarlyMixinLoaders
+[07:19:04] [main/INFO] [GTNHMixins]: LoadedCoreMods [com.gtnewhorizons.gtnhextlib.core.GTNHExtLibCore, cpw.mods.fml.relauncher.FMLCorePlugin, io.github.legacymoddingmc.unimixins.all.AllCore, org.spongepowered.asm.mixin.EnvironmentStateTweaker, GTNHLib Core, ganymedes01.etfuturum.mixinplugin.EtFuturumEarlyMixins, net.minecraftforge.gradle.tweakers.AccessTransformerTweaker, net.minecraftforge.classloading.FMLForgePlugin, cpw.mods.fml.common.launcher.FMLDeobfTweaker]
+[07:19:04] [main/INFO] [GTNHMixins]: Loading mixins from IEarlyMixinLoader [ganymedes01.etfuturum.mixinplugin.EtFuturumEarlyMixins]
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.etfuturum.early.json] chestpairing.MixinTileEntity
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.etfuturum.early.json] chestpairing.MixinTileEntityChest
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.etfuturum.early.json] chestpairing.MixinBlockChest
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.etfuturum.early.json] chestpairing.MixinItemBlock
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.etfuturum.early.json] commandblockstate.MixinTileEntityCommandBlock
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.etfuturum.early.json] commandblockstate.MixinBlockCommandBlock
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.etfuturum.early.json] containedwater.MixinAnvilChunkLoader
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.etfuturum.early.json] containedwater.MixinWorld
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.etfuturum.early.json] containedwater.MixinBlockLiquid
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.etfuturum.early.json] containedwater.MixinBlockDynamicLiquid
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.etfuturum.early.json] containedwater.MixinEntity
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.etfuturum.early.json] containedwater.MixinEntityLivingBase
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.etfuturum.early.json] containedwater.MixinItemBucket
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.etfuturum.early.json] copperlifecycle.MixinEntityLightningBolt
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.etfuturum.early.json] endportal.MixinBlockEndPortal
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.etfuturum.early.json] fencewallconnect.MixinBlockWall
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.etfuturum.early.json] fencewallconnect.MixinBlockFence
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.etfuturum.early.json] stepfix.MixinEntity
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.etfuturum.early.json] spectator.MixinGameType
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.etfuturum.early.json] spectator.MixinEntity
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.etfuturum.early.json] spectator.MixinEntityLivingBase
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.etfuturum.early.json] spectator.MixinWorld
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.etfuturum.early.json] spectator.MixinWorldServer
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.etfuturum.early.json] spectator.MixinEntityPlayer
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.etfuturum.early.json] spectator.MixinNetHandlerPlayServer
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.etfuturum.early.json] spectator.MixinInventoryPlayer
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.etfuturum.early.json] spectator.MixinContainerChest
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.etfuturum.early.json] spectator.MixinSlot
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.etfuturum.early.json] spectator.MixinCommandGameMode
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.etfuturum.early.json] backlytra.MixinEntityPlayer
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.etfuturum.early.json] backlytra.MixinEntityLivingBase
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.etfuturum.early.json] backlytra.MixinNetHandlerPlayServer
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.etfuturum.early.json] backlytra.MixinEntityTrackerEntry
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.etfuturum.early.json] doweathercycle.MixinCommandHandler
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.etfuturum.early.json] doweathercycle.MixinWorldInfo
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.etfuturum.early.json] randomtickspeed.MixinWorldServer
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.etfuturum.early.json] randomtickspeed.MixinGameRules
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.etfuturum.early.json] flyspeed.MixinEntityPlayer
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.etfuturum.early.json] bouncybeds.MixinBlockBed
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.etfuturum.early.json] sounds.MixinEntityPlayer
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.etfuturum.early.json] sounds.MixinEntitySnowman
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.etfuturum.early.json] sounds.MixinEntitySkeleton
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.etfuturum.early.json] sounds.MixinEntitySquid
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.etfuturum.early.json] sounds.MixinEntityWitch
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.etfuturum.early.json] skeleton.MixinEntitySkeleton
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.etfuturum.early.json] zombie.MixinEntityZombie
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.etfuturum.early.json] floorceilbutton.MixinBlockButton
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.etfuturum.early.json] sounds.MixinItemEnderEye
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.etfuturum.early.json] sounds.MixinEntityEnderEye
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.etfuturum.early.json] sounds.MixinContainerEnchantment
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.etfuturum.early.json] sounds.MixinItemFishingRod
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.etfuturum.early.json] sounds.MixinTileEntityBeacon
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.etfuturum.early.json] sounds.MixinItemHoe
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.etfuturum.early.json] observer.MixinWorld
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.etfuturum.early.json] observer.MixinWorldServer
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.etfuturum.early.json] observer.MixinChunk
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.etfuturum.early.json] fallingarrowfix.MixinEntityArrow
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.etfuturum.early.json] blockinventories.MixinTileEntityHopper
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.etfuturum.early.json] projectilecollidefix.MixinEntityThrowable
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.etfuturum.early.json] posttreegen.MixinWorldGenAbstractTree
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.etfuturum.early.json] laddertrapdoors.MixinBlockLadder
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.etfuturum.early.json] laddertrapdoors.MixinBlockTrapdoor
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.etfuturum.early.json] backinslime.MixinBlockPistonBase
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.etfuturum.early.json] soulfire.MixinBlockFire
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.etfuturum.early.json] soulfire.MixinEntity
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.etfuturum.early.json] singlelevel.MixinEnchantment
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.etfuturum.early.json] uninflammableitem.MixinEntityItem
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.etfuturum.early.json] isLadderFix.MixinEntityLivingBase
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.etfuturum.early.json] liquidphysics.MixinEntity
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.etfuturum.early.json] liquidphysics.MixinWorld
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.etfuturum.early.json] liquidphysics.MixinBlockLiquid
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.etfuturum.early.json] liquidphysics.MixinEntityItem
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.etfuturum.early.json] thinpanes.MixinBlockPane
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.etfuturum.early.json] playerssleepingpercentage.MixinWorldServer
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.etfuturum.early.json] foxes.MixinEntityLivingBase
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.etfuturum.early.json] foxes.MixinEntityWolf
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.etfuturum.early.json] items.MixinItemSkull
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.etfuturum.early.json] blocks.MixinTileEntitySkull
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.etfuturum.early.json] geninfo.MixinChunkProviderServer
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.etfuturum.early.json] deepslateores.MixinChunk
+[07:19:04] [main/INFO] [GTNHMixins]: Loading mixins from IEarlyMixinLoader [com.gtnewhorizon.gtnhlib.core.GTNHLibCore]
+[07:19:04] [main/INFO] [mixin]: Checking for additional mixins for MixinEnvironment[PREINIT]
+[07:19:04] [main/INFO] [GTNHMixins]: ITargetMods found during Phase EARLY: []
+[07:19:04] [main/INFO] [GTNHMixins]: ITargetMods not found during Phase EARLY: [LWJGL3IFY]
+[07:19:04] [main/INFO] [GTNHMixins]: Not loading the following EARLY mixins: [MixinTessellator, MixinWavefrontObject, fml.MixinGuiModList, MixinGuiScreen, MixinFontRenderer, models.FRMAccessor, models.MixinEffectRenderer_FixParticleIcons, models.MixinFileResourcePack, models.MixinFolderResourcePack, models.MixinRenderBlocks, models.SRRMAccessor, models.MixinModelFHC, models.MixinRenderGlobal, block_sounds.MixinPlayerControllerMP, block_sounds.MixinRenderGlobal, EntityRendererAccessor, MixinItemRenderer_Translucency, MixinRenderItem_Translucency, MixinMinecraft_PickBlockTrap, fml.MixinGuiConfig, MixinGuiSelectWorld]
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.gtnhlib.early.json] fml.EventBusAccessor
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.gtnhlib.early.json] fml.EnumHolderAccessor
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.gtnhlib.early.json] MixinEntityLivingBase
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.gtnhlib.early.json] MixinMinecraftServer
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.gtnhlib.early.json] MixinGameRules
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.gtnhlib.early.json] MixinCommandHandler
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.gtnhlib.early.json] MixinCommandHelp
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.gtnhlib.early.json] MixinTileEntitySkull
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.gtnhlib.early.json] block_sounds.MixinEntity
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.gtnhlib.early.json] block_sounds.MixinEntityLivingBase
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.gtnhlib.early.json] block_sounds.MixinEntityHorse
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.gtnhlib.early.json] block_sounds.MixinItemBlock
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.gtnhlib.early.json] block_sounds.MixinItemSlab
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.gtnhlib.early.json] MixinIChatComponentSerializer
+[07:19:04] [main/INFO] [GTNHMixins]: Loading [mixins.gtnhlib.early.json] fml.MixinJarDiscoverer
+[07:19:04] [main/INFO] [LaunchWrapper]: Calling tweak class cpw.mods.fml.relauncher.CoreModManager$FMLPluginWrapper
+[07:19:04] [main/INFO] [LaunchWrapper]: Calling tweak class cpw.mods.fml.relauncher.CoreModManager$FMLPluginWrapper
+[07:19:04] [main/INFO] [mixin]: Checking for additional mixins for MixinEnvironment[PREINIT]
+[07:19:04] [main/INFO] [LaunchWrapper]: Calling tweak class org.spongepowered.asm.mixin.EnvironmentStateTweaker
+[07:19:04] [main/INFO] [LaunchWrapper]: Calling tweak class cpw.mods.fml.common.launcher.FMLDeobfTweaker
+[07:19:04] [main/INFO] [mixin]: Preparing mixins for MixinEnvironment[INIT]
+[07:19:04] [main/INFO] [LaunchWrapper]: Calling tweak class net.minecraftforge.gradle.tweakers.AccessTransformerTweaker
+[07:19:04] [main/INFO] [GradleStart]: Remapping AccessTransformer rules...
+[07:19:04] [main/INFO] [LaunchWrapper]: Loading tweak class name cpw.mods.fml.common.launcher.TerminalTweaker
+[07:19:04] [main/INFO] [LaunchWrapper]: Calling tweak class cpw.mods.fml.common.launcher.TerminalTweaker
+[07:19:04] [main/INFO] [mixin]: Preparing mixins for MixinEnvironment[DEFAULT]
+[07:19:04] [main/INFO] [mixin]: Selecting config mixingasm.mixin.json
+[07:19:04] [main/INFO] [mixin]: Selecting config mixins.etfuturum.json
+[07:19:05] [main/INFO] [mixin]: Selecting config mixins.gtnhlib.json
+[07:19:05] [main/INFO] [mixin]: Selecting config mixins.etfuturum.early.json
+[07:19:05] [main/INFO] [mixin]: Selecting config mixins.gtnhlib.early.json
+[07:19:05] [main/INFO] [mixin]: Preparing mixingasm.mixin.json (0)
+[07:19:05] [main/INFO] [mixin]: Preparing mixins.etfuturum.json (0)
+[07:19:05] [main/INFO] [mixin]: Preparing mixins.gtnhlib.json (0)
+[07:19:05] [main/INFO] [mixin]: Preparing mixins.etfuturum.early.json (80)
+[07:19:05] [main/INFO] [mixin]: Preparing mixins.gtnhlib.early.json (15)
+[07:19:05] [main/INFO] [MixinExtras|Service]: Initializing MixinExtras via com.llamalad7.mixinextras.service.MixinExtrasServiceImpl(version=0.5.0).
+[07:19:05] [main/INFO] [mixin]: Mixing MixinMinecraftServer from mixins.gtnhlib.early.json into net.minecraft.server.MinecraftServer
+[07:19:05] [main/INFO] [mixin]: Mixing spectator.MixinWorldServer from mixins.etfuturum.early.json into net.minecraft.world.WorldServer
+[07:19:05] [Decompiler thread/INFO] [fernflower]: Decompiling net/minecraft/server/MinecraftServer
+[07:19:05] [main/INFO] [mixin]: Mixing randomtickspeed.MixinWorldServer from mixins.etfuturum.early.json into net.minecraft.world.WorldServer
+[07:19:05] [main/INFO] [mixin]: Mixing observer.MixinWorldServer from mixins.etfuturum.early.json into net.minecraft.world.WorldServer
+[07:19:05] [main/INFO] [mixin]: Mixing playerssleepingpercentage.MixinWorldServer from mixins.etfuturum.early.json into net.minecraft.world.WorldServer
+[07:19:05] [main/INFO] [mixin]: Mixing containedwater.MixinWorld from mixins.etfuturum.early.json into net.minecraft.world.World
+[07:19:05] [main/INFO] [mixin]: Mixing spectator.MixinWorld from mixins.etfuturum.early.json into net.minecraft.world.World
+[07:19:05] [main/INFO] [mixin]: Mixing observer.MixinWorld from mixins.etfuturum.early.json into net.minecraft.world.World
+[07:19:05] [main/INFO] [mixin]: Mixing liquidphysics.MixinWorld from mixins.etfuturum.early.json into net.minecraft.world.World
+[07:19:05] [main/INFO] [mixin]: Mixing spectator.MixinGameType from mixins.etfuturum.early.json into net.minecraft.world.WorldSettings$GameType
+[07:19:05] [main/INFO] [mixin]: Mixing backlytra.MixinEntityPlayer from mixins.etfuturum.early.json into net.minecraft.entity.player.EntityPlayer
+[07:19:05] [main/INFO] [mixin]: Mixing flyspeed.MixinEntityPlayer from mixins.etfuturum.early.json into net.minecraft.entity.player.EntityPlayer
+[07:19:05] [main/INFO] [mixin]: Mixing sounds.MixinEntityPlayer from mixins.etfuturum.early.json into net.minecraft.entity.player.EntityPlayer
+[07:19:05] [main/INFO] [mixin]: Mixing spectator.MixinEntityPlayer from mixins.etfuturum.early.json into net.minecraft.entity.player.EntityPlayer
+[07:19:05] [main/INFO] [mixin]: Mixing containedwater.MixinEntityLivingBase from mixins.etfuturum.early.json into net.minecraft.entity.EntityLivingBase
+[07:19:05] [main/INFO] [mixin]: Mixing spectator.MixinEntityLivingBase from mixins.etfuturum.early.json into net.minecraft.entity.EntityLivingBase
+[07:19:05] [main/INFO] [mixin]: Mixing backlytra.MixinEntityLivingBase from mixins.etfuturum.early.json into net.minecraft.entity.EntityLivingBase
+[07:19:05] [main/INFO] [mixin]: Mixing isLadderFix.MixinEntityLivingBase from mixins.etfuturum.early.json into net.minecraft.entity.EntityLivingBase
+[07:19:05] [main/INFO] [mixin]: Mixing foxes.MixinEntityLivingBase from mixins.etfuturum.early.json into net.minecraft.entity.EntityLivingBase
+[07:19:05] [main/INFO] [mixin]: Mixing MixinEntityLivingBase from mixins.gtnhlib.early.json into net.minecraft.entity.EntityLivingBase
+[07:19:05] [main/INFO] [mixin]: Mixing block_sounds.MixinEntityLivingBase from mixins.gtnhlib.early.json into net.minecraft.entity.EntityLivingBase
+[07:19:05] [Decompiler thread/INFO] [fernflower]: Writing /Users/rhysh/Documents/GitHub/Et-Futurum-Requiem-plus/build/modern-state-tests/server/.mixin.out/java/net/minecraft/server/MinecraftServer.java
+[07:19:05] [Decompiler thread/INFO] [fernflower]: Decompiling com/llamalad7/mixinextras/sugar/impl/ref/generated/LocalRefImpl
+[07:19:05] [Decompiler thread/INFO] [fernflower]: Writing /Users/rhysh/Documents/GitHub/Et-Futurum-Requiem-plus/build/modern-state-tests/server/.mixin.out/java/com/llamalad7/mixinextras/sugar/impl/ref/generated/LocalRefImpl.java
+[07:19:05] [Decompiler thread/INFO] [fernflower]: Decompiling net/minecraft/world/WorldServer
+[07:19:05] [main/INFO] [mixin]: Mixing containedwater.MixinEntity from mixins.etfuturum.early.json into net.minecraft.entity.Entity
+[07:19:05] [main/INFO] [mixin]: Mixing stepfix.MixinEntity from mixins.etfuturum.early.json into net.minecraft.entity.Entity
+[07:19:05] [main/INFO] [mixin]: Mixing spectator.MixinEntity from mixins.etfuturum.early.json into net.minecraft.entity.Entity
+[07:19:05] [main/INFO] [mixin]: Mixing soulfire.MixinEntity from mixins.etfuturum.early.json into net.minecraft.entity.Entity
+[07:19:05] [main/INFO] [mixin]: Mixing liquidphysics.MixinEntity from mixins.etfuturum.early.json into net.minecraft.entity.Entity
+[07:19:05] [main/INFO] [mixin]: Mixing block_sounds.MixinEntity from mixins.gtnhlib.early.json into net.minecraft.entity.Entity
+[07:19:05] [main/INFO] [LaunchWrapper]: Launching wrapped minecraft {net.minecraft.server.MinecraftServer}
+[07:19:05] [main/INFO] [mixin]: Mixing uninflammableitem.MixinEntityItem from mixins.etfuturum.early.json into net.minecraft.entity.item.EntityItem
+[07:19:05] [main/INFO] [mixin]: Mixing liquidphysics.MixinEntityItem from mixins.etfuturum.early.json into net.minecraft.entity.item.EntityItem
+[07:19:05] [Decompiler thread/INFO] [fernflower]: Writing /Users/rhysh/Documents/GitHub/Et-Futurum-Requiem-plus/build/modern-state-tests/server/.mixin.out/java/net/minecraft/world/WorldServer.java
+[07:19:05] [Decompiler thread/INFO] [fernflower]: Decompiling net/minecraft/world/World
+[07:19:05] [main/INFO] [mixin]: Mixing containedwater.MixinBlockDynamicLiquid from mixins.etfuturum.early.json into net.minecraft.block.BlockDynamicLiquid
+[07:19:05] [main/INFO] [mixin]: Mixing containedwater.MixinBlockLiquid from mixins.etfuturum.early.json into net.minecraft.block.BlockLiquid
+[07:19:05] [main/INFO] [mixin]: Mixing liquidphysics.MixinBlockLiquid from mixins.etfuturum.early.json into net.minecraft.block.BlockLiquid
+[07:19:05] [main/INFO] [mixin]: Mixing soulfire.MixinBlockFire from mixins.etfuturum.early.json into net.minecraft.block.BlockFire
+[07:19:05] [main/INFO] [mixin]: Mixing chestpairing.MixinTileEntity from mixins.etfuturum.early.json into net.minecraft.tileentity.TileEntity
+[07:19:05] [main/INFO] [mixin]: Mixing bouncybeds.MixinBlockBed from mixins.etfuturum.early.json into net.minecraft.block.BlockBed
+[07:19:05] [main/INFO] [mixin]: Mixing backinslime.MixinBlockPistonBase from mixins.etfuturum.early.json into net.minecraft.block.BlockPistonBase
+[07:19:05] [main/INFO] [mixin]: Mixing chestpairing.MixinBlockChest from mixins.etfuturum.early.json into net.minecraft.block.BlockChest
+[07:19:05] [main/INFO] [mixin]: Mixing chestpairing.MixinTileEntityChest from mixins.etfuturum.early.json into net.minecraft.tileentity.TileEntityChest
+[07:19:05] [main/INFO] [mixin]: Mixing laddertrapdoors.MixinBlockLadder from mixins.etfuturum.early.json into net.minecraft.block.BlockLadder
+[07:19:05] [main/INFO] [mixin]: Mixing floorceilbutton.MixinBlockButton from mixins.etfuturum.early.json into net.minecraft.block.BlockButton
+[07:19:05] [main/INFO] [mixin]: Mixing fencewallconnect.MixinBlockFence from mixins.etfuturum.early.json into net.minecraft.block.BlockFence
+[07:19:05] [main/INFO] [mixin]: Mixing sounds.MixinEntitySnowman from mixins.etfuturum.early.json into net.minecraft.entity.monster.EntitySnowman
+[07:19:05] [main/INFO] [mixin]: Mixing laddertrapdoors.MixinBlockTrapdoor from mixins.etfuturum.early.json into net.minecraft.block.BlockTrapDoor
+[07:19:05] [main/INFO] [mixin]: Mixing thinpanes.MixinBlockPane from mixins.etfuturum.early.json into net.minecraft.block.BlockPane
+[07:19:05] [main/INFO] [mixin]: Mixing endportal.MixinBlockEndPortal from mixins.etfuturum.early.json into net.minecraft.block.BlockEndPortal
+[07:19:05] [main/INFO] [mixin]: Mixing commandblockstate.MixinBlockCommandBlock from mixins.etfuturum.early.json into net.minecraft.block.BlockCommandBlock
+[07:19:05] [main/INFO] [mixin]: Mixing commandblockstate.MixinTileEntityCommandBlock from mixins.etfuturum.early.json into net.minecraft.tileentity.TileEntityCommandBlock
+[07:19:05] [main/INFO] [mixin]: Mixing sounds.MixinTileEntityBeacon from mixins.etfuturum.early.json into net.minecraft.tileentity.TileEntityBeacon
+[07:19:05] [main/INFO] [mixin]: Mixing fencewallconnect.MixinBlockWall from mixins.etfuturum.early.json into net.minecraft.block.BlockWall
+[07:19:05] [main/INFO] [mixin]: Mixing blocks.MixinTileEntitySkull from mixins.etfuturum.early.json into net.minecraft.tileentity.TileEntitySkull
+[07:19:05] [main/INFO] [mixin]: Mixing MixinTileEntitySkull from mixins.gtnhlib.early.json into net.minecraft.tileentity.TileEntitySkull
+[07:19:05] [main/INFO] [mixin]: Mixing blockinventories.MixinTileEntityHopper from mixins.etfuturum.early.json into net.minecraft.tileentity.TileEntityHopper
+[07:19:05] [main/INFO] [mixin]: Mixing chestpairing.MixinItemBlock from mixins.etfuturum.early.json into net.minecraft.item.ItemBlock
+[07:19:05] [main/INFO] [mixin]: Mixing block_sounds.MixinItemBlock from mixins.gtnhlib.early.json into net.minecraft.item.ItemBlock
+[07:19:05] [main/INFO] [mixin]: Mixing fallingarrowfix.MixinEntityArrow from mixins.etfuturum.early.json into net.minecraft.entity.projectile.EntityArrow
+[07:19:05] [main/INFO] [mixin]: Mixing sounds.MixinItemHoe from mixins.etfuturum.early.json into net.minecraft.item.ItemHoe
+[07:19:05] [main/INFO] [mixin]: Mixing containedwater.MixinItemBucket from mixins.etfuturum.early.json into net.minecraft.item.ItemBucket
+[07:19:05] [main/INFO] [mixin]: Mixing projectilecollidefix.MixinEntityThrowable from mixins.etfuturum.early.json into net.minecraft.entity.projectile.EntityThrowable
+[07:19:05] [main/INFO] [mixin]: Mixing sounds.MixinItemFishingRod from mixins.etfuturum.early.json into net.minecraft.item.ItemFishingRod
+[07:19:05] [main/INFO] [mixin]: Mixing sounds.MixinItemEnderEye from mixins.etfuturum.early.json into net.minecraft.item.ItemEnderEye
+[07:19:05] [main/INFO] [mixin]: Mixing sounds.MixinEntityEnderEye from mixins.etfuturum.early.json into net.minecraft.entity.item.EntityEnderEye
+[07:19:05] [main/INFO] [mixin]: Mixing items.MixinItemSkull from mixins.etfuturum.early.json into net.minecraft.item.ItemSkull
+[07:19:05] [main/INFO] [mixin]: Mixing block_sounds.MixinItemSlab from mixins.gtnhlib.early.json into net.minecraft.item.ItemSlab
+[07:19:05] [main/INFO] [mixin]: Mixing sounds.MixinEntitySkeleton from mixins.etfuturum.early.json into net.minecraft.entity.monster.EntitySkeleton
+[07:19:05] [main/INFO] [mixin]: Mixing skeleton.MixinEntitySkeleton from mixins.etfuturum.early.json into net.minecraft.entity.monster.EntitySkeleton
+[07:19:06] [main/INFO] [mixin]: Mixing zombie.MixinEntityZombie from mixins.etfuturum.early.json into net.minecraft.entity.monster.EntityZombie
+[07:19:06] [main/INFO] [mixin]: Mixing sounds.MixinEntityWitch from mixins.etfuturum.early.json into net.minecraft.entity.monster.EntityWitch
+[07:19:06] [main/INFO] [mixin]: Mixing sounds.MixinEntitySquid from mixins.etfuturum.early.json into net.minecraft.entity.passive.EntitySquid
+[07:19:06] [main/INFO] [mixin]: Mixing foxes.MixinEntityWolf from mixins.etfuturum.early.json into net.minecraft.entity.passive.EntityWolf
+[07:19:06] [main/INFO] [mixin]: Mixing block_sounds.MixinEntity from mixins.gtnhlib.early.json into net.minecraft.entity.passive.EntityHorse
+[07:19:06] [main/INFO] [mixin]: Mixing block_sounds.MixinEntityHorse from mixins.gtnhlib.early.json into net.minecraft.entity.passive.EntityHorse
+[07:19:06] [main/INFO] [mixin]: Mixing doweathercycle.MixinCommandHandler from mixins.etfuturum.early.json into net.minecraft.command.CommandHandler
+[07:19:06] [main/INFO] [mixin]: Mixing MixinCommandHandler from mixins.gtnhlib.early.json into net.minecraft.command.CommandHandler
+[07:19:06] [main/INFO] [mixin]: Mixing spectator.MixinCommandGameMode from mixins.etfuturum.early.json into net.minecraft.command.CommandGameMode
+[07:19:06] [main/INFO] [mixin]: Mixing MixinCommandHelp from mixins.gtnhlib.early.json into net.minecraft.command.CommandHelp
+[07:19:06] [Server thread/INFO]: Starting minecraft server version 1.7.10
+[07:19:06] [Server thread/INFO] [unimixins]: Transforming FMLCommonHandler to add hook for enhancing crash reports
+[07:19:06] [Server thread/INFO] [mixin]: Mixing fml.EventBusAccessor from mixins.gtnhlib.early.json into cpw.mods.fml.common.eventhandler.EventBus
+[07:19:06] [Server thread/INFO] [MinecraftForge]: Attempting early MinecraftForge initialization
+[07:19:06] [Server thread/INFO] [FML]: MinecraftForge v10.13.4.1614 Initialized
+[07:19:06] [Decompiler thread/INFO] [fernflower]: Writing /Users/rhysh/Documents/GitHub/Et-Futurum-Requiem-plus/build/modern-state-tests/server/.mixin.out/java/net/minecraft/world/World.java
+[07:19:06] [Decompiler thread/INFO] [fernflower]: Decompiling net/minecraft/world/WorldSettings$GameType
+[07:19:06] [Decompiler thread/INFO] [fernflower]: Writing /Users/rhysh/Documents/GitHub/Et-Futurum-Requiem-plus/build/modern-state-tests/server/.mixin.out/java/net/minecraft/world/WorldSettings$GameType.java
+[07:19:06] [Decompiler thread/INFO] [fernflower]: Decompiling net/minecraft/entity/player/EntityPlayer
+[07:19:06] [Server thread/INFO] [FML]: Replaced 183 ore recipies
+[07:19:06] [Server thread/INFO] [MinecraftForge]: Completed early MinecraftForge initialization
+[07:19:06] [Server thread/INFO] [mixin]: Mixing LoadControllerMixin from mixin.mixinbooterlegacy.json into cpw.mods.fml.common.LoadController
+[07:19:06] [Server thread/INFO] [mixin]: Mixing LateMixinOrchestrationMixin from mixins.gtnhmixins.json into cpw.mods.fml.common.LoadController
+[07:19:06] [Server thread/INFO] [mixin]: Mixing fml.MixinJarDiscoverer from mixins.gtnhlib.early.json into cpw.mods.fml.common.discovery.JarDiscoverer
+[07:19:06] [Server thread/INFO] [FML]: Found 0 mods from the command line. Injecting into mod discoverer
+[07:19:06] [Server thread/INFO] [FML]: Searching /Users/rhysh/Documents/GitHub/Et-Futurum-Requiem-plus/build/modern-state-tests/server/mods for mods
+[07:19:06] [Server thread/INFO] [FML]: Also searching /Users/rhysh/Documents/GitHub/Et-Futurum-Requiem-plus/build/modern-state-tests/server/mods/1.7.10 for mods
+[07:19:06] [Server thread/INFO] [mixin]: Mixing fml.EnumHolderAccessor from mixins.gtnhlib.early.json into cpw.mods.fml.common.discovery.asm.ModAnnotation$EnumHolder
+[07:19:06] [Decompiler thread/INFO] [fernflower]: Writing /Users/rhysh/Documents/GitHub/Et-Futurum-Requiem-plus/build/modern-state-tests/server/.mixin.out/java/net/minecraft/entity/player/EntityPlayer.java
+[07:19:06] [Decompiler thread/INFO] [fernflower]: Decompiling com/llamalad7/mixinextras/sugar/impl/ref/generated/LocalBooleanRefImpl
+[07:19:06] [Decompiler thread/INFO] [fernflower]: Writing /Users/rhysh/Documents/GitHub/Et-Futurum-Requiem-plus/build/modern-state-tests/server/.mixin.out/java/com/llamalad7/mixinextras/sugar/impl/ref/generated/LocalBooleanRefImpl.java
+[07:19:06] [Decompiler thread/INFO] [fernflower]: Decompiling net/minecraft/entity/EntityLivingBase
+[07:19:06] [Decompiler thread/INFO] [fernflower]: Writing /Users/rhysh/Documents/GitHub/Et-Futurum-Requiem-plus/build/modern-state-tests/server/.mixin.out/java/net/minecraft/entity/EntityLivingBase.java
+[07:19:06] [Decompiler thread/INFO] [fernflower]: Decompiling com/llamalad7/mixinextras/sugar/impl/ref/generated/LocalDoubleRefImpl
+[07:19:06] [Decompiler thread/INFO] [fernflower]: Writing /Users/rhysh/Documents/GitHub/Et-Futurum-Requiem-plus/build/modern-state-tests/server/.mixin.out/java/com/llamalad7/mixinextras/sugar/impl/ref/generated/LocalDoubleRefImpl.java
+[07:19:06] [Decompiler thread/INFO] [fernflower]: Decompiling com/llamalad7/mixinextras/sugar/impl/ref/generated/LocalIntRefImpl
+[07:19:06] [Decompiler thread/INFO] [fernflower]: Writing /Users/rhysh/Documents/GitHub/Et-Futurum-Requiem-plus/build/modern-state-tests/server/.mixin.out/java/com/llamalad7/mixinextras/sugar/impl/ref/generated/LocalIntRefImpl.java
+[07:19:06] [Decompiler thread/INFO] [fernflower]: Decompiling net/minecraft/entity/Entity
+[07:19:06] [Decompiler thread/INFO] [fernflower]: Writing /Users/rhysh/Documents/GitHub/Et-Futurum-Requiem-plus/build/modern-state-tests/server/.mixin.out/java/net/minecraft/entity/Entity.java
+[07:19:06] [Decompiler thread/INFO] [fernflower]: Decompiling net/minecraft/entity/item/EntityItem
+[07:19:06] [Decompiler thread/INFO] [fernflower]: Writing /Users/rhysh/Documents/GitHub/Et-Futurum-Requiem-plus/build/modern-state-tests/server/.mixin.out/java/net/minecraft/entity/item/EntityItem.java
+[07:19:06] [Decompiler thread/INFO] [fernflower]: Decompiling net/minecraft/block/BlockDynamicLiquid
+[07:19:06] [Decompiler thread/INFO] [fernflower]: Writing /Users/rhysh/Documents/GitHub/Et-Futurum-Requiem-plus/build/modern-state-tests/server/.mixin.out/java/net/minecraft/block/BlockDynamicLiquid.java
+[07:19:06] [Decompiler thread/INFO] [fernflower]: Decompiling net/minecraft/block/BlockLiquid
+[07:19:06] [Decompiler thread/INFO] [fernflower]: Writing /Users/rhysh/Documents/GitHub/Et-Futurum-Requiem-plus/build/modern-state-tests/server/.mixin.out/java/net/minecraft/block/BlockLiquid.java
+[07:19:06] [Decompiler thread/INFO] [fernflower]: Decompiling net/minecraft/block/BlockFire
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Writing /Users/rhysh/Documents/GitHub/Et-Futurum-Requiem-plus/build/modern-state-tests/server/.mixin.out/java/net/minecraft/block/BlockFire.java
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Decompiling net/minecraft/tileentity/TileEntity
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Writing /Users/rhysh/Documents/GitHub/Et-Futurum-Requiem-plus/build/modern-state-tests/server/.mixin.out/java/net/minecraft/tileentity/TileEntity.java
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Decompiling net/minecraft/block/BlockBed
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Writing /Users/rhysh/Documents/GitHub/Et-Futurum-Requiem-plus/build/modern-state-tests/server/.mixin.out/java/net/minecraft/block/BlockBed.java
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Decompiling net/minecraft/block/BlockPistonBase
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Writing /Users/rhysh/Documents/GitHub/Et-Futurum-Requiem-plus/build/modern-state-tests/server/.mixin.out/java/net/minecraft/block/BlockPistonBase.java
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Decompiling net/minecraft/block/BlockChest
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Writing /Users/rhysh/Documents/GitHub/Et-Futurum-Requiem-plus/build/modern-state-tests/server/.mixin.out/java/net/minecraft/block/BlockChest.java
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Decompiling net/minecraft/tileentity/TileEntityChest
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Writing /Users/rhysh/Documents/GitHub/Et-Futurum-Requiem-plus/build/modern-state-tests/server/.mixin.out/java/net/minecraft/tileentity/TileEntityChest.java
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Decompiling net/minecraft/block/BlockLadder
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Writing /Users/rhysh/Documents/GitHub/Et-Futurum-Requiem-plus/build/modern-state-tests/server/.mixin.out/java/net/minecraft/block/BlockLadder.java
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Decompiling net/minecraft/block/BlockButton
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Writing /Users/rhysh/Documents/GitHub/Et-Futurum-Requiem-plus/build/modern-state-tests/server/.mixin.out/java/net/minecraft/block/BlockButton.java
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Decompiling net/minecraft/block/BlockFence
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Writing /Users/rhysh/Documents/GitHub/Et-Futurum-Requiem-plus/build/modern-state-tests/server/.mixin.out/java/net/minecraft/block/BlockFence.java
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Decompiling net/minecraft/entity/monster/EntitySnowman
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Writing /Users/rhysh/Documents/GitHub/Et-Futurum-Requiem-plus/build/modern-state-tests/server/.mixin.out/java/net/minecraft/entity/monster/EntitySnowman.java
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Decompiling net/minecraft/block/BlockTrapDoor
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Writing /Users/rhysh/Documents/GitHub/Et-Futurum-Requiem-plus/build/modern-state-tests/server/.mixin.out/java/net/minecraft/block/BlockTrapDoor.java
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Decompiling net/minecraft/block/BlockPane
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Writing /Users/rhysh/Documents/GitHub/Et-Futurum-Requiem-plus/build/modern-state-tests/server/.mixin.out/java/net/minecraft/block/BlockPane.java
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Decompiling net/minecraft/block/BlockEndPortal
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Writing /Users/rhysh/Documents/GitHub/Et-Futurum-Requiem-plus/build/modern-state-tests/server/.mixin.out/java/net/minecraft/block/BlockEndPortal.java
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Decompiling net/minecraft/block/BlockCommandBlock
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Writing /Users/rhysh/Documents/GitHub/Et-Futurum-Requiem-plus/build/modern-state-tests/server/.mixin.out/java/net/minecraft/block/BlockCommandBlock.java
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Decompiling net/minecraft/tileentity/TileEntityCommandBlock
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Writing /Users/rhysh/Documents/GitHub/Et-Futurum-Requiem-plus/build/modern-state-tests/server/.mixin.out/java/net/minecraft/tileentity/TileEntityCommandBlock.java
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Decompiling net/minecraft/tileentity/TileEntityBeacon
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Writing /Users/rhysh/Documents/GitHub/Et-Futurum-Requiem-plus/build/modern-state-tests/server/.mixin.out/java/net/minecraft/tileentity/TileEntityBeacon.java
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Decompiling net/minecraft/block/BlockWall
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Writing /Users/rhysh/Documents/GitHub/Et-Futurum-Requiem-plus/build/modern-state-tests/server/.mixin.out/java/net/minecraft/block/BlockWall.java
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Decompiling net/minecraft/tileentity/TileEntitySkull
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Writing /Users/rhysh/Documents/GitHub/Et-Futurum-Requiem-plus/build/modern-state-tests/server/.mixin.out/java/net/minecraft/tileentity/TileEntitySkull.java
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Decompiling net/minecraft/tileentity/TileEntityHopper
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Writing /Users/rhysh/Documents/GitHub/Et-Futurum-Requiem-plus/build/modern-state-tests/server/.mixin.out/java/net/minecraft/tileentity/TileEntityHopper.java
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Decompiling net/minecraft/item/ItemBlock
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Writing /Users/rhysh/Documents/GitHub/Et-Futurum-Requiem-plus/build/modern-state-tests/server/.mixin.out/java/net/minecraft/item/ItemBlock.java
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Decompiling net/minecraft/entity/projectile/EntityArrow
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Writing /Users/rhysh/Documents/GitHub/Et-Futurum-Requiem-plus/build/modern-state-tests/server/.mixin.out/java/net/minecraft/entity/projectile/EntityArrow.java
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Decompiling net/minecraft/item/ItemHoe
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Writing /Users/rhysh/Documents/GitHub/Et-Futurum-Requiem-plus/build/modern-state-tests/server/.mixin.out/java/net/minecraft/item/ItemHoe.java
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Decompiling net/minecraft/item/ItemBucket
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Writing /Users/rhysh/Documents/GitHub/Et-Futurum-Requiem-plus/build/modern-state-tests/server/.mixin.out/java/net/minecraft/item/ItemBucket.java
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Decompiling net/minecraft/entity/projectile/EntityThrowable
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Writing /Users/rhysh/Documents/GitHub/Et-Futurum-Requiem-plus/build/modern-state-tests/server/.mixin.out/java/net/minecraft/entity/projectile/EntityThrowable.java
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Decompiling net/minecraft/item/ItemFishingRod
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Writing /Users/rhysh/Documents/GitHub/Et-Futurum-Requiem-plus/build/modern-state-tests/server/.mixin.out/java/net/minecraft/item/ItemFishingRod.java
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Decompiling net/minecraft/item/ItemEnderEye
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Writing /Users/rhysh/Documents/GitHub/Et-Futurum-Requiem-plus/build/modern-state-tests/server/.mixin.out/java/net/minecraft/item/ItemEnderEye.java
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Decompiling net/minecraft/entity/item/EntityEnderEye
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Writing /Users/rhysh/Documents/GitHub/Et-Futurum-Requiem-plus/build/modern-state-tests/server/.mixin.out/java/net/minecraft/entity/item/EntityEnderEye.java
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Decompiling net/minecraft/item/ItemSkull
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Writing /Users/rhysh/Documents/GitHub/Et-Futurum-Requiem-plus/build/modern-state-tests/server/.mixin.out/java/net/minecraft/item/ItemSkull.java
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Decompiling net/minecraft/item/ItemSlab
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Writing /Users/rhysh/Documents/GitHub/Et-Futurum-Requiem-plus/build/modern-state-tests/server/.mixin.out/java/net/minecraft/item/ItemSlab.java
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Decompiling net/minecraft/entity/monster/EntitySkeleton
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Writing /Users/rhysh/Documents/GitHub/Et-Futurum-Requiem-plus/build/modern-state-tests/server/.mixin.out/java/net/minecraft/entity/monster/EntitySkeleton.java
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Decompiling net/minecraft/entity/monster/EntityZombie
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Writing /Users/rhysh/Documents/GitHub/Et-Futurum-Requiem-plus/build/modern-state-tests/server/.mixin.out/java/net/minecraft/entity/monster/EntityZombie.java
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Decompiling net/minecraft/entity/monster/EntityWitch
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Writing /Users/rhysh/Documents/GitHub/Et-Futurum-Requiem-plus/build/modern-state-tests/server/.mixin.out/java/net/minecraft/entity/monster/EntityWitch.java
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Decompiling net/minecraft/entity/passive/EntitySquid
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Writing /Users/rhysh/Documents/GitHub/Et-Futurum-Requiem-plus/build/modern-state-tests/server/.mixin.out/java/net/minecraft/entity/passive/EntitySquid.java
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Decompiling net/minecraft/entity/passive/EntityWolf
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Writing /Users/rhysh/Documents/GitHub/Et-Futurum-Requiem-plus/build/modern-state-tests/server/.mixin.out/java/net/minecraft/entity/passive/EntityWolf.java
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Decompiling net/minecraft/entity/passive/EntityHorse
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Writing /Users/rhysh/Documents/GitHub/Et-Futurum-Requiem-plus/build/modern-state-tests/server/.mixin.out/java/net/minecraft/entity/passive/EntityHorse.java
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Decompiling net/minecraft/command/CommandHandler
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Writing /Users/rhysh/Documents/GitHub/Et-Futurum-Requiem-plus/build/modern-state-tests/server/.mixin.out/java/net/minecraft/command/CommandHandler.java
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Decompiling net/minecraft/command/CommandGameMode
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Writing /Users/rhysh/Documents/GitHub/Et-Futurum-Requiem-plus/build/modern-state-tests/server/.mixin.out/java/net/minecraft/command/CommandGameMode.java
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Decompiling net/minecraft/command/CommandHelp
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Writing /Users/rhysh/Documents/GitHub/Et-Futurum-Requiem-plus/build/modern-state-tests/server/.mixin.out/java/net/minecraft/command/CommandHelp.java
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Decompiling cpw/mods/fml/common/eventhandler/EventBus
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Writing /Users/rhysh/Documents/GitHub/Et-Futurum-Requiem-plus/build/modern-state-tests/server/.mixin.out/java/cpw/mods/fml/common/eventhandler/EventBus.java
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Decompiling com/gtnewhorizon/gtnhlib/mixins/early/fml/EventBusAccessor
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Writing /Users/rhysh/Documents/GitHub/Et-Futurum-Requiem-plus/build/modern-state-tests/server/.mixin.out/java/com/gtnewhorizon/gtnhlib/mixins/early/fml/EventBusAccessor.java
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Decompiling cpw/mods/fml/common/LoadController
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Writing /Users/rhysh/Documents/GitHub/Et-Futurum-Requiem-plus/build/modern-state-tests/server/.mixin.out/java/cpw/mods/fml/common/LoadController.java
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Decompiling cpw/mods/fml/common/discovery/JarDiscoverer
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Writing /Users/rhysh/Documents/GitHub/Et-Futurum-Requiem-plus/build/modern-state-tests/server/.mixin.out/java/cpw/mods/fml/common/discovery/JarDiscoverer.java
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Decompiling cpw/mods/fml/common/discovery/asm/ModAnnotation$EnumHolder
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Writing /Users/rhysh/Documents/GitHub/Et-Futurum-Requiem-plus/build/modern-state-tests/server/.mixin.out/java/cpw/mods/fml/common/discovery/asm/ModAnnotation$EnumHolder.java
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Decompiling com/gtnewhorizon/gtnhlib/mixins/early/fml/EnumHolderAccessor
+[07:19:07] [Decompiler thread/INFO] [fernflower]: Writing /Users/rhysh/Documents/GitHub/Et-Futurum-Requiem-plus/build/modern-state-tests/server/.mixin.out/java/com/gtnewhorizon/gtnhlib/mixins/early/fml/EnumHolderAccessor.java
+[07:19:09] [Server thread/ERROR] [FML]: Unable to read a class file correctly
+java.lang.IllegalArgumentException
+	at org.objectweb.asm.ClassReader.<init>(ClassReader.java:170) ~[asm-debug-all-5.0.3.jar:5.0.3]
+	at org.objectweb.asm.ClassReader.<init>(ClassReader.java:153) ~[asm-debug-all-5.0.3.jar:5.0.3]
+	at org.objectweb.asm.ClassReader.<init>(ClassReader.java:424) ~[asm-debug-all-5.0.3.jar:5.0.3]
+	at cpw.mods.fml.common.discovery.asm.ASMModParser.<init>(ASMModParser.java:52) [ASMModParser.class:?]
+	at cpw.mods.fml.common.discovery.JarDiscoverer.discover(JarDiscoverer.java:72) [JarDiscoverer.class:?]
+	at cpw.mods.fml.common.discovery.ContainerType.findMods(ContainerType.java:42) [ContainerType.class:?]
+	at cpw.mods.fml.common.discovery.ModCandidate.explore(ModCandidate.java:71) [ModCandidate.class:?]
+	at cpw.mods.fml.common.discovery.ModDiscoverer.identifyMods(ModDiscoverer.java:131) [ModDiscoverer.class:?]
+	at cpw.mods.fml.common.Loader.identifyMods(Loader.java:364) [Loader.class:?]
+	at cpw.mods.fml.common.Loader.loadMods(Loader.java:489) [Loader.class:?]
+	at cpw.mods.fml.server.FMLServerHandler.beginServerLoading(FMLServerHandler.java:87) [FMLServerHandler.class:?]
+	at cpw.mods.fml.common.FMLCommonHandler.onServerStart(FMLCommonHandler.java:314) [FMLCommonHandler.class:?]
+	at net.minecraft.server.dedicated.DedicatedServer.startServer(DedicatedServer.java:120) [DedicatedServer.class:?]
+	at net.minecraft.server.MinecraftServer.run(MinecraftServer.java:449) [MinecraftServer.class:?]
+	at net.minecraft.server.MinecraftServer$2.run(MinecraftServer.java:756) [MinecraftServer$2.class:?]
+[07:19:09] [Server thread/ERROR] [FML]: There was a problem reading the entry module-info.class in the jar /Users/rhysh/.gradle/caches/modules-2/files-2.1/org.joml/joml/1.10.8/fc0a71dad90a2cf41d82a76156a0e700af8e4f8d/joml-1.10.8.jar - probably a corrupt zip
+cpw.mods.fml.common.LoaderException: java.lang.IllegalArgumentException
+
+	at cpw.mods.fml.common.discovery.asm.ASMModParser.<init>(ASMModParser.java:58) ~[ASMModParser.class:?]
+	at cpw.mods.fml.common.discovery.JarDiscoverer.discover(JarDiscoverer.java:72) [JarDiscoverer.class:?]
+	at cpw.mods.fml.common.discovery.ContainerType.findMods(ContainerType.java:42) [ContainerType.class:?]
+	at cpw.mods.fml.common.discovery.ModCandidate.explore(ModCandidate.java:71) [ModCandidate.class:?]
+	at cpw.mods.fml.common.discovery.ModDiscoverer.identifyMods(ModDiscoverer.java:131) [ModDiscoverer.class:?]
+	at cpw.mods.fml.common.Loader.identifyMods(Loader.java:364) [Loader.class:?]
+	at cpw.mods.fml.common.Loader.loadMods(Loader.java:489) [Loader.class:?]
+	at cpw.mods.fml.server.FMLServerHandler.beginServerLoading(FMLServerHandler.java:87) [FMLServerHandler.class:?]
+	at cpw.mods.fml.common.FMLCommonHandler.onServerStart(FMLCommonHandler.java:314) [FMLCommonHandler.class:?]
+	at net.minecraft.server.dedicated.DedicatedServer.startServer(DedicatedServer.java:120) [DedicatedServer.class:?]
+	at net.minecraft.server.MinecraftServer.run(MinecraftServer.java:449) [MinecraftServer.class:?]
+	at net.minecraft.server.MinecraftServer$2.run(MinecraftServer.java:756) [MinecraftServer$2.class:?]
+Caused by: java.lang.IllegalArgumentException
+	at org.objectweb.asm.ClassReader.<init>(ClassReader.java:170) ~[asm-debug-all-5.0.3.jar:5.0.3]
+	at org.objectweb.asm.ClassReader.<init>(ClassReader.java:153) ~[asm-debug-all-5.0.3.jar:5.0.3]
+	at org.objectweb.asm.ClassReader.<init>(ClassReader.java:424) ~[asm-debug-all-5.0.3.jar:5.0.3]
+	at cpw.mods.fml.common.discovery.asm.ASMModParser.<init>(ASMModParser.java:52) ~[ASMModParser.class:?]
+	... 11 more
+[07:19:09] [Server thread/WARN] [FML]: Zip file joml-1.10.8.jar failed to read properly, it will be ignored
+cpw.mods.fml.common.LoaderException: java.lang.IllegalArgumentException
+
+	at cpw.mods.fml.common.discovery.asm.ASMModParser.<init>(ASMModParser.java:58) ~[ASMModParser.class:?]
+	at cpw.mods.fml.common.discovery.JarDiscoverer.discover(JarDiscoverer.java:72) [JarDiscoverer.class:?]
+	at cpw.mods.fml.common.discovery.ContainerType.findMods(ContainerType.java:42) [ContainerType.class:?]
+	at cpw.mods.fml.common.discovery.ModCandidate.explore(ModCandidate.java:71) [ModCandidate.class:?]
+	at cpw.mods.fml.common.discovery.ModDiscoverer.identifyMods(ModDiscoverer.java:131) [ModDiscoverer.class:?]
+	at cpw.mods.fml.common.Loader.identifyMods(Loader.java:364) [Loader.class:?]
+	at cpw.mods.fml.common.Loader.loadMods(Loader.java:489) [Loader.class:?]
+	at cpw.mods.fml.server.FMLServerHandler.beginServerLoading(FMLServerHandler.java:87) [FMLServerHandler.class:?]
+	at cpw.mods.fml.common.FMLCommonHandler.onServerStart(FMLCommonHandler.java:314) [FMLCommonHandler.class:?]
+	at net.minecraft.server.dedicated.DedicatedServer.startServer(DedicatedServer.java:120) [DedicatedServer.class:?]
+	at net.minecraft.server.MinecraftServer.run(MinecraftServer.java:449) [MinecraftServer.class:?]
+	at net.minecraft.server.MinecraftServer$2.run(MinecraftServer.java:756) [MinecraftServer$2.class:?]
+Caused by: java.lang.IllegalArgumentException
+	at org.objectweb.asm.ClassReader.<init>(ClassReader.java:170) ~[asm-debug-all-5.0.3.jar:5.0.3]
+	at org.objectweb.asm.ClassReader.<init>(ClassReader.java:153) ~[asm-debug-all-5.0.3.jar:5.0.3]
+	at org.objectweb.asm.ClassReader.<init>(ClassReader.java:424) ~[asm-debug-all-5.0.3.jar:5.0.3]
+	at cpw.mods.fml.common.discovery.asm.ASMModParser.<init>(ASMModParser.java:52) ~[ASMModParser.class:?]
+	... 11 more
+[07:19:09] [Server thread/ERROR] [FML]: Unable to read a class file correctly
+java.lang.IllegalArgumentException
+	at org.objectweb.asm.ClassReader.<init>(ClassReader.java:170) ~[asm-debug-all-5.0.3.jar:5.0.3]
+	at org.objectweb.asm.ClassReader.<init>(ClassReader.java:153) ~[asm-debug-all-5.0.3.jar:5.0.3]
+	at org.objectweb.asm.ClassReader.<init>(ClassReader.java:424) ~[asm-debug-all-5.0.3.jar:5.0.3]
+	at cpw.mods.fml.common.discovery.asm.ASMModParser.<init>(ASMModParser.java:52) [ASMModParser.class:?]
+	at cpw.mods.fml.common.discovery.JarDiscoverer.discover(JarDiscoverer.java:72) [JarDiscoverer.class:?]
+	at cpw.mods.fml.common.discovery.ContainerType.findMods(ContainerType.java:42) [ContainerType.class:?]
+	at cpw.mods.fml.common.discovery.ModCandidate.explore(ModCandidate.java:71) [ModCandidate.class:?]
+	at cpw.mods.fml.common.discovery.ModDiscoverer.identifyMods(ModDiscoverer.java:131) [ModDiscoverer.class:?]
+	at cpw.mods.fml.common.Loader.identifyMods(Loader.java:364) [Loader.class:?]
+	at cpw.mods.fml.common.Loader.loadMods(Loader.java:489) [Loader.class:?]
+	at cpw.mods.fml.server.FMLServerHandler.beginServerLoading(FMLServerHandler.java:87) [FMLServerHandler.class:?]
+	at cpw.mods.fml.common.FMLCommonHandler.onServerStart(FMLCommonHandler.java:314) [FMLCommonHandler.class:?]
+	at net.minecraft.server.dedicated.DedicatedServer.startServer(DedicatedServer.java:120) [DedicatedServer.class:?]
+	at net.minecraft.server.MinecraftServer.run(MinecraftServer.java:449) [MinecraftServer.class:?]
+	at net.minecraft.server.MinecraftServer$2.run(MinecraftServer.java:756) [MinecraftServer$2.class:?]
+[07:19:09] [Server thread/ERROR] [FML]: There was a problem reading the entry module-info.class in the jar /Users/rhysh/Documents/GitHub/Et-Futurum-Requiem-plus/build/modern-state-tests/server/./falsepattern/org.joml-joml-1.10.8.jar - probably a corrupt zip
+cpw.mods.fml.common.LoaderException: java.lang.IllegalArgumentException
+
+	at cpw.mods.fml.common.discovery.asm.ASMModParser.<init>(ASMModParser.java:58) ~[ASMModParser.class:?]
+	at cpw.mods.fml.common.discovery.JarDiscoverer.discover(JarDiscoverer.java:72) [JarDiscoverer.class:?]
+	at cpw.mods.fml.common.discovery.ContainerType.findMods(ContainerType.java:42) [ContainerType.class:?]
+	at cpw.mods.fml.common.discovery.ModCandidate.explore(ModCandidate.java:71) [ModCandidate.class:?]
+	at cpw.mods.fml.common.discovery.ModDiscoverer.identifyMods(ModDiscoverer.java:131) [ModDiscoverer.class:?]
+	at cpw.mods.fml.common.Loader.identifyMods(Loader.java:364) [Loader.class:?]
+	at cpw.mods.fml.common.Loader.loadMods(Loader.java:489) [Loader.class:?]
+	at cpw.mods.fml.server.FMLServerHandler.beginServerLoading(FMLServerHandler.java:87) [FMLServerHandler.class:?]
+	at cpw.mods.fml.common.FMLCommonHandler.onServerStart(FMLCommonHandler.java:314) [FMLCommonHandler.class:?]
+	at net.minecraft.server.dedicated.DedicatedServer.startServer(DedicatedServer.java:120) [DedicatedServer.class:?]
+	at net.minecraft.server.MinecraftServer.run(MinecraftServer.java:449) [MinecraftServer.class:?]
+	at net.minecraft.server.MinecraftServer$2.run(MinecraftServer.java:756) [MinecraftServer$2.class:?]
+Caused by: java.lang.IllegalArgumentException
+	at org.objectweb.asm.ClassReader.<init>(ClassReader.java:170) ~[asm-debug-all-5.0.3.jar:5.0.3]
+	at org.objectweb.asm.ClassReader.<init>(ClassReader.java:153) ~[asm-debug-all-5.0.3.jar:5.0.3]
+	at org.objectweb.asm.ClassReader.<init>(ClassReader.java:424) ~[asm-debug-all-5.0.3.jar:5.0.3]
+	at cpw.mods.fml.common.discovery.asm.ASMModParser.<init>(ASMModParser.java:52) ~[ASMModParser.class:?]
+	... 11 more
+[07:19:09] [Server thread/WARN] [FML]: Zip file org.joml-joml-1.10.8.jar failed to read properly, it will be ignored
+cpw.mods.fml.common.LoaderException: java.lang.IllegalArgumentException
+
+	at cpw.mods.fml.common.discovery.asm.ASMModParser.<init>(ASMModParser.java:58) ~[ASMModParser.class:?]
+	at cpw.mods.fml.common.discovery.JarDiscoverer.discover(JarDiscoverer.java:72) [JarDiscoverer.class:?]
+	at cpw.mods.fml.common.discovery.ContainerType.findMods(ContainerType.java:42) [ContainerType.class:?]
+	at cpw.mods.fml.common.discovery.ModCandidate.explore(ModCandidate.java:71) [ModCandidate.class:?]
+	at cpw.mods.fml.common.discovery.ModDiscoverer.identifyMods(ModDiscoverer.java:131) [ModDiscoverer.class:?]
+	at cpw.mods.fml.common.Loader.identifyMods(Loader.java:364) [Loader.class:?]
+	at cpw.mods.fml.common.Loader.loadMods(Loader.java:489) [Loader.class:?]
+	at cpw.mods.fml.server.FMLServerHandler.beginServerLoading(FMLServerHandler.java:87) [FMLServerHandler.class:?]
+	at cpw.mods.fml.common.FMLCommonHandler.onServerStart(FMLCommonHandler.java:314) [FMLCommonHandler.class:?]
+	at net.minecraft.server.dedicated.DedicatedServer.startServer(DedicatedServer.java:120) [DedicatedServer.class:?]
+	at net.minecraft.server.MinecraftServer.run(MinecraftServer.java:449) [MinecraftServer.class:?]
+	at net.minecraft.server.MinecraftServer$2.run(MinecraftServer.java:756) [MinecraftServer$2.class:?]
+Caused by: java.lang.IllegalArgumentException
+	at org.objectweb.asm.ClassReader.<init>(ClassReader.java:170) ~[asm-debug-all-5.0.3.jar:5.0.3]
+	at org.objectweb.asm.ClassReader.<init>(ClassReader.java:153) ~[asm-debug-all-5.0.3.jar:5.0.3]
+	at org.objectweb.asm.ClassReader.<init>(ClassReader.java:424) ~[asm-debug-all-5.0.3.jar:5.0.3]
+	at cpw.mods.fml.common.discovery.asm.ASMModParser.<init>(ASMModParser.java:52) ~[ASMModParser.class:?]
+	... 11 more
+[07:19:09] [Server thread/INFO] [FML]: Forge Mod Loader has identified 16 mods to load
+[07:19:09] [Server thread/INFO] [mixin]: Mixing doweathercycle.MixinWorldInfo from mixins.etfuturum.early.json into net.minecraft.world.storage.WorldInfo
+[07:19:09] [Decompiler thread/INFO] [fernflower]: Decompiling net/minecraft/world/storage/WorldInfo
+[07:19:09] [Decompiler thread/INFO] [fernflower]: Writing /Users/rhysh/Documents/GitHub/Et-Futurum-Requiem-plus/build/modern-state-tests/server/.mixin.out/java/net/minecraft/world/storage/WorldInfo.java
+[07:19:10] [Server thread/INFO] [MixinBooter]: Instantiating all ILateMixinLoader implemented classes...
+[07:19:10] [Server thread/INFO] [GTNHMixins]: Searching ASMData for ILateMixinLoaders
+[07:19:10] [Server thread/INFO] [GTNHMixins]: LiteLoader not present
+[07:19:10] [Server thread/INFO] [GTNHMixins]: LoadedMods [mixingasm, gtnhmixins, mixinextras, FML, spongemixins, unimixins-compat, gtnhextlib, Forge, gtnhlib, etfuturum, unimixins, GTNHLib Core, mixinbooterlegacy, modern_state_probe, mcp, unimixins-mixin]
+[07:19:10] [Server thread/INFO] [GTNHMixins]: Loading mixins from ILateMixinLoader [com.gtnewhorizon.gtnhlib.core.GTNHLibLateMixinLoader]
+[07:19:10] [Server thread/INFO] [GTNHMixins]: ITargetMods found during Phase LATE: []
+[07:19:10] [Server thread/INFO] [GTNHMixins]: ITargetMods not found during Phase LATE: [THAUMCRAFT]
+[07:19:10] [Server thread/INFO] [GTNHMixins]: Not loading the following LATE mixins: [MixinEnhancedInfusionRecipe]
+[07:19:10] [Server thread/INFO] [GTNHMixins]: Loading mixins from ILateMixinLoader [ganymedes01.etfuturum.mixinplugin.EtFuturumLateMixins]
+[07:19:10] [Server thread/INFO] [mixin]: Selecting config mixins.gtnhlib.late.json
+[07:19:10] [Server thread/INFO] [mixin]: Selecting config mixins.etfuturum.late.json
+[07:19:10] [Server thread/INFO] [mixin]: Preparing mixins.gtnhlib.late.json (0)
+[07:19:10] [Server thread/INFO] [mixin]: Preparing mixins.etfuturum.late.json (0)
+[07:19:10] [Server thread/INFO] [FML]: Attempting connection with missing mods [mcp, FML, Forge, GTNHLib Core, etfuturum, gtnhlib, unimixins, unimixins-mixin, unimixins-compat, mixingasm, spongemixins, mixinbooterlegacy, gtnhmixins, mixinextras, gtnhextlib, modern_state_probe] at CLIENT
+[07:19:10] [Server thread/INFO] [FML]: Attempting connection with missing mods [mcp, FML, Forge, GTNHLib Core, etfuturum, gtnhlib, unimixins, unimixins-mixin, unimixins-compat, mixingasm, spongemixins, mixinbooterlegacy, gtnhmixins, mixinextras, gtnhextlib, modern_state_probe] at SERVER
+[07:19:10] [Server thread/INFO] [FML]: Processing ObjectHolder annotations
+[07:19:10] [Server thread/INFO] [FML]: Found 341 ObjectHolder annotations
+[07:19:10] [Server thread/INFO] [FML]: Identifying ItemStackHolder annotations
+[07:19:10] [Server thread/INFO] [FML]: Found 0 ItemStackHolder annotations
+[07:19:10] [Server thread/INFO] [mclib(etfuturum)]: Latest version of MCLib present: 0.3.7.7 @ makamys.mclib
+[07:19:10] [Server thread/INFO] [FML]: Configured a dormant chunk cache size of 0
+[07:19:10] [Server thread/INFO] [mixin]: Mixing posttreegen.MixinWorldGenAbstractTree from mixins.etfuturum.early.json into net.minecraft.world.gen.feature.WorldGenAbstractTree
+[07:19:10] [Decompiler thread/INFO] [fernflower]: Decompiling net/minecraft/world/gen/feature/WorldGenAbstractTree
+[07:19:10] [Decompiler thread/INFO] [fernflower]: Writing /Users/rhysh/Documents/GitHub/Et-Futurum-Requiem-plus/build/modern-state-tests/server/.mixin.out/java/net/minecraft/world/gen/feature/WorldGenAbstractTree.java
+[07:19:10] [Forge Version Check/INFO] [STDERR]: [java.lang.Throwable$WrappedPrintStream:println:749]: com.google.gson.JsonSyntaxException: java.lang.IllegalStateException: Expected BEGIN_OBJECT but was STRING at line 1 column 1
+[07:19:10] [Forge Version Check/INFO] [STDERR]: [java.lang.Throwable$WrappedPrintStream:println:749]: 	at com.google.gson.Gson.fromJson(Gson.java:815)
+[07:19:10] [Forge Version Check/INFO] [STDERR]: [java.lang.Throwable$WrappedPrintStream:println:749]: 	at com.google.gson.Gson.fromJson(Gson.java:768)
+[07:19:10] [Forge Version Check/INFO] [STDERR]: [java.lang.Throwable$WrappedPrintStream:println:749]: 	at com.google.gson.Gson.fromJson(Gson.java:717)
+[07:19:10] [Forge Version Check/INFO] [STDERR]: [java.lang.Throwable$WrappedPrintStream:println:749]: 	at com.google.gson.Gson.fromJson(Gson.java:689)
+[07:19:10] [Forge Version Check/INFO] [STDERR]: [java.lang.Throwable$WrappedPrintStream:println:749]: 	at net.minecraftforge.common.ForgeVersion$1.run(ForgeVersion.java:94)
+[07:19:10] [Forge Version Check/INFO] [STDERR]: [java.lang.Throwable$WrappedPrintStream:println:749]: Caused by: java.lang.IllegalStateException: Expected BEGIN_OBJECT but was STRING at line 1 column 1
+[07:19:10] [Forge Version Check/INFO] [STDERR]: [java.lang.Throwable$WrappedPrintStream:println:749]: 	at com.google.gson.stream.JsonReader.beginObject(JsonReader.java:374)
+[07:19:10] [Forge Version Check/INFO] [STDERR]: [java.lang.Throwable$WrappedPrintStream:println:749]: 	at com.google.gson.internal.bind.MapTypeAdapterFactory$Adapter.read(MapTypeAdapterFactory.java:183)
+[07:19:10] [Forge Version Check/INFO] [STDERR]: [java.lang.Throwable$WrappedPrintStream:println:749]: 	at com.google.gson.internal.bind.MapTypeAdapterFactory$Adapter.read(MapTypeAdapterFactory.java:145)
+[07:19:10] [Forge Version Check/INFO] [STDERR]: [java.lang.Throwable$WrappedPrintStream:println:749]: 	at com.google.gson.Gson.fromJson(Gson.java:803)
+[07:19:10] [Forge Version Check/INFO] [STDERR]: [java.lang.Throwable$WrappedPrintStream:println:749]: 	... 4 more
+[07:19:10] [Server thread/INFO] [gtnhlib]: GTNHLib version 0.11.4 loaded.
+[07:19:10] [Server thread/INFO] [gtnhlib]: Number formatting: Using System Default (en_GB)
+[07:19:10] [Server thread/INFO] [mixin]: Mixing copperlifecycle.MixinEntityLightningBolt from mixins.etfuturum.early.json into net.minecraft.entity.effect.EntityLightningBolt
+[07:19:10] [Decompiler thread/INFO] [fernflower]: Decompiling net/minecraft/entity/effect/EntityLightningBolt
+[07:19:10] [Decompiler thread/INFO] [fernflower]: Writing /Users/rhysh/Documents/GitHub/Et-Futurum-Requiem-plus/build/modern-state-tests/server/.mixin.out/java/net/minecraft/entity/effect/EntityLightningBolt.java
+[07:19:10] [Server thread/INFO] [mixin]: Mixing singlelevel.MixinEnchantment from mixins.etfuturum.early.json into net.minecraft.enchantment.Enchantment
+[07:19:10] [Decompiler thread/INFO] [fernflower]: Decompiling net/minecraft/enchantment/Enchantment
+[07:19:10] [Decompiler thread/INFO] [fernflower]: Writing /Users/rhysh/Documents/GitHub/Et-Futurum-Requiem-plus/build/modern-state-tests/server/.mixin.out/java/net/minecraft/enchantment/Enchantment.java
+[07:19:10] [Server thread/INFO] [FML]: Applying holder lookups
+[07:19:10] [Server thread/INFO] [FML]: Holder lookups applied
+[07:19:10] [Server thread/INFO] [FML]: Injecting itemstacks
+[07:19:10] [Server thread/INFO] [FML]: Itemstack injection complete
+[07:19:10] [Server thread/INFO]: Loading properties
+[07:19:10] [Server thread/INFO]: Default game type: SURVIVAL
+[07:19:10] [Server thread/INFO]: Generating keypair
+[07:19:10] [Server thread/INFO]: Starting Minecraft server on 127.0.0.1:25576
+[07:19:10] [Server thread/WARN]: **** SERVER IS RUNNING IN OFFLINE/INSECURE MODE!
+[07:19:10] [Server thread/WARN]: The server will make no attempt to authenticate usernames. Beware.
+[07:19:10] [Server thread/WARN]: While this makes the game possible to play without internet access, it also opens up the ability for hackers to connect with any username they choose.
+[07:19:10] [Server thread/WARN]: To change this, set "online-mode" to "true" in the server.properties file.
+[07:19:10] [Server thread/INFO] [mixin]: Mixing observer.MixinChunk from mixins.etfuturum.early.json into net.minecraft.world.chunk.Chunk
+[07:19:10] [Server thread/INFO] [mixin]: Mixing deepslateores.MixinChunk from mixins.etfuturum.early.json into net.minecraft.world.chunk.Chunk
+[07:19:10] [Decompiler thread/INFO] [fernflower]: Decompiling net/minecraft/world/chunk/Chunk
+[07:19:10] [Server thread/INFO] [FML]: Injecting itemstacks
+[07:19:10] [Server thread/INFO] [FML]: Itemstack injection complete
+[07:19:10] [Server thread/INFO] [mixin]: Mixing randomtickspeed.MixinGameRules from mixins.etfuturum.early.json into net.minecraft.world.GameRules
+[07:19:10] [Server thread/INFO] [mixin]: Mixing MixinGameRules from mixins.gtnhlib.early.json into net.minecraft.world.GameRules
+[07:19:10] [Decompiler thread/INFO] [fernflower]: Writing /Users/rhysh/Documents/GitHub/Et-Futurum-Requiem-plus/build/modern-state-tests/server/.mixin.out/java/net/minecraft/world/chunk/Chunk.java
+[07:19:10] [Decompiler thread/INFO] [fernflower]: Decompiling net/minecraft/world/GameRules
+[07:19:10] [Decompiler thread/INFO] [fernflower]: Writing /Users/rhysh/Documents/GitHub/Et-Futurum-Requiem-plus/build/modern-state-tests/server/.mixin.out/java/net/minecraft/world/GameRules.java
+[07:19:10] [Server thread/INFO] [FML]: Forge Mod Loader has successfully loaded 16 mods
+[07:19:10] [Server thread/INFO]: Preparing level "world"
+[07:19:10] [Server thread/INFO] [FML]: Injecting existing block and item data into this server instance
+[07:19:10] [Server thread/INFO] [FML]: Applying holder lookups
+[07:19:10] [Server thread/INFO] [FML]: Holder lookups applied
+[07:19:10] [Server thread/INFO] [mixin]: Mixing containedwater.MixinAnvilChunkLoader from mixins.etfuturum.early.json into net.minecraft.world.chunk.storage.AnvilChunkLoader
+[07:19:10] [Decompiler thread/INFO] [fernflower]: Decompiling net/minecraft/world/chunk/storage/AnvilChunkLoader
+[07:19:10] [Server thread/INFO] [mixin]: Mixing geninfo.MixinChunkProviderServer from mixins.etfuturum.early.json into net.minecraft.world.gen.ChunkProviderServer
+[07:19:10] [Server thread/INFO] [mixin]: Renaming synthetic method lambda$new$0()Ljava/util/concurrent/atomic/AtomicInteger; to mdbe52a6$etfuturum$lambda$new$0$0 in mixins.etfuturum.early.json:geninfo.MixinChunkProviderServer from mod etfuturum
+[07:19:10] [Server thread/INFO] [FML]: Loading dimension 0 (world) (net.minecraft.server.dedicated.DedicatedServer@4bbbd9ab)
+[07:19:10] [Server thread/INFO] [FML]: Loading dimension 1 (world) (net.minecraft.server.dedicated.DedicatedServer@4bbbd9ab)
+[07:19:10] [Decompiler thread/INFO] [fernflower]: Writing /Users/rhysh/Documents/GitHub/Et-Futurum-Requiem-plus/build/modern-state-tests/server/.mixin.out/java/net/minecraft/world/chunk/storage/AnvilChunkLoader.java
+[07:19:10] [Decompiler thread/INFO] [fernflower]: Decompiling net/minecraft/world/gen/ChunkProviderServer
+[07:19:10] [Server thread/INFO] [FML]: Loading dimension -1 (world) (net.minecraft.server.dedicated.DedicatedServer@4bbbd9ab)
+[07:19:10] [Server thread/INFO]: Preparing start region for level 0
+[07:19:10] [Decompiler thread/INFO] [fernflower]: Writing /Users/rhysh/Documents/GitHub/Et-Futurum-Requiem-plus/build/modern-state-tests/server/.mixin.out/java/net/minecraft/world/gen/ChunkProviderServer.java
+[07:19:11] [Server thread/INFO]: Done (0.157s)! For help, type "help" or "?"
+[07:19:11] [Server thread/INFO] [mixin]: Mixing backlytra.MixinEntityTrackerEntry from mixins.etfuturum.early.json into net.minecraft.entity.EntityTrackerEntry
+[07:19:11] [Decompiler thread/INFO] [fernflower]: Decompiling net/minecraft/entity/EntityTrackerEntry
+[07:19:11] [Server thread/INFO] [STDOUT]: [efrtest.ModernStateProbe:start:50]: MODERN_STATE_PROBE restart persistence PASSED (all 26 ages, zero head TEs, entity freeze state=true)
+[07:19:11] [Server thread/INFO] [mixin]: Mixing spectator.MixinContainerChest from mixins.etfuturum.early.json into net.minecraft.inventory.ContainerChest
+[07:19:11] [Server thread/INFO] [mixin]: Mixing sounds.MixinContainerEnchantment from mixins.etfuturum.early.json into net.minecraft.inventory.ContainerEnchantment
+[07:19:11] [Server thread/INFO] [mixin]: Mixing spectator.MixinInventoryPlayer from mixins.etfuturum.early.json into net.minecraft.entity.player.InventoryPlayer
+[07:19:11] [Server thread/INFO] [mixin]: Mixing spectator.MixinSlot from mixins.etfuturum.early.json into net.minecraft.inventory.Slot
+[07:19:11] [Decompiler thread/INFO] [fernflower]: Writing /Users/rhysh/Documents/GitHub/Et-Futurum-Requiem-plus/build/modern-state-tests/server/.mixin.out/java/net/minecraft/entity/EntityTrackerEntry.java
+[07:19:11] [Decompiler thread/INFO] [fernflower]: Decompiling net/minecraft/inventory/ContainerChest
+[07:19:11] [Server thread/INFO] [STDOUT]: [efrtest.ModernStateProbe:start:140]: MODERN_STATE_PROBE PASSED: real Forge block registry, no kelp TEs, transformed migration/immersion, wet/dry counts, snow collision, freezing damage/immunity/melting
+[07:19:11] [Server thread/INFO]: Stopping server
+[07:19:11] [Server thread/INFO]: Saving players
+[07:19:11] [Server thread/INFO]: Saving worlds
+[07:19:11] [Server thread/INFO]: Saving chunks for level 'world'/Overworld
+[07:19:11] [Decompiler thread/INFO] [fernflower]: Writing /Users/rhysh/Documents/GitHub/Et-Futurum-Requiem-plus/build/modern-state-tests/server/.mixin.out/java/net/minecraft/inventory/ContainerChest.java
+[07:19:11] [Decompiler thread/INFO] [fernflower]: Decompiling net/minecraft/inventory/ContainerEnchantment
+[07:19:11] [Server thread/INFO]: Saving chunks for level 'world'/Nether
+[07:19:11] [Server thread/INFO]: Saving chunks for level 'world'/The End
+[07:19:11] [Server thread/INFO] [FML]: Unloading dimension 0
+[07:19:11] [Server thread/INFO] [FML]: Unloading dimension -1
+[07:19:11] [Server thread/INFO] [FML]: Unloading dimension 1
+[07:19:11] [Server thread/INFO] [FML]: Applying holder lookups
+[07:19:11] [Server thread/INFO] [FML]: Holder lookups applied
+[07:19:11] [Decompiler thread/INFO] [fernflower]: Writing /Users/rhysh/Documents/GitHub/Et-Futurum-Requiem-plus/build/modern-state-tests/server/.mixin.out/java/net/minecraft/inventory/ContainerEnchantment.java
+[07:19:11] [Decompiler thread/INFO] [fernflower]: Decompiling net/minecraft/entity/player/InventoryPlayer
+
+BUILD SUCCESSFUL in 8s
+15 actionable tasks: 1 executed, 14 up-to-date
+Configuration cache entry reused.

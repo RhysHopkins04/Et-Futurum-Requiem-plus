@@ -1,0 +1,12 @@
+Behavior was checked against Mojang's exact Java 1.21.11 artifacts, downloaded from its version manifest on 2026-10-03. No repository was reconstructed from upstream.
+
+- [Version metadata](https://piston-meta.mojang.com/v1/packages/4f6bd9388f12e9d7adc2ded64acba66212d60521/1.21.11.json).
+- Server SHA-1: `64bb6d763bed0a9f1d632ec347938594144943ed`; matching mappings SHA-1: `5621e9253f05fd57872bbe7f8ddf5f9a7d525955`.
+- Client SHA-1: `ba2df812c2d12e0219c489c4cd9a5e1f0760f5bd`; matching mappings SHA-1: `031a68bebf55d824f66d6573d8c752f0e1bf232a`.
+- Inspection used `javap -c -p` and Mojang mappings: `PowderSnowBlock` (`eft`), `LivingEntity` (`chl`), `PowderedSnowFogEnvironment` (`igx`) and the bundled entity/item tags. Local inspection copies remain in `/private/tmp/modern-*-1.21.11*` and `/private/tmp/*1.21.11-bytecode.txt`; the files in this directory summarize the findings without shipping game code/assets.
+
+Confirmed rules: stuck movement multipliers 0.9 horizontal / 1.5 vertical, collision at 0.9 height for falls greater than 2.5 blocks, leather boots permit walking/climbing, leather armor prevents freezing, frozen ticks cap at 140, thawing subtracts 2 ticks, freezing damage occurs every 40 entity ticks. Freeze damage is 1 HP, multiplied by 5 for Blaze/Magma Cube counterparts. Snow Golem, Stray, Polar Bear and Wither are immune; Rabbit, Fox, Silverfish and Endermite can walk on powder snow. Leather horse armor also appears in the modern freeze-immune wearables tag; this fork has no corresponding leather horse armor item.
+
+Burning entities extinguish and remove powder snow when the player/mob-griefing interaction is permitted. Powder snow has no ordinary ambient-temperature/random melt routine in this class. Powder fog uses ARGB `0xFF9FBBCC`, start 0/end 2; spectators use start -8 and half the render distance. The actual client jar contains `textures/misc/powder_snow_outline.png` and `textures/item/powder_snow_bucket.png`.
+
+EFR encodings were checked in the current local `BlockAmethystCluster`, `BlockPointedDripstone`, `ModernMapParityBlocks` and `ModernJsonModelBridge` implementations: paired amethyst IDs with facing+6 stage selection; downward dripstone 0..4/upward +5; tall-seagrass 0/1; pickle count-1 with wet bit 4; coral wall Forge facing 2..5 with wet bit 8. The old kelp TE ID and BYTE `Age` field are retained exclusively for forward migration and legacy converter templates.

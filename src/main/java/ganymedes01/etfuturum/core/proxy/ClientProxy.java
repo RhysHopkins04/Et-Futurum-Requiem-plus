@@ -55,6 +55,7 @@ public class ClientProxy extends CommonProxy {
 	@Override
 	public void registerEvents() {
 		super.registerEvents();
+        MinecraftForge.EVENT_BUS.register(new ganymedes01.etfuturum.client.handlers.PowderSnowClientHandler());
 		FMLCommonHandler.instance().bus().register(ClientEventHandler.INSTANCE);
 		MinecraftForge.EVENT_BUS.register(ClientEventHandler.INSTANCE);
 

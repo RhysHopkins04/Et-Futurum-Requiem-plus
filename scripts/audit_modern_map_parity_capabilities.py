@@ -71,6 +71,8 @@ PASS_34_VISIBLE_NAMES = {
     "sea_pickle", "tall_seagrass",
 }
 
+PASS_38_SCULK_NAMES = {"sculk_sensor", "calibrated_sculk_sensor", "sculk_shrieker"}
+
 PASS_35_VISIBLE_NAMES = {
     "trial_spawner", "vault", "crafter", "bell", "respawn_anchor", "sculk_sensor",
     "calibrated_sculk_sensor", "sculk_shrieker", "jigsaw", "repeating_command_block",
@@ -102,9 +104,9 @@ VISUAL_SHELL_GAPS = {
     "lectern": "No stored book, page, GUI, comparator or redstone-pulse implementation.",
     "grindstone": "Orientation models exist; repair/disenchant GUI and XP mechanics do not.",
     "respawn_anchor": "No charges, dimension respawn, explosion or comparator implementation.",
-    "sculk_sensor": "No vibration, phase, cooldown or redstone implementation.",
-    "calibrated_sculk_sensor": "No calibration filtering, vibration phase or redstone implementation.",
-    "sculk_shrieker": "No shrieking, cooldown, can_summon or player-trigger implementation.",
+    "sculk_sensor": "Pass 38 implements bounded vibration travel, phase timing, redstone and comparator frequency output; Warden is unrelated/deferred.",
+    "calibrated_sculk_sensor": "Pass 38 implements facing-relative calibration filtering, vibration lifecycle and redstone output.",
+    "sculk_shrieker": "Pass 38 implements player-triggered shrieking and warning state through the explicit pre-Warden boundary; Warden spawning/entity behaviour remains deferred.",
     "powder_snow": "No sinking, leather-boots collision, freezing or bucket behaviour.",
     "frogspawn": "No water-surface survival or hatch lifecycle.",
 }
@@ -154,6 +156,8 @@ def is_copper_weathering_family(name):
 
 
 def profile_for(name, style):
+    if name in PASS_38_SCULK_NAMES:
+        return "PASS_38_SCULK_GAMEPLAY"
     if is_pass37_vegetation(name):
         return "PASS_37_VEGETATION_LIFECYCLE"
     if is_copper_weathering_family(name):
@@ -187,6 +191,8 @@ def profile_for(name, style):
 
 
 def gap_for(name, style, profile):
+    if profile == "PASS_38_SCULK_GAMEPLAY":
+        return "Pass 38 implements bounded vibration listening, phase/redstone/filtering or Shrieker warning gameplay; Warden entity/spawn remains deferred."
     if profile == "PASS_37_VEGETATION_LIFECYCLE":
         if name in {"mangrove_propagule", "mangrove_leaves", "pale_oak_sapling", "pale_oak_leaves"}:
             return "Manual/random-tick/bonemeal lifecycle is implemented without enabling biome generation; entity-coupled endpoints remain out of scope."
@@ -256,7 +262,17 @@ def row_for(entry):
         "known_difference": gap_for(name, style, profile),
     }
 
-    if profile == "PASS_37_VEGETATION_LIFECYCLE":
+    if profile == "PASS_38_SCULK_GAMEPLAY":
+        row.update({
+            "blockstate": entry.get("meta") or "Pass 35 metadata state retained exactly",
+            "shape": "Pass 35 AssetDirector model/bounds retained",
+            "function": "Pass 38 shared vibration bridge + runtime lifecycle/redstone/filtering/warning mechanics",
+            "nbt": "TileEntitySculkRuntime transient/persistent runtime state; imported metadata remains authoritative",
+            "map_import": "Pass 35 static mapping unchanged; runtime mechanics advance imported transient states after ticking",
+            "review_status": "PASS_38_VERIFIED",
+            "mechanics_review_status": "PASS_38_VERIFIED",
+        })
+    elif profile == "PASS_37_VEGETATION_LIFECYCLE":
         row.update({
             "blockstate": entry.get("meta") or "Pass 34/37 imported state preserved; lifecycle-only state stored in bounded metadata/TE where required",
             "shape": "existing exact AssetDirector 1.21.11 model state and Pass 34 bounds preserved",
@@ -267,7 +283,7 @@ def row_for(entry):
             "mechanics_review_status": "PASS_37_VERIFIED",
         })
         if name == "kelp":
-            row["blockstate"] = "head identity plus synchronized AGE 0..25 TE; body uses kelp_plant identity"
+            row["blockstate"] = "head AGE 0..15 in kelp metadata, AGE 16..25 in kelp_age_16 metadata; old Age BYTE TEs migrate on Anvil load; body uses kelp_plant identity"
             row["nbt"] = "ParityKelpStateTileEntity Age byte 0..25"
         elif name == "mangrove_propagule":
             row["parity_create_path"] = "existing ModBlocks.SAPLING metadata 0 / BlockModernSapling"

@@ -1,0 +1,21 @@
+{
+  "sample": [
+    {
+      "compact": false,
+      "heads": 4096,
+      "tile_entities": 4096,
+      "uncompressed_chunk_bytes": 312852,
+      "seconds": 0.02945
+    },
+    {
+      "compact": true,
+      "heads": 4096,
+      "tile_entities": 0,
+      "uncompressed_chunk_bytes": 13844,
+      "seconds": 0.00036
+    }
+  ],
+  "legacy_head_compound_bytes": 73,
+  "legacy_63_million_head_compound_bytes": 4599000000,
+  "compact_additional_age_tile_bytes": 0
+}

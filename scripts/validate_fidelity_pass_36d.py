@@ -18,17 +18,19 @@ def need(cond, msg):
     if not cond:
         errors.append(msg)
 
-need(str(CONTRACT.get("contract_revision")) in ("36", "37"),
-     "Backporter contract revision must be Pass 36 or forward-compatible Pass 37")
+need(str(CONTRACT.get("contract_revision")) in ("36", "37", "38"),
+     "Backporter contract revision must be Pass 36 or a forward-compatible later revision")
 if str(CONTRACT.get("contract_revision")) == "36":
     need(CONTRACT.get("implemented_in_version") == "3.5.8", "Pass 36 contract must record planned development version 3.5.8")
-else:
+elif str(CONTRACT.get("contract_revision")) == "37":
     need(CONTRACT.get("implemented_in_version") == "3.5.9", "Pass 37 contract must record planned development version 3.5.9")
+else:
+    need(CONTRACT.get("implemented_in_version") == "3.5.10", "Pass 38 contract must record planned development version 3.5.10")
 need(CONTRACT.get("implemented_in_git_ref") is None,
      "unreleased Pass 36 contract must not self-reference a commit or claim a release tag")
 need(CONTRACT.get("release_status") == "unreleased",
      "Pass 36 contract must explicitly record unreleased status")
-need(('String stagingVersion = "3.5.8"' in BUILD) or ('String stagingVersion = "3.5.9"' in BUILD),
+need(('String stagingVersion = "3.5.8"' in BUILD) or ('String stagingVersion = "3.5.9"' in BUILD) or ('String stagingVersion = "3.5.10"' in BUILD),
      "build.gradle stagingVersion must remain compatible with the Pass 36/37 development state")
 need(CONTRACT.get("implemented_in_version") != "3.5.5",
      "stale 3.5.5 implementation provenance remains in the Pass 36 contract")

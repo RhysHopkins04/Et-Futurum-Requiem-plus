@@ -72,10 +72,11 @@ except Exception as exc:
     contract = {}
 
 revision = str(contract.get('contract_revision'))
-if revision not in ('32f','33','34','35','36','37'):
+if revision not in ('32f','33','34','35','36','37','38'):
     errors.append('contract revision must remain 32f-compatible or advance through later fidelity passes')
-if revision == '37':
-    if contract.get('implemented_in_version') != '3.5.9' or contract.get('implemented_in_git_ref') is not None or contract.get('release_status') != 'unreleased':
+if revision in ('37','38'):
+    expected_version = '3.5.10' if revision == '38' else '3.5.9'
+    if contract.get('implemented_in_version') != expected_version or contract.get('implemented_in_git_ref') is not None or contract.get('release_status') != 'unreleased':
         errors.append('Pass 37 contract provenance must be unreleased 3.5.9 with no git ref')
 
 entries = {e.get('key'): e for e in contract.get('blocks', []) if isinstance(e, dict)}

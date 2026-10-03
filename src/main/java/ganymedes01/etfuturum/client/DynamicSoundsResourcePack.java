@@ -134,6 +134,9 @@ public class DynamicSoundsResourcePack implements IResourcePack {
 						Tags.MC_ASSET_VER + ":ambient/cave/cave18",
 						Tags.MC_ASSET_VER + ":ambient/cave/cave19");
 			}
+            // Local vanilla-snow fallbacks keep buckets audible without optional sound downloads.
+            addSoundsToCategory("item.bucket.fill_powder_snow", "minecraft:step/snow1", "minecraft:step/snow2");
+            addSoundsToCategory("item.bucket.empty_powder_snow", "minecraft:step/snow3", "minecraft:step/snow4");
 			return rootObject;
 		}
 
@@ -173,6 +176,50 @@ public class DynamicSoundsResourcePack implements IResourcePack {
 					"block/eyeblossom/eyeblossom_idle5",
 					"block/eyeblossom/eyeblossom_idle6");
 
+			// Pass 38b: the Sculk gameplay TEs play these modern events in the
+			// versioned namespace. Keep Mojang's per-event volume on the backing sounds.
+			addSoundsToCategoryWithSettings("block.sculk_sensor.clicking", 0.73F, 1.0F,
+					"block/sculk_sensor/sculk_clicking1",
+					"block/sculk_sensor/sculk_clicking2",
+					"block/sculk_sensor/sculk_clicking3",
+					"block/sculk_sensor/sculk_clicking4",
+					"block/sculk_sensor/sculk_clicking5",
+					"block/sculk_sensor/sculk_clicking6");
+			addSoundsToCategoryWithSettings("block.sculk_sensor.clicking_stop", 0.62F, 1.0F,
+					"block/sculk_sensor/sculk_clicking_stop1",
+					"block/sculk_sensor/sculk_clicking_stop2",
+					"block/sculk_sensor/sculk_clicking_stop3",
+					"block/sculk_sensor/sculk_clicking_stop4",
+					"block/sculk_sensor/sculk_clicking_stop5");
+			addSoundsToCategoryWithSettings("block.sculk_shrieker.shriek", 0.85F, 1.0F,
+					"block/sculk_shrieker/shriek1",
+					"block/sculk_shrieker/shriek2",
+					"block/sculk_shrieker/shriek3",
+					"block/sculk_shrieker/shriek4",
+					"block/sculk_shrieker/shriek5");
+			addSoundsToCategoryWithSettings("block.sculk_catalyst.bloom", 0.25F, 1.0F,
+					"enchant/soulspeed/soulspeed1", "enchant/soulspeed/soulspeed2",
+					"enchant/soulspeed/soulspeed3", "enchant/soulspeed/soulspeed4",
+					"enchant/soulspeed/soulspeed5", "enchant/soulspeed/soulspeed6",
+					"enchant/soulspeed/soulspeed7", "enchant/soulspeed/soulspeed8",
+					"enchant/soulspeed/soulspeed9", "enchant/soulspeed/soulspeed10",
+					"enchant/soulspeed/soulspeed11", "enchant/soulspeed/soulspeed12",
+					"enchant/soulspeed/soulspeed13");
+
+			// Pass 38f: exact pre-Warden reply events used after a can_summon Shrieker's
+			// 90-tick shriek. Level 1/2/3/4 map to close/closer/closest/listening_angry.
+			addSoundsToCategory("entity.warden.nearby_close",
+					"mob/warden/nearby_close_1", "mob/warden/nearby_close_2",
+					"mob/warden/nearby_close_3", "mob/warden/nearby_close_4");
+			addSoundsToCategory("entity.warden.nearby_closer",
+					"mob/warden/nearby_closer_1", "mob/warden/nearby_closer_2", "mob/warden/nearby_closer_3");
+			addSoundsToCategory("entity.warden.nearby_closest",
+					"mob/warden/nearby_closest_1", "mob/warden/nearby_closest_2", "mob/warden/nearby_closest_3");
+			addSoundsToCategory("entity.warden.listening_angry",
+					"mob/warden/listening_angry_1", "mob/warden/listening_angry_2",
+					"mob/warden/listening_angry_3", "mob/warden/listening_angry_4",
+					"mob/warden/listening_angry_5");
+
 			// Vanilla 1.21.11: block.hanging_sign.waxed_interact_fail ->
 			// { name: block.sign.waxed_interact_fail, type: event }. Minecraft 1.7 already
 			// resolves bare type=event names inside the containing sounds.json namespace.
@@ -193,6 +240,9 @@ public class DynamicSoundsResourcePack implements IResourcePack {
 					"minecraft:random/glass1",
 					"minecraft:random/glass2",
 					"minecraft:random/glass3");
+            // Local vanilla-snow fallbacks keep buckets audible without optional sound downloads.
+            addSoundsToCategory("item.bucket.fill_powder_snow", "minecraft:step/snow1", "minecraft:step/snow2");
+            addSoundsToCategory("item.bucket.empty_powder_snow", "minecraft:step/snow3", "minecraft:step/snow4");
 			return rootObject;
 		}
 	}

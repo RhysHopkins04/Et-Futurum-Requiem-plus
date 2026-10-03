@@ -1,0 +1,89 @@
+validate_fidelity_pass_37.py: PASS
+Fidelity Pass 37 validation PASSED
+ - aquatic Kelp/Seagrass/Coral/Sea Pickle lifecycle is bounded without general waterlogging
+ - Torchflower, Pitcher, Mangrove and Pale Oak growth paths are represented without biome worldgen
+ - Pale Moss, Leaf Litter, Wildflowers and Eyeblossom block-local mechanics are gated
+ - entity-dependent lifecycle endpoints remain deferred
+ - Backporter contract revision 37 / unreleased 3.5.9 and Pass 34 visible-state contracts remain intact
+
+validate_fidelity_pass_37b.py: PASS
+Fidelity Pass 37b validation PASSED
+ - Pitcher age/half publication order is neighbour-safe and shared by Bone Meal/random growth
+ - mature Torchflower/Pitcher Plant substrate rules no longer fall through generic parity placement
+ - dry Sea Pickle unlit behavior remains intentional
+ - EtFuturumWorldListener cannot recursively force-load chunks from update callbacks
+ - Mangrove propagules have no adjacency ban and retain the 85% tall-tree bias
+
+validate_fidelity_pass_37c.py: PASS
+Fidelity Pass 37c validation PASSED
+ - bounded aquatic blocks resist legacy liquid-flow overwrite without general waterlogging
+ - Tall Seagrass publication and parity-cube support are neighbour-safe
+ - Pitcher loot/pick behavior follows the modern lower-half/item contract
+ - Pale Moss Block bonemeal patch behavior is block-local and bounded
+ - Eyeblossom time checks and transition particles are reliably synchronized
+
+validate_fidelity_pass_37d.py: PASS
+Fidelity Pass 37d validation PASSED
+ - Sea Pickle placement and survival share the parity-aware sturdy-top support bridge
+ - live Sea Pickles on Coral Blocks retain the bounded modern Bone Meal interaction
+ - Pitcher and Pale Moss Carpet behaviors remain intentionally unchanged
+
+validate_fidelity_pass_37e.py: PASS
+Fidelity Pass 37e validation PASSED
+ - horizontal Coral Fan use atomically publishes the technical wall-fan identity
+ - wall-only support no longer depends on a temporary floor-fan state or a block below
+ - floor placement, water bit, wall facing, drops and pick-block contracts remain intact
+
+validate_fidelity_pass_37f.py: PASS
+Fidelity Pass 37f validation PASSED
+ - 1.7 client ItemBlock preflight now uses Coral Fan side-aware support
+ - horizontal wall placement no longer inherits the floor-fan support gate
+ - Pass 37e atomic wall publication and existing floor/import/drop contracts remain intact
+
+validate_fidelity_pass_38.py: PASS
+Fidelity Pass 38 validation PASSED
+ - shared bounded vibration bridge and exact 1..15 frequency table are present
+ - Sensor/Calibrated lifecycle, redstone/comparator, travel and wool occlusion are gated
+ - Shrieker warning lifecycle reaches an explicit no-Warden boundary
+ - Catalyst bloom/death XP and bounded persisted Sculk charge spreading are implemented
+ - Pass-30 FaceMask and Pass-35 visible-state encodings remain authoritative
+ - contract revision 38/39 / unreleased 3.5.10 provenance is consistent
+
+validate_fidelity_pass_38b.py: PASS
+Fidelity Pass 38b validation PASSED
+ - wool/wool-carpet source damping now covers steps, placement/breaking and projectile impacts
+ - path occlusion remains intact and stale Sensor arrivals cannot survive ACTIVE/COOLDOWN
+ - Sensor comparator output remains event-frequency-only while ACTIVE
+ - Sensor/Shrieker/Catalyst modern sound events are defined in the versioned sound namespace
+ - Sculk-spread-generated Shriekers correctly use can_summon=false
+
+validate_fidelity_pass_38c.py: PASS
+Fidelity Pass 38c validation PASSED
+ - Sculk Catalyst validate() performs no chunk/world reads during TileEntity insertion
+ - Sensor/Calibrated/Shrieker validate() performs no world reads or early listener registration
+ - registration and imported transient-state normalization are deferred to the first installed server tick
+ - guarded unload/invalidate paths preserve listener/catalyst registry safety
+ - Pass-38b cooldown and sound corrections remain intact
+
+validate_fidelity_pass_38d.py: PASS
+Fidelity Pass 38d validation PASSED
+ - ItemBlock right-click no longer races the resolved PlaceEvent with a false BLOCK_ACTIVATE
+ - wool/carpet placement owns no vibration and normal block placement emits one BLOCK_PLACE
+ - cancelled place/break actions cannot create Sculk vibrations
+ - normal Sensor distance power is locked to the radius-8 formula; calibrated to radius 16
+ - comparator output remains ACTIVE-only accepted-event frequency (destroy 12 / place 13)
+
+validate_fidelity_pass_38e.py: PASS
+Fidelity Pass 38e validation PASSED
+ - Calibrated Sensor weak output is suppressed on the rotating amethyst/input face
+ - calibration 13 retains exact filtering: STEP 1 rejected, BLOCK_PLACE 13 accepted
+ - range-16 listening and ACTIVE-only comparator frequency remain unchanged
+ - contract revision 38 / staging version 3.5.10 remain unchanged
+
+validate_fidelity_pass_38f.py: PASS
+Fidelity Pass 38f validation PASSED
+ - direct player stepping and vibration arrivals converge on one Shrieker tryShriek path
+ - can_summon warnings use radius-16 shared state, 200-tick cooldown, level 4 cap and 12000-tick decay
+ - 90-tick completion plays exact level 1..4 Warden reply sounds within +/-10 blocks
+ - warning sound aliases/backing OGG requests are present while Warden/Darkness remain deferred
+ - Pass 38e calibrated-input isolation, contract revision 38 and staging version 3.5.10 remain intact

@@ -1,8 +1,8 @@
 {
   "schema": 1,
   "contract_id": "etfuturum-requiem-plus-backporter-state-contract",
-  "contract_revision": "37",
-  "implemented_in_version": "3.5.9",
+  "contract_revision": "39",
+  "implemented_in_version": "3.5.10",
   "implemented_in_git_ref": null,
   "release_status": "unreleased",
   "source_minecraft": "1.21.11",
@@ -2277,7 +2277,8 @@
         "Pass 34c allows in-place stacking from 1..4 while preserving bit2; Pass 37 extends this with support, live-light and bounded bonemeal lifecycle behavior.",
         "Normal runtime placement defaults to the live visual bit while imported maps preserve the exact source waterlogged visual bit.",
         "bits0..1 remain pickles-1 and bit2 remains the bounded source-water/live compatibility bit, not general waterlogging.",
-        "Pass 37 supports in-place 1..4 stacking, 6/9/12/15 live light, support loss, count drops, and the bounded modern coral-block bonemeal spread algorithm."
+        "Pass 37 supports in-place 1..4 stacking, 6/9/12/15 live light, support loss, count drops, and the bounded modern coral-block bonemeal spread algorithm.",
+        "Pass 39: bounded contained-source-water rendering, body/eye immersion, vanilla swimming/drowning/fog and bucket fill/drain; metadata wet/dry flags are respected. No general waterlogging."
       ]
     },
     {
@@ -2313,7 +2314,8 @@
       "notes": [
         "Normal placement creates the canonical lower+upper two-block pair while Backporter may still import either half exactly.",
         "Metadata 0=lower and 1=upper remains authoritative for imported halves.",
-        "Pass 37 requires source water for normal placement, restores source water on removal, removes the counterpart safely, and yields two Seagrass only when harvested with shears."
+        "Pass 37 requires source water for normal placement, restores source water on removal, removes the counterpart safely, and yields two Seagrass only when harvested with shears.",
+        "Pass 39: bounded contained-source-water rendering, body/eye immersion, vanilla swimming/drowning/fog and bucket fill/drain; metadata wet/dry flags are respected. No general waterlogging."
       ]
     },
     {
@@ -2688,7 +2690,19 @@
         "layout": "metadata phase: 0=inactive, 1=active, 2=cooldown"
       },
       "tile_entity": {
-        "required": false
+        "required": true,
+        "id": "etfuturum:modern_sculk_runtime",
+        "fields": [
+          "SculkPower",
+          "LastVibrationFrequency",
+          "PhaseEndsAt",
+          "PendingArrivalAt",
+          "PendingFrequency",
+          "PendingX",
+          "PendingY",
+          "PendingZ",
+          "PendingPlayerMost/Least"
+        ]
       },
       "source_properties": {
         "sculk_sensor_phase": "exact -> metadata 0..2",
@@ -2697,13 +2711,12 @@
       },
       "derived": [],
       "unsupported": [
-        "waterlogged",
-        "vibration/redstone mechanics"
+        "waterlogged"
       ],
       "exactness": {
         "visible_state": "exact",
         "map_state": "exact",
-        "gameplay": "deferred"
+        "gameplay": "Pass 38 vibration travel, phase timing, redstone and comparator frequency implemented"
       },
       "visual_property_classification": {
         "sculk_sensor_phase": "STORED_EXACTLY",
@@ -2711,7 +2724,8 @@
         "waterlogged": "UNSUPPORTED"
       },
       "notes": [
-        "Modern active and cooldown both intentionally resolve the active model; the distinct persistent phase is still retained exactly."
+        "Metadata remains phase 0/1/2. Pass 38 adds server-authoritative vibration travel, 30-tick ACTIVE, 10-tick COOLDOWN, distance-scaled redstone and comparator frequency without changing imported phase encoding.",
+        "Modern active and cooldown intentionally reuse the active static model; persistent phase remains distinct."
       ]
     },
     {
@@ -2739,7 +2753,19 @@
         "range": "0..11"
       },
       "tile_entity": {
-        "required": false
+        "required": true,
+        "id": "etfuturum:modern_sculk_runtime",
+        "fields": [
+          "SculkPower",
+          "LastVibrationFrequency",
+          "PhaseEndsAt",
+          "PendingArrivalAt",
+          "PendingFrequency",
+          "PendingX",
+          "PendingY",
+          "PendingZ",
+          "PendingPlayerMost/Least"
+        ]
       },
       "source_properties": {
         "facing": "exact -> metadata bits0..1",
@@ -2749,13 +2775,12 @@
       },
       "derived": [],
       "unsupported": [
-        "waterlogged",
-        "vibration/filtering/redstone mechanics"
+        "waterlogged"
       ],
       "exactness": {
         "visible_state": "exact",
         "map_state": "exact",
-        "gameplay": "deferred"
+        "gameplay": "Pass 38 16-block vibration listening, rear-side calibration filtering, phase timing and redstone implemented"
       },
       "visual_property_classification": {
         "facing": "STORED_EXACTLY",
@@ -2764,7 +2789,7 @@
         "waterlogged": "UNSUPPORTED"
       },
       "notes": [
-        "All 12 facing/phase combinations are preserved. Vibration filtering/redstone mechanics are deferred."
+        "All 12 facing/phase metadata combinations remain authoritative. Pass 38 reads the rear calibration input by facing; non-zero levels accept only the matching 1..15 vibration frequency."
       ]
     },
     {
@@ -2782,7 +2807,14 @@
         "shrieking_bit": 2
       },
       "tile_entity": {
-        "required": false
+        "required": true,
+        "id": "etfuturum:modern_sculk_runtime",
+        "fields": [
+          "PhaseEndsAt",
+          "PendingArrivalAt",
+          "PendingPlayerMost/Least",
+          "WarningLevel"
+        ]
       },
       "source_properties": {
         "can_summon": "exact -> metadata bit0",
@@ -2792,12 +2824,12 @@
       "derived": [],
       "unsupported": [
         "waterlogged",
-        "Warden/shriek gameplay"
+        "Warden entity/spawn endpoint"
       ],
       "exactness": {
         "visible_state": "exact",
         "map_state": "exact",
-        "gameplay": "deferred"
+        "gameplay": "Pass 38 sensor-tendril trigger, 90-tick shriek and persistent per-player warning progression implemented; Warden spawn suppressed at boundary"
       },
       "visual_property_classification": {
         "can_summon": "STORED_EXACTLY",
@@ -2805,7 +2837,8 @@
         "waterlogged": "UNSUPPORTED"
       },
       "notes": [
-        "can_summon selects the exact Mojang model. shrieking is deliberately not collapsed: its persistent source boolean is retained even though it does not select a distinct static 1.21.11 model."
+        "can_summon/shrieking metadata bits remain exact. Pass 38 only suppresses the unavailable Warden entity spawn after completing the warning transition.",
+        "The shrieking boolean remains persistent even though it does not select a distinct static model."
       ]
     },
     {
@@ -3001,14 +3034,15 @@
         "minecraft:kelp"
       ],
       "target_ids": [
-        "etfuturum:kelp"
+        "etfuturum:kelp",
+        "etfuturum:kelp_age_16"
       ],
       "classification": "FULL_IMPORT",
       "metadata": {
-        "layout": "metadata 0; AGE is stored in synchronized TE"
+        "layout": "age 0..15: kelp metadata=age; age 16..25: kelp_age_16 metadata=age-16"
       },
       "tile_entity": {
-        "required": true,
+        "required": false,
         "id": "etfuturum:modern_parity_kelp_state",
         "fields": [
           {
@@ -3016,10 +3050,11 @@
             "type": "TAG_Byte 0..25",
             "required": true
           }
-        ]
+        ],
+        "legacy_read_only": true
       },
       "source_properties": {
-        "age": "exact -> TE Age 0..25"
+        "age": "exact -> split block identity and low four metadata bits; no new TE"
       },
       "derived": [],
       "unsupported": [
@@ -3028,14 +3063,16 @@
       "exactness": {
         "visible_state": "exact",
         "map_state": "exact",
-        "gameplay": "Pass 37 tip/body conversion, 14% random growth, one-block bonemeal growth and support lifecycle implemented"
+        "gameplay": "Pass 37 tip/body conversion, 14% random growth, one-block bonemeal growth and support lifecycle implemented; bounded source-water immersion and rendering implemented"
       },
       "visual_property_classification": {
         "age": "STORED_EXACTLY_NON_VISUAL"
       },
       "notes": [
-        "Kelp head AGE is gameplay-persistent even though it does not select a model. Kelp Plant bodies carry no age TE.",
-        "Normal placement requires source water; breaking/support updates restore source water through the bounded aquatic compatibility path."
+        "Every age is stored without a tile entity. The hidden kelp_age_16 identity drops/picks the canonical kelp item and shares its model.",
+        "Existing etfuturum:modern_parity_kelp_state Age BYTE records migrate before Anvil creates tile entities; migrated chunks are marked dirty and save the compact state.",
+        "A template without kelp_age_16 still uses the legacy Age BYTE converter contract; use the updated EFR runtime for the 63-million-head map.",
+        "Placement, support, growth and breaking water restoration retain the Pass-37 lifecycle."
       ]
     },
     {
@@ -3067,7 +3104,8 @@
       },
       "visual_property_classification": {},
       "notes": [
-        "Breaking a Kelp column promotes the highest surviving body below the break to a Kelp head with the modern random placement-age range 0..24."
+        "Breaking a Kelp column promotes the highest surviving body below the break to a Kelp head with the modern random placement-age range 0..24.",
+        "Pass 39: bounded contained-source-water rendering, body/eye immersion, vanilla swimming/drowning/fog and bucket fill/drain; metadata wet/dry flags are respected. No general waterlogging."
       ]
     },
     {
@@ -3099,7 +3137,8 @@
       },
       "visual_property_classification": {},
       "notes": [
-        "Normal placement requires a source-water block and a sturdy non-Magma support."
+        "Normal placement requires a source-water block and a sturdy non-Magma support.",
+        "Pass 39: bounded contained-source-water rendering, body/eye immersion, vanilla swimming/drowning/fog and bucket fill/drain; metadata wet/dry flags are respected. No general waterlogging."
       ]
     },
     {
@@ -3219,7 +3258,8 @@
       },
       "notes": [
         "Live coral schedules death after 60+rand(0..39) ticks without water and converts to the matching dead identity.",
-        "Wall-fan facing is preserved through death. The high metadata bit is a bounded source-water compatibility bit only and does not enable general waterlogging."
+        "Wall-fan facing is preserved through death. The high metadata bit is a bounded source-water compatibility bit only and does not enable general waterlogging.",
+        "Pass 39: bounded contained-source-water rendering, body/eye immersion, vanilla swimming/drowning/fog and bucket fill/drain; metadata wet/dry flags are respected. No general waterlogging."
       ]
     },
     {
@@ -3293,6 +3333,37 @@
       "notes": [
         "Non-Overworld legacy dimensions retain their imported identity because 1.7 has no modern environment-attribute timeline override.",
         "Bee-specific effects remain explicitly deferred to the entity phase."
+      ]
+    },
+    {
+      "key": "powder_snow",
+      "source_ids": [
+        "minecraft:powder_snow",
+        "minecraft:poweder_snow"
+      ],
+      "target_ids": [
+        "etfuturum:powder_snow"
+      ],
+      "classification": "FULL_IMPORT",
+      "metadata": {
+        "layout": "metadata 0"
+      },
+      "tile_entity": {
+        "required": false
+      },
+      "source_properties": {},
+      "derived": [],
+      "unsupported": [
+        "Modern frozen-heart HUD art and shaking animation are not ported; frost overlay/fog are implemented."
+      ],
+      "exactness": {
+        "visible_state": "exact block model",
+        "map_state": "exact",
+        "gameplay": "1.21.11-derived conditional collision, stuck movement, leather handling, freezing/thawing/damage/immunity, burning-entity melting and buckets"
+      },
+      "notes": [
+        "Only the observed minecraft:poweder_snow typo is aliased; other namespaces and misspellings are not normalized.",
+        "Dedicated-server runtime tests pass; client visual checks are documented separately."
       ]
     }
   ],
@@ -3402,8 +3473,8 @@
     {
       "implementation": "TileEntitySculkCatalyst",
       "tile_entity_id": "etfuturum.sculk_catalyst",
-      "classification": "PARTIAL_IMPORT",
-      "note": "Persistent block bloom is metadata; TE bloomWithExperience remains TODO, so mechanics are partial."
+      "classification": "FULL_IMPORT",
+      "note": "Pass 38 implements the 8-tick bloom pulse plus persisted bounded charge cursors, XP consumption and Sculk/Sculk Vein/Sensor/Shrieker growth; no arbitrary TileEntity replacement or chunk force-loading."
     },
     {
       "implementation": "TileEntityNewBrewingStand",
@@ -3452,6 +3523,12 @@
       "tile_entity_id": "Control (vanilla 1.7 TileEntityCommandBlock)",
       "classification": "FULL_IMPORT",
       "note": "Pass 35 mixin adds EFRModernFacing and EFRConditional to the existing vanilla command block TE without rewriting command execution or powered metadata."
+    },
+    {
+      "implementation": "TileEntitySculkRuntime",
+      "tile_entity_id": "etfuturum:modern_sculk_runtime",
+      "classification": "FULL_IMPORT",
+      "note": "Pass 38 runtime state for Sensor/Calibrated Sensor/Shrieker; visible imported state stays in established Pass-35 metadata."
     }
   ]
 }

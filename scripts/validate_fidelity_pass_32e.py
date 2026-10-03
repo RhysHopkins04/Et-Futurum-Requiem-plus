@@ -60,8 +60,9 @@ except Exception as exc:
 revision = str(contract.get('contract_revision', ''))
 if revision not in ('32e', '32f') and not (revision.isdigit() and int(revision) >= 33):
     errors.append("contract contract_revision must be '32e' or a later fidelity pass revision")
-if revision == '37':
-    if contract.get('implemented_in_version') != '3.5.9' or contract.get('implemented_in_git_ref') is not None or contract.get('release_status') != 'unreleased':
+if revision in ('37','38'):
+    expected_version = '3.5.10' if revision == '38' else '3.5.9'
+    if contract.get('implemented_in_version') != expected_version or contract.get('implemented_in_git_ref') is not None or contract.get('release_status') != 'unreleased':
         errors.append('Pass 37 contract provenance must be unreleased 3.5.9 with no git ref')
 else:
     for key, expected in (('implemented_in_version', '3.5.5'), ('implemented_in_git_ref', 'refs/tags/3.5.5')):

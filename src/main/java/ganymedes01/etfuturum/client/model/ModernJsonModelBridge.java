@@ -560,7 +560,7 @@ public final class ModernJsonModelBridge {
     }
 
     private static Model loadBlockStateModel(ModernMapParityBlocks entry, Map<String, String> defaults) throws IOException {
-        Model model = loadBlockStateModel(entry.getRegistryName(), defaults);
+        Model model = loadBlockStateModel(entry == ModernMapParityBlocks.KELP_AGE_16 ? "kelp" : entry.getRegistryName(), defaults);
         correctSegmentedGroundDecalTopUv(entry, model);
         correctCoralFanFaceBakeryUv(entry, model);
         return model;
@@ -696,6 +696,7 @@ public final class ModernJsonModelBridge {
         if (name.endsWith("_wall_hanging_sign")) return name.substring(0, name.length() - "_wall_hanging_sign".length()) + "_hanging_sign";
         if (name.endsWith("_wall_sign")) return name.substring(0, name.length() - "_wall_sign".length()) + "_sign";
         if (name.endsWith("_coral_wall_fan")) return name.substring(0, name.length() - "_wall_fan".length()) + "_fan";
+        if ("kelp_age_16".equals(name)) return "kelp";
         if ("kelp_plant".equals(name)) return "kelp";
         if ("tall_seagrass".equals(name)) return "seagrass";
         if ("torchflower_crop".equals(name)) return "torchflower";

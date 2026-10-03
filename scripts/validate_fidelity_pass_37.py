@@ -35,11 +35,11 @@ def has(src, *parts):
     return all(p in src for p in parts)
 
 # Revision / unreleased provenance.
-need(str(CONTRACT.get('contract_revision')) == '37', 'Backporter contract revision must be 37')
-need(CONTRACT.get('implemented_in_version') == '3.5.9', 'Pass 37 contract must target unreleased 3.5.9')
+need(str(CONTRACT.get('contract_revision')) in ('37','38','39'), 'Backporter contract revision must be 37 or forward-compatible Pass 38/39')
+need((str(CONTRACT.get('contract_revision')) == '37' and CONTRACT.get('implemented_in_version') == '3.5.9') or (str(CONTRACT.get('contract_revision')) in ('38','39') and CONTRACT.get('implemented_in_version') == '3.5.10'), 'Pass 37/38 contract provenance must match its unreleased staging version')
 need(CONTRACT.get('implemented_in_git_ref') is None, 'unreleased Pass 37 contract must not self-reference a git ref')
 need(CONTRACT.get('release_status') == 'unreleased', 'Pass 37 contract must remain unreleased')
-need('String stagingVersion = "3.5.9"' in BUILD, 'build.gradle stagingVersion must be 3.5.9')
+need(('String stagingVersion = "3.5.9"' in BUILD) or ('String stagingVersion = "3.5.10"' in BUILD), 'build.gradle stagingVersion must be Pass 37 or forward-compatible Pass 38/39')
 need(CONTRACT.get('implemented_in_version') != '3.5.5' and CONTRACT.get('implemented_in_git_ref') != 'refs/tags/3.5.5',
      'stale 3.5.5 provenance remains')
 

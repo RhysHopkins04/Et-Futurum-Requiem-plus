@@ -46,7 +46,7 @@ require(doc, "## Pass 33c runtime corrections", "Pass 33c documentation", errors
 require(doc, "remains powered while an arrow is lodged", "wooden-button projectile documentation", errors)
 
 revision = contract.get("revision") or contract.get("contract_revision")
-if str(revision) not in ("33", "34", "35", "36", "37"):
+if str(revision) not in ("33", "34", "35", "36", "37", "38"):
     errors.append(f"Backporter contract revision is not Pass 33+ forward-compatible: {revision!r}")
 
 if errors:

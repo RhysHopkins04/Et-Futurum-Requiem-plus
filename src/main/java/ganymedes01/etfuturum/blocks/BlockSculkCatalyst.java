@@ -23,6 +23,7 @@ public class BlockSculkCatalyst extends BaseBlock {
 		setHardness(3.0F);
 		setResistance(3.0F);
 		setBlockSound(ModSounds.soundSculkCatalyst);
+		setLightLevel(6.0F / 15.0F);
 	}
 
 	@Override

@@ -193,3 +193,43 @@ open/close/idle sounds. Bee effects remain deferred with the entity phase.
 
 Entity-spawning endpoints, biome/world generation, structure generation and general waterlogging remain outside
 Pass 37. The Backporter contract revision is 37 and the unreleased development version is 3.5.9.
+
+## Pass 38 Sculk functional parity contract
+
+Pass 38 promotes `sculk_sensor`, `calibrated_sculk_sensor` and `sculk_shrieker` from the Pass-35
+visible-state shell to `PASS_38_VERIFIED` gameplay. A single server-authoritative
+`SculkVibrationDispatcher` owns the 1.21.11 frequency table, bounded per-chunk listener registration,
+distance travel delay and six-ray vibration occlusion against wool-equivalent dampening blocks.
+Ordinary Sensors listen within 8 blocks; Calibrated Sensors listen within 16 blocks and read their
+rear calibration input without assuming modern direction ordinals. Their existing metadata remains
+unchanged while a small runtime tile entity stores redstone power, last vibration frequency, pending
+travel and lifecycle timing. ACTIVE is 30 ticks for the ordinary Sensor and 10 for the Calibrated
+Sensor; both use the modern 10-tick COOLDOWN.
+
+Shriekers listen to the Sensor tendrils-clicking bridge rather than arbitrary raw noise, require a
+responsible player, retain `can_summon`/`shrieking` in the existing metadata bits, and execute the
+90-tick shriek plus the persistent per-player warning/cooldown state needed before Warden creation.
+The boundary where modern Java would try to create a Warden is deliberately terminal in EFR Pass 38:
+warning progression is retained but no Warden entity is spawned and no retry loop is scheduled.
+
+`TileEntitySculkCatalyst.bloomWithExperience` is no longer a TODO. Death handling uses a bounded
+chunk-indexed catalyst registry, consumes the qualifying death XP, performs the 8-tick bloom pulse and
+adds persisted charge cursors. The 1.7 adaptation retains the modern bounded cursor model constants
+(maximum charge 1000, maximum 32 cursors, 24-block growth radius and 1-in-11 special Shrieker split),
+avoids unloaded chunks and TileEntity-containing blocks, converts a conservative 1.7 equivalent of
+`sculk_replaceable`, places/merges six-face Sculk Vein state, and can grow Sensors or natural
+`can_summon=true` Shriekers. Pass-30 FaceMask storage is reused rather than rewritten.
+
+General waterlogging, the Warden entity/AI/model/spawn endpoint, and a general-purpose modern GameEvent
+API remain outside this pass. Backporter contract revision is 38 and the unreleased staging version is
+3.5.10.
+
+### Pass 39: bounded fluids, compact kelp and powder snow
+
+Kelp ages now use two block identities and metadata: `kelp` for 0..15 and hidden `kelp_age_16` for 16..25. No new kelp head tile entities are created. Anvil loading migrates old `modern_parity_kelp_state` / `Age` BYTE records before allocation and marks changed chunks dirty. This supersedes the Pass-37 head-TE storage statement above.
+
+Kelp/stems, both seagrass forms, wet sea pickles and wet coral plants/fans expose contained source water to body/eye material queries, vanilla swimming/drowning, camera fog and the translucent water rendering pass. The renderer shares water heights and culling with neighboring water and uses vanilla biome water tint. Dry pickles/coral and unrelated parity blocks remain excluded. Bucket removal suppresses restoration only at the drained cell.
+
+Powder snow derives its collision, movement and freezing rules from Mojang's Java 1.21.11 server. Leather armor and supported immune/walkable entity types are explicit. Frozen ticks persist in Forge entity data and sync to the owning player for the client frost overlay; powder-snow fog and movement particles are included. Modern frozen-heart artwork and entity shaking are remaining presentation differences.
+
+See `docs/modern-state-fixes/HANDOFF.md` for validation evidence, scale assessment and client/server restart checks.

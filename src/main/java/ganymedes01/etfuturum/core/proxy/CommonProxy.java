@@ -48,6 +48,8 @@ public class CommonProxy implements IGuiHandler {
 	}
 
 	public void registerEvents() {
+        ganymedes01.etfuturum.ModernPowderSnowBucket.init();
+        MinecraftForge.EVENT_BUS.register(new ganymedes01.etfuturum.core.handlers.ModernFluidEventHandler());
 		MinecraftForge.EVENT_BUS.register(EntityEventHandler.INSTANCE);
 
 		FMLCommonHandler.instance().bus().register(ServerEventHandler.INSTANCE);
@@ -97,6 +99,7 @@ public class CommonProxy implements IGuiHandler {
 		if (ModBlocks.SCULK_CATALYST.isEnabled()) {
 			GameRegistry.registerTileEntity(TileEntitySculkCatalyst.class, Utils.getUnlocalisedName("sculk_catalyst"));
 		}
+		GameRegistry.registerTileEntity(TileEntitySculkRuntime.class, Utils.getUnlocalisedName("modern_sculk_runtime"));
 		if (ModBlocks.END_GATEWAY.isEnabled()) {
 			GameRegistry.registerTileEntity(TileEntityGateway.class, Utils.getUnlocalisedName("end_gateway"));
 		}

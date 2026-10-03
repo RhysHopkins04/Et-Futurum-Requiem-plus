@@ -18,6 +18,7 @@ import net.minecraft.util.IIcon;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.biome.BiomeGenBase;
+import net.minecraftforge.client.ForgeHooksClient;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -55,6 +56,14 @@ public final class BlockModernJsonModelRenderer implements ISimpleBlockRendering
     @Override
     public boolean renderWorldBlock(IBlockAccess world, int x, int y, int z, Block block, int modelId,
             RenderBlocks renderer) {
+        if (ForgeHooksClient.getWorldRenderPass() == 1) {
+            if (!ModernMapParityBlocks.containsWater(world,x,y,z)) return false;
+            IBlockAccess original = renderer.blockAccess;
+            try {
+                renderer.blockAccess = new ContainedWaterAccess(world);
+                return renderer.renderBlockLiquid(Blocks.water,x,y,z);
+            } finally { renderer.blockAccess = original; }
+        }
         ModernMapParityBlocks entry;
         if (ModBlocks.SAPLING.isEnabled() && block == ModBlocks.SAPLING.get()) {
             int saplingMeta = world.getBlockMetadata(x, y, z);

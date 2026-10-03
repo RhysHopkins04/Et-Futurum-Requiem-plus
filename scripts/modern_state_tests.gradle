@@ -1,0 +1,26 @@
+// Invoke with ./gradlew --offline -I scripts/modern_state_tests.gradle modernStateContracts
+// Test classes and the optional Forge probe never enter the distributable mod JAR.
+gradle.projectsEvaluated {
+    def p = gradle.rootProject
+    def out = p.layout.buildDirectory.dir('modern-state-tests/classes')
+    def compile = p.tasks.register('compileModernStateTests', JavaCompile) {
+        dependsOn p.tasks.named('classes')
+        source = p.fileTree('src/testModernState/java') { include '**/*.java' }
+        classpath = p.sourceSets.main.runtimeClasspath
+        destinationDirectory = out
+        sourceCompatibility = '1.8'
+        targetCompatibility = '1.8'
+        options.compilerArgs += ['-proc:none']
+    }
+    p.tasks.register('modernStateContracts', JavaExec) {
+        dependsOn compile
+        classpath = p.sourceSets.main.runtimeClasspath + p.files(out)
+        mainClass = 'efrtest.ModernStateContracts'
+    }
+    p.tasks.named('runServer', JavaExec) {
+        dependsOn compile
+        classpath += p.files(out)
+        workingDir = p.file('build/modern-state-tests/server')
+        systemProperty 'efr.modernStateProbe', 'true'
+    }
+}

@@ -264,6 +264,7 @@ public class EtFuturum {
 		networkWrapper.registerMessage(StartElytraFlyingHandler.class, StartElytraFlyingMessage.class, 6, Side.SERVER);
 		networkWrapper.registerMessage(AttackYawHandler.class, AttackYawMessage.class, 7, Side.CLIENT);
 		networkWrapper.registerMessage(WoodSignUpdateHandler.class, WoodSignUpdateMessage.class, 8, Side.SERVER);
+        networkWrapper.registerMessage(ganymedes01.etfuturum.network.FrozenStateHandler.class, ganymedes01.etfuturum.network.FrozenStateMessage.class, 9, Side.CLIENT);
 
 		if (!Reference.SNAPSHOT_BUILD && !Reference.DEV_ENVIRONMENT) {
 			MCLibModules.updateCheckAPI.submitModTask(Tags.MOD_ID, Tags.VERSION, Reference.VERSION_URL);
@@ -926,6 +927,38 @@ public class EtFuturum {
 				"eyeblossom_idle1", "eyeblossom_idle2", "eyeblossom_idle3",
 				"eyeblossom_idle4", "eyeblossom_idle5", "eyeblossom_idle6"
 		}) config.addObject(ver, "minecraft/sounds/block/eyeblossom/" + sound + ".ogg");
+
+		// Pass 38b: Pass 38 runtime code plays these exact modern Sculk events.
+		// DynamicSoundsResourcePack owns the versioned sounds.json, so request both
+		// the event metadata and each backing OGG explicitly.
+		for (String event : new String[] {
+				"block.sculk_sensor.clicking", "block.sculk_sensor.clicking_stop",
+				"block.sculk_shrieker.shriek", "block.sculk_catalyst.bloom"
+		}) config.addSoundEvent(ver, event, "block");
+		for (int i = 1; i <= 6; ++i)
+			config.addObject(ver, "minecraft/sounds/block/sculk_sensor/sculk_clicking" + i + ".ogg");
+		for (int i = 1; i <= 5; ++i)
+			config.addObject(ver, "minecraft/sounds/block/sculk_sensor/sculk_clicking_stop" + i + ".ogg");
+		for (int i = 1; i <= 5; ++i)
+			config.addObject(ver, "minecraft/sounds/block/sculk_shrieker/shriek" + i + ".ogg");
+		for (int i = 1; i <= 13; ++i)
+			config.addObject(ver, "minecraft/sounds/enchant/soulspeed/soulspeed" + i + ".ogg");
+
+		// Pass 38f: can_summon Shrieker warning replies are modern Warden sound events,
+		// but they occur before/around the unavailable Warden spawn endpoint. Fetch the
+		// exact event metadata and backing OGGs so the block-local warning lifecycle is audible.
+		for (String event : new String[] {
+				"entity.warden.nearby_close", "entity.warden.nearby_closer",
+				"entity.warden.nearby_closest", "entity.warden.listening_angry"
+		}) config.addSoundEvent(ver, event, "hostile");
+		for (int i = 1; i <= 4; ++i)
+			config.addObject(ver, "minecraft/sounds/mob/warden/nearby_close_" + i + ".ogg");
+		for (int i = 1; i <= 3; ++i) {
+			config.addObject(ver, "minecraft/sounds/mob/warden/nearby_closer_" + i + ".ogg");
+			config.addObject(ver, "minecraft/sounds/mob/warden/nearby_closest_" + i + ".ogg");
+		}
+		for (int i = 1; i <= 5; ++i)
+			config.addObject(ver, "minecraft/sounds/mob/warden/listening_angry_" + i + ".ogg");
 		config.addSoundEvent(ver, "block.ender_chest.open", "block");
 		config.addSoundEvent(ver, "block.ender_chest.close", "block");
 		config.addSoundEvent(ver, "block.composter.empty", "block");

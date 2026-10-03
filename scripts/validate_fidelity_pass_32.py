@@ -54,7 +54,7 @@ for token in (
     'tag.setInteger("LastInteractedSlot", lastInteractedSlot)',
     'tag.hasKey("LastInteractedSlot")',
     "shelf.setLastInteractedSlot(slot);",
-    "isChiseledBookshelf() || super.hasComparatorInputOverride()",
+    "isChiseledBookshelf()",
     "return slot >= 0 && slot < 6 ? slot + 1 : 0;",
     "worldObj.func_147453_f(xCoord, yCoord, zCoord, getBlockType())",
     'new ItemStack(Items.book)',
@@ -138,10 +138,11 @@ if contract.get("schema") != 1:
     errors.append("Backporter contract schema must be 1")
 if contract.get("source_minecraft") != "1.21.11":
     errors.append("Backporter contract source_minecraft must be 1.21.11")
-if str(contract.get("contract_revision")) not in ("32e", "32f", "33", "34", "35", "36", "37"):
+if str(contract.get("contract_revision")) not in ("32e", "32f", "33", "34", "35", "36", "37", "38"):
     errors.append("Backporter contract contract_revision must be Pass 32e or a forward-compatible later fidelity revision")
-if str(contract.get("contract_revision")) == "37":
-    if contract.get("implemented_in_version") != "3.5.9" or contract.get("implemented_in_git_ref") is not None or contract.get("release_status") != "unreleased":
+if str(contract.get("contract_revision")) in ("37","38"):
+    expected_version = "3.5.10" if str(contract.get("contract_revision")) == "38" else "3.5.9"
+    if contract.get("implemented_in_version") != expected_version or contract.get("implemented_in_git_ref") is not None or contract.get("release_status") != "unreleased":
         errors.append("Pass 37 contract provenance must be unreleased 3.5.9 with no git ref")
 if "authoritative_source_commit" in contract or "generated_by_pass" in contract:
     errors.append("Backporter contract must not retain stale Pass 31/32c provenance fields")

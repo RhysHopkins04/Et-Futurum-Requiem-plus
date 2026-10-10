@@ -390,7 +390,25 @@ public class EtFuturumEarlyMixins implements IFMLLoadingPlugin, IEarlyMixinLoade
 			mixins.add("extendedheight.MixinPlayerInstance");
 			if (side == MixinEnvironment.Side.CLIENT) {
 				mixins.add("extendedheight.MixinIntegratedServer");
-				mixins.add("extendedheight.client.MixinRenderGlobal");
+				// Celeritas replaces the legacy RenderGlobal chunk grid and intentionally
+				// reduces its allocation constant from 16 to 1. Do not compete for
+				// the same @ModifyConstant target (Angelica 2.2.14, priority 900):
+				// let Celeritas own rendering and report EFR's 384 block height.
+				// Resource lookup avoids initializing Angelica classes while loading mixins.
+				boolean celeritasPresent = Launch.classLoader.getResource(
+					"com/gtnewhorizons/angelica/rendering/celeritas/CeleritasWorldRenderer.class") != null;
+				if (celeritasPresent) {
+					mixins.add("extendedheight.client.MixinAngelicaCeleritasWorldRenderer");
+                    // Celeritas' reported height is only one of its bounds.
+                    // Its own section manager, section-clone reader, and lighting
+                    // view also hardcode the vanilla 0..255 column. Keep these
+                    // optional Angelica-only mixins paired with the height getter.
+                    mixins.add("extendedheight.client.MixinAngelicaRenderSectionManager");
+                    mixins.add("extendedheight.client.MixinAngelicaClonedChunkSection");
+                    mixins.add("extendedheight.client.MixinAngelicaWorldSlice");
+				} else {
+					mixins.add("extendedheight.client.MixinRenderGlobal");
+				}
 				mixins.add("extendedheight.client.MixinWorldClient");
 				mixins.add("extendedheight.client.MixinNetHandlerPlayClient");
 			} else {

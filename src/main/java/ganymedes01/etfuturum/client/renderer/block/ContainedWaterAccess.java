@@ -19,7 +19,7 @@ public final class ContainedWaterAccess implements IBlockAccess {
     public int isBlockProvidingPowerTo(int x,int y,int z,int side) { return source.isBlockProvidingPowerTo(x,y,z,side); }
     public boolean isAirBlock(int x,int y,int z) { return source.isAirBlock(x,y,z); }
     public BiomeGenBase getBiomeGenForCoords(int x,int z) { return source.getBiomeGenForCoords(x,z); }
-    public int getHeight() { return source.getHeight(); }
+    public int getHeight() { return ganymedes01.etfuturum.core.utils.WorldHeightCompat.heightOf(source); }
     public boolean extendedLevelsInChunkCache() { return source.extendedLevelsInChunkCache(); }
     public boolean isSideSolid(int x,int y,int z,ForgeDirection side,boolean fallback) { return source.isSideSolid(x,y,z,side,fallback); }
 }

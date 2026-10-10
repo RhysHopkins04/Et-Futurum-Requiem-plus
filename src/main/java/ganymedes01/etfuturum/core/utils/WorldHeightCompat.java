@@ -50,6 +50,19 @@ public final class WorldHeightCompat {
      */
     public static final int MAX_CHUNK_DATA_BYTES = 393728;
 
+
+    /**
+     * Read world height without invoking a method on IBlockAccess
+     * that is absent in the Crucible runtime interface.
+     */
+    public static int heightOf(net.minecraft.world.IBlockAccess access) {
+        if (access instanceof net.minecraft.world.World) {
+            return ((net.minecraft.world.World) access).getHeight();
+        }
+        return ganymedes01.etfuturum.configuration.configs.ConfigWorld.extendedWorldHeight
+                ? EXTENDED_HEIGHT : LEGACY_HEIGHT;
+    }
+
     private WorldHeightCompat() {}
 
     public static int modernToPhysicalY(int modernY) {

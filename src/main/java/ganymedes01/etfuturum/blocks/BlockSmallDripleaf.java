@@ -34,6 +34,8 @@ import java.util.Random;
 public class BlockSmallDripleaf extends Block implements IGrowable {
 
     public static final int UPPER_BIT = 4;
+    public static final int WATERLOGGED_BIT = 8;
+    private static final ThreadLocal<Boolean> CONVERTING = new ThreadLocal<Boolean>();
 
     private IIcon leafTop;
     private IIcon leafSide;
@@ -63,6 +65,15 @@ public class BlockSmallDripleaf extends Block implements IGrowable {
     }
 
     @Override
+    public boolean canRenderInPass(int pass) {
+        return pass == 0 || pass == 1;
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public int getRenderBlockPass() { return 1; }
+
+    @Override
     public boolean isOpaqueCube() {
         return false;
     }
@@ -83,6 +94,23 @@ public class BlockSmallDripleaf extends Block implements IGrowable {
     }
 
     @Override
+    public void setBlockBoundsBasedOnState(IBlockAccess world, int x, int y, int z) {
+        if (isUpper(world.getBlockMetadata(x, y, z))) {
+            // The upper section includes leaf plates spanning near the block edges.
+            setBlockBounds(1F / 16F, 0, 1F / 16F, 15F / 16F, 15F / 16F, 15F / 16F);
+        } else {
+            // The lower section is just two crossed stem planes, ~0.31 blocks wide.
+            setBlockBounds(5.5F / 16F, 0, 5.5F / 16F, 10.5F / 16F, 1, 10.5F / 16F);
+        }
+    }
+
+    @Override
+    public AxisAlignedBB getSelectedBoundingBoxFromPool(World world, int x, int y, int z) {
+        setBlockBoundsBasedOnState(world, x, y, z);
+        return super.getSelectedBoundingBoxFromPool(world, x, y, z);
+    }
+
+    @Override
     public boolean isReplaceable(IBlockAccess world, int x, int y, int z) {
         return false;
     }
@@ -90,8 +118,26 @@ public class BlockSmallDripleaf extends Block implements IGrowable {
     @Override
     public boolean canPlaceBlockAt(World world, int x, int y, int z) {
         return y < world.getHeight() - 1
-                && world.isAirBlock(x, y + 1, z)
-                && isValidSmallDripleafGround(world, x, y - 1, z);
+                && isAirOrSourceWater(world, x, y, z)
+                && isAirOrSourceWater(world, x, y + 1, z)
+                && isValidSmallDripleafGround(world, x, y - 1, z, isSourceWater(world, x, y, z));
+    }
+
+    /** Called before the item replaces the source block, so the original water is still observable. */
+    @Override
+    public int onBlockPlaced(World world, int x, int y, int z, int side,
+                              float hitX, float hitY, float hitZ, int metadata) {
+        return (metadata & 7) | (isSourceWater(world, x, y, z) ? WATERLOGGED_BIT : 0);
+    }
+
+    private static boolean isSourceWater(IBlockAccess world, int x, int y, int z) {
+        Block b = world.getBlock(x, y, z);
+        return (b == Blocks.water || b == Blocks.flowing_water)
+                && (world.getBlockMetadata(x, y, z) & 15) == 0;
+    }
+
+    private static boolean isAirOrSourceWater(IBlockAccess world, int x, int y, int z) {
+        return world.isAirBlock(x, y, z) || isSourceWater(world, x, y, z);
     }
 
     @Override
@@ -102,9 +148,12 @@ public class BlockSmallDripleaf extends Block implements IGrowable {
 
         int yawQuadrant = MathHelper.floor_double((placer.rotationYaw * 4.0F / 360.0F) + 0.5D) & 3;
         int facing = (yawQuadrant + 2) & 3;
-        world.setBlockMetadataWithNotify(x, y, z, makeMeta(facing, false), 2);
-        if (world.isAirBlock(x, y + 1, z)) {
-            world.setBlock(x, y + 1, z, this, makeMeta(facing, true), 3);
+        int lowerWater = world.getBlockMetadata(x, y, z) & WATERLOGGED_BIT;
+        boolean upperWater = isSourceWater(world, x, y + 1, z);
+        world.setBlockMetadataWithNotify(x, y, z, makeMeta(facing, false) | lowerWater, 2);
+        if (isAirOrSourceWater(world, x, y + 1, z)) {
+            world.setBlock(x, y + 1, z, this,
+                    makeMeta(facing, true) | (upperWater ? WATERLOGGED_BIT : 0), 3);
         }
     }
 
@@ -117,7 +166,7 @@ public class BlockSmallDripleaf extends Block implements IGrowable {
         }
 
         Block above = world.getBlock(x, y + 1, z);
-        return isValidSmallDripleafGround(world, x, y - 1, z)
+        return isValidSmallDripleafGround(world, x, y - 1, z, (meta & WATERLOGGED_BIT) != 0)
                 && above == this
                 && isUpper(world.getBlockMetadata(x, y + 1, z));
     }
@@ -131,7 +180,7 @@ public class BlockSmallDripleaf extends Block implements IGrowable {
 
     @Override
     public void breakBlock(World world, int x, int y, int z, Block oldBlock, int oldMeta) {
-        if (!world.isRemote) {
+        if (!world.isRemote && !Boolean.TRUE.equals(CONVERTING.get())) {
             int otherY = isUpper(oldMeta) ? y - 1 : y + 1;
             if (world.getBlock(x, otherY, z) == this) {
                 world.setBlockToAir(x, otherY, z);
@@ -140,9 +189,24 @@ public class BlockSmallDripleaf extends Block implements IGrowable {
         super.breakBlock(world, x, y, z, oldBlock, oldMeta);
     }
 
-    private boolean isValidSmallDripleafGround(IBlockAccess world, int x, int y, int z) {
+    /**
+     * Modern 1.21 small-dripleaf survival: clay and moss support it dry; on
+     * dirt-like substrates its lower half must occupy source water.
+     * Unlike a generic Material.ground check, this does not accidentally allow
+     * stone/sand/gravel, which are not part of the modern placeable tag.
+     */
+    private boolean isValidSmallDripleafGround(IBlockAccess world, int x, int y, int z,
+                                                boolean lowerIsWet) {
         Block ground = world.getBlock(x, y, z);
-        return ground == Blocks.clay || (ModBlocks.MOSS_BLOCK.isEnabled() && ground == ModBlocks.MOSS_BLOCK.get());
+        if (ground == Blocks.clay || (ModBlocks.MOSS_BLOCK.isEnabled() && ground == ModBlocks.MOSS_BLOCK.get()))
+            return true;
+        if (!lowerIsWet) return false;
+        return ground == Blocks.dirt || ground == Blocks.grass || ground == Blocks.farmland
+                || ground == Blocks.mycelium
+                || (ModBlocks.ROOTED_DIRT.isEnabled() && ground == ModBlocks.ROOTED_DIRT.get())
+                || (ModBlocks.MUD.isEnabled() && ground == ModBlocks.MUD.get())
+                || (ModBlocks.MUDDY_MANGROVE_ROOTS.isEnabled() && ground == ModBlocks.MUDDY_MANGROVE_ROOTS.get())
+                || ground == ganymedes01.etfuturum.ModernMapParityBlocks.PALE_MOSS_BLOCK.get();
     }
 
     @Override
@@ -189,18 +253,41 @@ public class BlockSmallDripleaf extends Block implements IGrowable {
         int desiredHeight = 2 + random.nextInt(4);
         int height = 2;
         for (int i = 2; i < desiredHeight; i++) {
-            if (!world.isAirBlock(x, lowerY + i, z)) {
+            if (!isAirOrSourceWater(world, x, lowerY + i, z)) {
                 break;
             }
             height++;
         }
 
-        // Replacing the lower half removes the old upper half through breakBlock, after which the
-        // complete big-dripleaf column can be installed bottom-up.
-        for (int i = 0; i < height - 1; i++) {
-            world.setBlock(x, lowerY + i, z, ModBlocks.BIG_DRIPLEAF_STEM.get(), facing, 3);
+        // Capture the original wet states *before* replacing the lower half.
+        // breakBlock removes the original upper half, otherwise losing its water flag.
+        boolean[] water = new boolean[height];
+        for (int i = 0; i < height; i++) {
+            int atY = lowerY + i;
+            water[i] = world.getBlock(x, atY, z) == this
+                    ? (world.getBlockMetadata(x, atY, z) & WATERLOGGED_BIT) != 0
+                    : isSourceWater(world, x, atY, z);
         }
-        world.setBlock(x, lowerY + height - 1, z, ModBlocks.BIG_DRIPLEAF.get(), facing, 3);
+        // Replacing the lower small-dripleaf half normally removes its companion.
+        // During intentional conversion keep both original halves available until
+        // their wet states have been consumed, and publish only the complete column.
+        CONVERTING.set(Boolean.TRUE);
+        try {
+            for (int i = 0; i < height - 1; i++) {
+                world.setBlock(x, lowerY + i, z, ModBlocks.BIG_DRIPLEAF_STEM.get(),
+                        facing | (water[i] ? BlockBigDripleafStem.WATERLOGGED_BIT : 0), 2);
+            }
+            world.setBlock(x, lowerY + height - 1, z,
+                    water[height - 1] ? ModBlocks.BIG_DRIPLEAF_WET.get() : ModBlocks.BIG_DRIPLEAF.get(),
+                    facing, 2);
+        } finally {
+            CONVERTING.remove();
+        }
+        for (int i = 0; i < height; i++) {
+            int atY = lowerY + i;
+            world.markBlockForUpdate(x, atY, z);
+            world.notifyBlocksOfNeighborChange(x, atY, z, world.getBlock(x, atY, z));
+        }
     }
 
     @Override

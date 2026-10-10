@@ -704,6 +704,7 @@ public enum ModernMapParityBlocks {
 
     /** Bounded source fluid only: metadata on other parity blocks is never waterlogging. */
     public static boolean containsWater(IBlockAccess world, int x, int y, int z) {
+        if (ganymedes01.etfuturum.core.utils.DripleafWater.contains(world,x,y,z)) return true;
         Block b = world.getBlock(x,y,z);
         if (!(b instanceof ParityModelBlock)) return false;
         ModernMapParityBlocks e = ((ParityModelBlock)b).entry;
@@ -715,6 +716,8 @@ public enum ModernMapParityBlocks {
     }
 
     public static boolean drainContainedWater(World world, int x, int y, int z) {
+        if (ganymedes01.etfuturum.core.utils.DripleafWater.contains(world,x,y,z))
+            return ganymedes01.etfuturum.core.utils.DripleafWater.drain(world,x,y,z);
         if (!containsWater(world, x, y, z)) return false;
         ModernMapParityBlocks e = fromBlock(world.getBlock(x, y, z));
         if (e == SEA_PICKLE) {
@@ -732,6 +735,7 @@ public enum ModernMapParityBlocks {
     }
 
     public static boolean fillContainedWater(World world, int x, int y, int z) {
+        if (ganymedes01.etfuturum.core.utils.DripleafWater.fill(world,x,y,z)) return true;
         ModernMapParityBlocks e = fromBlock(world.getBlock(x, y, z));
         if (e == null || world.provider.isHellWorld || containsWater(world,x,y,z)) return false;
         String n = e.getRegistryName();
@@ -744,7 +748,7 @@ public enum ModernMapParityBlocks {
     }
 
     private static boolean isWater(IBlockAccess world, int x, int y, int z) {
-        if (world == null || y < 0 || y > 255) return false;
+        if (world == null || y < 0 || y >= ganymedes01.etfuturum.core.utils.WorldHeightCompat.heightOf(world)) return false;
         Block block = world.getBlock(x, y, z);
         return block == Blocks.water || block == Blocks.flowing_water;
     }
@@ -2570,7 +2574,7 @@ public enum ModernMapParityBlocks {
 
         private boolean growKelpOne(World world, int x, int y, int z) {
             int hy = y;
-            while (hy < 255 && (isKelpHead(world.getBlock(x, hy + 1, z)) || world.getBlock(x, hy + 1, z) == KELP_PLANT.get())) hy++;
+            while (hy < world.getHeight() - 1 && (isKelpHead(world.getBlock(x, hy + 1, z)) || world.getBlock(x, hy + 1, z) == KELP_PLANT.get())) hy++;
             if (!isKelpHead(world.getBlock(x, hy, z))) {
                 if (world.getBlock(x, hy, z) == KELP_PLANT.get()) {
                     replaceKelpBlock(world, x, hy, z, KELP.get(), 0, 3);
@@ -2739,7 +2743,7 @@ public enum ModernMapParityBlocks {
                     int scan = 0;
                     while (py > 0 && world.isAirBlock(px, py, pz) && scan++ < 5) py--;
                     scan = 0;
-                    while (py < 255 && !world.isAirBlock(px, py, pz) && scan++ < 5) py++;
+                    while (py < world.getHeight() - 1 && !world.isAirBlock(px, py, pz) && scan++ < 5) py++;
                     int groundY = py - 1;
                     if (groundY < 0 || !world.isAirBlock(px, py, pz)) continue;
                     Block ground = world.getBlock(px, groundY, pz);
@@ -2754,7 +2758,7 @@ public enum ModernMapParityBlocks {
                         updatePaleMossCarpet(world, px, py, pz, true);
                     } else if (vegetation < 50) {
                         world.setBlock(px, py, pz, Blocks.tallgrass, 1, 3);
-                    } else if (py < 255 && world.isAirBlock(px, py + 1, pz)) {
+                    } else if (py < world.getHeight() - 1 && world.isAirBlock(px, py + 1, pz)) {
                         Blocks.double_plant.func_149889_c(world, px, py, pz, 2, 3);
                     }
                 }
@@ -4263,12 +4267,12 @@ public enum ModernMapParityBlocks {
                 int ty = y + direction.offsetY;
                 int tz = z + direction.offsetZ;
                 int scanned = 0;
-                while (ty >= 0 && ty <= 255 && world.getBlock(tx, ty, tz) == this && scanned++ < 7) {
+                while (ty >= 0 && ty < world.getHeight() && world.getBlock(tx, ty, tz) == this && scanned++ < 7) {
                     tx += direction.offsetX;
                     ty += direction.offsetY;
                     tz += direction.offsetZ;
                 }
-                if (ty < 0 || ty > 255 || scanned > 7 || !world.isAirBlock(tx, ty, tz) || !canPlaceBlockAt(world, tx, ty, tz)) return false;
+                if (ty < 0 || ty >= world.getHeight() || scanned > 7 || !world.isAirBlock(tx, ty, tz) || !canPlaceBlockAt(world, tx, ty, tz)) return false;
                 if (!world.isRemote) {
                     int scaffoldMeta = computeScaffoldingMeta(world, tx, ty, tz);
                     if (!world.setBlock(tx, ty, tz, this, scaffoldMeta, 3)) return false;

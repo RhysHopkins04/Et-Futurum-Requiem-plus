@@ -11,7 +11,9 @@ import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.ModifyConstant;
 
 import java.io.IOException;
-import java.util.concurrent.Semaphore;
+import java.io.ByteArrayOutputStream;
+import java.util.zip.Deflater;
+import org.spongepowered.asm.mixin.Unique;
 import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
 
@@ -27,13 +29,8 @@ public abstract class MixinS26PacketMapChunkBulk {
     @Shadow private byte[][] field_149260_f;
     @Shadow private int field_149261_g;
     @Shadow private boolean field_149267_h;
-    @Shadow private static byte[] field_149268_i;
-    @Shadow(remap = false) private Semaphore deflateGate;
-
-    @Shadow(remap = false)
-    private void deflate() {
-        throw new AssertionError();
-    }
+    // Do not shadow a static compression scratch buffer here: Crucible/Spigot
+    // changes the vanilla static field into an instance field.
 
     @ModifyConstant(method = "<init>(Ljava/util/List;)V", constant = @Constant(intValue = 65535))
     private int etfu$sendAllExtendedSections(int original) {
@@ -55,14 +52,13 @@ public abstract class MixinS26PacketMapChunkBulk {
         this.field_149262_d = new int[chunkCount];
         this.field_149260_f = new byte[chunkCount][];
 
-        if (field_149268_i.length < this.field_149261_g) {
-            field_149268_i = new byte[this.field_149261_g];
-        }
-
-        data.readBytes(field_149268_i, 0, this.field_149261_g);
+        // Packet-local input works with both Forge's static and Crucible's
+        // per-packet scratch buffer and avoids cross-thread buffer sharing.
+        byte[] compressedInput = new byte[this.field_149261_g];
+        data.readBytes(compressedInput, 0, this.field_149261_g);
         byte[] inflatedData = new byte[S21PacketChunkData.func_149275_c() * chunkCount];
         Inflater inflater = new Inflater();
-        inflater.setInput(field_149268_i, 0, this.field_149261_g);
+        inflater.setInput(compressedInput, 0, this.field_149261_g);
 
         try {
             inflater.inflate(inflatedData);
@@ -104,13 +100,7 @@ public abstract class MixinS26PacketMapChunkBulk {
      */
     @Overwrite
     public void writePacketData(PacketBuffer data) throws IOException {
-        if (this.field_149263_e == null) {
-            this.deflateGate.acquireUninterruptibly();
-            if (this.field_149263_e == null) {
-                this.deflate();
-            }
-            this.deflateGate.release();
-        }
+        this.etfu$ensureCompressed();
 
         data.writeShort(this.field_149266_a.length);
         data.writeInt(this.field_149261_g);
@@ -124,4 +114,47 @@ public abstract class MixinS26PacketMapChunkBulk {
             data.writeInt(this.field_149262_d[i]);
         }
     }
+    /**
+     * Forge bulk packets use a private deflate() + deflateGate; Crucible/Spigot
+     * instead uses compress() and does not have either of those members.
+     * Compress from the shared, stable uncompressed chunk payload fields that
+     * both packet implementations expose. Never rely on either private API.
+     */
+    @Unique
+    private synchronized void etfu$ensureCompressed() {
+        if (this.field_149263_e != null) {
+            return;
+        }
+
+        int rawSize = 0;
+        for (byte[] chunkData : this.field_149260_f) {
+            rawSize = Math.addExact(rawSize, chunkData.length);
+        }
+        byte[] raw = new byte[rawSize];
+        int offset = 0;
+        for (byte[] chunkData : this.field_149260_f) {
+            System.arraycopy(chunkData, 0, raw, offset, chunkData.length);
+            offset += chunkData.length;
+        }
+
+        Deflater compressor = new Deflater(4); // Same level as Crucible's bulk compression.
+        try {
+            compressor.setInput(raw);
+            compressor.finish();
+            ByteArrayOutputStream result = new ByteArrayOutputStream(Math.max(64, rawSize / 3));
+            byte[] scratch = new byte[8192];
+            while (!compressor.finished()) {
+                int written = compressor.deflate(scratch);
+                if (written <= 0) {
+                    throw new IllegalStateException("Bulk chunk deflater made no progress");
+                }
+                result.write(scratch, 0, written);
+            }
+            this.field_149263_e = result.toByteArray();
+            this.field_149261_g = this.field_149263_e.length;
+        } finally {
+            compressor.end();
+        }
+    }
+
 }

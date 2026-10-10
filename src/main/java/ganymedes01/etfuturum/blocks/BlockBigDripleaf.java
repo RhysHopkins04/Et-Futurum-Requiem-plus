@@ -40,18 +40,22 @@ public class BlockBigDripleaf extends Block implements IGrowable {
     public static final int TILT_PARTIAL = 2;
     public static final int TILT_FULL = 3;
 
+    private final boolean wetVariant;
     private IIcon topIcon;
     private IIcon sideIcon;
     private IIcon tipIcon;
     private IIcon stemIcon;
 
-    public BlockBigDripleaf() {
+    public BlockBigDripleaf() { this(false); }
+
+    public BlockBigDripleaf(boolean wetVariant) {
         super(Material.plants);
-        setBlockName(Utils.getUnlocalisedName("big_dripleaf"));
+        this.wetVariant = wetVariant;
+        setBlockName(Utils.getUnlocalisedName(wetVariant ? "big_dripleaf_wet" : "big_dripleaf"));
         setBlockTextureName("big_dripleaf_top");
         Utils.setBlockSound(this, ModSounds.soundBigDripleaf);
         setHardness(0.1F);
-        setCreativeTab(EtFuturum.creativeTabBlocks);
+        if (!wetVariant) setCreativeTab(EtFuturum.creativeTabBlocks);
         setTickRandomly(false);
         setBlockBounds(0.0F, 0.75F, 0.0F, 1.0F, 0.9375F, 1.0F);
     }
@@ -79,8 +83,20 @@ public class BlockBigDripleaf extends Block implements IGrowable {
                 || material == Material.grass
                 || material == Material.clay
                 || (ModBlocks.MOSS_BLOCK.isEnabled() && ground == ModBlocks.MOSS_BLOCK.get())
-                || (ModBlocks.ROOTED_DIRT.isEnabled() && ground == ModBlocks.ROOTED_DIRT.get());
+                || (ModBlocks.ROOTED_DIRT.isEnabled() && ground == ModBlocks.ROOTED_DIRT.get())
+                || (ModBlocks.MUD.isEnabled() && ground == ModBlocks.MUD.get())
+                || (ModBlocks.MUDDY_MANGROVE_ROOTS.isEnabled() && ground == ModBlocks.MUDDY_MANGROVE_ROOTS.get())
+                || ground == ganymedes01.etfuturum.ModernMapParityBlocks.PALE_MOSS_BLOCK.get();
     }
+
+    public boolean isWaterloggedVariant() { return wetVariant; }
+
+    @Override
+    public boolean canRenderInPass(int pass) { return pass == 0 || (pass == 1 && wetVariant); }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public int getRenderBlockPass() { return wetVariant ? 1 : 0; }
 
     @Override
     public boolean isOpaqueCube() {
@@ -100,6 +116,13 @@ public class BlockBigDripleaf extends Block implements IGrowable {
     @Override
     public boolean isReplaceable(IBlockAccess world, int x, int y, int z) {
         return false;
+    }
+
+    /** Refuse unsupported substrates at placement instead of planting and then popping. */
+    @Override
+    public boolean canPlaceBlockAt(World world, int x, int y, int z) {
+        return y > 0 && y < world.getHeight()
+                && isValidBigDripleafGround(world, x, y - 1, z);
     }
 
     @Override
@@ -122,7 +145,7 @@ public class BlockBigDripleaf extends Block implements IGrowable {
         if (!world.isRemote && !canBlockStay(world, x, y, z)) {
             // Neighbor-driven collapse mirrors modern update-shape behaviour: the unsupported
             // top disappears rather than creating an extra drop above a stem the player broke.
-            world.setBlockToAir(x, y, z);
+            world.func_147480_a(x, y, z, true);
             return;
         }
 
@@ -219,20 +242,37 @@ public class BlockBigDripleaf extends Block implements IGrowable {
     }
 
     public void growOne(World world, int x, int y, int z) {
-        if (world.isRemote || !world.isAirBlock(x, y + 1, z)) {
+        if (world.isRemote || y + 1 >= world.getHeight()
+                || (!world.isAirBlock(x, y + 1, z) && !isSourceWater(world, x, y + 1, z))) {
             return;
         }
 
         int meta = world.getBlockMetadata(x, y, z);
         int facing = getFacing(meta);
-        world.setBlock(x, y, z, ModBlocks.BIG_DRIPLEAF_STEM.get(), facing, 3);
-        world.setBlock(x, y + 1, z, this, makeMeta(facing, TILT_NONE), 3);
+        boolean wetAbove = isSourceWater(world, x, y + 1, z);
+        // Do not notify neighbours between the top-to-stem replacement and the
+        // new top being placed. The incomplete column must never be observed by
+        // the stem's structural survival check.
+        if (!world.setBlock(x, y, z, ModBlocks.BIG_DRIPLEAF_STEM.get(),
+                facing | (wetVariant ? BlockBigDripleafStem.WATERLOGGED_BIT : 0), 2)) return;
+        world.setBlock(x, y + 1, z,
+                wetAbove ? ModBlocks.BIG_DRIPLEAF_WET.get() : ModBlocks.BIG_DRIPLEAF.get(),
+                makeMeta(facing, TILT_NONE), 2);
+        world.notifyBlocksOfNeighborChange(x, y, z, ModBlocks.BIG_DRIPLEAF_STEM.get());
+        world.notifyBlocksOfNeighborChange(x, y + 1, z, world.getBlock(x, y + 1, z));
+    }
+
+    private static boolean isSourceWater(IBlockAccess world, int x, int y, int z) {
+        Block b = world.getBlock(x, y, z);
+        return (b == Blocks.water || b == Blocks.flowing_water)
+                && (world.getBlockMetadata(x, y, z) & 15) == 0;
     }
 
     /** MCP: canFertilize */
     @Override
     public boolean func_149851_a(World world, int x, int y, int z, boolean isClient) {
-        return ModBlocks.BIG_DRIPLEAF_STEM.isEnabled() && y < world.getHeight() - 1 && world.isAirBlock(x, y + 1, z);
+        return ModBlocks.BIG_DRIPLEAF_STEM.isEnabled() && y < world.getHeight() - 1
+                && (world.isAirBlock(x, y + 1, z) || isSourceWater(world, x, y + 1, z));
     }
 
     /** MCP: shouldFertilize */
@@ -249,7 +289,7 @@ public class BlockBigDripleaf extends Block implements IGrowable {
 
     @Override
     public Item getItemDropped(int meta, Random random, int fortune) {
-        return Item.getItemFromBlock(this);
+        return Item.getItemFromBlock(ModBlocks.BIG_DRIPLEAF.get());
     }
 
     @Override

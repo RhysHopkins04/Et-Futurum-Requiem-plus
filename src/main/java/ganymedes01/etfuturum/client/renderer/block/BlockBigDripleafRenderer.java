@@ -8,6 +8,9 @@ import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;
+import net.minecraft.init.Blocks;
+import net.minecraftforge.client.ForgeHooksClient;
+import ganymedes01.etfuturum.ModernMapParityBlocks;
 
 /**
  * Faithful 1.7.10 tessellation of the modern Java Edition big-dripleaf block models.
@@ -48,6 +51,14 @@ public class BlockBigDripleafRenderer extends BlockModelBase {
 
     @Override
     public boolean renderWorldBlock(IBlockAccess world, int x, int y, int z, Block block, int modelId, RenderBlocks renderer) {
+        if (ForgeHooksClient.getWorldRenderPass() == 1) {
+            if (!ModernMapParityBlocks.containsWater(world,x,y,z)) return false;
+            IBlockAccess original = renderer.blockAccess;
+            try {
+                renderer.blockAccess = new ContainedWaterAccess(world);
+                return renderer.renderBlockLiquid(Blocks.water,x,y,z);
+            } finally { renderer.blockAccess = original; }
+        }
         Tessellator tess = Tessellator.instance;
         tess.setBrightness(block.getMixedBrightnessForBlock(world, x, y, z));
         tess.setColorOpaque_F(1.0F, 1.0F, 1.0F);

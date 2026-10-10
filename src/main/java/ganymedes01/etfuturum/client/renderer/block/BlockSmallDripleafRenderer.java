@@ -7,6 +7,9 @@ import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;
+import net.minecraft.init.Blocks;
+import net.minecraftforge.client.ForgeHooksClient;
+import ganymedes01.etfuturum.ModernMapParityBlocks;
 
 /**
  * Faithful 1.7.10 tessellation of the modern Java Edition small-dripleaf models.
@@ -39,6 +42,14 @@ public class BlockSmallDripleafRenderer extends BlockModelBase {
 
     @Override
     public boolean renderWorldBlock(IBlockAccess world, int x, int y, int z, Block block, int modelId, RenderBlocks renderer) {
+        if (ForgeHooksClient.getWorldRenderPass() == 1) {
+            if (!ModernMapParityBlocks.containsWater(world,x,y,z)) return false;
+            IBlockAccess original = renderer.blockAccess;
+            try {
+                renderer.blockAccess = new ContainedWaterAccess(world);
+                return renderer.renderBlockLiquid(Blocks.water,x,y,z);
+            } finally { renderer.blockAccess = original; }
+        }
         BlockSmallDripleaf leaf = (BlockSmallDripleaf) block;
         Tessellator tess = Tessellator.instance;
         int meta = world.getBlockMetadata(x, y, z);

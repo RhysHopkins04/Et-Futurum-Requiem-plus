@@ -7,6 +7,7 @@ import net.minecraft.block.Block;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityChest;
+import net.minecraft.world.WorldServer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -58,6 +59,15 @@ public abstract class MixinTileEntityChest extends TileEntity implements IChestP
                 this.worldObj.markBlockRangeForRenderUpdate(this.xCoord, this.yCoord, this.zCoord,
                         this.xCoord, this.yCoord, this.zCoord);
             } else if (sync) {
+                // World can trigger chunk/structure generation from its own constructor, before
+                // WorldServer has initialised its block-event queue and player manager. HBM
+                // structures can place vanilla chests during that window; preserve the pairing
+                // state (already marked dirty above), but defer all server notifications until
+                // the WorldServer is fully constructed. No clients can observe this early state.
+                if (this.worldObj instanceof WorldServer
+                        && ((WorldServer) this.worldObj).getPlayerManager() == null) {
+                    return;
+                }
                 this.worldObj.addBlockEvent(this.xCoord, this.yCoord, this.zCoord, this.getBlockType(),
                         ModernChestPairing.PAIR_BLOCK_EVENT, direction);
                 this.worldObj.markBlockForUpdate(this.xCoord, this.yCoord, this.zCoord);

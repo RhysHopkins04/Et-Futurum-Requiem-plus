@@ -1099,6 +1099,11 @@ public class ServerEventHandler {
 
 	@SubscribeEvent
 	public void onFillBucketEvent(FillBucketEvent event) {
+        // Dripleaf water buckets are handled (including sound) by the
+        // higher-priority ModernFluidEventHandler. Do not play a duplicate.
+        if (event.target != null && event.target.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK
+                && ganymedes01.etfuturum.core.utils.DripleafWater.isDripleaf(
+                        event.world, event.target.blockX, event.target.blockY, event.target.blockZ)) return;
 		if (ConfigSounds.fluidInteract && event.current.getItem() instanceof ItemBucket) {//In case some weirdo mod fires this event but doesn't use ItemBucket
 			Block isFull = ((ItemBucket) event.current.getItem()).isFull;
 			MovingObjectPosition target = event.target;

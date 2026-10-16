@@ -41,7 +41,8 @@ need('ParityMultifaceTileEntity' in PAR and 'isSculkVein()' in PAR,'Pass-30 Face
 need('meta=phase_index*4+facing_index' in text('docs/BACKPORTER_STATE_CONTRACT.json') and 'bit0=can_summon; bit1=shrieking' in text('docs/BACKPORTER_STATE_CONTRACT.json'),'Pass-35 Sculk visible-state encodings regressed')
 need(str(CON.get('contract_revision')) in ('38','39'),'contract revision must be 38 or forward-compatible 39')
 need(CON.get('implemented_in_version')=='3.5.10' and CON.get('implemented_in_git_ref') is None and CON.get('release_status')=='unreleased','3.5.10 unreleased provenance invalid')
-need('String stagingVersion = "3.5.10"' in BUILD,'stagingVersion must be 3.5.10')
+version=re.search(r'String stagingVersion = "(\d+)\.(\d+)\.(\d+)"',BUILD)
+need(version and tuple(map(int,version.groups())) >= (3,5,10),'stagingVersion predates Pass 38')
 need('PASS_38_SCULK_GAMEPLAY' in AUD and 'PASS_38_VERIFIED' in AUD,'capability audit not promoted to Pass 38')
 # Warden boundary: documentation/comments are fine; introducing an EntityWarden implementation is not.
 alljava='\n'.join(p.read_text(errors='replace') for p in (ROOT/'src/main/java').rglob('*.java'))

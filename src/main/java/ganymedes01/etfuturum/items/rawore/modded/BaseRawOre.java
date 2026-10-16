@@ -9,7 +9,10 @@ public class BaseRawOre extends BaseItem {
 	public BaseRawOre(String subfolder, String name) {
 		this.subfolder = subfolder;
 		setNames("raw_" + name);
+		setCreativeTab(null);
 	}
+
+	@Override public void getSubItems(net.minecraft.item.Item item, net.minecraft.creativetab.CreativeTabs tab, java.util.List<net.minecraft.item.ItemStack> list) {}
 
 	@Override
 	public String getTextureSubfolder() {

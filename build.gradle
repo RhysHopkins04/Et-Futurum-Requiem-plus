@@ -4,7 +4,7 @@ plugins {
 
 // Write the next planned version here. This will be used instead of the previous tag version for CI builds and other "dirty" builds.
 // If left blank, the previous tag name will be used. At the moment, this will not apply at all if there is no tag in the repository.
-String stagingVersion = "3.5.12"
+String stagingVersion = "3.5.16"
 stagingVersion = stagingVersion.trim()
 def details = versionDetails()
 // Commit distance isn't 0, last tag isn't empty and there are no unpushed commits.
@@ -41,6 +41,8 @@ minecraft {
     injectedTags.put("MOD_ID", project.modId)
     injectedTags.put("MOD_NAME", project.modName)
     injectedTags.put("MOD_GROUP", project.modGroup)
+    // Keep Forge's reported version aligned with the staging version used for the jar.
+    injectedTags.put("VERSION", project.version.toString())
 
     //Returns true if this build isn't a tagged release build, meaning it came from the CI (or was arbitrarily built)
     injectedTags.put("SNAPSHOT_BUILD", !isTaggedRelease)
@@ -51,3 +53,6 @@ minecraft {
 
     injectedTags.put("MC_ASSET_VER", "minecraft_1.21.11")
 }
+
+// Import data-format contracts run in every ordinary check/build; runtime probes stay opt-in.
+apply from: 'scripts/earth_import_contracts.gradle'

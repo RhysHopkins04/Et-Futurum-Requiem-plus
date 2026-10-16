@@ -100,6 +100,7 @@ public enum ModBlocks {
 	POWERED_COPPER_BULB(ConfigBlocksItems.enableCopper, new BlockCopperBulb(true), null),
 	LIGHTNING_ROD(ConfigBlocksItems.enableLightningRodBlock, new BlockLightningRod()),
 	DEEPSLATE(ConfigBlocksItems.enableDeepslate, new BlockDeepslate()),
+	INFESTED_DEEPSLATE(ConfigBlocksItems.enableDeepslate, new BlockInfestedDeepslate()),
 	COBBLED_DEEPSLATE(ConfigBlocksItems.enableDeepslate, new BaseBlock(Material.rock).setNames("cobbled_deepslate")
 			.setBlockSound(ModSounds.soundDeepslate).setHardness(ConfigFunctions.useStoneHardnessForDeepslate ? 2.0f : 3.5f).setResistance(6).setCreativeTab(EtFuturum.creativeTabBlocks)),
 	POLISHED_DEEPSLATE(ConfigBlocksItems.enableDeepslate, new BaseBlock(Material.rock).setNames("polished_deepslate")
@@ -515,14 +516,44 @@ public enum ModBlocks {
 	BARRIER(ConfigBlocksItems.enableBarrier, new BlockBarrier()),
 
 	//Mod support
-	MODDED_RAW_ORE_BLOCK(Utils.enableModdedRawOres(), new BlockGeneralModdedRawOre(
+	MODDED_RAW_ORE_BLOCK(true, new BlockGeneralModdedRawOre(
 			"raw_aluminum_block", "raw_tin_block", "raw_silver_block", "raw_lead_block", "raw_nickel_block", "raw_platinum_block", "raw_mythril_block", "raw_uranium_block",
 			"raw_thorium_block", "raw_tungsten_block", "raw_titanium_block", "raw_zinc_block", "raw_magnesium_block", "raw_boron_block")),
-	RAW_ADAMANTIUM_BLOCK(Utils.enableModdedRawOres(ModsList.SIMPLEORES), new BlockRawAdamantium()),
+	RAW_ADAMANTIUM_BLOCK(ModsList.SIMPLEORES.isLoaded(), new BlockRawAdamantium()),
 
 	MODDED_DEEPSLATE_ORE(Utils.enableModdedDeepslateOres(), new BlockGeneralModdedDeepslateOre("deepslate_aluminum_ore", "deepslate_tin_ore", "deepslate_silver_ore", "deepslate_lead_ore",
 			"deepslate_nickel_ore", "deepslate_platinum_ore", "deepslate_mythril_ore", "deepslate_uranium_ore", "deepslate_thorium_ore", "deepslate_tungsten_ore", "deepslate_titanium_ore",
 			"deepslate_zinc_ore", "deepslate_magnesium_ore", "deepslate_boron_ore")),
+
+	DEEPSLATE_HBM_ORE(Utils.enableModdedDeepslateOres(ModsList.HBM), new BlockDeepslateHBMOre()),
+	DEEPSLATE_HBM_THORIUM_ORE(Utils.enableModdedDeepslateOres(ModsList.HBM), new ganymedes01.etfuturum.blocks.ores.modded.BlockDeepslateNtmOre("thorium")),
+	DEEPSLATE_HBM_TITANIUM_ORE(Utils.enableModdedDeepslateOres(ModsList.HBM), new ganymedes01.etfuturum.blocks.ores.modded.BlockDeepslateNtmOre("titanium")),
+	DEEPSLATE_HBM_SULFUR_ORE(Utils.enableModdedDeepslateOres(ModsList.HBM), new ganymedes01.etfuturum.blocks.ores.modded.BlockDeepslateNtmOre("sulfur")),
+	DEEPSLATE_HBM_ALUMINIUM_ORE(Utils.enableModdedDeepslateOres(ModsList.HBM), new ganymedes01.etfuturum.blocks.ores.modded.BlockDeepslateNtmOre("aluminium")),
+	DEEPSLATE_HBM_COPPER_ORE(Utils.enableModdedDeepslateOres(ModsList.HBM), new ganymedes01.etfuturum.blocks.ores.modded.BlockDeepslateNtmOre("copper")),
+	DEEPSLATE_HBM_ZINC_ORE(Utils.enableModdedDeepslateOres(ModsList.HBM), new ganymedes01.etfuturum.blocks.ores.modded.BlockDeepslateNtmOre("zinc")),
+	DEEPSLATE_HBM_FLUORITE_ORE(Utils.enableModdedDeepslateOres(ModsList.HBM), new ganymedes01.etfuturum.blocks.ores.modded.BlockDeepslateNtmOre("fluorite")),
+	DEEPSLATE_HBM_NITER_ORE(Utils.enableModdedDeepslateOres(ModsList.HBM), new ganymedes01.etfuturum.blocks.ores.modded.BlockDeepslateNtmOre("niter")),
+	DEEPSLATE_HBM_TUNGSTEN_ORE(Utils.enableModdedDeepslateOres(ModsList.HBM), new ganymedes01.etfuturum.blocks.ores.modded.BlockDeepslateNtmOre("tungsten")),
+	DEEPSLATE_HBM_LEAD_ORE(Utils.enableModdedDeepslateOres(ModsList.HBM), new ganymedes01.etfuturum.blocks.ores.modded.BlockDeepslateNtmOre("lead")),
+	DEEPSLATE_HBM_BERYLLIUM_ORE(Utils.enableModdedDeepslateOres(ModsList.HBM), new ganymedes01.etfuturum.blocks.ores.modded.BlockDeepslateNtmOre("beryllium")),
+	DEEPSLATE_HBM_RARE_ORE(Utils.enableModdedDeepslateOres(ModsList.HBM), new ganymedes01.etfuturum.blocks.ores.modded.BlockDeepslateNtmOre("rare")),
+	DEEPSLATE_HBM_LIGNITE_ORE(Utils.enableModdedDeepslateOres(ModsList.HBM), new ganymedes01.etfuturum.blocks.ores.modded.BlockDeepslateNtmOre("lignite")),
+	DEEPSLATE_HBM_CINNEBAR_ORE(Utils.enableModdedDeepslateOres(ModsList.HBM), new ganymedes01.etfuturum.blocks.ores.modded.BlockDeepslateNtmOre("cinnebar")),
+	DEEPSLATE_HBM_COBALT_ORE(Utils.enableModdedDeepslateOres(ModsList.HBM), new ganymedes01.etfuturum.blocks.ores.modded.BlockDeepslateNtmOre("cobalt")),
+	DEEPSLATE_HBM_COLTAN_ORE(Utils.enableModdedDeepslateOres(ModsList.HBM), new ganymedes01.etfuturum.blocks.ores.modded.BlockDeepslateNtmOre("coltan")),
+	DEEPSLATE_HBM_URANIUM_ORE(Utils.enableModdedDeepslateOres(ModsList.HBM), new ganymedes01.etfuturum.blocks.ores.modded.BlockDeepslateNtmOre("uranium", "ore_uranium", true)),
+	DEEPSLATE_HBM_ASBESTOS_ORE(Utils.enableModdedDeepslateOres(ModsList.HBM), new ganymedes01.etfuturum.blocks.ores.modded.BlockDeepslateNtmOre("asbestos", "ore_asbestos", true)),
+	DEEPSLATE_HBM_IRON_ORE(Utils.enableModdedDeepslateOres(ModsList.HBM), new ganymedes01.etfuturum.blocks.ores.modded.BlockDeepslateNtmOre("iron", "ore_iron", false)),
+	DEEPSLATE_HBM_GOLD_ORE(Utils.enableModdedDeepslateOres(ModsList.HBM), new ganymedes01.etfuturum.blocks.ores.modded.BlockDeepslateNtmOre("gold", "ore_gold", false)),
+	DEEPSLATE_HBM_REDSTONE_ORE(Utils.enableModdedDeepslateOres(ModsList.HBM), new ganymedes01.etfuturum.blocks.ores.modded.BlockDeepslateNtmOre("redstone", "ore_redstone", false)),
+	DEEPSLATE_HBM_LAPIS_ORE(Utils.enableModdedDeepslateOres(ModsList.HBM), new ganymedes01.etfuturum.blocks.ores.modded.BlockDeepslateNtmOre("lapis", "ore_lapis", false)),
+	DEEPSLATE_HBM_EMERALD_ORE(Utils.enableModdedDeepslateOres(ModsList.HBM), new ganymedes01.etfuturum.blocks.ores.modded.BlockDeepslateNtmOre("emerald", "ore_emerald", false)),
+	DEEPSLATE_HBM_DIAMOND_ORE(Utils.enableModdedDeepslateOres(ModsList.HBM), new ganymedes01.etfuturum.blocks.ores.modded.BlockDeepslateNtmOre("diamond", "ore_diamond", false)),
+	DEEPSLATE_HBM_IRON_CLUSTER(Utils.enableModdedDeepslateOres(ModsList.HBM), new ganymedes01.etfuturum.blocks.ores.modded.BlockDeepslateNtmOre("iron_cluster", "cluster_iron", false)),
+	DEEPSLATE_HBM_TITANIUM_CLUSTER(Utils.enableModdedDeepslateOres(ModsList.HBM), new ganymedes01.etfuturum.blocks.ores.modded.BlockDeepslateNtmOre("titanium_cluster", "cluster_titanium", false)),
+	DEEPSLATE_HBM_COPPER_CLUSTER(Utils.enableModdedDeepslateOres(ModsList.HBM), new ganymedes01.etfuturum.blocks.ores.modded.BlockDeepslateNtmOre("copper_cluster", "cluster_copper", false)),
+	DEEPSLATE_HBM_ALUMINIUM_CLUSTER(Utils.enableModdedDeepslateOres(ModsList.HBM), new ganymedes01.etfuturum.blocks.ores.modded.BlockDeepslateNtmOre("aluminium_cluster", "cluster_aluminium", false)),
 
 	DEEPSLATE_CERTUS_QUARTZ_ORE(Utils.enableModdedDeepslateOres(ModsList.APPLIED_ENERGISTICS_2), new BlockDeepslateCertusQuartzOre()),
 	DEEPSLATE_DRACONIUM_ORE(Utils.enableModdedDeepslateOres(ModsList.DRACONIC_EVOLUTION), new BlockDeepslateDraconiumOre()),
@@ -611,7 +642,8 @@ public enum ModBlocks {
 
 	ModBlocks(Boolean enabled, Block block) {
 		this(enabled, block,
-				block instanceof BaseSlab ? BaseSlabItemBlock.class
+				block instanceof ganymedes01.etfuturum.blocks.ores.modded.BlockDeepslateNtmOre ? ganymedes01.etfuturum.blocks.itemblocks.NtmOreItemBlock.class
+						: block instanceof BaseSlab ? BaseSlabItemBlock.class
 //						: block instanceof BaseWall ? BaseWallItemBlock.class
 						: block instanceof BaseDoor ? ItemBlockNewDoor.class
 						: block instanceof BaseFlower ? BasePotableItemBlock.class

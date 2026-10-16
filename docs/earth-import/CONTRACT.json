@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "status": "unreleased_foundation",
+  "dimension": 0,
+  "profile": {"file": "config/etfuturum/mapcompat.cfg", "importedEarthMode": true, "mapCompatibilityMode": false, "restart_required": true},
+  "height": {"physical_min_y": 0, "physical_max_y": 383, "logical_min_y": -64, "logical_max_y": 319, "y_offset": 64},
+  "surface_biomes": {"config_file": "config/etfuturum/importedbiomes.cfg", "ids": "actual runtime allocation from efr-import-capabilities.json", "fallback_storage": "Level.Biomes: 256 unsigned bytes; usable imported IDs 0..254, 255 is unset", "collision_policy": "reject before allocation; verify after registration; saved-world IDs immutable"},
+  "source_biomes": {
+    "nbt_location": "chunk root sibling of Level, via Forge ChunkDataEvent root NBT",
+    "nbt_key": "etfuturum:imported_biomes",
+    "fields": {"Version": "TAG_Int = 1", "YOffset": "TAG_Int = 64", "Sections": "TAG_List<TAG_Compound>, at most 24"},
+    "section_fields": {"Y": "TAG_Byte, original logical section Y -4..19", "Palette": "TAG_List<TAG_String>, 1..64 namespaced source identities", "Indices": "TAG_Byte_Array, exactly 64 unsigned palette indices"},
+    "sample_order": "quartX + 4 * quartZ + 16 * quartY",
+    "query_coordinates": "world X/Z, physical engine Y",
+    "unknown_names": "preserved verbatim, no surface biome registration implied",
+    "missing_data": "sourceAt returns null; biomeAt explicitly falls back to legacy surface",
+    "client_synchronization": false,
+    "apis": ["ImportedBiomeVolume", "ImportedBiomeData.sourceAt", "ImportedBiomeData.biomeAt", "ImportedBiomeData.attach"]
+  },
+  "saved_world_guard": {"world_saved_data": "etfuturum_import_identity", "version": 1, "fields": ["Version", "Height", "YOffset", "Biomes [{Source, ID}]"]},
+  "capability_export": {"command": "/efrimportreport", "permission_level": 2, "file": "efr-import-capabilities.json", "includes": ["providerClass", "chunkManagerClass", "height", "actualHeight", "surfaceBiomeIds", "registeredBiomes", "blockIds", "itemIds", "mods"]},
+  "not_implemented": ["backporter consumption", "NTM resource population", "structure placement", "saved entity translation", "general modern biome world generation", "exact modern biome spawning", "3D biome client networking"]
+}

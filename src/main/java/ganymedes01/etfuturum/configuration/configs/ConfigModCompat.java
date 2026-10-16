@@ -71,7 +71,8 @@ public class ConfigModCompat extends ConfigBase {
 						The color of soul fire. Needs to be a separate option because it's a mixin for fire and not a meta state.
 						Does not have any effect on the color of soul lanterns or soul torches. Check the RPLE colors config for those.""");
 
-		moddedRawOres = getBoolean("moddedRawOres", catMisc, true, "Raw ores for modded metals. Adds a set of \"general\" raw ores for common metals like \"oreAluminium\", \"oreTin\", etc.");
+		getBoolean("moddedRawOres", catMisc, false, "Retired option. Non-vanilla raw items and storage blocks are no longer active content.");
+		moddedRawOres = false;
 		moddedRawOresBlacklist = Lists.newArrayList(getStringList("moddedRawOresBlacklist", catMisc, new String[0], """
 				List of modded raw ores to disable. Add a ModID or ore dictionary tag. For example adding "oreTin" disables modded raw tin, and adding "SimpleOres" would disable raw adamantium ore. CaSe-SeNsItIvE!\
 				Each entry is separated by a new line. This only disables raw ores added from Et Futurum's end and will not affect raw ores from other mods."""));

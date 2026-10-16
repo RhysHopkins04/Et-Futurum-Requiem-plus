@@ -1,0 +1,23 @@
+package ganymedes01.etfuturum.mixins.early.imported.client;
+
+import ganymedes01.etfuturum.core.utils.WorldHeightCompat;
+import net.minecraft.world.WorldProvider;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+/** Vanilla client sky reference; third-party sky renderers may use their own reference model. */
+@Mixin(WorldProvider.class)
+public class MixinWorldProvider {
+    @Shadow public int dimensionId;
+    @Inject(method="getCloudHeight", at=@At("HEAD"), cancellable=true, remap=false, require=1)
+    private void etfu$importedCloudReference(CallbackInfoReturnable<Float> cir) {
+        if (dimensionId==0) cir.setReturnValue((float)WorldHeightCompat.PHYSICAL_CLOUD_HEIGHT);
+    }
+    @Inject(method="getHorizon", at=@At("HEAD"), cancellable=true, remap=false, require=1)
+    private void etfu$importedHorizonReference(CallbackInfoReturnable<Double> cir) {
+        if (dimensionId==0) cir.setReturnValue((double)WorldHeightCompat.PHYSICAL_SEA_LEVEL);
+    }
+}

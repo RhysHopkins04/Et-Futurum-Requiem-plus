@@ -458,9 +458,8 @@ public class Utils {
 		return enableModdedRawOres(null);
 	}
 
-	public static boolean enableModdedRawOres(ModsList mod) { //Won't store as static variable to prevent accidental early initialization
-		return ConfigBlocksItems.enableRawOres && ConfigModCompat.moddedRawOres
-				&& (mod == null || (mod.isLoaded() && !ConfigModCompat.moddedRawOresBlacklist.contains(mod.modID())));
+	public static boolean enableModdedRawOres(ModsList mod) {
+		return false; // Non-vanilla raw forms are retired; native processing owns modded ores.
 	}
 
 	public static boolean listGeneralModdedDeepslateOre(String oreDict) {
@@ -468,8 +467,7 @@ public class Utils {
 	}
 
 	public static boolean listGeneralModdedRawOre(String oreDict) {
-		return !ConfigModCompat.moddedRawOresBlacklist.contains(oreDict.replace("ingot", "ore"))
-				&& !OreDictionary.getOres(oreDict).isEmpty() && !OreDictionary.getOres(oreDict.replace("ingot", "ore")).isEmpty();
+		return false;
 	}
 
 	/**

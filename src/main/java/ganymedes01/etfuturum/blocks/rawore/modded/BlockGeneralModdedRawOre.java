@@ -34,6 +34,9 @@ public class BlockGeneralModdedRawOre extends BaseSubtypesBlock implements IInit
 		hardnesses = new float[ores.length];
 		resistances = new float[ores.length];
 		setNames("modded_raw_ore");
+		setCreativeTab(null);
+		java.util.Arrays.fill(hardnesses, 5F);
+		java.util.Arrays.fill(resistances, 6F);
 		setHardness(5);
 		setResistance(6);
 		setHarvestLevel("pickaxe", 1); //TODO: Config for this since some mods use different harvest levels for these materials
@@ -41,7 +44,7 @@ public class BlockGeneralModdedRawOre extends BaseSubtypesBlock implements IInit
 
 	@Override
 	public void getSubBlocks(Item item, CreativeTabs tab, List<ItemStack> list) {
-		ModItems.MODDED_RAW_ORE.get().getSubItems(item, tab, list);
+		// Hidden legacy save identity.
 	}
 
 	@Override
@@ -63,31 +66,11 @@ public class BlockGeneralModdedRawOre extends BaseSubtypesBlock implements IInit
 
 	@Override
 	public void postInitAction() {
-		loaded.add(this);
+		// No active registrations.
 	}
 
 	@Override
 	public void onLoadAction() {
-		DummyWorld world = DummyWorld.getGlobalInstance();
-		for (int i = 0; i < ores.length; i++) {
-			ItemStack stack = Utils.getFirstBlockFromTag(ores[i], new ItemStack(Blocks.iron_block));
-			Block block = Block.getBlockFromItem(stack.getItem());
-			//We do this cursed shit because these functions have no meta input. So we have to place it to "simulate" the method to get an accurate output for that specific meta.
-			//Since many mod ores are based on meta we need to do this to ensure the returned resistance of the block is accurate. There is probably a better way to do this.
-			//This also won't be "accurate" if the block returns different stuff depending on the input functions, but we can document and make special code for such cases as they come along.
-			world.setBlock(0, 0, 0, block, stack.getItemDamage(), 0);
-			try {
-				if (block.getHarvestTool(stack.getItemDamage()) != null) {
-					setHarvestLevel("pickaxe", block.getHarvestLevel(stack.getItemDamage()), i);
-				}
-				hardnesses[i] = block.getBlockHardness(world, 0, 0, 0);
-				resistances[i] = block.getExplosionResistance(null, world, 0, 0, 0, 0, 0, 0) * 5; //Because the game divides it by 5 for some reason
-			} catch (Exception e) {
-				setHarvestLevel("pickaxe", 1, i);
-				hardnesses[i] = Blocks.iron_block.blockHardness;
-				resistances[i] = Blocks.iron_block.blockResistance;
-			}
-		}
-		world.clearFakeData();
+		// Retired forms do not resolve or register modded materials.
 	}
 }

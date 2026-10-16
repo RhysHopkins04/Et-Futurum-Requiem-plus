@@ -470,6 +470,7 @@ public class ServerEventHandler {
 
 	@SubscribeEvent(priority = EventPriority.HIGHEST)
 	public void harvestEvent(BlockEvent.HarvestDropsEvent event) {
+		ganymedes01.etfuturum.compat.NtmOreCompat.retainReactiveOreDrop(event);
 		if (ConfigFunctions.enableSilkTouchingMushrooms && event.isSilkTouching)
 			if (event.block == Blocks.brown_mushroom_block) {
 				event.drops.clear();
@@ -493,6 +494,8 @@ public class ServerEventHandler {
 			//For example all oreIron in the drops turn into Raw Iron
 			for (int i = 0; i < event.drops.size(); i++) {
 				ItemStack stack = event.drops.get(i);
+				// NTM inputs carry native processing, hazard and cluster semantics.
+				if (ganymedes01.etfuturum.compat.NtmOreCompat.preservesDrops(event.block, stack)) continue;
 				for (String oreName : EtFuturum.getOreStrings(stack)) {
 					//For some reason this list is always empty for items which were added during the event being fired
 					RawOreDropMapping mapping = RawOreRegistry.getOre(oreName);

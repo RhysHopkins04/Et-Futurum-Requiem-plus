@@ -208,6 +208,7 @@ public class EtFuturum {
 		ModBlocks.init();
 		ModernMapParityBlocks.init();
 		ModItems.init();
+		ganymedes01.etfuturum.world.imported.ImportedBiomes.register();
 		if (ConfigBlocksItems.enableVanillaSigns) {
 			ganymedes01.etfuturum.blocks.BlockWoodSign.installVanillaSignTileEntityCompatibility();
 		}
@@ -413,6 +414,11 @@ public class EtFuturum {
 			RawOreRegistry.init();
 			SmithingTableRecipes.init();
 		}
+		if (ConfigMapCompatibility.importedEarthMode) {
+			DeepslateOreRegistry.init(); // Recipe/ore mappings, not an automatic terrain pass.
+			RawOreRegistry.init();
+			SmithingTableRecipes.init();
+		}
 		StrippedLogRegistry.init();
 		CompostingRegistry.init();
 		BeePlantRegistry.init();
@@ -426,6 +432,7 @@ public class EtFuturum {
 	@EventHandler
 	@SuppressWarnings("unchecked")
 	public void onLoadComplete(FMLLoadCompleteEvent e) {
+		ganymedes01.etfuturum.world.imported.ImportedBiomes.verifyRegistry();
 		for (ModBlocks block : ModBlocks.values()) {
 			if (block.isEnabled() && block.get() instanceof IInitAction) {
 				((IInitAction) block.get()).onLoadAction();
@@ -512,6 +519,7 @@ public class EtFuturum {
 
 	@EventHandler
 	public void serverStarting(FMLServerStartingEvent event) {
+		event.registerServerCommand(new ganymedes01.etfuturum.command.CommandImportReport());
 		if (ConfigFunctions.enableFillCommand) {
 			event.registerServerCommand(new CommandFill());
 		}

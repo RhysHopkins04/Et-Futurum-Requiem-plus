@@ -25,6 +25,12 @@ public class EtFuturumLateMixins implements ILateMixinLoader {
 	@Override
 	public List<String> getMixins(Set<String> loadedMods) {
 		List<String> mixins = new ObjectArrayList<>();
+		if (loadedMods.contains("hbm")) {
+			mixins.add("ntm.MixinCoalDustBreakEffects");
+			mixins.add("ntm.MixinShredderRecipes");
+			mixins.add("ntm.MixinCentrifugeRecipes");
+			mixins.add("ntm.MixinCrystallizerRecipes");
+		}
 
 		if (ConfigMixins.enableElytra && loadedMods.stream().anyMatch(name -> name.equals("Thaumcraft"))) {
 			mixins.add("backlytra.thaumcraft.MixinEventHandlerEntity");

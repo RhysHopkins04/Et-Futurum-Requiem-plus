@@ -374,7 +374,12 @@ public class EtFuturumEarlyMixins implements IFMLLoadingPlugin, IEarlyMixinLoade
 		// Extended height is selected before Minecraft core classes are transformed. When disabled -
 		// including the Map Compatibility Mode runtime override - none of these engine/protocol mixins
 		// are applied, leaving ordinary 1.7.10 world architecture untouched.
-		if (ConfigWorld.extendedWorldHeight && !ConfigMapCompatibility.isEnabled()) {
+		if (ConfigMapCompatibility.importedEarthMode) {
+			mixins.add("imported.MixinBiomeGenBase");
+			mixins.add("imported.MixinWorldProvider");
+			if (side == MixinEnvironment.Side.CLIENT) mixins.add("imported.client.MixinWorldProvider");
+		}
+		if (ConfigWorld.extendedWorldHeight && ConfigMapCompatibility.allowsExtendedHeight()) {
 			mixins.add("extendedheight.MixinWorldProvider");
 			mixins.add("extendedheight.MixinWorld");
 			mixins.add("extendedheight.MixinChunk");

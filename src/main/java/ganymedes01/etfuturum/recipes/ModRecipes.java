@@ -14,6 +14,7 @@ import ganymedes01.etfuturum.blocks.IDegradable;
 import ganymedes01.etfuturum.blocks.ores.BaseDeepslateOre;
 import ganymedes01.etfuturum.blocks.ores.BaseSubtypesDeepslateOre;
 import ganymedes01.etfuturum.blocks.ores.modded.BlockGeneralModdedDeepslateOre;
+import ganymedes01.etfuturum.blocks.ores.modded.BlockDeepslateHBMOre;
 import ganymedes01.etfuturum.blocks.rawore.modded.BlockGeneralModdedRawOre;
 import ganymedes01.etfuturum.compat.CompatIronChests;
 import ganymedes01.etfuturum.compat.ExternalContent;
@@ -81,7 +82,7 @@ public class ModRecipes {
 		ModTagging.registerOreDictionary();
 		ModTagging.registerHogTags();
 
-		if (ConfigMapCompatibility.isEnabled()) {
+		if (ConfigMapCompatibility.mapCompatibilityMode) {
 			return;
 		}
 
@@ -1899,6 +1900,9 @@ public class ModRecipes {
 
 		registerGeneralDeepslateOres();
 		registerModSupportDeepslateOres();
+		if (ModsList.HBM.isLoaded() && ModBlocks.DEEPSLATE_HBM_ORE.isEnabled()) {
+			BlockDeepslateHBMOre.preserveReactiveOres();
+		}
 
 		ItemStack result;
 		if (ModItems.COPPER_INGOT.isEnabled()) {
@@ -1969,73 +1973,11 @@ public class ModRecipes {
 	}
 
 	public static void unregisterGeneralRawOres() {
-		Pair<List<ItemGeneralModdedRawOre>, List<BlockGeneralModdedRawOre>> pair = Pair.of(ItemGeneralModdedRawOre.loaded, BlockGeneralModdedRawOre.loaded);
-		if (pair.getLeft().isEmpty()) {
-			return;
-		}
-		for (int j = 0; j < pair.getLeft().size(); j++) {
-			ItemGeneralModdedRawOre oreItem = pair.getLeft().get(j);
-			BlockGeneralModdedRawOre oreBlock = pair.getRight().get(j);
-			for (int i = 0; i < oreItem.ores.length; i++) {
-				RecipeHelper.removeAllRecipesWithOutput(oreItem, i, false);
-				RecipeHelper.removeAllRecipesWithOutput(oreBlock, i, false);
-				ItemStack stack = new ItemStack(oreItem, 1, i);
-				Iterator<ItemStack> iterator = FurnaceRecipes.smelting().getSmeltingList().keySet().iterator();
-				while (iterator.hasNext()) {
-					ItemStack smeltingInput = iterator.next();
-					if (stack.getItem() == smeltingInput.getItem() && stack.getItemDamage() == smeltingInput.getItemDamage()) {
-						iterator.remove();
-					}
-				}
-			}
-		}
+		// Retired: only vanilla copper, iron and gold have EFR raw forms.
 	}
 
 	public static void registerGeneralRawOres() {
-		//Future-proofing in case I add more of these. Also will have only the meta-combined versions when enabled for the eventual NEID/EID support
-		Pair<List<ItemGeneralModdedRawOre>, List<BlockGeneralModdedRawOre>> pair = Pair.of(ItemGeneralModdedRawOre.loaded, BlockGeneralModdedRawOre.loaded);
-		if (pair.getLeft().size() != pair.getRight().size()) {
-			throw new RuntimeException("Modded raw ore block count does not match modded raw ore item count!");
-		}
-		if (pair.getLeft().isEmpty()) {
-			return;
-		}
-		for (int k = 0; k < pair.getLeft().size(); k++) {
-			ItemGeneralModdedRawOre oreItem = pair.getLeft().get(k);
-			BlockGeneralModdedRawOre oreBlock = pair.getRight().get(k);
-			//Insert alternate Mythril spelling to list. Yes I know "mithril" is technically the primary spelling but "mythril" is used by most mods, so "mithril" is secondary to it here.
-			for (int i = 0; i < oreItem.ores.length; i++) {
-				String type = oreItem.ores[i];
-				//This can run post-load, so don't register multiple tags if the raw ore already got one.
-				//We have to do this since it is impossible to remove OreDictionary entries.
-				//Well it's probably *technically* possible but I don't want to do it, PR an OD remover if you need EFR to do it.
-				//For now just restart your game to clear entries that would no longer get a tag.
-				boolean registeredRecipe = false;
-				for (int j = 0; j < 1; j++) { //If it's mythril, we'll run this once more, changing the spelling to mithril to account for both tags.
-					if (Utils.listGeneralModdedRawOre(type)) { //Make sure an ingot AND ore is present
-						RecipeHelper.registerOre(type.replace("ingot", "raw"), new ItemStack(oreItem, 1, i));
-						ItemStack ore = new ItemStack(oreBlock, 1, i);
-						RecipeHelper.registerOre(type.replace("ingot", "blockRaw"), ore);
-						if (ConfigFunctions.registerRawItemAsOre) {
-							RecipeHelper.registerOre(type.replace("ingot", "ore"), new ItemStack(oreItem, 1, i));
-						}
-						if (!registeredRecipe) {
-							ItemStack output = new ItemStack(oreBlock, 1, i);
-							RecipeHelper.addShapedRecipe(RecipeHelper.Priority.HIGH, output, "xxx", "xxx", "xxx", 'x', new ItemStack(oreItem, 1, i));
-							Object[] objects = new Object[]{"x", 'x', new ItemStack(oreBlock, 1, i)};
-							RecipeHelper.addShapedRecipe(RecipeHelper.Priority.HIGH, new ItemStack(oreItem, 9, i), objects);
-							registeredRecipe = true;
-						}
-						ItemStack output = Utils.getFirstStackFromTag(type);
-						RecipeHelper.addSmelting(new ItemStack(oreItem, 1, i), output, 0.7F);
-					}
-					if (type.endsWith("Mythril")) {
-						type = type.replace("Mythril", "Mithril"); //Redoes it once more for mithril spelling
-						j = -1;
-					}
-				}
-			}
-		}
+		// Retired: only vanilla copper, iron and gold have EFR raw forms.
 	}
 
 	private static void registerModSupportDeepslateOres() {
@@ -2052,6 +1994,9 @@ public class ModRecipes {
 				}
 				if (RecipeHelper.validateItems(ore)) {
 					DeepslateOreRegistry.addOre(ore.getBase(), ore.getBaseMeta(), ore, 0);
+					if (ore instanceof ganymedes01.etfuturum.blocks.ores.modded.BlockDeepslateNtmOre) {
+						RecipeHelper.addShapelessRecipe(RecipeHelper.Priority.HIGH, baseStack.copy(), stack.copy());
+					}
 				}
 			}
 			for (BaseSubtypesDeepslateOre ore : BaseSubtypesDeepslateOre.loaded) {
@@ -2066,7 +2011,11 @@ public class ModRecipes {
 						}
 					}
 					if (RecipeHelper.validateItems(ore)) {
-						DeepslateOreRegistry.addOre(ore.getBase(i), ore.getBaseMeta(i), ore, i);
+						if (!(ore instanceof BlockDeepslateHBMOre)) DeepslateOreRegistry.addOre(ore.getBase(i), ore.getBaseMeta(i), ore, i);
+						if (ore instanceof BlockDeepslateHBMOre) {
+							// Silk-picked variants can enter NTM machines which match exact native stacks.
+							RecipeHelper.addShapelessRecipe(RecipeHelper.Priority.HIGH, baseStack.copy(), stack.copy());
+						}
 					}
 				}
 			}
@@ -2074,28 +2023,7 @@ public class ModRecipes {
 	}
 
 	private static void registerModSupportRawOres() {
-		if (ModItems.RAW_ADAMANTIUM.isEnabled() && ModBlocks.RAW_ADAMANTIUM_BLOCK.isEnabled()) {
-			addTagsAndRawOre("Adamantium", ModItems.RAW_ADAMANTIUM.newItemStack());
-			addTagsAndRawOre("Adamantite", ModItems.RAW_ADAMANTIUM.newItemStack());
-			addTagsAndRawOre("Adamantine", ModItems.RAW_ADAMANTIUM.newItemStack());
-			ItemStack ore2 = ModBlocks.RAW_ADAMANTIUM_BLOCK.newItemStack();
-			RecipeHelper.registerOre("blockRawAdamantium", ore2);
-			ItemStack ore1 = ModBlocks.RAW_ADAMANTIUM_BLOCK.newItemStack();
-			RecipeHelper.registerOre("blockRawAdamantite", ore1);
-			ItemStack ore = ModBlocks.RAW_ADAMANTIUM_BLOCK.newItemStack();
-			RecipeHelper.registerOre("blockRawAdamantine", ore);
-			ItemStack output2 = ModBlocks.RAW_ADAMANTIUM_BLOCK.newItemStack();
-			Object[] objects1 = new Object[]{"xxx", "xxx", "xxx", 'x', ModItems.RAW_ADAMANTIUM.newItemStack()};
-			RecipeHelper.addShapedRecipe(RecipeHelper.Priority.HIGH, output2, objects1);
-			ItemStack output1 = ModItems.RAW_ADAMANTIUM.newItemStack(9);
-			Object[] objects = new Object[]{"x", 'x', ModBlocks.RAW_ADAMANTIUM_BLOCK.newItemStack()};
-			RecipeHelper.addShapedRecipe(RecipeHelper.Priority.HIGH, output1, objects);
-			ItemStack input = ModItems.RAW_ADAMANTIUM.newItemStack();
-			ItemStack output = ExternalContent.Items.SIMPLEORES_ADAMANTIUM_INGOT.newItemStack();
-			float exp = ExternalContent.Items.SIMPLEORES_ADAMANTIUM_INGOT.get().getSmeltingExperience(ExternalContent.Items.SIMPLEORES_ADAMANTIUM_INGOT.newItemStack());
-			RecipeHelper.addSmelting(input, output, exp);
-			RawOreRegistry.addOre("oreAdamantium", ModItems.RAW_ADAMANTIUM.get(), 0);
-		}
+		// Retired: only vanilla copper, iron and gold have EFR raw forms.
 	}
 
 	private static void addTagsAndDeepslate(String tagNoPrefix, ItemStack stack) {

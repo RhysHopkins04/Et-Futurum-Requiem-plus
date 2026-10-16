@@ -15,6 +15,7 @@ import java.io.File;
 public class ConfigMapCompatibility extends ConfigBase {
 
     public static boolean mapCompatibilityMode;
+    public static boolean importedEarthMode;
 
     private static final String CATEGORY = "map compatibility mode";
 
@@ -35,10 +36,18 @@ public class ConfigMapCompatibility extends ConfigBase {
                 "RTG or another world generator remains authoritative while Et Futurum supplies blocks and items. " +
                 "This does not delete or rewrite your other Et Futurum configuration values; it overrides selected values at runtime. " +
                 "REQUIRES A FULL RESTART.");
+        importedEarthMode = getBoolean("importedEarthMode", CATEGORY, false,
+                "Imported modern Earth profile: suppress EFR automatic terrain generation and provider replacement, " +
+                "but retain the 384-block engine and configured ore/content registrations. " +
+                "Enable on BOTH client and server. Mutually exclusive with mapCompatibilityMode. REQUIRES A FULL RESTART.");
     }
 
     public static boolean isEnabled() {
-        return mapCompatibilityMode;
+        return mapCompatibilityMode || importedEarthMode;
+    }
+
+    public static boolean allowsExtendedHeight() {
+        return !mapCompatibilityMode;
     }
 
     /**
@@ -46,18 +55,23 @@ public class ConfigMapCompatibility extends ConfigBase {
      * safe to call repeatedly because config values also have late construction/init phases.
      */
     public static void applyCompatibilityOverrides() {
-        if (!mapCompatibilityMode) {
+        if (mapCompatibilityMode && importedEarthMode) {
+            throw new IllegalStateException("Choose importedEarthMode OR mapCompatibilityMode, not both; their height contracts differ.");
+        }
+        if (!isEnabled()) {
             return;
         }
 
-        ConfigModCompat.moddedRawOres = false;
-        ConfigModCompat.moddedDeepslateOres = false;
-        ConfigFunctions.registerRawItemAsOre = false;
+        if (mapCompatibilityMode) {
+            ConfigModCompat.moddedRawOres = false;
+            ConfigModCompat.moddedDeepslateOres = false;
+            ConfigFunctions.registerRawItemAsOre = false;
 
-        ConfigMixins.enableElytra = false;
-        ConfigEntities.enableShulker = false;
-        ConfigBlocksItems.enableShulkerBoxes = false;
-        ConfigEntities.enableDragonRespawn = false;
+            ConfigMixins.enableElytra = false;
+            ConfigEntities.enableShulker = false;
+            ConfigBlocksItems.enableShulkerBoxes = false;
+            ConfigEntities.enableDragonRespawn = false;
+        }
 
         ConfigExperiments.netherDimensionProvider = false;
         ConfigExperiments.endDimensionProvider = false;
@@ -67,8 +81,8 @@ public class ConfigMapCompatibility extends ConfigBase {
         ConfigWorld.tileReplacementMode = -1;
 
         // Extended world height is an early engine/core protocol change, not a content feature.
-        // Compatibility Mode must leave the 1.7.10/RTG world architecture entirely untouched.
-        ConfigWorld.extendedWorldHeight = false;
+        // Legacy Compatibility Mode leaves the 1.7.10/RTG architecture untouched; Earth explicitly needs 384.
+        ConfigWorld.extendedWorldHeight = importedEarthMode;
         ConfigWorld.modernOverworldGeneration = false;
         ConfigWorld.modernOreGeneration = false;
         ConfigWorld.modernLargeOreVeins = false;

@@ -33,6 +33,7 @@ public enum ModsList {
 	BIOMES_O_PLENTY("BiomesOPlenty"),
 	EXTRA_UTILITIES("ExtraUtilities"),
 	APPLIED_ENERGISTICS_2("appliedenergistics2"),
+	HBM("hbm"),
 	ARS_MAGICA_2("arsmagica2"),
 	MULTIPART("McMultipart"),
 	DRACONIC_EVOLUTION("DraconicEvolution"),

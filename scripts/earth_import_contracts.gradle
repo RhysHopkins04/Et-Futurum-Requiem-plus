@@ -1,0 +1,17 @@
+// Always-on data contracts. Probe classes remain outside the distributable source set.
+def earthTestClasses = layout.buildDirectory.dir('earth-import-tests/classes')
+def earthTestCompile = tasks.register('compileEarthImportTests', JavaCompile) {
+    dependsOn tasks.named('classes')
+    source = fileTree('src/testEarthImport/java') { include '**/*.java' }
+    classpath = sourceSets.main.runtimeClasspath
+    destinationDirectory = earthTestClasses
+    sourceCompatibility = '1.8'
+    targetCompatibility = '1.8'
+    options.compilerArgs += ['-proc:none']
+}
+def earthContracts = tasks.register('earthImportContracts', JavaExec) {
+    dependsOn earthTestCompile
+    classpath = sourceSets.main.runtimeClasspath + files(earthTestClasses)
+    mainClass = 'efrtest.EarthImportContracts'
+}
+tasks.named('check') { dependsOn earthContracts }

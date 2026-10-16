@@ -6,6 +6,7 @@ import codechicken.nei.recipe.FurnaceRecipeHandler;
 import codechicken.nei.recipe.GuiCraftingRecipe;
 import codechicken.nei.recipe.GuiUsageRecipe;
 import ganymedes01.etfuturum.ModBlocks;
+import ganymedes01.etfuturum.ModItems;
 import ganymedes01.etfuturum.Tags;
 import ganymedes01.etfuturum.compat.nei.BannerPatternHandler;
 import ganymedes01.etfuturum.compat.nei.BlastFurnaceRecipeHandler;
@@ -25,6 +26,12 @@ public class NEIEtFuturumConfig implements IConfigureNEI {
 
 	@Override
 	public void loadConfig() {
+		// Retired raw-metal IDs remain only to read existing saves.
+		API.hideItem(ModItems.MODDED_RAW_ORE.newItemStack(1, OreDictionary.WILDCARD_VALUE));
+		API.hideItem(ModBlocks.MODDED_RAW_ORE_BLOCK.newItemStack(1, OreDictionary.WILDCARD_VALUE));
+		if (ModItems.RAW_ADAMANTIUM.isEnabled()) API.hideItem(ModItems.RAW_ADAMANTIUM.newItemStack());
+		if (ModBlocks.RAW_ADAMANTIUM_BLOCK.isEnabled()) API.hideItem(ModBlocks.RAW_ADAMANTIUM_BLOCK.newItemStack());
+		if (ModBlocks.DEEPSLATE_HBM_ORE.isEnabled()) API.hideItem(ModBlocks.DEEPSLATE_HBM_ORE.newItemStack(1, OreDictionary.WILDCARD_VALUE));
 		if (ConfigWorld.tileReplacementMode != -1) {
 			if (ModBlocks.BREWING_STAND.isEnabled()) {
 				API.hideItem(ModBlocks.BREWING_STAND.newItemStack());

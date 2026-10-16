@@ -25,16 +25,12 @@ public class ItemGeneralModdedRawOre extends BaseSubtypesItem implements IInitAc
 			ores[i] = "ingot" + StringUtils.capitalize(names[i].replaceFirst("^raw_", ""));
 		}
 		setNames("modded_raw_ore");
+		setCreativeTab(null);
 	}
 
 	@Override
 	public void getSubItems(Item item, CreativeTabs tabs, List<ItemStack> list) {
-		for (int i = 0; i < ores.length; i++) {
-			ItemStack stack = new ItemStack(item, 1, i);
-			if (Utils.listGeneralModdedRawOre(ores[i]) || Utils.listGeneralModdedRawOre(ores[i].replace("Mythril", "Mithril"))) {
-				list.add(stack);
-			}
-		}
+		// Hidden legacy save identity; no active raw-metal variants.
 	}
 
 	@Override
@@ -47,6 +43,6 @@ public class ItemGeneralModdedRawOre extends BaseSubtypesItem implements IInitAc
 
 	@Override
 	public void postInitAction() {
-		loaded.add(this);
+		// Do not register tags, recipes or drops for retired forms.
 	}
 }

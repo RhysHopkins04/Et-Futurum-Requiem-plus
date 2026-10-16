@@ -103,7 +103,7 @@ if "MinecraftForge.TERRAIN_GEN_BUS.register(WorldEventHandler.INSTANCE);" not in
     failures.append("terrain-generation event registration guard is missing")
 
 recipes = require("src/main/java/ganymedes01/etfuturum/recipes/ModRecipes.java")
-if "if (ConfigMapCompatibility.isEnabled()) {\n\t\t\treturn;\n\t\t}\n\n\t\tregisterRecipes();" not in recipes:
+if "if (ConfigMapCompatibility.mapCompatibilityMode) {\n\t\t\treturn;\n\t\t}\n\n\t\tregisterRecipes();" not in recipes:
     failures.append("automatic recipe/loot registration is not mapcompat-gated")
 
 server = require("src/main/java/ganymedes01/etfuturum/core/handlers/ServerEventHandler.java")
@@ -114,9 +114,9 @@ blocks = require("src/main/java/ganymedes01/etfuturum/ModBlocks.java")
 for registry in (
     "ROOTED_DIRT(ConfigBlocksItems.enableLushCaveBlocks, new BlockRootedDirt())",
     "HANGING_ROOTS(ConfigBlocksItems.enableLushCaveBlocks, new BlockHangingRoots())",
-    "SMALL_DRIPLEAF(ConfigBlocksItems.enableLushCaveBlocks, new BlockSmallDripleaf())",
+    "SMALL_DRIPLEAF(ConfigBlocksItems.enableLushCaveBlocks, new BlockSmallDripleaf(), ItemBlockSmallDripleaf.class)",
     "BIG_DRIPLEAF_STEM(ConfigBlocksItems.enableLushCaveBlocks, new BlockBigDripleafStem(), null)",
-    "BIG_DRIPLEAF(ConfigBlocksItems.enableLushCaveBlocks, new BlockBigDripleaf())",
+    "BIG_DRIPLEAF(ConfigBlocksItems.enableLushCaveBlocks, new BlockBigDripleaf(), ItemBlockBigDripleaf.class)",
     "MOSS_BLOCK(ConfigBlocksItems.enableLushCaveBlocks, new BlockMoss())",
     "MOSS_CARPET(ConfigBlocksItems.enableLushCaveBlocks, new BlockMossCarpet())",
     "AZALEA(ConfigBlocksItems.enableLushCaveBlocks, new BlockAzalea())",
@@ -129,7 +129,7 @@ for registry in (
 require("src/main/java/ganymedes01/etfuturum/blocks/BlockRootedDirt.java", 'setNames("rooted_dirt")')
 require("src/main/java/ganymedes01/etfuturum/blocks/BlockHangingRoots.java", 'Utils.getUnlocalisedName("hanging_roots")')
 small = require("src/main/java/ganymedes01/etfuturum/blocks/BlockSmallDripleaf.java", 'Utils.getUnlocalisedName("small_dripleaf")')
-big = require("src/main/java/ganymedes01/etfuturum/blocks/BlockBigDripleaf.java", 'Utils.getUnlocalisedName("big_dripleaf")')
+big = require("src/main/java/ganymedes01/etfuturum/blocks/BlockBigDripleaf.java", 'Utils.getUnlocalisedName(wetVariant ? "big_dripleaf_wet" : "big_dripleaf")')
 stem = require("src/main/java/ganymedes01/etfuturum/blocks/BlockBigDripleafStem.java", 'Utils.getUnlocalisedName("big_dripleaf_stem")')
 for expected in ("UPPER_BIT = 4", "implements IGrowable", "BIG_DRIPLEAF_STEM.get()", "BIG_DRIPLEAF.get()"):
     if expected not in small:
@@ -363,10 +363,10 @@ for expected in (
 
 if 'extendedWorldHeight = getBoolean("extendedWorldHeight", catGeneration, false' not in world_config:
     failures.append("extendedWorldHeight foundation must remain explicit opt-in during P005 validation")
-if "ConfigWorld.extendedWorldHeight = false;" not in config:
+if "ConfigWorld.extendedWorldHeight = importedEarthMode;" not in config or "return !mapCompatibilityMode;" not in config:
     failures.append("Map Compatibility Mode does not force extended world height off")
 
-height_mixin_gate = 'if (ConfigWorld.extendedWorldHeight && !ConfigMapCompatibility.isEnabled()) {'
+height_mixin_gate = 'if (ConfigWorld.extendedWorldHeight && ConfigMapCompatibility.allowsExtendedHeight()) {'
 if height_mixin_gate not in mixins:
     failures.append("extended-height early mixin group is not config/mapcompat gated")
 for expected in (
@@ -464,8 +464,10 @@ for expected in (
     "this.field_149262_d[index] = data.readInt()",
     "WorldHeightCompat.EXTENDED_SECTION_COUNT",
     "data.writeInt(this.field_149265_c[i])",
-    "@Shadow(remap = false) private Semaphore deflateGate;",
-    "@Shadow(remap = false)",
+    "private synchronized void etfu$ensureCompressed()",
+    "ByteArrayOutputStream",
+    "new Deflater(4)",
+    "byte[] compressedInput",
 ):
     if expected not in s26:
         failures.append(f"extended S26 bulk chunk packet support missing: {expected}")
@@ -1720,7 +1722,7 @@ for expected in ('registerDynamicAlias', 'new ResourceLocation(Tags.MC_ASSET_VER
     if expected not in parity_bridge:
         failures.append(f"modern map visual parity AssetDirector model bridge missing: {expected}")
 parity_model_bridge = require("src/main/java/ganymedes01/etfuturum/client/model/ModernJsonModelBridge.java", "class ModernJsonModelBridge")
-for expected in ('blockstates/" + entry.getRegistryName() + ".json', 'items/" + name + ".json', 'resolveRawModel', 'registerDynamicAlias'):
+for expected in ('blockstates/" + registryName + ".json', 'items/" + name + ".json', 'resolveRawModel', 'registerDynamicAlias'):
     if expected not in parity_model_bridge:
         failures.append(f"modern map visual parity JSON model bridge missing: {expected}")
 

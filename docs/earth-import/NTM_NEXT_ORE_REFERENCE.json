@@ -1,0 +1,154 @@
+{
+  "repository": "https://github.com/Warfactory-Official/ntm-next",
+  "commit": "1b8c6c2d0936de9d9f85926293f7666a1e6aac0a",
+  "path": "neoforge/src/main/resources/data/hbm/loot_table/blocks",
+  "variants": [
+    {
+      "block": "ore_aluminium_deepslate",
+      "loot_items": [
+        "hbm:ore_aluminium_deepslate",
+        "hbm:raw_aluminium"
+      ]
+    },
+    {
+      "block": "ore_asbestos_deepslate",
+      "loot_items": [
+        "hbm:ore_asbestos_deepslate",
+        "hbm:ingot_asbestos"
+      ]
+    },
+    {
+      "block": "ore_basalt_asbestos",
+      "loot_items": [
+        "hbm:ore_basalt_asbestos",
+        "hbm:ingot_asbestos"
+      ]
+    },
+    {
+      "block": "ore_basalt_fluorite",
+      "loot_items": [
+        "hbm:ore_basalt_fluorite",
+        "hbm:fluorite"
+      ]
+    },
+    {
+      "block": "ore_basalt_gem",
+      "loot_items": [
+        "hbm:ore_basalt_gem",
+        "hbm:gem_volcanic"
+      ]
+    },
+    {
+      "block": "ore_basalt_molysite",
+      "loot_items": [
+        "hbm:ore_basalt_molysite",
+        "hbm:powder_molysite"
+      ]
+    },
+    {
+      "block": "ore_basalt_sulfur",
+      "loot_items": [
+        "hbm:ore_basalt_sulfur",
+        "hbm:sulfur"
+      ]
+    },
+    {
+      "block": "ore_beryllium_deepslate",
+      "loot_items": [
+        "hbm:ore_beryllium_deepslate",
+        "hbm:raw_beryllium"
+      ]
+    },
+    {
+      "block": "ore_cinnabar_deepslate",
+      "loot_items": [
+        "hbm:ore_cinnabar_deepslate",
+        "hbm:cinnabar"
+      ]
+    },
+    {
+      "block": "ore_cobalt_deepslate",
+      "loot_items": [
+        "hbm:ore_cobalt_deepslate",
+        "hbm:raw_cobalt"
+      ]
+    },
+    {
+      "block": "ore_coltan_deepslate",
+      "loot_items": [
+        "hbm:ore_coltan_deepslate",
+        "hbm:fragment_coltan"
+      ]
+    },
+    {
+      "block": "ore_fluorite_deepslate",
+      "loot_items": [
+        "hbm:ore_fluorite_deepslate",
+        "hbm:fluorite"
+      ]
+    },
+    {
+      "block": "ore_lead_deepslate",
+      "loot_items": [
+        "hbm:ore_lead_deepslate",
+        "hbm:raw_lead"
+      ]
+    },
+    {
+      "block": "ore_lignite_deepslate",
+      "loot_items": [
+        "hbm:ore_lignite_deepslate",
+        "hbm:lignite"
+      ]
+    },
+    {
+      "block": "ore_niter_deepslate",
+      "loot_items": [
+        "hbm:ore_niter_deepslate",
+        "hbm:niter"
+      ]
+    },
+    {
+      "block": "ore_rare_deepslate",
+      "loot_items": [
+        "hbm:ore_rare_deepslate",
+        "hbm:chunk_ore_rare"
+      ]
+    },
+    {
+      "block": "ore_sulfur_deepslate",
+      "loot_items": [
+        "hbm:ore_sulfur_deepslate",
+        "hbm:sulfur"
+      ]
+    },
+    {
+      "block": "ore_thorium_deepslate",
+      "loot_items": [
+        "hbm:ore_thorium_deepslate",
+        "hbm:raw_thorium"
+      ]
+    },
+    {
+      "block": "ore_titanium_deepslate",
+      "loot_items": [
+        "hbm:ore_titanium_deepslate",
+        "hbm:raw_titanium"
+      ]
+    },
+    {
+      "block": "ore_tungsten_deepslate",
+      "loot_items": [
+        "hbm:ore_tungsten_deepslate",
+        "hbm:raw_tungsten"
+      ]
+    },
+    {
+      "block": "ore_uranium_deepslate",
+      "loot_items": [
+        "hbm:ore_uranium_deepslate",
+        "hbm:raw_uranium"
+      ]
+    }
+  ]
+}

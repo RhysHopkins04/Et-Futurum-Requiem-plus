@@ -45,6 +45,7 @@ public class BlockGeneralModdedDeepslateOre extends BaseSubtypesBlock implements
 	public void getSubBlocks(Item item, CreativeTabs tabs, List<ItemStack> list) {
 		for (int i = 0; i < ores.length; i++) {
 			ItemStack stack = new ItemStack(item, 1, i);
+			if (ganymedes01.etfuturum.compat.NtmOreCompat.hasOnlyNtmSources(ores[i])) continue;
 			if (Utils.listGeneralModdedDeepslateOre(ores[i]) || Utils.listGeneralModdedDeepslateOre(ores[i].replace("Mythril", "Mithril"))) {
 				list.add(stack);
 			}

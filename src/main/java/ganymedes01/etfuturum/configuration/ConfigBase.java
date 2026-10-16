@@ -31,6 +31,7 @@ public abstract class ConfigBase extends Configuration {
 	public static final ConfigBase FUNCTIONS = new ConfigFunctions(createConfigFile("functions"));
 	public static final ConfigBase TWEAKS = new ConfigTweaks(createConfigFile("tweaks"));
 	public static final ConfigBase WORLD = new ConfigWorld(createConfigFile("world"));
+	public static final ConfigBase IMPORTED_BIOMES = new ConfigImportedBiomes(createConfigFile("importedbiomes"));
 	public static final ConfigBase ENTITIES = new ConfigEntities(createConfigFile("entities"));
 	public static final ConfigBase SOUNDS = new ConfigSounds(createConfigFile("sounds"));
 	public static final ConfigBase MOD_COMPAT = new ConfigModCompat(createConfigFile("modcompat"));

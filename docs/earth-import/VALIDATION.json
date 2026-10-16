@@ -1,0 +1,229 @@
+{
+  "status": "foundation_automated_checks_passed_ore_client_smoke_accepted_earth_pack_pending",
+  "artifact": "build/libs/etfuturum-3.5.16-master.7-3edaf57d69-dirty.jar",
+  "artifact_sha256": "3f1cf5b7e2689716f9ee338f784ace2ae279238139dffadb2217fbb3873ae07a",
+  "ntm_jar_name": "HBM-NTM-[1.0.27_X5778_H261_WG2.4.0].jar",
+  "ntm_sha256": "ee052e85bd27a627735f580bfec4ef606a9f2d1f5a6198e3eff18c8967ec5ed7",
+  "tested_provider": "com.hbm.dim.WorldProviderEarth",
+  "height": 384,
+  "surface_biomes": {
+    "minecraft:cherry_grove": 210,
+    "minecraft:grove": 211,
+    "minecraft:snowy_slopes": 212,
+    "minecraft:jagged_peaks": 213,
+    "minecraft:frozen_peaks": 214,
+    "minecraft:stony_peaks": 215,
+    "minecraft:meadow": 216,
+    "minecraft:mangrove_swamp": 217,
+    "minecraft:bamboo_jungle": 218,
+    "minecraft:warm_ocean": 219,
+    "minecraft:lukewarm_ocean": 220,
+    "minecraft:cold_ocean": 221,
+    "minecraft:deep_lukewarm_ocean": 222,
+    "minecraft:deep_cold_ocean": 223,
+    "minecraft:deep_frozen_ocean": 224,
+    "minecraft:pale_garden": 225
+  },
+  "runtime_block_ids": 1936,
+  "runtime_item_ids": 4135,
+  "checks": {
+    "earth_data_contracts": {
+      "status": "passed",
+      "log": "build/earth-import-tests/contracts-build.log"
+    },
+    "earth_forge_save": {
+      "status": "passed",
+      "log": "build/earth-import-tests/forge-save.log"
+    },
+    "earth_forge_restart": {
+      "status": "passed",
+      "log": "build/earth-import-tests/forge-restart.log"
+    },
+    "ntm_forge_save": {
+      "status": "passed",
+      "log": "build/earth-import-tests/ntm-forge-save.log"
+    },
+    "ntm_forge_restart": {
+      "status": "passed",
+      "log": "build/earth-import-tests/ntm-forge-restart.log"
+    },
+    "legacy_profile": {
+      "status": "passed",
+      "log": "build/earth-import-tests/legacy-forge-legacy.log"
+    },
+    "existing_modern_state_save": {
+      "status": "passed",
+      "log": "build/modern-state-tests/runtime-save.log"
+    },
+    "existing_modern_state_restart": {
+      "status": "passed",
+      "log": "build/modern-state-tests/runtime-restart.log"
+    },
+    "always_on_final_build": {
+      "status": "passed",
+      "log": "build/earth-import-tests/contracts-build.log"
+    },
+    "version_bump_build": {
+      "status": "passed",
+      "log": "build/earth-import-tests/version-bump-build.log"
+    },
+    "ntm_raw_on_save": {
+      "status": "passed",
+      "log": "build/earth-import-tests/ntm-raw-on-forge-save.log"
+    },
+    "ntm_raw_on_restart": {
+      "status": "passed",
+      "log": "build/earth-import-tests/ntm-raw-on-forge-restart.log"
+    },
+    "ntm_raw_off_save": {
+      "status": "passed",
+      "log": "build/earth-import-tests/ntm-raw-off-forge-save.log"
+    },
+    "ntm_raw_off_restart": {
+      "status": "passed",
+      "log": "build/earth-import-tests/ntm-raw-off-forge-restart.log"
+    },
+    "current_no_ntm_save_restart": {
+      "status": "passed",
+      "log": "build/earth-import-tests/no-ntm-final-3.5.16.log"
+    },
+    "individual_ntm_on_save": {
+      "status": "passed",
+      "log": "build/earth-import-tests/ntm-individual-on-forge-save.log"
+    },
+    "individual_ntm_on_restart": {
+      "status": "passed",
+      "log": "build/earth-import-tests/ntm-individual-on-forge-restart.log"
+    },
+    "individual_ntm_off_save": {
+      "status": "passed",
+      "log": "build/earth-import-tests/ntm-individual-off-forge-save.log"
+    },
+    "individual_ntm_off_restart": {
+      "status": "passed",
+      "log": "build/earth-import-tests/ntm-individual-off-forge-restart.log"
+    },
+    "earth_coverage_ntm_on_save": {
+      "status": "passed",
+      "log": "build/earth-import-tests/ntm-coverage-on-forge-save.log"
+    },
+    "earth_coverage_ntm_on_restart": {
+      "status": "passed",
+      "log": "build/earth-import-tests/ntm-coverage-on-forge-restart.log"
+    },
+    "earth_coverage_ntm_off_save": {
+      "status": "passed",
+      "log": "build/earth-import-tests/ntm-coverage-off-forge-save.log"
+    },
+    "earth_coverage_ntm_off_restart": {
+      "status": "passed",
+      "log": "build/earth-import-tests/ntm-coverage-off-forge-restart.log"
+    },
+    "native_overlay_atlas_loader": {
+      "status": "passed",
+      "log": "build/earth-import-tests/ntm-contracts-build.log"
+    },
+    "current_ntm_on_save": {
+      "status": "passed",
+      "log": "build/earth-import-tests/ntm-3.5.16-on-forge-save.log"
+    },
+    "current_ntm_on_restart": {
+      "status": "passed",
+      "log": "build/earth-import-tests/ntm-3.5.16-on-forge-restart.log"
+    },
+    "current_ntm_off_save": {
+      "status": "passed",
+      "log": "build/earth-import-tests/ntm-3.5.16-off-forge-save.log"
+    },
+    "current_ntm_off_restart": {
+      "status": "passed",
+      "log": "build/earth-import-tests/ntm-3.5.16-off-forge-restart.log"
+    },
+    "current_legacy_profile": {
+      "status": "passed",
+      "log": "build/earth-import-tests/legacy-3.5.16.log"
+    },
+    "smithing_earth_save": {
+      "status": "passed",
+      "log": "build/earth-import-tests/smithing-earth-save.log"
+    },
+    "smithing_earth_restart": {
+      "status": "passed",
+      "log": "build/earth-import-tests/smithing-earth-restart.log"
+    },
+    "smithing_ntm_save": {
+      "status": "passed",
+      "log": "build/earth-import-tests/smithing-ntm-save.log"
+    },
+    "smithing_ntm_restart": {
+      "status": "passed",
+      "log": "build/earth-import-tests/smithing-ntm-restart.log"
+    },
+    "smithing_legacy": {
+      "status": "passed",
+      "log": "build/earth-import-tests/smithing-legacy.log"
+    }
+  },
+  "static_checks": [
+    "validate_plus_map_compat.py",
+    "validate_fidelity_pass_37.py",
+    "validate_fidelity_pass_38.py"
+  ],
+  "packaging": "no test probe or NTM classes in mod jar",
+  "backporter_implementation_changed": false,
+  "committed": false,
+  "limits": [
+    "development configs, not entire production modpack",
+    "complete powered-machine cycles and NTM processors beyond the three adapted recipe query APIs are not certified",
+    "no resource-population or native extractor certification",
+    "User accepted ore/client behaviour before the smithing correction; no dedicated Earth-mode full-pack client or Angelica certification.",
+    "Release Testing importedEarthMode was false at review; actual pack biome-ID allocation and converted-world integration remain pending."
+  ],
+  "version_bump_note": "3.5.16 retires all active non-vanilla EFR raw forms while preserving hidden save IDs; normal self-dropping NTM deepslate ores retain the deepslate block; Silk Touch retains deepslate ores/clusters; native coal/lignite mining dust and breathing exposure now recognise EFR variants. Current no-NTM and legacy profile checks also pass.",
+  "earlier_ntm_input": {
+    "name": "HBM-NTM-[1.0.27_X5778_H261_WG2.3.0].jar",
+    "sha256": "48f4dc545a5b3fd68ec8d0ccba6265c67509a395164bd1132fd3330fbdb1e566"
+  },
+  "ntm_source_commit": "ee241d23df6bf0003765997bc87f079a0baf4870",
+  "previous_artifact": {
+    "path": "build/libs/etfuturum-3.5.15-master.7-3edaf57d69-dirty.jar",
+    "sha256": "7cba5be42bee64320235344ea00b45ac39312694d2366812942a1fc2fdde05b5"
+  },
+  "identity_contract": {
+    "active_materials": 28,
+    "material_metadata": false,
+    "old_combined_id_retained": true,
+    "old_combined_id_hidden": true
+  },
+  "raw_policy": {
+    "active_materials": [
+      "copper",
+      "iron",
+      "gold"
+    ],
+    "other_efr_raw_forms": "retired; hidden registry identities only",
+    "non_vanilla_raw_tags_recipes_drops": false
+  },
+  "drop_policy": {
+    "ore_self_drops": "deepslate variant",
+    "resource_drops": "native NTM products",
+    "silk_touch": "deepslate ore/cluster identity",
+    "processing": "native query normalization and furnace aliases"
+  },
+  "client_feedback": {
+    "3.5.15": "user reports new textures visually fine",
+    "3.5.16": "User reports the ore changes working. The subsequent Earth-mode smithing correction is covered separately by automated tests, not this earlier client acceptance."
+  },
+  "pre_smithing_fix_artifact": {
+    "path": "build/libs/etfuturum-3.5.16-master.7-3edaf57d69-dirty.jar",
+    "sha256": "40b310820ce3285f34c449015dc6a070e58078c214742b5a08462f49176cca92",
+    "client_feedback": "User reports 3.5.16 working, including the ore changes; this was before the Earth-mode smithing initialization correction."
+  },
+  "smithing_correction": {
+    "date": "2026-10-16",
+    "change": "Initialize built-in smithing recipes in importedEarthMode; legacy content-only suppression and the existing enableNetherite gate are retained.",
+    "regression_reproduced": "build/earth-import-tests/smithing-before-fix-forge.log",
+    "coverage": "All 9 upgrades via the real startup recipe registry and matching API, output quantities, damage/custom NBT retention, unchanged input stacks, wrong material and reversed-slot rejection; without NTM, with NTM 2.4.0, restart, and legacy suppression.",
+    "final_build": "./gradlew --offline check build passed; static map compatibility, Pass 37 and Pass 38 validators passed."
+  }
+}

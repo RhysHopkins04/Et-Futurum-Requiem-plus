@@ -39,7 +39,8 @@ need(str(CONTRACT.get('contract_revision')) in ('37','38','39'), 'Backporter con
 need((str(CONTRACT.get('contract_revision')) == '37' and CONTRACT.get('implemented_in_version') == '3.5.9') or (str(CONTRACT.get('contract_revision')) in ('38','39') and CONTRACT.get('implemented_in_version') == '3.5.10'), 'Pass 37/38 contract provenance must match its unreleased staging version')
 need(CONTRACT.get('implemented_in_git_ref') is None, 'unreleased Pass 37 contract must not self-reference a git ref')
 need(CONTRACT.get('release_status') == 'unreleased', 'Pass 37 contract must remain unreleased')
-need(('String stagingVersion = "3.5.9"' in BUILD) or ('String stagingVersion = "3.5.10"' in BUILD), 'build.gradle stagingVersion must be Pass 37 or forward-compatible Pass 38/39')
+version = re.search(r'String stagingVersion = "(\d+)\.(\d+)\.(\d+)"', BUILD)
+need(version and tuple(map(int, version.groups())) >= (3, 5, 9), 'stagingVersion predates Pass 37')
 need(CONTRACT.get('implemented_in_version') != '3.5.5' and CONTRACT.get('implemented_in_git_ref') != 'refs/tags/3.5.5',
      'stale 3.5.5 provenance remains')
 

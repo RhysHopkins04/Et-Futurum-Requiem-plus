@@ -1,0 +1,46 @@
+// Opt-in NEI data tests. No window, GL context, user world or distributable test classes.
+gradle.projectsEvaluated {
+    def p=gradle.rootProject
+    def compiled=p.layout.buildDirectory.dir('recipe-display-tests/classes')
+    def compile=p.tasks.register('compileRecipeDisplayTests',JavaCompile) {
+        dependsOn p.tasks.named('classes')
+        source=p.fileTree('src/testRecipeDisplays/java') { include '**/*.java' }
+        classpath=p.sourceSets.main.compileClasspath.filter { !it.name.contains('jabel') }+p.sourceSets.main.output
+        destinationDirectory=compiled
+        sourceCompatibility='1.8'
+        targetCompatibility='1.8'
+        options.compilerArgs+=['-proc:none']
+    }
+    p.tasks.register('recipeDisplayContracts',JavaExec) {
+        dependsOn compile
+        classpath=p.sourceSets.main.compileClasspath.filter { !it.name.contains('jabel') }+p.sourceSets.main.output+p.files(compiled)
+        javaLauncher=p.tasks.named('runServer',JavaExec).get().javaLauncher
+        if(p.hasProperty('smithingReferenceJar'))systemProperty 'efr.test.vanillaJar',p.property('smithingReferenceJar').toString()
+        mainClass='net.minecraft.launchwrapper.Launch'
+        args '--tweakClass','efrtweak.RecipeDisplayTweaker'
+    }
+}
+
+// Separate process: exercise the actual Mixin transformers, not just their helper methods.
+gradle.projectsEvaluated {
+    def p=gradle.rootProject
+    p.tasks.register('trimMixinContracts',JavaExec) {
+        dependsOn p.tasks.named('compileRecipeDisplayTests')
+        classpath=p.sourceSets.main.compileClasspath.filter { !it.name.contains('jabel') && !it.name.startsWith('rple-') }+p.sourceSets.main.output+p.files(p.layout.buildDirectory.dir('recipe-display-tests/classes'), 'src/testRecipeDisplays/resources')
+        javaLauncher=p.tasks.named('runServer',JavaExec).get().javaLauncher
+        mainClass='net.minecraft.launchwrapper.Launch'
+        // The test only starts Mixin, not FML. Suppress automatic coremod launch;
+        // production trim hooks are registered explicitly by the test tweaker.
+        def corePlugins=[]
+        classpath.files.findAll { it.isFile() && it.name.endsWith('.jar') }.each { file ->
+            new java.util.jar.JarFile(file).withCloseable { jar ->
+                def plugin=jar.manifest?.mainAttributes?.getValue('FMLCorePlugin')
+                if(plugin)corePlugins.add(plugin)
+            }
+        }
+        systemProperty 'fml.coreMods.load',corePlugins.join(',')
+        systemProperty 'mixin.debug.export','true'
+        args '--tweakClass','efrtweak.TrimMixinTweaker'
+        workingDir=p.file('build/recipe-display-tests')
+    }
+}

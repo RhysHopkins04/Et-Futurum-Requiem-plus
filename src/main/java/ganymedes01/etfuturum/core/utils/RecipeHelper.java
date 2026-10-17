@@ -82,7 +82,7 @@ public final class RecipeHelper {
 
     private static boolean matchesOutput(IRecipe recipe, Item item, int meta, boolean wildcards) {
         ItemStack stack = recipe.getRecipeOutput();
-        return stack != null && stack.getItem() == item
+        return item != null && stack != null && stack.getItem() != null && stack.getItem() == item
             && ((wildcards && stack.getItemDamage() == OreDictionary.WILDCARD_VALUE) || meta == stack.getItemDamage());
     }
 

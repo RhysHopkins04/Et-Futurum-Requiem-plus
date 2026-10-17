@@ -92,6 +92,33 @@ public class NEIEtFuturumConfig implements IConfigureNEI {
 			GuiUsageRecipe.usagehandlers.add(handler);
 		}
 
+        if (ganymedes01.etfuturum.ModernMapParityBlocks.CAMPFIRE.get() != null) {
+            API.registerRecipeHandler(new ganymedes01.etfuturum.compat.nei.CampfireRecipeHandler());
+            GuiUsageRecipe.usagehandlers.add(0,new ganymedes01.etfuturum.compat.nei.CampfireRecipeHandler());
+            API.registerRecipeHandler(new ganymedes01.etfuturum.compat.nei.CandleCakeRecipeHandler());
+            GuiUsageRecipe.usagehandlers.add(0,new ganymedes01.etfuturum.compat.nei.CandleCakeRecipeHandler());
+        }
+        if (ModBlocks.SMITHING_TABLE.isEnabled()) {
+            API.registerRecipeHandler(new ganymedes01.etfuturum.compat.nei.SmithingRecipeHandler());
+            GuiUsageRecipe.usagehandlers.add(0,new ganymedes01.etfuturum.compat.nei.SmithingRecipeHandler());
+        }
+        if (ganymedes01.etfuturum.recipes.StonecutterRecipes.enabled()) {
+            API.registerRecipeHandler(new ganymedes01.etfuturum.compat.nei.StonecutterRecipeHandler());
+            GuiUsageRecipe.usagehandlers.add(0,new ganymedes01.etfuturum.compat.nei.StonecutterRecipeHandler());
+        }
+        if (ganymedes01.etfuturum.recipes.LoomRecipes.enabled()) {
+            API.registerRecipeHandler(new ganymedes01.etfuturum.compat.nei.LoomRecipeHandler());
+            GuiUsageRecipe.usagehandlers.add(0,new ganymedes01.etfuturum.compat.nei.LoomRecipeHandler());
+        }
+        if (ganymedes01.etfuturum.recipes.GrindstoneRecipes.enabled()) {
+            API.registerRecipeHandler(new ganymedes01.etfuturum.compat.nei.GrindstoneRecipeHandler());
+            GuiUsageRecipe.usagehandlers.add(0,new ganymedes01.etfuturum.compat.nei.GrindstoneRecipeHandler());
+        }
+        if (ganymedes01.etfuturum.recipes.CartographyRecipes.enabled()) {
+            API.registerRecipeHandler(new ganymedes01.etfuturum.compat.nei.CartographyRecipeHandler());
+            GuiUsageRecipe.usagehandlers.add(0,new ganymedes01.etfuturum.compat.nei.CartographyRecipeHandler());
+        }
+        ganymedes01.etfuturum.compat.nei.NEIProcessOrdering.installDefaults();
 		if (ModBlocks.COMPOSTER.isEnabled()) {
 			ComposterHandler handler = new ComposterHandler();
 			GuiCraftingRecipe.craftinghandlers.add(handler);

@@ -3,6 +3,7 @@ package ganymedes01.etfuturum.recipes;
 import cpw.mods.fml.common.registry.GameRegistry;
 import ganymedes01.etfuturum.ModBlocks;
 import ganymedes01.etfuturum.ModItems;
+import ganymedes01.etfuturum.ModernMapParityBlocks;
 import ganymedes01.etfuturum.Tags;
 import ganymedes01.etfuturum.api.crops.IBeeGrowable;
 import ganymedes01.etfuturum.blocks.BlockBerryBush;
@@ -235,6 +236,7 @@ public class ModTagging {
 		RecipeHelper.registerOre("soulSoil", ModBlocks.SOUL_SOIL.get());
 
 		RecipeHelper.registerOre("nuggetIron", ModItems.NUGGET_IRON.get());
+		RecipeHelper.registerOre("nuggetCopper", ModItems.COPPER_NUGGET.get());
 
 		RecipeHelper.registerOre("foodMuttonraw", ModItems.MUTTON_RAW.get());
 		RecipeHelper.registerOre("listAllmeatraw", ModItems.MUTTON_RAW.get());
@@ -303,6 +305,19 @@ public class ModTagging {
 				RecipeHelper.registerOre("slabWood", ore1);
 				ItemStack ore = ModBlocks.WOOD_FENCE.newItemStack(1, i);
 				RecipeHelper.registerOre("fenceWood", ore);
+			}
+		}
+		if (ConfigBlocksItems.enableModernMapParityBlocks) {
+			RecipeHelper.registerOre("plankWood", ModernMapParityBlocks.PALE_OAK_PLANKS.get());
+			RecipeHelper.registerOre("slabWood", ModernMapParityBlocks.PALE_OAK_SLAB.get());
+			RecipeHelper.registerOre("fenceWood", ModernMapParityBlocks.PALE_OAK_FENCE.get());
+			RecipeHelper.registerOre("stairWood", ModernMapParityBlocks.PALE_OAK_STAIRS.get());
+			RecipeHelper.registerOre("treeSapling", ModernMapParityBlocks.PALE_OAK_SAPLING.get());
+			RecipeHelper.registerOre("treeLeaves", ModernMapParityBlocks.PALE_OAK_LEAVES.get());
+			for (ModernMapParityBlocks entry : new ModernMapParityBlocks[]{ModernMapParityBlocks.PALE_OAK_LOG,
+					ModernMapParityBlocks.PALE_OAK_WOOD, ModernMapParityBlocks.STRIPPED_PALE_OAK_LOG,
+					ModernMapParityBlocks.STRIPPED_PALE_OAK_WOOD}) {
+				if (entry.get() != null) RecipeHelper.registerOre("logWood", new ItemStack(entry.get(), 1, OreDictionary.WILDCARD_VALUE));
 			}
 		}
 

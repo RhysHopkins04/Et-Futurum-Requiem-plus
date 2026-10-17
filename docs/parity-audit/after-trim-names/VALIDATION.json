@@ -1,0 +1,35 @@
+{
+  "version": "3.5.28",
+  "jar": "build/libs/etfuturum-3.5.28-master.8-2fe04e1fd4-dirty.jar",
+  "jar_sha256": "6f87d4a175adf8e7bb4f4c1587bdcf457e3eef2c0d771335aed062ced073a857",
+  "changed_source_sha256": {
+    "build.gradle": "3c93369d8930774887e0a6ff483161a0963fa2277b6dd38c6fe470aceb2c5554",
+    "src/main/java/ganymedes01/etfuturum/client/renderer/trim/ArmorTrimRenderer.java": "066e06c0fae4c4741a5797627ffcca1d57e0617c2c7446986934170caca84082",
+    "src/main/java/ganymedes01/etfuturum/items/ItemSmithingTemplate.java": "8249913a3570ffbefa2a811cdb4ff552607a1339ba256a1365ba048b79761148",
+    "src/main/resources/assets/etfuturum/lang/en_US.lang": "c75d0d2aab9e10f3c0a87e01d4005a55b36a71f603d2acf9dd6a4f6156895079",
+    "src/testRecipeDisplays/java/efrtest/RecipeDisplayContracts.java": "b0986a63189995a44a855bc75156cccec3d3067f4952597988787dd7916f7dbb",
+    "src/testRecipeDisplays/java/efrtest/TrimNamingContracts.java": "cf60fd96fecaeb1ee20559ab17d3fbdf2d72b2f76fb801b8fdd6da5a20643abf"
+  },
+  "test_log_sha256": "8dc702728df075f69a907e69abfe1f87ac936a7dbc4457bc878bd68762831f81",
+  "test_log": "build/trim-names-patch/tests.log",
+  "passed_markers": [
+    "TRIM_MIXINS PASSED: production icon and worn/stand hooks applied to real Forge renderer classes; no window or GL calls",
+    "EARTH_IMPORT_NTM_TEXTURES PASSED: alpha, resolution scaling, immutable inputs; 0 native overlays",
+    "EARTH_IMPORT_CONTRACTS PASSED: all 1536 quarts, 24 sections, compressed NBT, malformed data, unknown names, sparse fallback, immutable storage",
+    "[17:07:26] [main/INFO]: [efrtest.WorkstationAssetContracts:run:28]: WORKSTATION_ASSETS PASSED: 32 actual bridge routes use AssetDirector; no migrated PNGs in resources",
+    "[17:07:26] [main/INFO]: [efrtest.BookSigningContracts:run:29]: BOOK_SIGNING PASSED: one title append per committed event, page isolation, control keys, legacy path and title length; no window opened",
+    "[17:07:27] [main/INFO]: [efrtest.ArmorTrimAssetContracts:run:83]: ARMOR_TRIM_ASSETS PASSED: 640 actual AssetDirector-reference palette permutations, alpha mapping and all 19 real bridge aliases; no window/GL context",
+    "[17:07:27] [main/INFO]: [efrtest.SmithingScreenContracts:run:32]: SMITHING_SCREEN PASSED: versioned resource, no legacy override, copied armor in correct slots, tools and empty results clear all equipment",
+    "[17:07:27] [main/INFO]: [efrtest.TrimNamingContracts:run:74]: TRIM_NAMING PASSED: 19 actual localized names/tooltips, 18 distinct pattern images, 72 template-to-recipe-to-renderer routes and all pattern/material labels match vanilla",
+    "[17:07:27] [main/INFO]: [efrtest.RecipeDisplayContracts:main:115]: RECIPE_DISPLAY_CONTRACTS PASSED: actual NEI item dispatch, sequential result/usage queries, category isolation and registry overrides/removals"
+  ],
+  "template_names_rarities_tooltips_checked": 19,
+  "pattern_routes_checked": 72,
+  "unique_worn_texture_paths": 36,
+  "unique_pattern_images": 18,
+  "palette_permutations_checked": 640,
+  "live_gl_render_verified": false,
+  "server_suite_repeated_this_pass": false,
+  "new_pngs": 0,
+  "git_history_modified": false
+}

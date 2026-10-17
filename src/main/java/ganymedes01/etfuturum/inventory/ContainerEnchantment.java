@@ -28,6 +28,7 @@ public class ContainerEnchantment extends Container {
 	 * current world (for bookshelf counting)
 	 */
 	private final World world;
+    private final EntityPlayer owner;
 	private final Random rand;
 	public int enchantmentSeed;
 
@@ -44,6 +45,7 @@ public class ContainerEnchantment extends Container {
 	public final boolean noFuel;
 
 	public ContainerEnchantment(InventoryPlayer inventory, World world, int x, int y, int z) {
+		owner=inventory.player;
 		tableInventory = new InventoryBasic("Enchant", true, 2) {
 
 			@Override
@@ -100,7 +102,7 @@ public class ContainerEnchantment extends Container {
 	}
 
 	private static void chargeForEnchant(EntityPlayer player, Random rand, int amount) {
-		player.addExperienceLevel(-amount);
+		if(!player.capabilities.isCreativeMode)player.addExperienceLevel(-amount);
 
 		setEnchantSeed(player, rand.nextInt());
 	}
@@ -111,7 +113,8 @@ public class ContainerEnchantment extends Container {
 		p_75132_1_.sendProgressBarUpdate(this, 0, enchantLevels[0]);
 		p_75132_1_.sendProgressBarUpdate(this, 1, enchantLevels[1]);
 		p_75132_1_.sendProgressBarUpdate(this, 2, enchantLevels[2]);
-		p_75132_1_.sendProgressBarUpdate(this, 3, enchantmentSeed & -16);
+		p_75132_1_.sendProgressBarUpdate(this, 3, enchantmentSeed & 0xFFF0);
+        p_75132_1_.sendProgressBarUpdate(this,7,enchantmentSeed >>> 16);
 		p_75132_1_.sendProgressBarUpdate(this, 4, enchantmentIds[0]);
 		p_75132_1_.sendProgressBarUpdate(this, 5, enchantmentIds[1]);
 		p_75132_1_.sendProgressBarUpdate(this, 6, enchantmentIds[2]);
@@ -129,7 +132,8 @@ public class ContainerEnchantment extends Container {
 			var2.sendProgressBarUpdate(this, 0, enchantLevels[0]);
 			var2.sendProgressBarUpdate(this, 1, enchantLevels[1]);
 			var2.sendProgressBarUpdate(this, 2, enchantLevels[2]);
-			var2.sendProgressBarUpdate(this, 3, enchantmentSeed & -16);
+			var2.sendProgressBarUpdate(this, 3, enchantmentSeed & 0xFFF0);
+            var2.sendProgressBarUpdate(this,7,enchantmentSeed >>> 16);
 			var2.sendProgressBarUpdate(this, 4, enchantmentIds[0]);
 			var2.sendProgressBarUpdate(this, 5, enchantmentIds[1]);
 			var2.sendProgressBarUpdate(this, 6, enchantmentIds[2]);
@@ -141,7 +145,9 @@ public class ContainerEnchantment extends Container {
 		if (p_75137_1_ >= 0 && p_75137_1_ <= 2)
 			enchantLevels[p_75137_1_] = p_75137_2_;
 		else if (p_75137_1_ == 3)
-			enchantmentSeed = p_75137_2_;
+			enchantmentSeed = (enchantmentSeed & 0xFFFF0000) | (p_75137_2_ & 0xFFFF);
+        else if (p_75137_1_ == 7)
+            enchantmentSeed=(enchantmentSeed & 0xFFFF) | ((p_75137_2_ & 0xFFFF)<<16);
 		else if (p_75137_1_ >= 4 && p_75137_1_ <= 6)
 			enchantmentIds[p_75137_1_ - 4] = p_75137_2_;
 		else
@@ -159,6 +165,7 @@ public class ContainerEnchantment extends Container {
 
 			if (var2 != null && var2.isItemEnchantable()) {
 				if (!world.isRemote) {
+                    enchantmentSeed=getEnchantSeed(owner);
 					power = 0;
 					int j;
 
@@ -193,7 +200,7 @@ public class ContainerEnchantment extends Container {
 							if (var7 != null && !var7.isEmpty()) {
 								EnchantmentData var6 = var7.get(rand.nextInt(var7.size()));
 								enchantmentIds[j] = var6.enchantmentobj.effectId | var6.enchantmentLevel << 8;
-							}
+							} else enchantLevels[j]=0;
 						}
 
 					detectAndSendChanges();
@@ -211,23 +218,29 @@ public class ContainerEnchantment extends Container {
 	 */
 	@Override
 	public boolean enchantItem(EntityPlayer player, int id) {
+		if(id<0 || id>=3 || !canInteractWith(player)) return false;
+        onCraftMatrixChanged(tableInventory);
 		ItemStack slot0 = tableInventory.getStackInSlot(0);
 		ItemStack slot1 = tableInventory.getStackInSlot(1);
 		int var5 = id + 1;
 
-		if ((slot1 == null || slot1.stackSize < var5) && !player.capabilities.isCreativeMode) {
+		if (slot0==null || slot0.stackSize!=1 || !slot0.isItemEnchantable()) return false;
+        if (!noFuel && (slot1 == null || slot1.stackSize < var5 || !ItemTags.hasTag(slot1.getItem(),slot1.getItemDamage(),Tags.MOD_ID+":enchantment_fuel")) && !player.capabilities.isCreativeMode) {
 			return false;
 		} else if (enchantLevels[id] > 0 && slot0 != null && (player.experienceLevel >= var5 && player.experienceLevel >= enchantLevels[id] || player.capabilities.isCreativeMode)) {
 			if (!world.isRemote) {
 				List<EnchantmentData> var6 = getEnchantmentList(slot0, id, enchantLevels[id]);
+                if(var6==null || var6.isEmpty())return false;
 				boolean var7 = slot0.getItem() == Items.book;
 
-				if (var6 != null) {
+				if (var6 != null && !var6.isEmpty()) {
 					chargeForEnchant(player, rand, var5);
 					world.playSoundEffect(posX + 0.5F, posY + 0.5F, posZ + 0.5F, Tags.MC_ASSET_VER + ":block.enchantment_table.use", 1.0F, world.rand.nextFloat() * 0.1F + 0.9F);
 
-					if (var7)
-						slot0.func_150996_a(Items.enchanted_book); // setItem
+					if (var7) {
+                        slot0.func_150996_a(Items.enchanted_book); // Retain name and unrelated custom data.
+                        slot0.setItemDamage(0);
+                    }
 
 					for (EnchantmentData var9 : var6) {
 						if (var7)
@@ -236,7 +249,7 @@ public class ContainerEnchantment extends Container {
 							slot0.addEnchantment(var9.enchantmentobj, var9.enchantmentLevel);
 					}
 
-					if (!player.capabilities.isCreativeMode && slot1 != null) {
+					if (!noFuel && !player.capabilities.isCreativeMode && slot1 != null) {
 						slot1.stackSize -= var5;
 
 						if (slot1.stackSize <= 0) {
@@ -246,7 +259,7 @@ public class ContainerEnchantment extends Container {
 					}
 
 					tableInventory.markDirty();
-					enchantmentSeed = rand.nextInt();
+					enchantmentSeed = getEnchantSeed(player);
 					onCraftMatrixChanged(tableInventory);
 				}
 			}
@@ -258,7 +271,7 @@ public class ContainerEnchantment extends Container {
 
 	private List<EnchantmentData> getEnchantmentList(ItemStack stack, int seed, int level) {
 		rand.setSeed(enchantmentSeed + seed);
-		List<EnchantmentData> list = EnchantmentHelper.buildEnchantmentList(rand, stack, level);
+		List<EnchantmentData> list = ganymedes01.etfuturum.recipes.EnchantingTableRecipes.build(rand, stack, level);
 
 		if (stack.getItem() == Items.book && list != null && list.size() > 1)
 			list.remove(rand.nextInt(list.size()));
@@ -281,14 +294,16 @@ public class ContainerEnchantment extends Container {
 		if (!world.isRemote)
 			for (int i = 0; i < tableInventory.getSizeInventory(); i++) {
 				ItemStack stack = tableInventory.getStackInSlotOnClosing(i);
-				if (stack != null)
-					player.dropPlayerItemWithRandomChoice(stack, false);
+				if (stack != null && (!player.isEntityAlive() || !player.inventory.addItemStackToInventory(stack)))
+                    player.dropPlayerItemWithRandomChoice(stack,false);
 			}
 	}
 
 	@Override
 	public boolean canInteractWith(EntityPlayer player) {
-		return world.getBlock(posX, posY, posZ) == ModBlocks.ENCHANTMENT_TABLE.get() && player.getDistanceSq(posX + 0.5D, posY + 0.5D, posZ + 0.5D) <= 64.0D;
+		return player==owner && ModBlocks.ENCHANTMENT_TABLE.isEnabled()
+                && !ganymedes01.etfuturum.api.spectator.SpectatorUtils.isSpectator(player)
+                && world.getBlock(posX, posY, posZ) == ModBlocks.ENCHANTMENT_TABLE.get() && player.getDistanceSq(posX + 0.5D, posY + 0.5D, posZ + 0.5D) <= 64.0D;
 	}
 
 	/**
@@ -296,48 +311,25 @@ public class ContainerEnchantment extends Container {
 	 */
 	@Override
 	public ItemStack transferStackInSlot(EntityPlayer playerIn, int index) {
-		ItemStack var3 = null;
-		Slot var4 = (Slot) inventorySlots.get(index);
-
-		if (var4 != null && var4.getHasStack()) {
-			ItemStack var5 = var4.getStack();
-			var3 = var5.copy();
-
-			if (index == 0) {
-				if (!mergeItemStack(var5, 2, noFuel ? 37 : 38, true))
-					return null;
-			} else if (!noFuel && index == 1) {
-				if (!mergeItemStack(var5, 2, 38, true))
-					return null;
-			} else if (!noFuel && ItemTags.hasTag(var5.getItem(), var5.getItemDamage(), Tags.MOD_ID + ":enchantment_fuel")) {
-				if (!mergeItemStack(var5, 1, 2, true))
-					return null;
-			} else {
-				if (((Slot) inventorySlots.get(0)).getHasStack() || !((Slot) inventorySlots.get(0)).isItemValid(var5))
-					return null;
-
-				if (var5.hasTagCompound() && var5.stackSize == 1) {
-					((Slot) inventorySlots.get(0)).putStack(var5.copy());
-					var5.stackSize = 0;
-				} else if (var5.stackSize >= 1) {
-					ItemStack newStack = var5.copy();
-					var5.stackSize = 1;
-					((Slot) inventorySlots.get(0)).putStack(newStack);
-					--var5.stackSize;
-				}
-			}
-
-			if (var5.stackSize == 0)
-				var4.putStack(null);
-			else
-				var4.onSlotChanged();
-
-			if (var5.stackSize == var3.stackSize)
-				return null;
-
-			var4.onPickupFromSlot(playerIn, var5);
-		}
-
-		return var3;
-	}
+        if(!canInteractWith(playerIn) || index<0 || index>=inventorySlots.size())return null;
+        int start=noFuel?1:2,end=start+36;
+        Slot slot=(Slot)inventorySlots.get(index);if(!slot.getHasStack())return null;
+        ItemStack stack=slot.getStack(),original=stack.copy();
+        if(index<start) {
+            if(!mergeItemStack(stack,start,end,true))return null;
+        } else if(!noFuel && ItemTags.hasTag(stack.getItem(),stack.getItemDamage(),Tags.MOD_ID+":enchantment_fuel")) {
+            if(!mergeItemStack(stack,1,2,false))return null;
+        } else if(!getSlot(0).getHasStack()) {
+            ItemStack single=stack.copy();single.stackSize=1;getSlot(0).putStack(single);--stack.stackSize;
+        } else {
+            int hotbar=start+27;
+            if(!(index<hotbar?mergeItemStack(stack,hotbar,end,false):mergeItemStack(stack,start,hotbar,false)))return null;
+        }
+        if(stack.stackSize<=0)slot.putStack(null);else slot.onSlotChanged();
+        slot.onPickupFromSlot(playerIn,stack);return original;
+    }
+    @Override public ItemStack slotClick(int slot,int button,int mode,EntityPlayer player) {
+        if(!canInteractWith(player) || slot>=inventorySlots.size())return null;
+        return super.slotClick(slot,button,mode,player);
+    }
 }

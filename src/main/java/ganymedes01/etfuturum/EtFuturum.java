@@ -266,6 +266,8 @@ public class EtFuturum {
 		networkWrapper.registerMessage(AttackYawHandler.class, AttackYawMessage.class, 7, Side.CLIENT);
 		networkWrapper.registerMessage(WoodSignUpdateHandler.class, WoodSignUpdateMessage.class, 8, Side.SERVER);
         networkWrapper.registerMessage(ganymedes01.etfuturum.network.FrozenStateHandler.class, ganymedes01.etfuturum.network.FrozenStateMessage.class, 9, Side.CLIENT);
+        networkWrapper.registerMessage(ganymedes01.etfuturum.network.LecternBookActionHandler.class,ganymedes01.etfuturum.network.LecternBookActionMessage.class,10,Side.SERVER);
+        cpw.mods.fml.common.FMLCommonHandler.instance().bus().register(new ganymedes01.etfuturum.network.LecternBookActionHandler());
 
 		if (!Reference.SNAPSHOT_BUILD && !Reference.DEV_ENVIRONMENT) {
 			MCLibModules.updateCheckAPI.submitModTask(Tags.MOD_ID, Tags.VERSION, Reference.VERSION_URL);

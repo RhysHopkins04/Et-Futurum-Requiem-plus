@@ -16,7 +16,13 @@ public class ItemBlockDecorationWorkbench extends ItemBlock {
 
 	@Override
 	public void addInformation(ItemStack stack, EntityPlayer player, List<String> lore, boolean f3h) {
-		lore.add("\u00a7o" + StatCollector.translateToLocal("efr.decoration.only"));
+        if (field_150939_a instanceof ganymedes01.etfuturum.blocks.BlockLoom
+                && ganymedes01.etfuturum.recipes.LoomRecipes.enabled()) return;
+        if (field_150939_a instanceof ganymedes01.etfuturum.blocks.BlockStonecutter
+                && ganymedes01.etfuturum.recipes.StonecutterRecipes.enabled()) return;
+		if(field_150939_a instanceof ganymedes01.etfuturum.blocks.BlockCartographyTable
+                && ganymedes01.etfuturum.recipes.CartographyRecipes.enabled())return;
+        lore.add("\u00a7o" + StatCollector.translateToLocal("efr.decoration.only"));
 	}
 
 }

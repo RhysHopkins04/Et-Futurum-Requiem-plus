@@ -16,6 +16,10 @@ import java.util.List;
 public class ConfigFunctions extends ConfigBase {
 
 	public static boolean enableBowRendering;
+    public static boolean allowLecternBookClickActions=false;
+    public static boolean requireNetheriteUpgradeTemplate=true;
+    public static boolean allowModdedArmorTrims=false;
+    public static boolean allowModdedTrimMaterials=false;
 	public static boolean enableSkullDrop;
 	public static boolean enableRecipeForPrismarine;
 	public static boolean enableFancySkulls;
@@ -210,6 +214,14 @@ public class ConfigFunctions extends ConfigBase {
 		mobSpawnerEgging = getBoolean("mobSpawnerEgging", catChanges, true, "Click a mob spawner with a vanilla or EFR egg, and it'll change the mob inside. Doesn't support modded eggs.");
 		fireworkRecipeFixes = getBoolean("fireworkRecipeFixes", catChanges, true, "Fixes fireworks not being able to have an extra duration without a star, and they'll output 3 instead of 1. Note: This currently does NOT update NEI, it'll still show the old recipe outputs.");
 
+        allowModdedArmorTrims=getBoolean("allowModdedArmorTrims",catSettings,false,
+                "Allow smithing trims on other mods' ItemArmor equipment. Off by default: only vanilla armor and EFR netherite accept trims. Opt-in rendering uses the standard humanoid armor UV layout; custom models/textures may need a dedicated adapter.");
+        allowModdedTrimMaterials=getBoolean("allowModdedTrimMaterials",catSettings,false,
+                "Allow OreDictionary ingot equivalents from other mods as smithing trim materials (iron, gold, copper and netherite). Off by default: only vanilla ingredients and EFR's enabled modern equivalents are accepted. This does not add new trim colors or allow additional armor types; allowModdedArmorTrims controls armor separately.");
+        requireNetheriteUpgradeTemplate=getBoolean("requireNetheriteUpgradeTemplate",catSettings,true,
+                "Require the modern netherite upgrade template for built-in diamond upgrades. Disable for pre-1.20 progression or imported worlds without template loot. Custom two-input CraftTweaker recipes remain available with an empty template slot.");
+        allowLecternBookClickActions=getBoolean("allowLecternBookClickActions",catSettings,false,
+                "Server-side opt-in for signed lectern books to run clicked commands or offer web/clipboard/suggested-command links. Disabled by default. Commands use the clicking player's normal chat permission/filter/spam handling; URLs still respect the client's chat-link settings. Reading and page links work when disabled.");
 		//settings
 		enableNetheriteFlammable = getBoolean("enableNetheriteFlammable", catSettings, false, "Set to true to disable the fireproof item entity Netherite/ancient debris etc uses");
 		enableRecipeForPrismarine = getBoolean("enablePrismarineRecipes", catSettings, true, "Recipe for prismarine if you want it without the temples, or want it craftable alongside temples.");

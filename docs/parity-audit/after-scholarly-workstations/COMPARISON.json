@@ -1,0 +1,9 @@
+{
+  "version": "3.5.22",
+  "baseline": "after-loom (3.5.21)",
+  "matches_before": 1295,
+  "matches_after": 1295,
+  "previously_matching_regressions": [],
+  "existing_block_item_and_surface_biome_ids_unchanged": true,
+  "scope": "Recipe witnesses and registry identity comparison; workstation behavior tested separately."
+}

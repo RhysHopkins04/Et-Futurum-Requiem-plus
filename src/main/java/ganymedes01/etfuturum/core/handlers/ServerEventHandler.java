@@ -652,6 +652,17 @@ public class ServerEventHandler {
 	@SubscribeEvent(priority = EventPriority.HIGHEST)
 	public void onPlayerInteract(PlayerInteractEvent event) {
 		EntityPlayer player = event.entityPlayer;
+        if (event.action == Action.RIGHT_CLICK_BLOCK && !SpectatorUtils.isSpectator(player)
+                && event.useBlock != Result.DENY && event.useItem != Result.DENY
+                && ModernMapParityBlocks.addCandleToCake(event.world,event.x,event.y,event.z,player)) {
+            // Client must still send the vanilla interaction packet to the server.
+            if (!event.world.isRemote) {
+                event.useBlock = Result.DENY;
+                event.useItem = Result.DENY;
+                event.setCanceled(true);
+            }
+            return;
+        }
 
 		// Literal vanilla oak signs do not have an onBlockActivated hook in 1.7.10. Route their
 		// right-click through EFR's modern sign layer, while leaving the client event uncancelled
@@ -1991,7 +2002,7 @@ public class ServerEventHandler {
 
 	@SubscribeEvent
 	public void fuelBurnTime(FuelBurnTimeEvent e) {
-		if (RecipeHelper.validateItems(e.fuel))
+		if (!RecipeHelper.validateItems(e.fuel))
 			return;
 
 		initFurnaceModifiers();
@@ -2066,6 +2077,8 @@ public class ServerEventHandler {
 
 		if (!initBurnTimeRemappings.getAndSet(true)) {
 			burnTimeRemappings.put(ModItems.BAMBOO.newItemStack(1, OreDictionary.WILDCARD_VALUE), 50);
+            if (ModernMapParityBlocks.DRIED_KELP_BLOCK.get()!=null)
+                burnTimeRemappings.put(new ItemStack(ModernMapParityBlocks.DRIED_KELP_BLOCK.get()),4000);
 		}
 	}
 

@@ -1,0 +1,19 @@
+// Opt-in audit only: no probe classes enter the distributable jar or normal runs.
+gradle.projectsEvaluated {
+    def p = gradle.rootProject
+    def compile = p.tasks.register('compileParityAudit', JavaCompile) {
+        dependsOn p.tasks.named('classes')
+        source = p.fileTree('src/testParityAudit/java') { include '**/*.java' }
+        classpath = p.sourceSets.main.runtimeClasspath
+        destinationDirectory = p.layout.buildDirectory.dir('parity-audit/classes')
+        sourceCompatibility = '1.8'
+        targetCompatibility = '1.8'
+        options.compilerArgs += ['-proc:none']
+    }
+    p.tasks.named('runServer', JavaExec) {
+        dependsOn compile
+        classpath += p.files(p.layout.buildDirectory.dir('parity-audit/classes'))
+        workingDir = p.file(p.findProperty('parityAuditDir') ?: 'build/parity-audit/server')
+        systemProperty 'efr.parityAudit', 'true'
+    }
+}

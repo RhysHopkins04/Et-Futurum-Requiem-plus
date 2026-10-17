@@ -23,6 +23,32 @@ public class IMCSenderGTNH {
 			sendCatalyst("fuel", "etfuturum:blast_furnace");
 		}
 
+        if (ganymedes01.etfuturum.ModernMapParityBlocks.CAMPFIRE.get() != null) {
+            sendHandler("ganymedes01.etfuturum.compat.nei.CampfireRecipeHandler", "etfuturum:campfire", 2, false);
+            sendCatalyst("etfuturum.campfire", "etfuturum:campfire");
+            sendCatalyst("etfuturum.campfire", "etfuturum:soul_campfire");
+            sendHandler("ganymedes01.etfuturum.compat.nei.CandleCakeRecipeHandler", "etfuturum:candle", 2, false);
+        }
+        if (ModBlocks.SMITHING_TABLE.isEnabled()) {
+            sendHandler("ganymedes01.etfuturum.compat.nei.SmithingRecipeHandler", "etfuturum:smithing_table", 2, false);
+            sendCatalyst("etfuturum.smithing", "etfuturum:smithing_table");
+        }
+        if (ganymedes01.etfuturum.recipes.StonecutterRecipes.enabled()) {
+            sendHandler("ganymedes01.etfuturum.compat.nei.StonecutterRecipeHandler","etfuturum:stonecutter",2,false);
+            sendCatalyst("etfuturum.stonecutting","etfuturum:stonecutter");
+        }
+        if (ganymedes01.etfuturum.recipes.LoomRecipes.enabled()) {
+            sendHandler("ganymedes01.etfuturum.compat.nei.LoomRecipeHandler","etfuturum:loom",2,false);
+            sendCatalyst("etfuturum.loom","etfuturum:loom");
+        }
+        if (ganymedes01.etfuturum.recipes.GrindstoneRecipes.enabled()) {
+            sendHandler("ganymedes01.etfuturum.compat.nei.GrindstoneRecipeHandler","etfuturum:grindstone",2,false);
+            sendCatalyst("etfuturum.grinding","etfuturum:grindstone");
+        }
+        if (ganymedes01.etfuturum.recipes.CartographyRecipes.enabled()) {
+            sendHandler("ganymedes01.etfuturum.compat.nei.CartographyRecipeHandler","etfuturum:cartography_table",2,false);
+            sendCatalyst("etfuturum.cartography","etfuturum:cartography_table");
+        }
 		if (ModBlocks.BANNER.isEnabled()) {
 			sendHandler("ganymedes01.etfuturum.compat.nei.BannerPatternHandler", "etfuturum:banner");
 		}
@@ -49,7 +75,7 @@ public class IMCSenderGTNH {
 		nbt.setString("modId", Tags.MOD_ID);
 		nbt.setBoolean("modRequired", true);
 		nbt.setString("itemName", block);
-		nbt.setInteger("handlerHeight", 65);
+		nbt.setInteger("handlerHeight", maxRecipesPerPage == 2 ? 82 : 65);
 		nbt.setInteger("handlerWidth", 166);
 		nbt.setInteger("maxRecipesPerPage", maxRecipesPerPage);
 		nbt.setInteger("yShift", 6);

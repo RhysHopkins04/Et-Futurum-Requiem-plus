@@ -1,0 +1,8 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "ganymedes01.etfuturum.mixins.early.armortrim.client",
+  "compatibilityLevel": "JAVA_8",
+  "client": ["MixinArmorLayers", "MixinTrimIcons"],
+  "injectors": {"defaultRequire": 1}
+}

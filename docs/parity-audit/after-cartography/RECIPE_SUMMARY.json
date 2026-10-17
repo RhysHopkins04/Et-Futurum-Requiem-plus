@@ -1,0 +1,19 @@
+{
+  "interpretation": "Differences require source/alias/config review before labeling defects. Matching witnesses do not certify all mechanics, alternatives, recipes, containers, XP, consumption, automation or config combinations.",
+  "query_count": 4786,
+  "query_status_counts": {
+    "NO_MATCH_FOR_MODERN_INPUTS": 84,
+    "WITNESS_MATCH": 4702
+  },
+  "recipes": 1470,
+  "status_counts": {
+    "CAMPFIRE_REQUIRES_WORLD_TICK_TEST": 9,
+    "COMPONENT_OUTPUT_REQUIRES_NBT_TEST": 16,
+    "INPUT_NOT_RESOLVED": 3,
+    "MODERN_TEMPLATE_SYSTEM_NOT_IMPLEMENTED": 9,
+    "OUTPUT_NOT_RESOLVED": 100,
+    "RUNTIME_DIFFERENCE_REQUIRES_REVIEW": 8,
+    "SPECIAL_SERIALIZER_REQUIRES_BEHAVIOURAL_TEST": 30,
+    "WITNESSES_MATCH": 1295
+  }
+}

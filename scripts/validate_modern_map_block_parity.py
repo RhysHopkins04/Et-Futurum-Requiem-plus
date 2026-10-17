@@ -199,8 +199,8 @@ for forbidden in ("WorldGenerator", "IWorldGenerator", "import net.minecraft.ent
 for expected in (
     'private boolean isGrindstone()',
     'if (isGrindstone()) {',
-    'int face = meta / 4;',
-    'int facing = meta & 3;',
+    'GRINDSTONE_SHAPES=workstationShapes(GRINDSTONE_WALL_BOXES,true);',
+    'setWorkstationBounds(world.getBlockMetadata(x,y,z));',
     'if ("grindstone".equals(entry.getRegistryName())) {',
     'state.put("face", faces[face]);',
     'String[] faces = {"floor", "wall", "ceiling"};',
@@ -297,7 +297,7 @@ for expected in (
     'final float thirteen = 13.0F / 16.0F;',
     'world.getBlockMetadata(x, y, z) & 3',
     'int amountBits = world.getBlockMetadata(x, y, z) & 12;',
-    'if (isSegmentedGroundDecal() || isScaffolding() || isPaleOakButton()) return null;',
+    'if (isLectern() || isGrindstone() || isSegmentedGroundDecal() || isScaffolding() || isPaleOakButton()) return null;',
     'style == ModernMapParityBlocks.Style.SHELF',
     'String amountProperty = "wildflowers".equals(registryName) ? "flower_amount" : "segment_amount";',
     'prepared.facingModels[(amount - 1) * 4 + facing] = loadBlockStateModel(entry, state);',
@@ -404,7 +404,7 @@ for expected in (
     'GameRegistry.registerTileEntity(ParitySignTileEntity.class',
     'GameRegistry.registerTileEntity(ParityCampfireTileEntity.class',
     'class ParityCampfireTileEntity extends TileEntity',
-    'private static final int COOK_TIME = 600;',
+    'private static final int COOK_TIME = ganymedes01.etfuturum.recipes.CampfireRecipes.COOK_TIME;',
     'private final ItemStack[] cookingItems = new ItemStack[4];',
     'if (isCandle()) return (meta & 4) != 0 ? ((meta & 3) + 1) * 3 : 0;',
     'if (isCampfire()) return (meta & 4) != 0 ? (isSoulCampfire() ? 10 : 15) : 0;',
@@ -416,6 +416,8 @@ for expected in (
 ):
     if expected not in java:
         failures.append("fidelity-pass-10 mechanics invariant missing: " + expected)
+if 'public static final int COOK_TIME = 600;' not in (ROOT / 'src/main/java/ganymedes01/etfuturum/recipes/CampfireRecipes.java').read_text():
+    failures.append("campfire food cook time must remain 600 ticks")
 for expected in (
     'state.put("candles", Integer.toString(count));',
     'prepared.facingModels[(lit << 2) | (count - 1)]',

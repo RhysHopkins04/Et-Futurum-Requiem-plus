@@ -48,6 +48,8 @@ public final class SmithingRecipeProbe {
             check(output.getItemDamage() == 17 && tag.equals(output.getTagCompound()),
                     "smithing lost damage/custom data");
             check(ItemStack.areItemStacksEqual(before, input), "recipe query changed smithing input");
+            output.getTagCompound().setString("SmithingProbe", "mutated-result");
+            check(ItemStack.areItemStacksEqual(before, input), "smithing result aliases input NBT");
             grid.setInventorySlotContents(1, new ItemStack(Items.gold_ingot));
             check(recipes.findMatchingRecipe(grid, world) == null, "smithing accepted wrong upgrade material");
             grid.setInventorySlotContents(0, ModItems.NETHERITE_INGOT.newItemStack());

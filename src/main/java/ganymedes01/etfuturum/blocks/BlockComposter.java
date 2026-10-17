@@ -73,7 +73,7 @@ public class BlockComposter extends Block implements FakeTileEntityProvider {
 
 	@Override
 	public void addCollisionBoxesToList(World worldIn, int x, int y, int z, AxisAlignedBB mask, List<AxisAlignedBB> list, Entity collider) {
-		this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 0.125F, 1.0F);
+		this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, Math.max(.125F,(1+2*Math.min(7,worldIn.getBlockMetadata(x,y,z)))/16F), 1.0F);
 		super.addCollisionBoxesToList(worldIn, x, y, z, mask, list, collider);
 		float f = 0.125F;
 		this.setBlockBounds(0.0F, 0.0F, 0.0F, f, 1.0F, 1.0F);
@@ -95,17 +95,17 @@ public class BlockComposter extends Block implements FakeTileEntityProvider {
 	public static boolean addToComposter(World world, int x, int y, int z, ItemStack stack) {
 		int chance = CompostingRegistry.getCompostChance(stack);
 		int meta = world.getBlockMetadata(x, y, z);
-		if (chance > 0) {
+		if (!world.isRemote && world.getBlock(x,y,z)==ModBlocks.COMPOSTER.get() && meta<FULL_META && chance > 0 && stack.stackSize>0) {
 			/*
 			 * Takes the chance (which can be up to 600) and multiplies it by 0.01F (same as dividing by 100) to see how many times it passes 100
 			 * Then I wrap it by 100 and check that against the chance to see if we should add one more to the fill level.
 			 */
-			int fillAmount = (int) (chance * .01F) + (world.rand.nextInt(100) < chance % 100 ? 1 : 0);
+			int fillAmount = meta==0 && chance<=100 ? 1 : chance/100 + (world.rand.nextInt(100) < chance % 100 ? 1 : 0);
 			if (fillAmount > 0) {
 				world.setBlockMetadataWithNotify(x, y, z, Math.min(meta + fillAmount, FULL_META), 3);
 				world.playSoundEffect(x + 0.5D, y + 0.5D, z + 0.5D, Tags.MC_ASSET_VER + ":block.composter.fill_success", 1, 1);
 				if (fillAmount + meta >= FULL_META) {
-					world.scheduleBlockUpdate(x, y, z, ModBlocks.COMPOSTER.get(), world.rand.nextInt(10) + 10);
+					world.scheduleBlockUpdate(x, y, z, ModBlocks.COMPOSTER.get(), 20);
 				}
 			} else {
 				world.playSoundEffect(x + 0.5D, y + 0.5D, z + 0.5D, Tags.MC_ASSET_VER + ":block.composter.fill", 1, 1);
@@ -117,7 +117,8 @@ public class BlockComposter extends Block implements FakeTileEntityProvider {
 
 	@Override
 	public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int side, float clickX, float clickY, float clickZ) {
-		int meta = world.getBlockMetadata(x, y, z);
+		if(ganymedes01.etfuturum.api.spectator.SpectatorUtils.isSpectator(player) || !player.capabilities.allowEdit)return false;
+        int meta = world.getBlockMetadata(x, y, z);
 		if (meta < FULL_META) {
 			ItemStack stack = player.getCurrentEquippedItem();
 			int chance = CompostingRegistry.getCompostChance(stack);
@@ -140,9 +141,9 @@ public class BlockComposter extends Block implements FakeTileEntityProvider {
 				item.motionY = 0;
 				item.motionZ = world.rand.nextDouble() * 0.5D;
 				world.spawnEntityInWorld(item);
+                world.setBlockMetadataWithNotify(x,y,z,0,3);
 			}
 			world.playSound(x + 0.5D, y + 0.5D, z + 0.5D, Tags.MC_ASSET_VER + ":block.composter.empty", 1, 1, true);
-			world.setBlockMetadataWithNotify(x, y, z, 0, 3);
 			return true;
 		}
 		return false;
@@ -155,6 +156,12 @@ public class BlockComposter extends Block implements FakeTileEntityProvider {
 			world.setBlockMetadataWithNotify(x, y, z, HARVESTABLE_META, 3);
 		}
 	}
+
+    @Override public boolean hasComparatorInputOverride() { return true; }
+    @Override public int getComparatorInputOverride(World world,int x,int y,int z,int side) { return Math.min(HARVESTABLE_META,world.getBlockMetadata(x,y,z)); }
+    @Override public void onBlockAdded(World world,int x,int y,int z) {
+        if(!world.isRemote && world.getBlockMetadata(x,y,z)==FULL_META)world.scheduleBlockUpdate(x,y,z,this,20);
+    }
 
 	@Override
 	public boolean renderAsNormalBlock() {
@@ -247,21 +254,23 @@ public class BlockComposter extends Block implements FakeTileEntityProvider {
 			return p_94128_1_ == 1 ? SLOTS_SINGLE : SLOTS_NONE;
 		}
 
-		@Override
-		public boolean canInsertItem(int slot, ItemStack p_102007_2_, int side) {
-			return !this.dirty && side == 1 && addToComposter(world, x, y, z, p_102007_2_);
-		}
-
-		@Override
-		public void setInventorySlotContents(int index, ItemStack stack) {
-			markDirty();
-		}
-	}
+        @Override public boolean isItemValidForSlot(int slot,ItemStack stack) {
+            return slot==0 && !dirty && world.getBlock(x,y,z)==ModBlocks.COMPOSTER.get()
+                && world.getBlockMetadata(x,y,z)<FULL_META && CompostingRegistry.getCompostChance(stack)>0;
+        }
+        @Override public boolean canInsertItem(int slot,ItemStack stack,int side) { return side==1 && isItemValidForSlot(slot,stack); }
+        @Override public void setInventorySlotContents(int index,ItemStack stack) {
+            if(index==0 && isItemValidForSlot(index,stack) && addToComposter(world,x,y,z,stack))dirty=true;
+        }
+        // Hopper calls markDirty after committing the inserted stack, not while probing eligibility.
+        @Override public void markDirty() { }
+    }
 
 	static class InventoryFullComposter extends InventoryDummy {
+        private boolean removing;
 		public InventoryFullComposter(World world, int x, int y, int z) {
 			super(world, x, y, z, "composter_full", 1);
-			setInventorySlotContents(0, EtFuturumLootTables.COMPOSTER_LOOT.getOneItem(world.rand));
+			super.setInventorySlotContents(0, EtFuturumLootTables.COMPOSTER_LOOT.getOneItem(world.rand));
 		}
 
 		@Override
@@ -269,14 +278,21 @@ public class BlockComposter extends Block implements FakeTileEntityProvider {
 			return p_94128_1_ == 0 ? SLOTS_SINGLE : SLOTS_NONE;
 		}
 
-		@Override
-		public boolean canExtractItem(int p_102008_1_, ItemStack p_102008_2_, int p_102008_3_) {
-			if (p_102008_3_ == 0) {
-				world.playSound(x + 0.5D, y + 0.5D, z + 0.5D, Tags.MC_ASSET_VER + ":block.composter.empty", 1, 1, true);
-				world.setBlockMetadataWithNotify(x, y, z, 0, 3);
-				return true;
-			}
-			return false;
-		}
-	}
+        @Override public boolean isItemValidForSlot(int slot,ItemStack stack) { return false; }
+        @Override public boolean canExtractItem(int slot,ItemStack stack,int side) {
+            return slot==0 && stack!=null && stack.stackSize>0 && side==0 && !dirty && world.getBlock(x,y,z)==ModBlocks.COMPOSTER.get()
+                && world.getBlockMetadata(x,y,z)==HARVESTABLE_META;
+        }
+        @Override public ItemStack decrStackSize(int slot,int count) {
+            if(!canExtractItem(slot,getStackInSlot(slot),0) || count<=0)return null;
+            removing=true;try { return super.decrStackSize(slot,count); }finally { removing=false; }
+        }
+        @Override public void markDirty() {
+            if(!removing && !dirty && getStackInSlot(0)==null && world.getBlock(x,y,z)==ModBlocks.COMPOSTER.get()
+                && world.getBlockMetadata(x,y,z)==HARVESTABLE_META) {
+                world.setBlockMetadataWithNotify(x,y,z,0,3);
+                world.playSoundEffect(x+.5D,y+.5D,z+.5D,Tags.MC_ASSET_VER+":block.composter.empty",1,1);dirty=true;
+            }
+        }
+    }
 }

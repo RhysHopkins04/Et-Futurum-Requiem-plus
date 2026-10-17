@@ -1,0 +1,253 @@
+{
+  "schema": 1,
+  "vanilla_sha1": "ba2df812c2d12e0219c489c4cd9a5e1f0760f5bd",
+  "templates": [
+    {
+      "name": "netherite_upgrade_smithing_template",
+      "meta": 0,
+      "centers": [
+        "minecraft:netherrack"
+      ],
+      "targets": [
+        {
+          "item": "minecraft:netherrack",
+          "meta": 0
+        }
+      ]
+    },
+    {
+      "name": "sentry_armor_trim_smithing_template",
+      "meta": 1,
+      "centers": [
+        "minecraft:cobblestone"
+      ],
+      "targets": [
+        {
+          "item": "minecraft:cobblestone",
+          "meta": 0
+        }
+      ]
+    },
+    {
+      "name": "dune_armor_trim_smithing_template",
+      "meta": 2,
+      "centers": [
+        "minecraft:sandstone"
+      ],
+      "targets": [
+        {
+          "item": "minecraft:sandstone",
+          "meta": 0
+        }
+      ]
+    },
+    {
+      "name": "coast_armor_trim_smithing_template",
+      "meta": 3,
+      "centers": [
+        "minecraft:cobblestone"
+      ],
+      "targets": [
+        {
+          "item": "minecraft:cobblestone",
+          "meta": 0
+        }
+      ]
+    },
+    {
+      "name": "wild_armor_trim_smithing_template",
+      "meta": 4,
+      "centers": [
+        "minecraft:mossy_cobblestone"
+      ],
+      "targets": [
+        {
+          "item": "minecraft:mossy_cobblestone",
+          "meta": 0
+        }
+      ]
+    },
+    {
+      "name": "ward_armor_trim_smithing_template",
+      "meta": 5,
+      "centers": [
+        "minecraft:cobbled_deepslate"
+      ],
+      "targets": [
+        {
+          "item": "etfuturum:cobbled_deepslate",
+          "meta": 0
+        }
+      ]
+    },
+    {
+      "name": "eye_armor_trim_smithing_template",
+      "meta": 6,
+      "centers": [
+        "minecraft:end_stone"
+      ],
+      "targets": [
+        {
+          "item": "minecraft:end_stone",
+          "meta": 0
+        }
+      ]
+    },
+    {
+      "name": "vex_armor_trim_smithing_template",
+      "meta": 7,
+      "centers": [
+        "minecraft:cobblestone"
+      ],
+      "targets": [
+        {
+          "item": "minecraft:cobblestone",
+          "meta": 0
+        }
+      ]
+    },
+    {
+      "name": "tide_armor_trim_smithing_template",
+      "meta": 8,
+      "centers": [
+        "minecraft:prismarine"
+      ],
+      "targets": [
+        {
+          "item": "etfuturum:prismarine_block",
+          "meta": 0
+        }
+      ]
+    },
+    {
+      "name": "snout_armor_trim_smithing_template",
+      "meta": 9,
+      "centers": [
+        "minecraft:blackstone"
+      ],
+      "targets": [
+        {
+          "item": "etfuturum:blackstone",
+          "meta": 0
+        }
+      ]
+    },
+    {
+      "name": "rib_armor_trim_smithing_template",
+      "meta": 10,
+      "centers": [
+        "minecraft:netherrack"
+      ],
+      "targets": [
+        {
+          "item": "minecraft:netherrack",
+          "meta": 0
+        }
+      ]
+    },
+    {
+      "name": "spire_armor_trim_smithing_template",
+      "meta": 11,
+      "centers": [
+        "minecraft:purpur_block"
+      ],
+      "targets": [
+        {
+          "item": "etfuturum:purpur_block",
+          "meta": 0
+        }
+      ]
+    },
+    {
+      "name": "wayfinder_armor_trim_smithing_template",
+      "meta": 12,
+      "centers": [
+        "minecraft:terracotta"
+      ],
+      "targets": [
+        {
+          "item": "minecraft:hardened_clay",
+          "meta": 0
+        }
+      ]
+    },
+    {
+      "name": "shaper_armor_trim_smithing_template",
+      "meta": 13,
+      "centers": [
+        "minecraft:terracotta"
+      ],
+      "targets": [
+        {
+          "item": "minecraft:hardened_clay",
+          "meta": 0
+        }
+      ]
+    },
+    {
+      "name": "silence_armor_trim_smithing_template",
+      "meta": 14,
+      "centers": [
+        "minecraft:cobbled_deepslate"
+      ],
+      "targets": [
+        {
+          "item": "etfuturum:cobbled_deepslate",
+          "meta": 0
+        }
+      ]
+    },
+    {
+      "name": "raiser_armor_trim_smithing_template",
+      "meta": 15,
+      "centers": [
+        "minecraft:terracotta"
+      ],
+      "targets": [
+        {
+          "item": "minecraft:hardened_clay",
+          "meta": 0
+        }
+      ]
+    },
+    {
+      "name": "host_armor_trim_smithing_template",
+      "meta": 16,
+      "centers": [
+        "minecraft:terracotta"
+      ],
+      "targets": [
+        {
+          "item": "minecraft:hardened_clay",
+          "meta": 0
+        }
+      ]
+    },
+    {
+      "name": "flow_armor_trim_smithing_template",
+      "meta": 17,
+      "centers": [
+        "minecraft:breeze_rod"
+      ],
+      "targets": []
+    },
+    {
+      "name": "bolt_armor_trim_smithing_template",
+      "meta": 18,
+      "centers": [
+        "minecraft:copper_block",
+        "minecraft:waxed_copper_block"
+      ],
+      "targets": [
+        {
+          "item": "etfuturum:copper_block",
+          "meta": 0
+        },
+        {
+          "item": "etfuturum:copper_block",
+          "meta": 8
+        }
+      ]
+    }
+  ]
+}

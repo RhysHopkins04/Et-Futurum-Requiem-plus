@@ -22,6 +22,7 @@ import ganymedes01.etfuturum.network.WoodSignOpenMessage;
 import ganymedes01.etfuturum.recipes.crafting.RecipeDecoratedPot;
 import ganymedes01.etfuturum.tileentities.TileEntityWoodSign;
 import ganymedes01.etfuturum.tileentities.TileEntitySculkRuntime;
+import ganymedes01.etfuturum.tileentities.TileEntityLectern;
 import ganymedes01.etfuturum.world.generate.decorate.WorldGenPass37PaleOakTree;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockChest;
@@ -554,6 +555,8 @@ public enum ModernMapParityBlocks {
         return block;
     }
 
+    private static boolean lecternTileRegistered;
+
     public static void init() {
         if (!ConfigBlocksItems.enableModernMapParityBlocks) return;
         if (!parityChestTileRegistered) {
@@ -618,6 +621,10 @@ public enum ModernMapParityBlocks {
                     Tags.MOD_ID + ":modern_parity_kelp_state");
             parityKelpStateTileRegistered = true;
         }
+        if (!lecternTileRegistered) {
+            GameRegistry.registerTileEntity(TileEntityLectern.class, Tags.MOD_ID+":modern_parity_lectern");
+            lecternTileRegistered=true;
+        }
         ModernPotterySherds.init();
         ModernArchaeology.init();
         for (ModernMapParityBlocks entry : values()) {
@@ -667,8 +674,10 @@ public enum ModernMapParityBlocks {
                 GameRegistry.registerBlock(entry.block, name);
             }
         }
+        if(LECTERN.get()!=null)Blocks.fire.setFireInfo(LECTERN.get(),30,20);
         ModernVegetationItems.init();
-        if (!decoratedPotRecipeRegistered && DECORATED_POT.get() != null) {
+        if (!ganymedes01.etfuturum.configuration.configs.ConfigMapCompatibility.mapCompatibilityMode
+                && !decoratedPotRecipeRegistered && DECORATED_POT.get() != null) {
             RecipeSorter.register(Tags.MOD_ID + ".RecipeDecoratedPot", RecipeDecoratedPot.class,
                     RecipeSorter.Category.SHAPED, "after:minecraft:shaped");
             CraftingManager.getInstance().getRecipeList().add(new RecipeDecoratedPot());
@@ -788,6 +797,25 @@ public enum ModernMapParityBlocks {
 
     public Block getDoubleSlab() {
         return doubleSlabBlock;
+    }
+
+    /** Candle cakes are world interactions, not crafting-grid products. */
+    public static ModernMapParityBlocks candleCakeFor(ModernMapParityBlocks candle) {
+        if (candle == null || candle.style != Style.CANDLE) return null;
+        return valueOf(candle.name() + "_CAKE");
+    }
+
+    public static boolean addCandleToCake(World world, int x, int y, int z, EntityPlayer player) {
+        if (player == null || world.getBlock(x,y,z) != Blocks.cake || world.getBlockMetadata(x,y,z) != 0) return false;
+        ItemStack held = player.getHeldItem();
+        if (held == null || !player.canPlayerEdit(x,y,z,1,held)) return false;
+        ModernMapParityBlocks cake = candleCakeFor(fromBlock(Block.getBlockFromItem(held.getItem())));
+        if (cake == null || cake.get() == null) return false;
+        if (!world.isRemote && world.setBlock(x,y,z,cake.get(),0,3)) {
+            if (!player.capabilities.isCreativeMode && --held.stackSize <= 0) player.inventory.setInventorySlotContents(player.inventory.currentItem,null);
+            world.playSoundEffect(x+.5D,y+.5D,z+.5D,Tags.MC_ASSET_VER+":block.candle.place",1,1);
+        }
+        return true;
     }
 
     public static ModernMapParityBlocks fromBlock(Block block) {
@@ -1581,7 +1609,7 @@ public enum ModernMapParityBlocks {
      * accumulated lit time, persistent progress, and item ejection on completion.
      */
     public static final class ParityCampfireTileEntity extends TileEntity {
-        private static final int COOK_TIME = 600;
+        private static final int COOK_TIME = ganymedes01.etfuturum.recipes.CampfireRecipes.COOK_TIME;
         private final ItemStack[] cookingItems = new ItemStack[4];
         private final int[] cookingTimes = new int[4];
 
@@ -1590,8 +1618,8 @@ public enum ModernMapParityBlocks {
         }
 
         public boolean addCookingItem(ItemStack input) {
-            if (input == null || input.getItem() == null || !(input.getItem() instanceof ItemFood)) return false;
-            ItemStack result = FurnaceRecipes.smelting().getSmeltingResult(input);
+            if (input == null || input.getItem() == null) return false;
+            ItemStack result = ganymedes01.etfuturum.recipes.CampfireRecipes.getCookingResult(input);
             if (result == null) return false;
             for (int i = 0; i < cookingItems.length; i++) {
                 if (cookingItems[i] == null) {
@@ -1620,7 +1648,7 @@ public enum ModernMapParityBlocks {
                 cookingTimes[i]++;
                 if (cookingTimes[i] < COOK_TIME) continue;
 
-                ItemStack result = FurnaceRecipes.smelting().getSmeltingResult(input);
+                ItemStack result = ganymedes01.etfuturum.recipes.CampfireRecipes.getCookingResult(input);
                 if (result == null) result = input.copy();
                 else result = result.copy();
                 EntityItem entity = new EntityItem(worldObj, xCoord + 0.5D, yCoord + 0.55D, zCoord + 0.5D, result);
@@ -2073,23 +2101,8 @@ public enum ModernMapParityBlocks {
         }
     }
 
-    /** Pass 35 Crafter TE stores only model-affecting booleans; no inventory/crafting logic is introduced. */
-    public static final class ParityCrafterStateTileEntity extends TileEntity {
-        private boolean triggered;
-        private boolean crafting;
-        public boolean isTriggered() { return triggered; }
-        public boolean isCrafting() { return crafting; }
-        public int getVisualFlags() { return (triggered ? 1 : 0) | (crafting ? 2 : 0); }
-        public void setVisualState(boolean triggered, boolean crafting) {
-            if (this.triggered == triggered && this.crafting == crafting) return;
-            this.triggered=triggered; this.crafting=crafting; sync();
-        }
-        private void sync() { markDirty(); if (worldObj != null) worldObj.markBlockForUpdate(xCoord,yCoord,zCoord); }
-        @Override public void writeToNBT(NBTTagCompound tag) { super.writeToNBT(tag); tag.setBoolean("Triggered",triggered); tag.setBoolean("Crafting",crafting); }
-        @Override public void readFromNBT(NBTTagCompound tag) { super.readFromNBT(tag); triggered=tag.getBoolean("Triggered"); crafting=tag.getBoolean("Crafting"); }
-        @Override public Packet getDescriptionPacket() { NBTTagCompound tag=new NBTTagCompound(); writeToNBT(tag); return new S35PacketUpdateTileEntity(xCoord,yCoord,zCoord,35,tag); }
-        @Override public void onDataPacket(NetworkManager network, S35PacketUpdateTileEntity packet) { readFromNBT(packet.func_148857_g()); if (worldObj != null) worldObj.markBlockForUpdate(xCoord,yCoord,zCoord); }
-    }
+    /** Keep the registered/imported Pass-35 identity while adding the operational inventory. */
+    public static final class ParityCrafterStateTileEntity extends ganymedes01.etfuturum.tileentities.TileEntityCrafter {}
 
     /** Legacy read compatibility only; Anvil migration removes these before TE allocation. */
     public static final class ParityKelpStateTileEntity extends TileEntity {
@@ -2227,6 +2240,8 @@ public enum ModernMapParityBlocks {
             setHardness(isScaffolding() ? 0.0F : isDecoratedPot() ? 0.0F
                     : entry.material == Material.wood ? 2.0F : entry.material == Material.plants ? 0.0F : 1.5F);
             setResistance(entry.material == Material.plants || isScaffolding() ? 0.0F : 5.0F);
+            if(isLectern()) { setHardness(2.5F);setResistance(25F/6F);setHarvestLevel("axe",0); }
+            if(isGrindstone()) { setHardness(2F);setResistance(10F);setHarvestLevel("pickaxe",0); }
             if (isScaffolding()) {
                 // Modern scaffolding breaks essentially instantly even by hand and has its own
                 // bamboo/scaffolding acoustic family rather than generic 1.7 wood sounds.
@@ -2258,6 +2273,40 @@ public enum ModernMapParityBlocks {
         private boolean isFenceGate() {
             return entry.style == Style.FENCE_GATE;
         }
+
+        // 1.21.11 numeric VoxelShape facts, in wall/north orientation for the grindstone.
+        private static final float[][] GRINDSTONE_WALL_BOXES={
+            {2,6,7,4,10,16},{2,5,3,4,11,9},{12,6,7,14,10,16},{12,5,3,14,11,9},{4,2,0,12,14,12}
+        };
+        private static final float[][] LECTERN_OUTLINE_BOXES={
+            {0,0,0,16,2,16},{4,2,4,12,14,12},
+            {0,10,1,16,14,5.333333F},{0,12,5.333333F,16,16,9.666667F},{0,14,9.666667F,16,18,14}
+        };
+        private static final float[][][] GRINDSTONE_SHAPES=workstationShapes(GRINDSTONE_WALL_BOXES,true);
+        private static final float[][][] LECTERN_SHAPES=workstationShapes(LECTERN_OUTLINE_BOXES,false);
+        private static float[][][] workstationShapes(float[][] source,boolean attached) {
+            float[][][] result=new float[attached?12:4][source.length][6];
+            for(int state=0;state<result.length;state++)for(int b=0;b<source.length;b++) {
+                float[] bounds=result[state][b];java.util.Arrays.fill(bounds,0,3,Float.POSITIVE_INFINITY);java.util.Arrays.fill(bounds,3,6,Float.NEGATIVE_INFINITY);
+                for(int vertex=0;vertex<8;vertex++) {
+                    float px=source[b][(vertex&1)==0?0:3]/16F,py=source[b][(vertex&2)==0?1:4]/16F,pz=source[b][(vertex&4)==0?2:5]/16F;
+                    if(attached && state/4==0) { float oldY=py;py=1-pz;pz=oldY; }
+                    else if(attached && state/4==2) { float oldY=py;py=pz;pz=1-oldY; }
+                    for(int rotate=0;rotate<(state&3);rotate++) { float oldX=px;px=1-pz;pz=oldX; }
+                    bounds[0]=Math.min(bounds[0],px);bounds[1]=Math.min(bounds[1],py);bounds[2]=Math.min(bounds[2],pz);
+                    bounds[3]=Math.max(bounds[3],px);bounds[4]=Math.max(bounds[4],py);bounds[5]=Math.max(bounds[5],pz);
+                }
+            }
+            return result;
+        }
+        private float[][] workstationOutline(int meta) { return isLectern()?LECTERN_SHAPES[meta&3]:GRINDSTONE_SHAPES[(meta&15)<12?meta&15:0]; }
+        private void setWorkstationBounds(int meta) {
+            float minX=1,minY=2,minZ=1,maxX=0,maxY=0,maxZ=0;
+            for(float[] box:workstationOutline(meta)) { minX=Math.min(minX,box[0]);minY=Math.min(minY,box[1]);minZ=Math.min(minZ,box[2]);maxX=Math.max(maxX,box[3]);maxY=Math.max(maxY,box[4]);maxZ=Math.max(maxZ,box[5]); }
+            setBlockBounds(minX,minY,minZ,maxX,maxY,maxZ);
+        }
+
+        private boolean isLectern() { return "lectern".equals(entry.getRegistryName()); }
 
         private boolean isGrindstone() {
             return "grindstone".equals(entry.getRegistryName());
@@ -3267,22 +3316,7 @@ public enum ModernMapParityBlocks {
                 }
                 return;
             }
-            if (isGrindstone()) {
-                int meta = world.getBlockMetadata(x, y, z) & 15;
-                int face = meta / 4;
-                int facing = meta & 3;
-                if (face == 0) { // floor
-                    if (facing == 1 || facing == 3) setBlockBounds(0.0F,0.0F,0.125F,1.0F,0.75F,0.875F);
-                    else setBlockBounds(0.125F,0.0F,0.0F,0.875F,0.75F,1.0F);
-                } else if (face == 2) { // ceiling
-                    if (facing == 1 || facing == 3) setBlockBounds(0.0F,0.25F,0.125F,1.0F,1.0F,0.875F);
-                    else setBlockBounds(0.125F,0.25F,0.0F,0.875F,1.0F,1.0F);
-                } else { // wall
-                    if (facing == 1 || facing == 3) setBlockBounds(0.0F,0.125F,0.125F,0.75F,0.875F,0.875F);
-                    else setBlockBounds(0.125F,0.125F,0.0F,0.875F,0.875F,0.75F);
-                }
-                return;
-            }
+            if (isLectern() || isGrindstone()) { setWorkstationBounds(world.getBlockMetadata(x,y,z));return; }
             if (isLightningRod()) {
                 int facing = world.getBlockMetadata(x, y, z) & 7;
                 if (facing == 2 || facing == 3) setBlockBounds(0.375F,0.375F,0.0F,0.625F,0.625F,1.0F);
@@ -3614,8 +3648,12 @@ public enum ModernMapParityBlocks {
             if (isCrafter()) {
                 // Preserve importer-supplied vertical FrontAndTop states; normal horizontal placement
                 // uses the player's cardinal direction with TOP=up.
-                int[] horizontal = {6, 11, 5, 4}; // south_up, west_up, north_up, east_up for S/W/N/E placer quadrants
-                world.setBlockMetadataWithNotify(x,y,z,horizontal[quadrant],2);
+                int[] horizontal = {5,4,6,11}; // front opposes the placing player's look direction
+                int facing=horizontal[quadrant];
+                if(placer.rotationPitch>45) { int[] up={9,10,8,7};facing=up[quadrant]; }
+                else if(placer.rotationPitch< -45) { int[] down={1,0,2,3};facing=down[quadrant]; }
+                world.setBlockMetadataWithNotify(x,y,z,facing,2);
+                TileEntity tile=world.getTileEntity(x,y,z);if(tile instanceof ParityCrafterStateTileEntity)((ParityCrafterStateTileEntity)tile).powerChanged();
                 return;
             }
             if (isBell()) {
@@ -3743,6 +3781,9 @@ public enum ModernMapParityBlocks {
                 world.scheduleBlockUpdate(x, y, z, this, 1);
                 return;
             }
+            if (isLectern()) {
+                world.setBlockMetadataWithNotify(x,y,z,quadrant,2);return;
+            }
             if (isGrindstone()) {
                 int meta = world.getBlockMetadata(x, y, z) & 15;
                 int faceBase = (meta / 4) * 4;
@@ -3798,7 +3839,7 @@ public enum ModernMapParityBlocks {
 
         private static void syncPlayerInventory(EntityPlayer player) {
             player.inventoryContainer.detectAndSendChanges();
-            if (player instanceof EntityPlayerMP) {
+            if (player instanceof EntityPlayerMP && ((EntityPlayerMP)player).playerNetServerHandler!=null) {
                 ((EntityPlayerMP) player).sendContainerToPlayer(player.inventoryContainer);
             }
         }
@@ -3888,6 +3929,32 @@ public enum ModernMapParityBlocks {
         public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int side,
                 float hitX, float hitY, float hitZ) {
             ItemStack held = player.getHeldItem();
+            if (isGrindstone()) {
+                if (!ganymedes01.etfuturum.recipes.GrindstoneRecipes.enabled() || ganymedes01.etfuturum.api.spectator.SpectatorUtils.isSpectator(player)) return false;
+                if (!world.isRemote) player.openGui(EtFuturum.instance,ganymedes01.etfuturum.lib.GUIIDs.GRINDSTONE,world,x,y,z);
+                return true;
+            }
+            if(isCrafter()) {
+                if(!ganymedes01.etfuturum.tileentities.TileEntityCrafter.enabled() || ganymedes01.etfuturum.api.spectator.SpectatorUtils.isSpectator(player))return false;
+                if(!world.isRemote)player.openGui(EtFuturum.instance,ganymedes01.etfuturum.lib.GUIIDs.CRAFTER,world,x,y,z);
+                return true;
+            }
+            if (isLectern()) {
+                if (!TileEntityLectern.enabled()) return false;
+                TileEntity tile=world.getTileEntity(x,y,z);
+                if (!(tile instanceof TileEntityLectern)) return false;
+                TileEntityLectern lectern=(TileEntityLectern)tile;
+                if (!lectern.hasBook()) {
+                    if (!TileEntityLectern.accepts(held) || !player.capabilities.allowEdit || ganymedes01.etfuturum.api.spectator.SpectatorUtils.isSpectator(player)) return false;
+                    if (!world.isRemote && lectern.insert(held) && !player.capabilities.isCreativeMode) {
+                        if (--held.stackSize<=0)player.inventory.setInventorySlotContents(player.inventory.currentItem,null);
+                        syncPlayerInventory(player);
+                    }
+                    return true;
+                }
+                if (!world.isRemote) player.openGui(EtFuturum.instance,ganymedes01.etfuturum.lib.GUIIDs.LECTERN,world,x,y,z);
+                return true;
+            }
 
             if (isPass36CopperLifecycle()) {
                 if (((IDegradable) this).tryWaxOnWaxOff(world, x, y, z, player)) return true;
@@ -4190,10 +4257,19 @@ public enum ModernMapParityBlocks {
                     }
                     return true;
                 }
-                if (lit && held == null) {
+                if (lit && held == null && hitY > 0.5F) {
                     if (!world.isRemote) {
                         setMetadataAndRelight(world, x, y, z, 0);
                         playModernSound(world, x, y, z, "block.candle.extinguish", 1.0F, 1.0F);
+                    }
+                    return true;
+                }
+                if (player.canEat(false)) {
+                    if (!world.isRemote) {
+                        player.getFoodStats().addStats(2,0.1F);
+                        ModernMapParityBlocks candle = ModernMapParityBlocks.valueOf(entry.name().substring(0,entry.name().length()-5));
+                        if (candle.get() != null) dropBlockAsItem(world,x,y,z,new ItemStack(candle.get()));
+                        world.setBlock(x,y,z,Blocks.cake,1,3);
                     }
                     return true;
                 }
@@ -4234,7 +4310,7 @@ public enum ModernMapParityBlocks {
                     }
                     return true;
                 }
-                if (lit && held != null && held.getItem() instanceof ItemFood) {
+                if (held != null && ganymedes01.etfuturum.recipes.CampfireRecipes.getCookingResult(held) != null) {
                     TileEntity tile = world.getTileEntity(x, y, z);
                     if (!(tile instanceof ParityCampfireTileEntity)) return false;
                     if (world.isRemote) return true;
@@ -4532,7 +4608,7 @@ public enum ModernMapParityBlocks {
         @Override
         public int damageDropped(int meta) {
             if (isCopperGolemStatue()) return meta & 15;
-            return (isKelp() || isKelpPlant() || isSegmentedGroundDecal() || isCandle() || isTurtleEgg() || isCampfire() || isScaffolding()
+            return (isLectern() || isGrindstone() || isKelp() || isKelpPlant() || isSegmentedGroundDecal() || isCandle() || isTurtleEgg() || isCampfire() || isScaffolding()
                     || isFroglight() || isCopperChain() || isCopperLantern() || isShelf() || isChiseledBookshelf()
                     || isDecoratedPot() || isAxisLog() || isMultiface() || isPaleOakButton() || isCopperTorch()
                     || isPaleMossCarpet() || isPaleHangingMoss() || isCreakingHeart() || isDriedGhast()
@@ -4545,7 +4621,7 @@ public enum ModernMapParityBlocks {
         @Override
         public int getDamageValue(World world, int x, int y, int z) {
             if (isCopperGolemStatue()) return world.getBlockMetadata(x,y,z) & 15;
-            return (isKelp() || isKelpPlant() || isSegmentedGroundDecal() || isCandle() || isTurtleEgg() || isCampfire() || isScaffolding()
+            return (isLectern() || isGrindstone() || isKelp() || isKelpPlant() || isSegmentedGroundDecal() || isCandle() || isTurtleEgg() || isCampfire() || isScaffolding()
                     || isFroglight() || isCopperChain() || isCopperLantern() || isShelf() || isChiseledBookshelf()
                     || isDecoratedPot() || isAxisLog() || isMultiface() || isPaleOakButton() || isCopperTorch()
                     || isPaleMossCarpet() || isPaleHangingMoss() || isCreakingHeart() || isDriedGhast()
@@ -4557,7 +4633,7 @@ public enum ModernMapParityBlocks {
 
         @Override
         public boolean hasTileEntity(int metadata) {
-            return isSign() || isHangingSign() || isCampfire() || isChiseledBookshelf()
+            return isLectern() || isSign() || isHangingSign() || isCampfire() || isChiseledBookshelf()
                     || isDecoratedPot() || isShelf() || isSuspicious() || isMultiface() || isPaleOakButton()
                     || isPaleMossCarpet() || isVault() || isCrafter()
                     || isSculkSensor() || isCalibratedSculkSensor() || isSculkShrieker();
@@ -4565,6 +4641,7 @@ public enum ModernMapParityBlocks {
 
         @Override
         public TileEntity createTileEntity(World world, int metadata) {
+            if (isLectern()) return new TileEntityLectern();
             if (isSign() || isHangingSign()) return new ParitySignTileEntity();
             if (isCampfire()) return new ParityCampfireTileEntity();
             if (isChiseledBookshelf()) return new ParityChiseledBookshelfTileEntity();
@@ -4587,13 +4664,15 @@ public enum ModernMapParityBlocks {
 
         @Override
         public boolean hasComparatorInputOverride() {
-            return isCopperGolemStatue() || isDecoratedPot() || isShelf() || isChiseledBookshelf()
+            return isCrafter() || isLectern() || isCopperGolemStatue() || isDecoratedPot() || isShelf() || isChiseledBookshelf()
                     || isSculkSensor() || isCalibratedSculkSensor() || super.hasComparatorInputOverride();
         }
 
         @Override
         public int getComparatorInputOverride(World world, int x, int y, int z, int side) {
             TileEntity tile = world.getTileEntity(x, y, z);
+            if(isCrafter())return tile instanceof ParityCrafterStateTileEntity?((ParityCrafterStateTileEntity)tile).comparator():0;
+            if (isLectern()) return tile instanceof TileEntityLectern?((TileEntityLectern)tile).comparator():0;
             if (isCopperGolemStatue()) return ((world.getBlockMetadata(x, y, z) >> 2) & 3) + 1;
             if (isChiseledBookshelf()) {
                 if (!(tile instanceof ParityChiseledBookshelfTileEntity)) return 0;
@@ -4859,6 +4938,7 @@ public enum ModernMapParityBlocks {
         @Override
         public void onBlockAdded(World world, int x, int y, int z) {
             super.onBlockAdded(world, x, y, z);
+            if(isCrafter()) { TileEntity tile=world.getTileEntity(x,y,z);if(tile instanceof ParityCrafterStateTileEntity)((ParityCrafterStateTileEntity)tile).powerChanged();return; }
             if (isTrialSpawner() || isVault()) world.updateLightByType(EnumSkyBlock.Block, x, y, z);
             if (isSuspicious()) world.scheduleBlockUpdate(x, y, z, this, 2);
             if (isLiveCoral()) scheduleCoralDeath(world,x,y,z);
@@ -4905,6 +4985,7 @@ public enum ModernMapParityBlocks {
 
         @Override
         public void onNeighborBlockChange(World world, int x, int y, int z, Block neighbor) {
+            if(isCrafter()) { TileEntity tile=world.getTileEntity(x,y,z);if(tile instanceof ParityCrafterStateTileEntity)((ParityCrafterStateTileEntity)tile).powerChanged();return; }
             if (!world.isRemote && containsWater(world,x,y,z)) world.scheduleBlockUpdate(x,y,z,this,5);
             if (isMultiface()) {
                 if (!world.isRemote) {
@@ -5080,6 +5161,15 @@ public enum ModernMapParityBlocks {
 
         @Override
         public void updateTick(World world, int x, int y, int z, Random random) {
+            if(isCrafter()) { TileEntity tile=world.getTileEntity(x,y,z);if(tile instanceof ParityCrafterStateTileEntity)((ParityCrafterStateTileEntity)tile).craft();return; }
+            if (isLectern()) {
+                int meta=world.getBlockMetadata(x,y,z);
+                if ((meta&4)!=0) {
+                    world.setBlockMetadataWithNotify(x,y,z,meta&~4,3);
+                    world.notifyBlocksOfNeighborChange(x,y-1,z,this);
+                }
+                return;
+            }
             if (isKelp()) {
                 if (!world.isRemote && getKelpAge(world,x,y,z)<25 && random.nextDouble()<0.14D) growKelpOne(world,x,y,z);
                 return;
@@ -5351,6 +5441,12 @@ public enum ModernMapParityBlocks {
 
         @Override
         public void breakBlock(World world, int x, int y, int z, Block block, int meta) {
+            if(isCrafter() && !world.isRemote) { TileEntity tile=world.getTileEntity(x,y,z);if(tile instanceof ParityCrafterStateTileEntity)((ParityCrafterStateTileEntity)tile).dropContents();world.func_147453_f(x,y,z,this); }
+            if (isLectern() && !world.isRemote) {
+                TileEntity tile=world.getTileEntity(x,y,z);
+                if (tile instanceof TileEntityLectern)((TileEntityLectern)tile).dropBook();
+                if ((meta&4)!=0)world.notifyBlocksOfNeighborChange(x,y-1,z,this);
+            }
             boolean promotePaleHangingMossTip = isPaleHangingMoss() && !world.isRemote
                     && world.getBlock(x, y + 1, z) == this;
             boolean internalKelpReplace = Boolean.TRUE.equals(PASS37_INTERNAL_KELP_REPLACE.get());
@@ -5417,6 +5513,12 @@ public enum ModernMapParityBlocks {
 
         @Override
         public ArrayList<ItemStack> getDrops(World world, int x, int y, int z, int metadata, int fortune) {
+            if (isCandleCake()) {
+                ArrayList<ItemStack> drops=new ArrayList<>();
+                ModernMapParityBlocks candle=valueOf(entry.name().substring(0,entry.name().length()-5));
+                if(candle.get()!=null)drops.add(new ItemStack(candle.get()));
+                return drops;
+            }
             if (isPitcherCrop()) {
                 ArrayList<ItemStack> drops=new ArrayList<ItemStack>();
                 int meta=metadata&15;
@@ -5520,7 +5622,7 @@ public enum ModernMapParityBlocks {
         }
 
         @Override public boolean canProvidePower() {
-            return isSculkSensor() || isCalibratedSculkSensor() || isPaleOakButton() || super.canProvidePower();
+            return isLectern() || isSculkSensor() || isCalibratedSculkSensor() || isPaleOakButton() || super.canProvidePower();
         }
         private int calibratedSculkInputPowerSide(IBlockAccess world, int x, int y, int z) {
             int facing = world.getBlockMetadata(x, y, z) & 3;
@@ -5532,6 +5634,7 @@ public enum ModernMapParityBlocks {
         }
 
         @Override public int isProvidingWeakPower(IBlockAccess world, int x, int y, int z, int side) {
+            if (isLectern())return (world.getBlockMetadata(x,y,z)&4)!=0?15:0;
             if (isSculkSensor() || isCalibratedSculkSensor()) {
                 if (isCalibratedSculkSensor() && side == calibratedSculkInputPowerSide(world, x, y, z)) return 0;
                 TileEntity te=world.getTileEntity(x,y,z);
@@ -5540,6 +5643,7 @@ public enum ModernMapParityBlocks {
             return isPaleOakButton() && buttonPowered(world, x, y, z) ? 15 : super.isProvidingWeakPower(world, x, y, z, side);
         }
         @Override public int isProvidingStrongPower(IBlockAccess world, int x, int y, int z, int side) {
+            if (isLectern())return side==1 && (world.getBlockMetadata(x,y,z)&4)!=0?15:0;
             if (isSculkSensor() || isCalibratedSculkSensor()) {
                 TileEntity te=world.getTileEntity(x,y,z);
                 return side==1 && te instanceof TileEntitySculkRuntime ? ((TileEntitySculkRuntime)te).getPower() : 0;
@@ -5569,6 +5673,13 @@ public enum ModernMapParityBlocks {
         @Override
         public void addCollisionBoxesToList(World world, int x, int y, int z, AxisAlignedBB mask,
                 List<AxisAlignedBB> list, Entity collider) {
+            if(isGrindstone()) {
+                for(float[] box:workstationOutline(world.getBlockMetadata(x,y,z)))addCollisionBox(mask,list,x,y,z,box[0],box[1],box[2],box[3],box[4],box[5]);return;
+            }
+            if (isLectern()) {
+                addCollisionBox(mask,list,x,y,z,0,0,0,1,.125F,1);
+                addCollisionBox(mask,list,x,y,z,.25F,.125F,.25F,.75F,.875F,.75F);return;
+            }
             if (entry.style == Style.PLANT || entry.style == Style.WALL_PLANT || entry.style == Style.VINE
                     || isSegmentedGroundDecal() || isPaleOakButton() || isCopperTorch()) return;
             if (isScaffolding()) {
@@ -5654,6 +5765,16 @@ public enum ModernMapParityBlocks {
 
         @Override
         public MovingObjectPosition collisionRayTrace(World world, int x, int y, int z, Vec3 start, Vec3 end) {
+            if(isLectern() || isGrindstone()) {
+                MovingObjectPosition closest=null;double nearest=Double.MAX_VALUE;
+                for(float[] box:workstationOutline(world.getBlockMetadata(x,y,z))) {
+                    MovingObjectPosition hit=AxisAlignedBB.getBoundingBox(x+box[0],y+box[1],z+box[2],x+box[3],y+box[4],z+box[5]).calculateIntercept(start,end);
+                    if(hit!=null && start.squareDistanceTo(hit.hitVec)<nearest) {
+                        nearest=start.squareDistanceTo(hit.hitVec);closest=new MovingObjectPosition(x,y,z,hit.sideHit,hit.hitVec);
+                    }
+                }
+                return closest;
+            }
             if (!isMultiface()) return super.collisionRayTrace(world, x, y, z, start, end);
             int mask = getMultifaceFaceMask(world, x, y, z);
             MovingObjectPosition closest = null;
@@ -5714,7 +5835,7 @@ public enum ModernMapParityBlocks {
         }
 
         @Override public AxisAlignedBB getCollisionBoundingBoxFromPool(World world, int x, int y, int z) {
-            if (isSegmentedGroundDecal() || isScaffolding() || isPaleOakButton()) return null;
+            if (isLectern() || isGrindstone() || isSegmentedGroundDecal() || isScaffolding() || isPaleOakButton()) return null;
             if (isPaleMossCarpet()) {
                 TileEntity tile = world.getTileEntity(x, y, z);
                 if (tile instanceof ParityPaleMossCarpetTileEntity

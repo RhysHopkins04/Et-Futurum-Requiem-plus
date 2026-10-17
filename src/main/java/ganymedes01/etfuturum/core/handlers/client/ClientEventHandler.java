@@ -97,6 +97,14 @@ import java.lang.ref.WeakReference;
 import java.util.*;
 
 public class ClientEventHandler {
+    @cpw.mods.fml.common.eventhandler.SubscribeEvent
+    public void armorTrimTooltip(net.minecraftforge.event.entity.player.ItemTooltipEvent event) {
+        net.minecraft.nbt.NBTTagCompound trim=ganymedes01.etfuturum.recipes.ModernSmithingRecipes.trim(event.itemStack);
+        if(trim!=null) {
+            event.toolTip.add(net.minecraft.util.EnumChatFormatting.GRAY+net.minecraft.client.resources.I18n.format("efr.trim."+trim.getString("pattern").replace("minecraft:","")));
+            event.toolTip.add(net.minecraft.util.EnumChatFormatting.GRAY+net.minecraft.client.resources.I18n.format("efr.trim.material."+trim.getString("material").replace("minecraft:","")));
+        }
+    }
 
 	public static final ClientEventHandler INSTANCE = new ClientEventHandler();
 	private final Minecraft mc = FMLClientHandler.instance().getClient();

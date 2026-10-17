@@ -395,6 +395,7 @@ public class BlockShulkerBox extends BlockContainer {
 	@Override
 	public void getSubBlocks(Item item, CreativeTabs tab, List<ItemStack> subItems) {
 		for (byte i = 0; i < (ConfigModCompat.shulkerBoxesIronChest ? ShulkerBoxType.VALUES.length : 1); i++) {
+            if(i>0 && !CompatIronChests.tierExists(ShulkerBoxType.VALUES[i].name())) continue;
 			for (byte j = 0; j < (ConfigBlocksItems.enableDyedShulkerBoxes ? 17 : 1); j++) {
 
 				NBTTagCompound tag = new NBTTagCompound();

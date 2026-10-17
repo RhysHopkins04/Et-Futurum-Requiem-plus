@@ -67,6 +67,10 @@ public class EtFuturumEarlyMixins implements IFMLLoadingPlugin, IEarlyMixinLoade
 
 		List<String> mixins = new ObjectArrayList<>();
 
+		mixins.add("cartography.MixinMapData");
+        mixins.add("cartography.MixinItemMap");
+        mixins.add("cartography.MixinRecipesMapExtending");
+
 		// Pass 32c: explicit modern single/left/right chest relationships. Runtime methods
 		// self-gate on enableModernMapParityBlocks so disabling the parity layer preserves 1.7 behavior.
 		mixins.add("chestpairing.MixinTileEntity");
@@ -286,6 +290,9 @@ public class EtFuturumEarlyMixins implements IFMLLoadingPlugin, IEarlyMixinLoade
 		}
 
 		if (side == MixinEnvironment.Side.CLIENT) {
+            mixins.add("bookinput.client.MixinGuiScreenBook");
+            mixins.add("armortrim.client.MixinArmorLayers");
+            mixins.add("armortrim.client.MixinTrimIcons");
 			if (ConfigMixins.dustUnderFallingBlocks) {
 				mixins.add("blockfallingparticles.client.MixinBlockFalling");
 			}

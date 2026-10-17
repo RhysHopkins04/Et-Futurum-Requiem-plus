@@ -96,18 +96,18 @@ def has_pass32_contract(name, style):
             or name.endswith("copper_chest"))
 
 VISUAL_SHELL_GAPS = {
-    "crafter": "No inventory, disabled-slot, recipe, redstone craft or block-entity implementation.",
+    "crafter": "Persistent nine-slot inventory, disabled slots, balanced automation, four-tick rising-edge recipes/remainders and comparator are implemented. Source item-stack translation remains Backporter work.",
     "trial_spawner": "No trial-spawner phase, cooldown, reward or block-entity implementation.",
     "vault": "No vault state machine, player interaction data or block-entity implementation.",
     "conduit": "No structure detection, activation, range, effects or target behaviour.",
     "bell": "No attachment state, ringing interaction, redstone response or animation state.",
-    "lectern": "No stored book, page, GUI, comparator or redstone-pulse implementation.",
-    "grindstone": "Orientation models exist; repair/disenchant GUI and XP mechanics do not.",
+    "lectern": "Book/page persistence, reading/link GUI, comparator and two-tick pulse are implemented; villager job-site behaviour and source-book translation remain separate work.",
+    "grindstone": "Repair/disenchant container, XP, registered-curse retention and exact multipart shapes are implemented; new curse enchantments themselves are not introduced.",
     "respawn_anchor": "No charges, dimension respawn, explosion or comparator implementation.",
     "sculk_sensor": "Pass 38 implements bounded vibration travel, phase timing, redstone and comparator frequency output; Warden is unrelated/deferred.",
     "calibrated_sculk_sensor": "Pass 38 implements facing-relative calibration filtering, vibration lifecycle and redstone output.",
     "sculk_shrieker": "Pass 38 implements player-triggered shrieking and warning state through the explicit pre-Warden boundary; Warden spawning/entity behaviour remains deferred.",
-    "powder_snow": "No sinking, leather-boots collision, freezing or bucket behaviour.",
+    "powder_snow": "Collision, leather boots, freezing, bucket pickup and persistence have scoped modern-state runtime coverage; complete gameplay parity is not implied.",
     "frogspawn": "No water-surface survival or hatch lifecycle.",
 }
 
@@ -136,7 +136,6 @@ def concrete_class(name, style):
 
 def existing_efr_equivalent(name):
     known = {
-        "lodestone": "ModBlocks.LODESTONE / BlockLodestone",
         "lightning_rod": "ModBlocks.LIGHTNING_ROD / BlockLightningRod",
         "mangrove_propagule": "ModBlocks.SAPLING metadata 0 / BlockModernSapling",
         "mangrove_leaves": "ModBlocks.LEAVES metadata 0 / BlockModernLeaves",
@@ -156,6 +155,10 @@ def is_copper_weathering_family(name):
 
 
 def profile_for(name, style):
+    if name=="crafter":return "CRAFTER_RUNTIME_VERIFIED"
+    if name in {"lectern","grindstone"}:return "WORKSTATION_RUNTIME_VERIFIED"
+    if name == "powder_snow":
+        return "MODERN_STATE_RUNTIME_VERIFIED"
     if name in PASS_38_SCULK_NAMES:
         return "PASS_38_SCULK_GAMEPLAY"
     if is_pass37_vegetation(name):
@@ -261,6 +264,26 @@ def row_for(entry):
         "review_status": "REQUIRES_EXACT_1_21_11_AUDIT",
         "known_difference": gap_for(name, style, profile),
     }
+
+    if profile == "CRAFTER_RUNTIME_VERIFIED":
+        row.update({"function":"Persistent automated crafting, balanced insertion, disabled slots and comparator",
+            "blockstate":"Existing 12 FrontAndTop orientations; Triggered/Crafting visual flags remain in the same TE",
+            "nbt":"Items, disabled_slots, Triggered, Crafting and crafting_ticks_remaining; old visual-only NBT reads safely",
+            "map_import":"Existing registry/TE/metadata contract retained; source ItemStack translation remains separate",
+            "review_status":"CRAFTER_RUNTIME_VERIFIED","known_difference":VISUAL_SHELL_GAPS[name]})
+    if profile == "WORKSTATION_RUNTIME_VERIFIED":
+        row.update({"function": "Shared book/page/comparator/pulse and opt-in link handling" if name=="lectern" else "Repair/disenchant/XP with registered curse and item-NBT preservation",
+                    "blockstate": "Facing bits 0..1, powered bit 2, book bit 3" if name=="lectern" else "Existing floor/wall/ceiling N/E/S/W encoding 0..11",
+                    "shape": "Multipart collision and outline/ray geometry",
+                    "nbt": "Persistent Book/Page tile data" if name=="lectern" else "Player-owned transient inputs; no block inventory",
+                    "review_status": "WORKSTATION_RUNTIME_VERIFIED",
+                    "map_import": "Registry and prior grindstone metadata retained; lectern source book translation needs Backporter support",
+                    "known_difference": VISUAL_SHELL_GAPS[name]})
+    if name == "powder_snow":
+        row.update({"function": "bounded collision/freezing, bucket and melting mechanics",
+                    "nbt": "entity freezing state persists across restart",
+                    "review_status": "MODERN_STATE_RUNTIME_VERIFIED",
+                    "known_difference": VISUAL_SHELL_GAPS[name]})
 
     if profile == "PASS_38_SCULK_GAMEPLAY":
         row.update({

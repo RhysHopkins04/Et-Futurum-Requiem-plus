@@ -1,0 +1,37 @@
+{
+  "version": "3.5.18",
+  "comparison_baseline": "after-crafting-sweep (3.5.17)",
+  "newly_matching_recipe_definitions": [
+    "copper_chain",
+    "copper_ingot_from_nuggets",
+    "copper_lantern",
+    "copper_nugget",
+    "copper_torch"
+  ],
+  "previously_matching_regressions": [],
+  "before_status_counts": {
+    "WITNESSES_MATCH": 1018,
+    "WORKSTATION_NOT_IMPLEMENTED": 254,
+    "SPECIAL_SERIALIZER_REQUIRES_BEHAVIOURAL_TEST": 30,
+    "CAMPFIRE_REQUIRES_WORLD_TICK_TEST": 8,
+    "OUTPUT_NOT_RESOLVED": 114,
+    "RUNTIME_DIFFERENCE_REQUIRES_REVIEW": 14,
+    "INPUT_NOT_RESOLVED": 7,
+    "MODERN_TEMPLATE_SYSTEM_NOT_IMPLEMENTED": 9,
+    "COMPONENT_OUTPUT_REQUIRES_NBT_TEST": 16
+  },
+  "after_status_counts": {
+    "WITNESSES_MATCH": 1023,
+    "WORKSTATION_NOT_IMPLEMENTED": 254,
+    "SPECIAL_SERIALIZER_REQUIRES_BEHAVIOURAL_TEST": 30,
+    "CAMPFIRE_REQUIRES_WORLD_TICK_TEST": 8,
+    "OUTPUT_NOT_RESOLVED": 111,
+    "RUNTIME_DIFFERENCE_REQUIRES_REVIEW": 14,
+    "INPUT_NOT_RESOLVED": 5,
+    "MODERN_TEMPLATE_SYSTEM_NOT_IMPLEMENTED": 9,
+    "COMPONENT_OUTPUT_REQUIRES_NBT_TEST": 16
+  },
+  "existing_block_and_item_numeric_ids_unchanged": true,
+  "new_item": "etfuturum:copper_nugget",
+  "scope": "Recipe witnesses and separate focused runtime contracts; not complete modern gameplay parity."
+}

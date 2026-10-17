@@ -211,7 +211,8 @@ public class TileEntityBanner extends TileEntity {
 		BRICKS("bricks", "bri", new ItemStack(Blocks.brick_block)),
 		SKULL("skull", "sku", new ItemStack(Items.skull, 1, 1)),
 		FLOWER("flower", "flo", new ItemStack(Blocks.red_flower, 1, 8)),
-		MOJANG("mojang", "moj", new ItemStack(Items.golden_apple, 1, 1));
+		MOJANG("mojang", "moj", new ItemStack(Items.golden_apple, 1, 1)),
+        GLOBE("globe", "glb"), PIGLIN("piglin", "pig"), FLOW("flow", "flw"), GUSTER("guster", "gus");
 
 		public static final EnumBannerPattern[] VALUES = values();
 

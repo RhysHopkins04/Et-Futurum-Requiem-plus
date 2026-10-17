@@ -68,7 +68,11 @@ public class GuiEnchantment extends GuiContainer {
 	private static final ItemStack LAPIS = new ItemStack(Items.dye, 1, 4); //This is used to match with lapis to put it at the front of the list
 
 	public GuiEnchantment(InventoryPlayer p_i45502_1_, World worldIn, String p_i45502_3_) {
-		super(new ContainerEnchantment(p_i45502_1_, worldIn, 0, 0, 0));
+		this(p_i45502_1_,worldIn,p_i45502_3_,0,0,0);
+    }
+
+    public GuiEnchantment(InventoryPlayer p_i45502_1_,World worldIn,String p_i45502_3_,int x,int y,int z) {
+        super(new ContainerEnchantment(p_i45502_1_,worldIn,x,y,z));
 		playerInventory = p_i45502_1_;
 		container = (ContainerEnchantment) inventorySlots;
 		nameable = p_i45502_3_;
@@ -87,7 +91,7 @@ public class GuiEnchantment extends GuiContainer {
 				}
 			}
 		}
-		displayItem = container.noFuel ? LAPIS : displayStacks.get(0).newItemStack();
+		displayItem = container.noFuel || displayStacks.isEmpty() ? LAPIS : displayStacks.get(0).newItemStack();
 	}
 
 	/**
@@ -254,7 +258,8 @@ public class GuiEnchantment extends GuiContainer {
 			if (func_146978_c/*isPointInRegion*/(60, 14 + 19 * var6, 108, 17, mouseX, mouseY) && var7 > 0 && var8 >= 0) {
 				ArrayList<String> var10 = Lists.newArrayList();
 				String var11;
-				Enchantment ench = Enchantment.enchantmentsList[var8 % Enchantment.enchantmentsList.length];
+				int enchantId = var8 & 255;
+                Enchantment ench = enchantId < Enchantment.enchantmentsList.length ? Enchantment.enchantmentsList[enchantId] : null;
 				if (ench != null) {
 					var11 = ench.getTranslatedName((var8) >> 8);
 					var10.add(EnumChatFormatting.WHITE.toString() + EnumChatFormatting.ITALIC + I18n.format("container.enchant.clue", var11));
@@ -265,40 +270,25 @@ public class GuiEnchantment extends GuiContainer {
 						var10.add("");
 					}
 
-					if (mc.thePlayer.experienceLevel < var7)
-						var10.add(EnumChatFormatting.RED + I18n.format("container.enchant.level.required") + ": " + container.enchantLevels[var6]);
-					else {
-						if (displayStacks.size() > 1) {
-							if (viewingTicks > 40) {
-								viewingTicks = 0;
-								ArrayList<ItemStack> tempList = new ArrayList<>();
-								for(ItemMetaPair mapping : displayStacks) {
-									ItemStack stack = mapping.newItemStack();
-									if(stack.isItemEqual(displayItem)) {
-										tempList.add(stack);
-									}
-								}
-								displayItem = tempList.get(displayRand.nextInt(tempList.size()));
-								//We don't want to display the same item name twice in a row (because then it looks like it's being displayed for a longer time)
-							}
-						}
-						if (!container.noFuel) {
-							String name;
-
-							if (displayItem.isItemEqual(LAPIS)) {
-								name = StatCollector.translateToLocal("container.enchant.lapis." + (var9 > 1 ? "many" : "one"));
-							} else {
-								name = "%s " + StatCollector.translateToLocal(displayItem.getUnlocalizedName() + ".name");
-							}
-
-							var11 = String.format(name, var9);
-							var10.add((var5 >= var9 ? EnumChatFormatting.GRAY : EnumChatFormatting.RED) + var11);
-						}
-
-						var11 = I18n.format(var9 == 1 ? "container.enchant.level.one" : "container.enchant.level.many", var9);
-
-						var10.add(EnumChatFormatting.GRAY + var11);
-					}
+                    // Always show the actual costs, even when the required offer level is unmet.
+                    if (mc.thePlayer.experienceLevel < var7)
+                        var10.add(EnumChatFormatting.RED + I18n.format("container.enchant.level.required") + ": " + var7);
+                    if (!container.noFuel) {
+                        if (displayStacks.size()>1 && viewingTicks>40) {
+                            viewingTicks=0;ArrayList<ItemStack> alternatives=new ArrayList<>();
+                            for(ItemMetaPair mapping:displayStacks) {
+                                ItemStack stack=mapping.newItemStack();
+                                if(!stack.isItemEqual(displayItem))alternatives.add(stack);
+                            }
+                            if(!alternatives.isEmpty())displayItem=alternatives.get(displayRand.nextInt(alternatives.size()));
+                        }
+                        String cost=displayItem.isItemEqual(LAPIS)
+                            ? I18n.format("container.enchant.lapis."+(var9>1?"many":"one"),var9)
+                            : var9+" "+displayItem.getDisplayName();
+                        var10.add((var5>=var9?EnumChatFormatting.GRAY:EnumChatFormatting.RED)+cost);
+                    }
+                    var10.add((mc.thePlayer.experienceLevel>=var9?EnumChatFormatting.GRAY:EnumChatFormatting.RED)
+                        + I18n.format(var9==1?"container.enchant.level.one":"container.enchant.level.many",var9));
 				}
 
 				drawHoveringText(var10, mouseX, mouseY, fontRendererObj);

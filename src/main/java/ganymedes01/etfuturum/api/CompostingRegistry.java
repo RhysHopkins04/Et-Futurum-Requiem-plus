@@ -29,6 +29,11 @@ public class CompostingRegistry {
 		if (!ConfigFunctions.enableAutoAddComposter) {
 			return;
 		}
+        if (ModItems.DRIED_KELP.isEnabled()) registerCompostable(ModItems.DRIED_KELP.newItemStack(),30);
+        if (ganymedes01.etfuturum.ModernMapParityBlocks.KELP.get()!=null)
+            registerCompostable(ganymedes01.etfuturum.ModernMapParityBlocks.KELP.get(),30);
+        if (ganymedes01.etfuturum.ModernMapParityBlocks.DRIED_KELP_BLOCK.get()!=null)
+            registerCompostable(ganymedes01.etfuturum.ModernMapParityBlocks.DRIED_KELP_BLOCK.get(),50);
 		registerCompostable(ImmutableList.of(
 				new ItemStack(Blocks.tallgrass, 1, 1),
 				new ItemStack(Blocks.leaves, 1, OreDictionary.WILDCARD_VALUE),
@@ -114,7 +119,29 @@ public class CompostingRegistry {
 				new ItemStack(Items.cake),
 				new ItemStack(Items.pumpkin_pie)
 		), 100);
-	}
+        loadModernProbabilities();
+    }
+
+    private static void loadModernProbabilities() {
+        try(java.io.InputStream input=CompostingRegistry.class.getResourceAsStream("/assets/etfuturum/recipes/composting_1_21_11.json")) {
+            if(input==null)throw new IllegalStateException("Missing composting catalog");
+            com.google.gson.JsonObject root=new com.google.gson.JsonParser().parse(new java.io.InputStreamReader(input,java.nio.charset.StandardCharsets.UTF_8)).getAsJsonObject();
+            if(root.get("schema").getAsInt()!=1 || !root.get("vanilla_sha1").getAsString().equals("ba2df812c2d12e0219c489c4cd9a5e1f0760f5bd"))throw new IllegalStateException("Unknown composting reference");
+            for(com.google.gson.JsonElement element:root.getAsJsonArray("entries")) {
+                com.google.gson.JsonObject row=element.getAsJsonObject();if(!row.has("target"))continue;
+                com.google.gson.JsonObject target=row.getAsJsonObject("target");String[] id=target.get("item").getAsString().split(":",2);
+                Item item=cpw.mods.fml.common.registry.GameRegistry.findItem(id[0],id[1]);
+                if(item!=null && item.delegate.name()!=null) {
+                    // ItemStackMap gives wildcard entries priority. Expand the existing block family
+                    // before applying exact modern variant probabilities (e.g. roots and mushroom stem).
+                    ItemStack wildcard=new ItemStack(item,1,OreDictionary.WILDCARD_VALUE);
+                    Integer family=COMPOSTING_REGISTRY.remove(wildcard);
+                    if(family!=null)for(int meta=0;meta<16;meta++)registerCompostable(new ItemStack(item,1,meta),family);
+                    registerCompostable(new ItemStack(item,1,target.get("meta").getAsInt()),row.get("percent").getAsInt());
+                }
+            }
+        }catch(Exception failure) { throw new IllegalStateException("Cannot load modern composting probabilities",failure); }
+    }
 
 	/**
 	 * Register an item to be compostable. The percent value is for how likely it is to successfully fill a layer.

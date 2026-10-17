@@ -1,0 +1,27 @@
+{
+  "version": "3.5.17",
+  "baseline_commit": "2fe04e1fd4af52e578f04ade5245d77acd999b23",
+  "build": "passed: ./gradlew --offline check build",
+  "jar": "build/libs/etfuturum-3.5.17-master.8-2fe04e1fd4-dirty.jar",
+  "jar_sha256": "2e0c70aae9697f02bf7bb588d8b40b5583deac3bdb5242e2d9c7e65289435128",
+  "jar_excludes_audit_test_and_hbm_classes": true,
+  "runtime_checks": {
+    "without_NTM": "passed: crafting safety, Earth contracts, save/restart",
+    "NTM_2.4.0": "passed: crafting safety, ore/tool/hazard contracts, save/restart",
+    "legacy_profile": "passed",
+    "feature_profile_cases": 9
+  },
+  "recipe_witness_queries": 4514,
+  "scope": "Focused crafting corrections, witness replay and startup/configuration contracts; not complete Minecraft 1.21.11 gameplay certification. No new client check performed in this sweep.",
+  "logs": {
+    "build/parity-audit/after-final-build.log": "f9b3f5cd052a6614ad1f5dc84dfb6bbc33215bf8e12613b6d738867dec8f51d8",
+    "build/earth-import-tests/forge-save.log": "adee9a1ae7c3e4e5879f846f4e93f73b83f9d0f5c26ab9b95a7b28e8ee7ac38e",
+    "build/earth-import-tests/forge-restart.log": "8dc455607284cac41b03d407de76926cb504f22fbefd7e78cca5eb6611fff210",
+    "build/earth-import-tests/ntm-forge-save.log": "d54e6281826ea98c22fd5cf31e0895d2019cb1b7718c2c063c57f871bdfbe46e",
+    "build/earth-import-tests/ntm-forge-restart.log": "3ec4ad4471528509c2f0570b248fd81dce47bae1ff3cd0e45b4a1540fed5ecd1",
+    "build/earth-import-tests/legacy-forge-legacy.log": "7e99b7233b331ea31b9adfb0d3e8eb43a75469b6b5701020cd161af41ed483ac",
+    "build/parity-audit/after-map-static.log": "7eae18c766a59f7e76214d9c2c7d5be5b67e4953eaf17217106d32ab9000066b",
+    "build/parity-audit/after-pass37-static.log": "2b0f0aae48edba186b1bba76e4280ff06edebe3563e0c39ffb37ca34cc019857",
+    "build/parity-audit/after-pass38-static.log": "7c555a150d31e30f6fac228bf48f97e84d609631b48cfd73ea9ee5eb8faf2aa6"
+  }
+}

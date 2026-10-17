@@ -45,7 +45,8 @@ public class BlockSmithingTable extends Block {
 
 	@Override
 	public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int side, float subX, float subY, float subZ) {
-		if (!world.isRemote)
+		if(!ganymedes01.etfuturum.recipes.ModernSmithingRecipes.enabled() || ganymedes01.etfuturum.api.spectator.SpectatorUtils.isSpectator(player))return false;
+        if (!world.isRemote)
 			player.openGui(EtFuturum.instance, GUIIDs.SMITHING_TABLE, world, x, y, z);
 		return true;
 	}

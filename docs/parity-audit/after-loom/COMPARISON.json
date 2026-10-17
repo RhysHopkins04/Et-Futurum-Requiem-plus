@@ -1,0 +1,18 @@
+{
+  "version": "3.5.21",
+  "baseline": "after-stonecutter (3.5.20)",
+  "newly_matching_definitions": [
+    "bordure_indented_banner_pattern",
+    "creeper_banner_pattern",
+    "field_masoned_banner_pattern",
+    "flower_banner_pattern",
+    "mojang_banner_pattern",
+    "skull_banner_pattern"
+  ],
+  "previously_matching_regressions": [],
+  "matches_before": 1289,
+  "matches_after": 1295,
+  "runtime_query_count": 4786,
+  "scope": "Recipe witness comparison; loom interaction contracts are checked separately.",
+  "existing_block_item_and_surface_biome_ids_unchanged": true
+}

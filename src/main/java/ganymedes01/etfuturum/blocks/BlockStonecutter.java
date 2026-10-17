@@ -98,6 +98,14 @@ public class BlockStonecutter extends Block {
 		return RenderIDs.STONECUTTER;
 	}
 
+    @Override
+    public boolean onBlockActivated(World world,int x,int y,int z,net.minecraft.entity.player.EntityPlayer player,int side,float hitX,float hitY,float hitZ) {
+        if (!ganymedes01.etfuturum.recipes.StonecutterRecipes.enabled()
+                || ganymedes01.etfuturum.api.spectator.SpectatorUtils.isSpectator(player)) return false;
+        if (!world.isRemote) player.openGui(EtFuturum.instance,ganymedes01.etfuturum.lib.GUIIDs.STONECUTTER,world,x,y,z);
+        return true;
+    }
+
 	//NON-VANILLA TWEAK CODE
 
 	public static final DamageSource STONECUTTER = (new DamageSource("stonecutter")).setFireDamage();

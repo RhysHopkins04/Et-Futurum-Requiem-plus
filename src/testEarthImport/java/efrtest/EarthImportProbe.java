@@ -34,10 +34,25 @@ public final class EarthImportProbe {
                 check(!ConfigModCompat.moddedDeepslateOres && !ConfigMapCompatibility.allowsExtendedHeight(),"legacy content-only restrictions changed");
                 check(ImportedBiomes.registered().isEmpty(),"import biomes registered in legacy profile");
                 SmithingRecipeProbe.run(world, true);
+                CraftingSweepProbe.run(world, true);
+                StonecutterProbe.run(world,true);
+                LoomProbe.run(world,true);
+                ScholarlyWorkstationsProbe.run(world,true);
+                CartographyComposterProbe.run(world,true);
+                SmithingCrafterProbe.run(world,true);
                 System.out.println("EARTH_IMPORT_LEGACY PASSED");return;
             }
             check(ConfigMapCompatibility.importedEarthMode && ConfigMapCompatibility.isEnabled(),"wrong profile");
             SmithingRecipeProbe.run(world, false);
+            CraftingSweepProbe.run(world, false);
+            CookingAndUsageProbe.run(world);
+            ProductionChainProbe.run(world);
+            StonecutterProbe.run(world,false);
+            LoomProbe.run(world,false);
+            ScholarlyWorkstationsProbe.run(world,false);
+            CartographyComposterProbe.run(world,false);
+            SmithingCrafterProbe.run(world,false);
+            IronChestShulkerProbe.run(world);
             check(ConfigWorld.extendedWorldHeight && world.getHeight()==384 && world.getActualHeight()==384,"height contract");
             check(world.provider.getAverageGroundLevel()==128,"imported spawn reference not shifted");
             check(!ConfigWorld.modernOverworldGeneration && !ConfigWorld.modernOreGeneration && ConfigWorld.tileReplacementMode==-1,"automatic generation/replacement enabled");

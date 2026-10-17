@@ -128,6 +128,20 @@ public final class ModernAssetResourcePack extends DefaultResourcePack {
         // registry block, but serve Mojang's current 1.21.11 texture/animation through AssetDirector.
         DYNAMIC_MODEL_ALIASES.put("textures/blocks/crying_obsidian.png", "textures/block/crying_obsidian.png");
         DYNAMIC_MODEL_ALIASES.put("textures/blocks/crying_obsidian.png.mcmeta", "textures/block/crying_obsidian.png.mcmeta");
+        // Exact curated aliases; modern art stays in the AssetDirector-provided client jar.
+        DYNAMIC_MODEL_ALIASES.putAll(loadWorkstationAliases("workstations_1_21_11.json"));
+        DYNAMIC_MODEL_ALIASES.putAll(loadWorkstationAliases("smithing_1_21_11.json"));
+    }
+
+    private static Map<String,String> loadWorkstationAliases(String filename) {
+        String resource="/assets/etfuturum/asset_aliases/"+filename;
+        try(InputStream input=ModernAssetResourcePack.class.getResourceAsStream(resource)) {
+            if(input==null)throw new IOException("Missing workstation asset alias catalog");
+            com.google.gson.JsonObject aliases=new com.google.gson.JsonParser().parse(new java.io.InputStreamReader(input,java.nio.charset.StandardCharsets.UTF_8)).getAsJsonObject().getAsJsonObject("aliases");
+            Map<String,String> result=new java.util.HashMap<>();
+            for(Map.Entry<String,com.google.gson.JsonElement> entry:aliases.entrySet())result.put(entry.getKey(),entry.getValue().getAsString());
+            return Collections.unmodifiableMap(result);
+        }catch(IOException | RuntimeException invalid) { throw new IllegalStateException("Unable to read workstation asset aliases",invalid); }
     }
 
     private ModernAssetResourcePack() {

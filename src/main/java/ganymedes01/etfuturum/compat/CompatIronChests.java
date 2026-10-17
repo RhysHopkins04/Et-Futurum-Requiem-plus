@@ -66,6 +66,25 @@ public class CompatIronChests {
 	}
 
 	public static void registerRecipes() {
+        if (ganymedes01.etfuturum.configuration.configs.ConfigModCompat.shulkerBoxesIronChest
+                && ganymedes01.etfuturum.ModBlocks.SHULKER_BOX.isEnabled() && ModItems.SHULKER_SHELL.isEnabled()) {
+            for (ganymedes01.etfuturum.tileentities.TileEntityShulkerBox.ShulkerBoxType type
+                    : ganymedes01.etfuturum.tileentities.TileEntityShulkerBox.ShulkerBoxType.VALUES) {
+                IronChestType chestType=tiers.get(type.name());
+                if (type.ordinal()==0 || chestType==null) continue;
+                ItemStack chest=registeredChest(chestType);
+                if (chest==null || chest.getItem()==null) continue;
+                ItemStack output=ganymedes01.etfuturum.ModBlocks.SHULKER_BOX.newItemStack();
+                net.minecraft.nbt.NBTTagCompound tag=new net.minecraft.nbt.NBTTagCompound();
+                tag.setByte("Type",(byte)type.ordinal()); output.setTagCompound(tag);
+                RecipeHelper.addShapedRecipe(RecipeHelper.Priority.HIGH,output,"S","C","S",'S',ModItems.SHULKER_SHELL.get(),'C',chest);
+                for(int color=0;color<(ganymedes01.etfuturum.configuration.configs.ConfigBlocksItems.enableDyedShulkerBoxes?16:0);color++) {
+                    ItemStack dyed=output.copy();dyed.getTagCompound().setByte("Color",(byte)(16-color));
+                    cpw.mods.fml.common.registry.GameRegistry.addRecipe(new ganymedes01.etfuturum.recipes.crafting.RecipeDyedShulkerBox(
+                            dyed,new Object[]{ganymedes01.etfuturum.ModBlocks.SHULKER_BOX.get(),ganymedes01.etfuturum.recipes.ModRecipes.ore_dyes[color]}));
+                }
+            }
+        }
 		if(ModItems.BARREL_UPGRADE.isEnabled()) {
 			ItemBarrelUpgrade upgrade = ((ItemBarrelUpgrade) ModItems.BARREL_UPGRADE.get());
 			for (int i = 0; i < upgrade.types.length; i++) {
@@ -83,6 +102,19 @@ public class CompatIronChests {
 			}
 		}
 	}
+
+    public static ItemStack registeredChest(IronChestType type) {
+        try {
+            Method getter=IronChestType.class.getMethod("getRegistredChest",IronChestType.class);
+            Object stack=getter.invoke(null,type);
+            return stack instanceof ItemStack ? ((ItemStack)stack).copy() : null;
+        } catch (NoSuchMethodException oldVersion) {
+            net.minecraft.block.Block chest=ExternalContent.Blocks.IRON_CHEST.get();
+            return chest==null?null:new ItemStack(chest,1,type.ordinal());
+        } catch (ReflectiveOperationException failure) {
+            throw new IllegalStateException("Cannot resolve Iron Chests tier "+type.name(),failure);
+        }
+    }
 
 	@Nullable
 	public static String getUpgradeName(String from, Item item) {

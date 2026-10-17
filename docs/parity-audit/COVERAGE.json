@@ -1,0 +1,11 @@
+{
+  "all_live_blocks_accounted_for": true,
+  "block_ledger_rows": 845,
+  "confirmed_findings": 26,
+  "disabled_block_declarations": 51,
+  "full_gameplay_certification": false,
+  "legacy_baseline_blocks": 171,
+  "live_efr_blocks": 623,
+  "production_source_changed_by_audit": false,
+  "recipe_definitions_accounted_for": 1470
+}

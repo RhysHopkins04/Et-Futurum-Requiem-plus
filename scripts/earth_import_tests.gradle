@@ -4,10 +4,11 @@ gradle.projectsEvaluated {
     if (p.hasProperty('earthNtmJar')) {
         p.dependencies.add('runtimeOnlyNonPublishable', p.dependencies.rfg.deobf(p.files(p.property('earthNtmJar'))))
     }
+    if (p.hasProperty('earthIronChestsDevJar')) p.dependencies.add('runtimeOnlyNonPublishable',p.files(p.property('earthIronChestsDevJar')))
     p.tasks.named('runServer', JavaExec) {
         dependsOn p.tasks.named('compileEarthImportTests')
         classpath += p.files(p.layout.buildDirectory.dir('earth-import-tests/classes'))
-        workingDir = p.file('build/earth-import-tests/' + (p.hasProperty('earthNtmJar') ? 'ntm-' : '') + (p.findProperty('earthProfile') == 'legacy' ? 'legacy-server' : 'server'))
+        workingDir = p.file('build/earth-import-tests/' + (p.hasProperty('earthNtmJar') ? 'ntm-' : '') + (p.hasProperty('earthIronChestsDevJar') ? 'ironchests-' : '') + (p.findProperty('earthProfile') == 'legacy' ? 'legacy-server' : 'server'))
         systemProperty 'efr.earthImportProbe', 'true'
         systemProperty 'efr.earthImportProfile', p.findProperty('earthProfile') ?: 'earth'
     }

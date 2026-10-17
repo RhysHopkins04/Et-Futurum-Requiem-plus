@@ -88,6 +88,10 @@ public class ModRecipes {
 
 		registerRecipes();
 		registerModernWoodParityRecipes();
+		RecipeParityCorrections.init();
+        ProductionChainRecipes.init();
+        StonecutterRecipes.init();
+        ModernSmithingRecipes.initDuplication();
 		tweakRecipes();
 		registerLoot();
 		if(ModsList.IRON_CHEST.isLoaded() && !ModsList.GTNH.isLoaded()) {
@@ -313,7 +317,7 @@ public class ModRecipes {
 		RecipeHelper.addShapedRecipe(RecipeHelper.Priority.HIGH, output229, "xxx", "xxx", "xxx", 'x', ModItems.DISC_FRAGMENT_5.get());
 
 		// Granite
-		ItemStack output228 = ModBlocks.STONE.newItemStack(2, 1);
+		ItemStack output228 = ModBlocks.STONE.newItemStack(1, 1);
 		RecipeHelper.addShapelessRecipe(RecipeHelper.Priority.HIGH, output228, "gemQuartz", "stoneDiorite");
 		ItemStack output215 = ModBlocks.STONE.newItemStack(4, 2);
 		RecipeHelper.addShapedRecipe(RecipeHelper.Priority.HIGH, output215, "xx", "xx", 'x', "stoneGranite");
@@ -660,7 +664,7 @@ public class ModRecipes {
 		ItemStack output182 = ModBlocks.BAMBOO_MOSAIC.newItemStack(1, 0);
 		Object[] objects135 = new Object[]{"x", "x", 'x', ModBlocks.WOOD_SLAB.newItemStack(1, 4)};
 		RecipeHelper.addShapedRecipe(RecipeHelper.Priority.HIGH, output182, objects135);
-		ItemStack output181 = ModBlocks.BAMBOO_MOSAIC_SLAB.newItemStack(6, 5);
+		ItemStack output181 = ModBlocks.BAMBOO_MOSAIC_SLAB.newItemStack(6, 0);
 		Object[] objects134 = new Object[]{"xxx", 'x', ModBlocks.BAMBOO_MOSAIC.newItemStack(1, 0)};
 		RecipeHelper.addShapedRecipe(RecipeHelper.Priority.HIGH, output181, objects134);
 		ItemStack output180 = ModBlocks.BAMBOO_MOSAIC_STAIRS.newItemStack(4);
@@ -906,11 +910,9 @@ public class ModRecipes {
 		RecipeHelper.addShapedRecipe(RecipeHelper.Priority.HIGH, output145, objects99);
 
 		ItemStack output144 = ModItems.RABBIT_STEW.newItemStack();
-		Object[] objects98 = new Object[]{" R ", "CPM", " B ", 'R', ModItems.RABBIT_COOKED.newItemStack(), 'C', Items.carrot, 'P', Items.baked_potato, 'M', Blocks.brown_mushroom, 'B', "bowlWood"};
-		RecipeHelper.addShapedRecipe(RecipeHelper.Priority.HIGH, output144, objects98);
+		RecipeHelper.addShapelessRecipe(RecipeHelper.Priority.HIGH, output144, ModItems.RABBIT_COOKED.newItemStack(), Items.carrot, Items.baked_potato, Blocks.brown_mushroom, "bowlWood");
 		ItemStack output143 = ModItems.RABBIT_STEW.newItemStack();
-		Object[] objects97 = new Object[]{" R ", "CPD", " B ", 'R', ModItems.RABBIT_COOKED.newItemStack(), 'C', Items.carrot, 'P', Items.baked_potato, 'D', Blocks.red_mushroom, 'B', "bowlWood"};
-		RecipeHelper.addShapedRecipe(RecipeHelper.Priority.HIGH, output143, objects97);
+		RecipeHelper.addShapelessRecipe(RecipeHelper.Priority.HIGH, output143, ModItems.RABBIT_COOKED.newItemStack(), Items.carrot, Items.baked_potato, Blocks.red_mushroom, "bowlWood");
 		ItemStack output1 = ModItems.RABBIT_COOKED.newItemStack();
 		RecipeHelper.addSmelting(ModItems.RABBIT_RAW.get(), output1, 0.35F);
 		RecipeHelper.addShapedRecipe(RecipeHelper.Priority.HIGH, new ItemStack(Items.leather), "xx", "xx", 'x', ModItems.RABBIT_HIDE.get());
@@ -920,7 +922,7 @@ public class ModRecipes {
 		RecipeHelper.addSmelting(input9, output11, 0.15F);
 
 		ItemStack output142 = ModItems.BEETROOT_SOUP.newItemStack();
-		RecipeHelper.addShapedRecipe(RecipeHelper.Priority.HIGH, output142, "xxx", "xxx", " y ", 'x', "cropBeetroot", 'y', "bowlWood");
+		RecipeHelper.addShapelessRecipe(RecipeHelper.Priority.HIGH, output142, "cropBeetroot", "cropBeetroot", "cropBeetroot", "cropBeetroot", "cropBeetroot", "cropBeetroot", "bowlWood");
 		GameRegistry.addRecipe(new ShapelessOreRecipe(new ItemStack(Items.dye, 1, 1), "cropBeetroot"));
 
 		if (!ModsList.GTNH.isLoaded()) {
@@ -949,7 +951,7 @@ public class ModRecipes {
 		ItemStack input8 = ModItems.CHORUS_FRUIT.newItemStack();
 		ItemStack output10 = ModItems.CHORUS_FRUIT_POPPED.newItemStack();
 		RecipeHelper.addSmelting(input8, output10, 0.0F);
-		ItemStack output135 = ModBlocks.END_ROD.newItemStack();
+		ItemStack output135 = ModBlocks.END_ROD.newItemStack(4);
 		RecipeHelper.addShapedRecipe(RecipeHelper.Priority.HIGH, output135, "x", "y", 'x', Items.blaze_rod, 'y', ModItems.CHORUS_FRUIT_POPPED.get());
 
 		ItemStack output226 = ModItems.DRAGON_BREATH.newItemStack();
@@ -1077,7 +1079,8 @@ public class ModRecipes {
 		ItemStack output4 = ModItems.NETHERITE_SCRAP.newItemStack();
 		RecipeHelper.addSmelting(ModBlocks.ANCIENT_DEBRIS.get(), output4, 2F);
 		ItemStack output225 = ModItems.NETHERITE_INGOT.newItemStack();
-		Object[] objects168 = new Object[]{ModItems.NETHERITE_SCRAP.newItemStack(), ModItems.NETHERITE_SCRAP.newItemStack(), ModItems.NETHERITE_SCRAP.newItemStack(), ModItems.NETHERITE_SCRAP.newItemStack(), "ingotGold", "ingotGold", "ingotGold", "ingotGold"};
+		// NEI's shapeless slot order is column-grouped; display the familiar modern layout.
+        Object[] objects168 = new Object[]{ModItems.NETHERITE_SCRAP.newItemStack(), ModItems.NETHERITE_SCRAP.newItemStack(), ModItems.NETHERITE_SCRAP.newItemStack(), "ingotGold", "ingotGold", "ingotGold", ModItems.NETHERITE_SCRAP.newItemStack(), "ingotGold"};
 		RecipeHelper.addShapelessRecipe(RecipeHelper.Priority.HIGH, output225, objects168);
 		if (!ModsList.GTNH.isLoaded()) {
 			ItemStack output3 = ModBlocks.NETHERITE_BLOCK.newItemStack();
@@ -1350,7 +1353,7 @@ public class ModRecipes {
 			ItemStack output5 = ModBlocks.COPPER_DOOR.newItemStack(3);
 			Object[] objects1 = new Object[]{"xx", "xx", "xx", 'x', ModItems.COPPER_INGOT.newItemStack()};
 			RecipeHelper.addShapedRecipe(RecipeHelper.Priority.HIGH, output5, objects1);
-			ItemStack output3 = ModBlocks.COPPER_TRAPDOOR.newItemStack(2);
+			ItemStack output3 = ModBlocks.COPPER_TRAPDOOR.newItemStack(1);
 			Object[] objects = new Object[]{"xx", "xx", 'x', ModItems.COPPER_INGOT.newItemStack()};
 			RecipeHelper.addShapedRecipe(RecipeHelper.Priority.HIGH, output3, objects);
 		}
@@ -1678,7 +1681,7 @@ public class ModRecipes {
 			Object[] objects = new Object[]{"x", "c", "x", 'x', ModItems.SHULKER_SHELL.newItemStack(), 'c', new ItemStack(Blocks.chest)};
 			RecipeHelper.addShapedRecipe(RecipeHelper.Priority.HIGH, output5, objects);
 		}
-		if (ModBlocks.SHULKER_BOX.isEnabled()) {
+		if (ModBlocks.SHULKER_BOX.isEnabled() && ConfigBlocksItems.enableDyedShulkerBoxes) {
 			for (int i = ore_dyes.length - 1; i >= 0; i--) {//Dyed box recipes
 				ItemStack shulker = ModBlocks.SHULKER_BOX.newItemStack();
 				shulker.setTagCompound(new NBTTagCompound());

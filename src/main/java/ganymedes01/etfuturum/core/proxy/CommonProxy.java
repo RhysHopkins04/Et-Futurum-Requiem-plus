@@ -299,7 +299,14 @@ public class CommonProxy implements IGuiHandler {
 					new ContainerBlastFurnace(player.inventory, (TileEntityBlastFurnace) world.getTileEntity(x, y, z));
 			case GUIIDs.SHULKER_BOX ->
 					new ContainerChestGeneric(player.inventory, (TileEntityShulkerBox) world.getTileEntity(x, y, z), ((TileEntityShulkerBox) world.getTileEntity(x, y, z)).getRowSize(), ((TileEntityShulkerBox) world.getTileEntity(x, y, z)).getSizeInventory() != 27);
-			case GUIIDs.SMITHING_TABLE -> new ContainerSmithingTable(player.inventory, world);
+			case GUIIDs.SMITHING_TABLE -> new ContainerSmithingTable(player.inventory, world,x,y,z);
+            case GUIIDs.CRAFTER -> world.getTileEntity(x,y,z) instanceof ganymedes01.etfuturum.tileentities.TileEntityCrafter?new ganymedes01.etfuturum.inventory.ContainerCrafter(player.inventory,(ganymedes01.etfuturum.tileentities.TileEntityCrafter)world.getTileEntity(x,y,z)):null;
+            case GUIIDs.CARTOGRAPHY_TABLE -> new ganymedes01.etfuturum.inventory.ContainerCartographyTable(player.inventory,world,x,y,z);
+            case GUIIDs.STONECUTTER -> new ContainerStonecutter(player.inventory,world,x,y,z);
+            case GUIIDs.LOOM -> new ganymedes01.etfuturum.inventory.ContainerLoom(player.inventory,world,x,y,z);
+            case GUIIDs.GRINDSTONE -> new ganymedes01.etfuturum.inventory.ContainerGrindstone(player.inventory,world,x,y,z);
+            case GUIIDs.LECTERN -> world.getTileEntity(x,y,z) instanceof ganymedes01.etfuturum.tileentities.TileEntityLectern
+                ?new ganymedes01.etfuturum.inventory.ContainerLectern(player,(ganymedes01.etfuturum.tileentities.TileEntityLectern)world.getTileEntity(x,y,z)):null;
 			default -> null;
 		};
 	}
@@ -307,7 +314,7 @@ public class CommonProxy implements IGuiHandler {
 	@Override
 	public Object getClientGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
 		return switch (ID) {
-			case GUIIDs.ENCHANTING_TABLE -> new GuiEnchantment(player.inventory, world, null);
+			case GUIIDs.ENCHANTING_TABLE -> new GuiEnchantment(player.inventory, world, null,x,y,z);
 			case GUIIDs.ANVIL -> new GuiAnvil(player, world, x, y, z);
 			case GUIIDs.BREWING_STAND ->
 					new GuiNewBrewingStand(player.inventory, (TileEntityNewBrewingStand) world.getTileEntity(x, y, z));
@@ -317,7 +324,14 @@ public class CommonProxy implements IGuiHandler {
 					new GuiBlastFurnace(player.inventory, (TileEntityBlastFurnace) world.getTileEntity(x, y, z));
 			case GUIIDs.SHULKER_BOX ->
 					new GuiShulkerBox(player.inventory, (TileEntityShulkerBox) world.getTileEntity(x, y, z));
-			case GUIIDs.SMITHING_TABLE -> new GuiSmithingTable(new ContainerSmithingTable(player.inventory, world));
+			case GUIIDs.SMITHING_TABLE -> new GuiSmithingTable(new ContainerSmithingTable(player.inventory, world,x,y,z));
+            case GUIIDs.CRAFTER -> world.getTileEntity(x,y,z) instanceof ganymedes01.etfuturum.tileentities.TileEntityCrafter?new ganymedes01.etfuturum.client.gui.inventory.GuiCrafter(new ganymedes01.etfuturum.inventory.ContainerCrafter(player.inventory,(ganymedes01.etfuturum.tileentities.TileEntityCrafter)world.getTileEntity(x,y,z))):null;
+            case GUIIDs.CARTOGRAPHY_TABLE -> new ganymedes01.etfuturum.client.gui.inventory.GuiCartographyTable(new ganymedes01.etfuturum.inventory.ContainerCartographyTable(player.inventory,world,x,y,z));
+            case GUIIDs.STONECUTTER -> new GuiStonecutter(new ContainerStonecutter(player.inventory,world,x,y,z));
+            case GUIIDs.LOOM -> new ganymedes01.etfuturum.client.gui.inventory.GuiLoom(new ganymedes01.etfuturum.inventory.ContainerLoom(player.inventory,world,x,y,z));
+            case GUIIDs.GRINDSTONE -> new ganymedes01.etfuturum.client.gui.inventory.GuiGrindstone(new ganymedes01.etfuturum.inventory.ContainerGrindstone(player.inventory,world,x,y,z));
+            case GUIIDs.LECTERN -> world.getTileEntity(x,y,z) instanceof ganymedes01.etfuturum.tileentities.TileEntityLectern
+                ?new ganymedes01.etfuturum.client.gui.inventory.GuiLectern(new ganymedes01.etfuturum.inventory.ContainerLectern(player,(ganymedes01.etfuturum.tileentities.TileEntityLectern)world.getTileEntity(x,y,z))):null;
 			default -> null;
 		};
 	}

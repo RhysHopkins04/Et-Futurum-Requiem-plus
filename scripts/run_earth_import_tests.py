@@ -17,7 +17,7 @@ EXTRA_ARGS = []
 PROFILE = "earth"
 
 def run(name, tasks, marker):
-    log = OUT / ((('ntm-' if any(a.startswith('-PearthNtmJar=') for a in EXTRA_ARGS) else '') + (('legacy-' if PROFILE=='legacy' else '') + name)) + '.log')
+    log = OUT / ((('ntm-' if any(a.startswith('-PearthNtmJar=') for a in EXTRA_ARGS) else '') + ('ironchests-' if any(a.startswith('-PearthIronChestsDevJar=') for a in EXTRA_ARGS) else '') + (('legacy-' if PROFILE=='legacy' else '') + name)) + '.log')
     with log.open('w') as stream:
         process = subprocess.Popen([str(ROOT/'gradlew'), '--offline', '-I', 'scripts/earth_import_tests.gradle', *EXTRA_ARGS, *tasks],
                                    cwd=ROOT, stdout=stream, stderr=subprocess.STDOUT, start_new_session=True)
@@ -39,6 +39,7 @@ def main():
     global SERVER, PROFILE
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--ntm-jar', type=Path, help='Optional installed NTM JAR, deobfuscated locally by RFG for a separate probe world')
+    parser.add_argument('--iron-chests-dev-jar', type=Path, help='Optional deobfuscated Iron Chests development JAR for a separate probe world')
     parser.add_argument('--profile', choices=['earth','legacy'], default='earth')
     parser.add_argument('--raw-as-ore', choices=['true','false'], help='Override only the disposable probe raw-item OreDictionary setting')
     args = parser.parse_args()
@@ -48,6 +49,10 @@ def main():
         if not args.ntm_jar.is_file(): raise RuntimeError('NTM JAR not found')
         EXTRA_ARGS.append('-PearthNtmJar=' + str(args.ntm_jar.resolve()))
         SERVER = OUT / 'ntm-server'
+    if args.iron_chests_dev_jar:
+        if not args.iron_chests_dev_jar.is_file(): raise RuntimeError('Iron Chests dev JAR not found')
+        EXTRA_ARGS.append('-PearthIronChestsDevJar=' + str(args.iron_chests_dev_jar.resolve()))
+        SERVER = SERVER.with_name(('ntm-' if args.ntm_jar else '') + 'ironchests-server')
     if PROFILE=='legacy': SERVER = SERVER.with_name(('ntm-' if args.ntm_jar else '') + 'legacy-server')
     SERVER.mkdir(parents=True, exist_ok=True)
     eula = ROOT/'run/server/eula.txt'
@@ -72,12 +77,30 @@ def main():
     if PROFILE=='legacy':
         legacy = run('forge-legacy', ['runServer'], 'EARTH_IMPORT_LEGACY PASSED')
         if 'EARTH_IMPORT_SMITHING PASSED' not in legacy: raise RuntimeError('Legacy smithing suppression check did not run')
+        if 'CRAFTING_SWEEP_LEGACY PASSED' not in legacy: raise RuntimeError('Legacy crafting sweep check did not run')
+        if 'SCHOLARLY_WORKSTATIONS_LEGACY PASSED' not in legacy: raise RuntimeError('Scholarly workstation legacy checks did not run')
+        if 'LOOM_LEGACY PASSED' not in legacy: raise RuntimeError('Loom legacy check did not run')
+        if 'STONECUTTER_LEGACY PASSED' not in legacy: raise RuntimeError('Stonecutter legacy check did not run')
+        if 'SMITHING_CRAFTER_LEGACY PASSED' not in legacy: raise RuntimeError('Smithing/crafter legacy gate did not run')
+        if 'CARTOGRAPHY_LEGACY PASSED' not in legacy: raise RuntimeError('Cartography legacy gate not tested')
         print('Legacy content-only profile retains 256 height and suppression PASSED.'); return
     saved = run('forge-save', ['runServer'], 'EARTH_IMPORT_PROBE PASSED')
     if 'EARTH_IMPORT_SMITHING PASSED: all 9 upgrades' not in saved: raise RuntimeError('Earth smithing upgrade checks did not run')
+    if 'CRAFTING_SWEEP PASSED' not in saved: raise RuntimeError('Crafting sweep regression checks did not run')
+    if 'MODERN_SMITHING PASSED' not in saved or 'CRAFTER PASSED' not in saved: raise RuntimeError('Modern smithing/crafter checks did not run')
+    if 'CARTOGRAPHY PASSED' not in saved or 'COMPOSTER PASSED' not in saved: raise RuntimeError('Cartography/composter checks did not run')
+    if 'SCHOLARLY_WORKSTATIONS PASSED' not in saved: raise RuntimeError('Scholarly workstation checks did not run')
+    if 'LOOM PASSED' not in saved: raise RuntimeError('Loom extraction checks did not run')
+    if 'STONECUTTER PASSED' not in saved: raise RuntimeError('Stonecutter extraction checks did not run')
+    if 'PRODUCTION_CHAINS PASSED' not in saved: raise RuntimeError('Production chain checks did not run')
+    if 'COOKING_AND_USAGE PASSED' not in saved: raise RuntimeError('Cooking and usage checks did not run')
+    if args.iron_chests_dev_jar and 'IRON_CHESTS_SHULKERS PASSED' not in saved: raise RuntimeError('Iron Chests shulker checks did not run')
     if args.ntm_jar and 'EARTH_IMPORT_NTM_ORES PASSED' not in saved: raise RuntimeError('NTM drop/provider checks did not run')
     if args.ntm_jar and 'EARTH_IMPORT_NTM_TOOLS PASSED' not in saved: raise RuntimeError('NTM actual tool ability checks did not run')
-    run('forge-restart', ['runServer'], 'EARTH_IMPORT_RESTART PASSED')
+    restarted=run('forge-restart', ['runServer'], 'EARTH_IMPORT_RESTART PASSED')
+    if 'LECTERN_RESTART PASSED' not in restarted: raise RuntimeError('Lectern fresh-process book/page check did not run')
+    if 'CRAFTER_RESTART PASSED' not in restarted: raise RuntimeError('Crafter persistence did not run')
+    if 'CARTOGRAPHY_RESTART PASSED' not in restarted: raise RuntimeError('Saved map restart check did not run')
     report = json.loads((SERVER/'world/efr-import-capabilities.json').read_text())
     if report['height'] != 384 or len(report['surfaceBiomeIds']) != 16: raise RuntimeError('Bad capability export')
     print('Earth import build, Forge load/save, fresh-process restart and capability export PASSED.', flush=True)

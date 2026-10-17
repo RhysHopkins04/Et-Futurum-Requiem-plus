@@ -1,0 +1,15 @@
+{
+  "source_commit": "2fe04e1fd4af52e578f04ade5245d77acd999b23",
+  "production_source_unchanged": true,
+  "normal_build": "passed",
+  "normal_build_log": "build/parity-audit/final-build.log",
+  "audit_probe_excluded_from_mod_jar": true,
+  "checked_jar": "build/libs/etfuturum-3.5.16-master.8-2fe04e1fd4-dirty.jar",
+  "checked_jar_sha256": "3cc3e9bdd9f06c2bf626b08cb8fe9b530243d614fa9b44f157ef71a71ec8624d",
+  "modern_state_gameplay_and_restart": "passed",
+  "static_map_pass37_pass38": "passed",
+  "audited_reference": "exact pinned Java 1.21.11",
+  "gameplay_fully_certified": false,
+  "full_pack_tested": false,
+  "committed_or_pushed_by_agent": false
+}

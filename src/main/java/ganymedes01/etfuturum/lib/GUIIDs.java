@@ -10,4 +10,10 @@ public class GUIIDs {
 	public static final int BLAST_FURNACE = 5;
 	public static final int SHULKER_BOX = 6;
 	public static final int SMITHING_TABLE = 7;
+    public static final int STONECUTTER = 8;
+    public static final int LOOM = 9;
+    public static final int GRINDSTONE=10;
+    public static final int LECTERN=11;
+    public static final int CARTOGRAPHY_TABLE=12;
+    public static final int CRAFTER=13;
 }

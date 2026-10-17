@@ -9,6 +9,7 @@ remaining migration debt explicit and prevents migrated Caves & Cliffs assets fr
 from pathlib import Path
 import re
 import sys
+import json
 
 ROOT = Path(__file__).resolve().parents[1]
 MC = ROOT / "src/main/resources/assets/minecraft"
@@ -16,6 +17,8 @@ BRIDGE = ROOT / "src/main/java/ganymedes01/etfuturum/client/ModernAssetResourceP
 
 text = BRIDGE.read_text(encoding="utf-8")
 aliased = set(re.findall(r'\"(textures/[^\"]+)\"', text))
+for catalog in (ROOT/"src/main/resources/assets/etfuturum/asset_aliases").glob("*.json"):
+    aliased.update(json.loads(catalog.read_text())["aliases"])
 regressions = []
 for rel in sorted(aliased):
     if (MC / rel).is_file():
@@ -29,4 +32,4 @@ if regressions:
     for rel in regressions:
         print(f" - {rel}")
     sys.exit(1)
-print("Caves & Cliffs migrated-asset guard PASSED")
+print("Migrated-asset guards PASSED (including workstation/production assets)")

@@ -29,6 +29,13 @@ public class BlockCartographyTable extends Block {
 		this.setCreativeTab(EtFuturum.creativeTabBlocks);
 	}
 
+    @Override
+    public boolean onBlockActivated(net.minecraft.world.World world,int x,int y,int z,net.minecraft.entity.player.EntityPlayer player,int side,float hitX,float hitY,float hitZ) {
+        if(!ganymedes01.etfuturum.recipes.CartographyRecipes.enabled() || ganymedes01.etfuturum.api.spectator.SpectatorUtils.isSpectator(player))return false;
+        if(!world.isRemote)player.openGui(EtFuturum.instance,ganymedes01.etfuturum.lib.GUIIDs.CARTOGRAPHY_TABLE,world,x,y,z);
+        return true;
+    }
+
 	@Override
 	public IIcon getIcon(int side, int meta) {
 		return side == 1 ? this.topIcon : (side == 0 ? Blocks.planks.getIcon(0, 5) : (side == 2 || side == 5 ? this.bottomIcon : side == 3 ? this.blockIcon : this.sideIcon));

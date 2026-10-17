@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "aliases": {
+    "textures/items/netherite_upgrade_smithing_template.png": "textures/item/netherite_upgrade_smithing_template.png",
+    "textures/items/sentry_armor_trim_smithing_template.png": "textures/item/sentry_armor_trim_smithing_template.png",
+    "textures/items/dune_armor_trim_smithing_template.png": "textures/item/dune_armor_trim_smithing_template.png",
+    "textures/items/coast_armor_trim_smithing_template.png": "textures/item/coast_armor_trim_smithing_template.png",
+    "textures/items/wild_armor_trim_smithing_template.png": "textures/item/wild_armor_trim_smithing_template.png",
+    "textures/items/ward_armor_trim_smithing_template.png": "textures/item/ward_armor_trim_smithing_template.png",
+    "textures/items/eye_armor_trim_smithing_template.png": "textures/item/eye_armor_trim_smithing_template.png",
+    "textures/items/vex_armor_trim_smithing_template.png": "textures/item/vex_armor_trim_smithing_template.png",
+    "textures/items/tide_armor_trim_smithing_template.png": "textures/item/tide_armor_trim_smithing_template.png",
+    "textures/items/snout_armor_trim_smithing_template.png": "textures/item/snout_armor_trim_smithing_template.png",
+    "textures/items/rib_armor_trim_smithing_template.png": "textures/item/rib_armor_trim_smithing_template.png",
+    "textures/items/spire_armor_trim_smithing_template.png": "textures/item/spire_armor_trim_smithing_template.png",
+    "textures/items/wayfinder_armor_trim_smithing_template.png": "textures/item/wayfinder_armor_trim_smithing_template.png",
+    "textures/items/shaper_armor_trim_smithing_template.png": "textures/item/shaper_armor_trim_smithing_template.png",
+    "textures/items/silence_armor_trim_smithing_template.png": "textures/item/silence_armor_trim_smithing_template.png",
+    "textures/items/raiser_armor_trim_smithing_template.png": "textures/item/raiser_armor_trim_smithing_template.png",
+    "textures/items/host_armor_trim_smithing_template.png": "textures/item/host_armor_trim_smithing_template.png",
+    "textures/items/flow_armor_trim_smithing_template.png": "textures/item/flow_armor_trim_smithing_template.png",
+    "textures/items/bolt_armor_trim_smithing_template.png": "textures/item/bolt_armor_trim_smithing_template.png"
+  }
+}

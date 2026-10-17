@@ -1,0 +1,3563 @@
+{
+  "schema": 1,
+  "vanilla_sha1": "ba2df812c2d12e0219c489c4cd9a5e1f0760f5bd",
+  "crosswalk_sha256": "763be02866522c9aaed6412dfcf1533a005fcf99ffeb31e1d0d7765dabb6cd58",
+  "recipes": [
+    {
+      "id": "minecraft:andesite_slab_from_andesite_stonecutting",
+      "modern_input": "minecraft:andesite",
+      "modern_output": "minecraft:andesite_slab",
+      "input": {
+        "item": "etfuturum:stone",
+        "meta": 5
+      },
+      "output": {
+        "item": "etfuturum:stone_slab_2",
+        "meta": 4,
+        "count": 2
+      }
+    },
+    {
+      "id": "minecraft:andesite_stairs_from_andesite_stonecutting",
+      "modern_input": "minecraft:andesite",
+      "modern_output": "minecraft:andesite_stairs",
+      "input": {
+        "item": "etfuturum:stone",
+        "meta": 5
+      },
+      "output": {
+        "item": "etfuturum:andesite_stairs",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:andesite_wall_from_andesite_stonecutting",
+      "modern_input": "minecraft:andesite",
+      "modern_output": "minecraft:andesite_wall",
+      "input": {
+        "item": "etfuturum:stone",
+        "meta": 5
+      },
+      "output": {
+        "item": "etfuturum:stone_wall_2",
+        "meta": 2,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:blackstone_slab_from_blackstone_stonecutting",
+      "modern_input": "minecraft:blackstone",
+      "modern_output": "minecraft:blackstone_slab",
+      "input": {
+        "item": "etfuturum:blackstone",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:blackstone_slab",
+        "meta": 0,
+        "count": 2
+      }
+    },
+    {
+      "id": "minecraft:blackstone_stairs_from_blackstone_stonecutting",
+      "modern_input": "minecraft:blackstone",
+      "modern_output": "minecraft:blackstone_stairs",
+      "input": {
+        "item": "etfuturum:blackstone",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:blackstone_stairs",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:blackstone_wall_from_blackstone_stonecutting",
+      "modern_input": "minecraft:blackstone",
+      "modern_output": "minecraft:blackstone_wall",
+      "input": {
+        "item": "etfuturum:blackstone",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:blackstone_wall",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:brick_slab_from_bricks_stonecutting",
+      "modern_input": "minecraft:bricks",
+      "modern_output": "minecraft:brick_slab",
+      "input": {
+        "item": "minecraft:brick_block",
+        "meta": 0
+      },
+      "output": {
+        "item": "minecraft:stone_slab",
+        "meta": 4,
+        "count": 2
+      }
+    },
+    {
+      "id": "minecraft:brick_stairs_from_bricks_stonecutting",
+      "modern_input": "minecraft:bricks",
+      "modern_output": "minecraft:brick_stairs",
+      "input": {
+        "item": "minecraft:brick_block",
+        "meta": 0
+      },
+      "output": {
+        "item": "minecraft:brick_stairs",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:brick_wall_from_bricks_stonecutting",
+      "modern_input": "minecraft:bricks",
+      "modern_output": "minecraft:brick_wall",
+      "input": {
+        "item": "minecraft:brick_block",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:stone_wall",
+        "meta": 3,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:chiseled_copper_from_copper_block_stonecutting",
+      "modern_input": "minecraft:copper_block",
+      "modern_output": "minecraft:chiseled_copper",
+      "input": {
+        "item": "etfuturum:copper_block",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:chiseled_copper",
+        "meta": 0,
+        "count": 4
+      }
+    },
+    {
+      "id": "minecraft:chiseled_copper_from_cut_copper_stonecutting",
+      "modern_input": "minecraft:cut_copper",
+      "modern_output": "minecraft:chiseled_copper",
+      "input": {
+        "item": "etfuturum:copper_block",
+        "meta": 4
+      },
+      "output": {
+        "item": "etfuturum:chiseled_copper",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:chiseled_deepslate_from_cobbled_deepslate_stonecutting",
+      "modern_input": "minecraft:cobbled_deepslate",
+      "modern_output": "minecraft:chiseled_deepslate",
+      "input": {
+        "item": "etfuturum:cobbled_deepslate",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:deepslate_bricks",
+        "meta": 4,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:chiseled_nether_bricks_from_nether_bricks_stonecutting",
+      "modern_input": "minecraft:nether_bricks",
+      "modern_output": "minecraft:chiseled_nether_bricks",
+      "input": {
+        "item": "minecraft:nether_brick",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:red_netherbrick",
+        "meta": 2,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:chiseled_polished_blackstone_from_blackstone_stonecutting",
+      "modern_input": "minecraft:blackstone",
+      "modern_output": "minecraft:chiseled_polished_blackstone",
+      "input": {
+        "item": "etfuturum:blackstone",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:blackstone",
+        "meta": 4,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:chiseled_polished_blackstone_from_polished_blackstone_stonecutting",
+      "modern_input": "minecraft:polished_blackstone",
+      "modern_output": "minecraft:chiseled_polished_blackstone",
+      "input": {
+        "item": "etfuturum:blackstone",
+        "meta": 1
+      },
+      "output": {
+        "item": "etfuturum:blackstone",
+        "meta": 4,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:chiseled_quartz_block_from_quartz_block_stonecutting",
+      "modern_input": "minecraft:quartz_block",
+      "modern_output": "minecraft:chiseled_quartz_block",
+      "input": {
+        "item": "minecraft:quartz_block",
+        "meta": 0
+      },
+      "output": {
+        "item": "minecraft:quartz_block",
+        "meta": 1,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:chiseled_red_sandstone_from_red_sandstone_stonecutting",
+      "modern_input": "minecraft:red_sandstone",
+      "modern_output": "minecraft:chiseled_red_sandstone",
+      "input": {
+        "item": "etfuturum:red_sandstone",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:red_sandstone",
+        "meta": 1,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:chiseled_resin_bricks_from_resin_bricks_stonecutting",
+      "modern_input": "minecraft:resin_bricks",
+      "modern_output": "minecraft:chiseled_resin_bricks",
+      "input": {
+        "item": "etfuturum:resin_bricks",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:chiseled_resin_bricks",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:chiseled_sandstone_from_sandstone_stonecutting",
+      "modern_input": "minecraft:sandstone",
+      "modern_output": "minecraft:chiseled_sandstone",
+      "input": {
+        "item": "minecraft:sandstone",
+        "meta": 0
+      },
+      "output": {
+        "item": "minecraft:sandstone",
+        "meta": 1,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:chiseled_stone_bricks_from_stone_bricks_stonecutting",
+      "modern_input": "minecraft:stone_bricks",
+      "modern_output": "minecraft:chiseled_stone_bricks",
+      "input": {
+        "item": "minecraft:stonebrick",
+        "meta": 0
+      },
+      "output": {
+        "item": "minecraft:stonebrick",
+        "meta": 3,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:chiseled_stone_bricks_stone_from_stonecutting",
+      "modern_input": "minecraft:stone",
+      "modern_output": "minecraft:chiseled_stone_bricks",
+      "input": {
+        "item": "minecraft:stone",
+        "meta": 0
+      },
+      "output": {
+        "item": "minecraft:stonebrick",
+        "meta": 3,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:chiseled_tuff_bricks_from_polished_tuff_stonecutting",
+      "modern_input": "minecraft:polished_tuff",
+      "modern_output": "minecraft:chiseled_tuff_bricks",
+      "input": {
+        "item": "etfuturum:tuff",
+        "meta": 1
+      },
+      "output": {
+        "item": "etfuturum:tuff",
+        "meta": 4,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:chiseled_tuff_bricks_from_tuff_bricks_stonecutting",
+      "modern_input": "minecraft:tuff_bricks",
+      "modern_output": "minecraft:chiseled_tuff_bricks",
+      "input": {
+        "item": "etfuturum:tuff",
+        "meta": 2
+      },
+      "output": {
+        "item": "etfuturum:tuff",
+        "meta": 4,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:chiseled_tuff_bricks_from_tuff_stonecutting",
+      "modern_input": "minecraft:tuff",
+      "modern_output": "minecraft:chiseled_tuff_bricks",
+      "input": {
+        "item": "etfuturum:tuff",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:tuff",
+        "meta": 4,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:chiseled_tuff_from_tuff_stonecutting",
+      "modern_input": "minecraft:tuff",
+      "modern_output": "minecraft:chiseled_tuff",
+      "input": {
+        "item": "etfuturum:tuff",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:tuff",
+        "meta": 3,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:cobbled_deepslate_slab_from_cobbled_deepslate_stonecutting",
+      "modern_input": "minecraft:cobbled_deepslate",
+      "modern_output": "minecraft:cobbled_deepslate_slab",
+      "input": {
+        "item": "etfuturum:cobbled_deepslate",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:deepslate_slab",
+        "meta": 0,
+        "count": 2
+      }
+    },
+    {
+      "id": "minecraft:cobbled_deepslate_stairs_from_cobbled_deepslate_stonecutting",
+      "modern_input": "minecraft:cobbled_deepslate",
+      "modern_output": "minecraft:cobbled_deepslate_stairs",
+      "input": {
+        "item": "etfuturum:cobbled_deepslate",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:cobbled_deepslate_stairs",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:cobbled_deepslate_wall_from_cobbled_deepslate_stonecutting",
+      "modern_input": "minecraft:cobbled_deepslate",
+      "modern_output": "minecraft:cobbled_deepslate_wall",
+      "input": {
+        "item": "etfuturum:cobbled_deepslate",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:deepslate_wall",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:cobblestone_slab_from_cobblestone_stonecutting",
+      "modern_input": "minecraft:cobblestone",
+      "modern_output": "minecraft:cobblestone_slab",
+      "input": {
+        "item": "minecraft:cobblestone",
+        "meta": 0
+      },
+      "output": {
+        "item": "minecraft:stone_slab",
+        "meta": 3,
+        "count": 2
+      }
+    },
+    {
+      "id": "minecraft:cobblestone_stairs_from_cobblestone_stonecutting",
+      "modern_input": "minecraft:cobblestone",
+      "modern_output": "minecraft:cobblestone_stairs",
+      "input": {
+        "item": "minecraft:cobblestone",
+        "meta": 0
+      },
+      "output": {
+        "item": "minecraft:stone_stairs",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:cobblestone_wall_from_cobblestone_stonecutting",
+      "modern_input": "minecraft:cobblestone",
+      "modern_output": "minecraft:cobblestone_wall",
+      "input": {
+        "item": "minecraft:cobblestone",
+        "meta": 0
+      },
+      "output": {
+        "item": "minecraft:cobblestone_wall",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:copper_grate_from_copper_block_stonecutting",
+      "modern_input": "minecraft:copper_block",
+      "modern_output": "minecraft:copper_grate",
+      "input": {
+        "item": "etfuturum:copper_block",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:copper_grate",
+        "meta": 0,
+        "count": 4
+      }
+    },
+    {
+      "id": "minecraft:cut_copper_from_copper_block_stonecutting",
+      "modern_input": "minecraft:copper_block",
+      "modern_output": "minecraft:cut_copper",
+      "input": {
+        "item": "etfuturum:copper_block",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:copper_block",
+        "meta": 4,
+        "count": 4
+      }
+    },
+    {
+      "id": "minecraft:cut_copper_slab_from_copper_block_stonecutting",
+      "modern_input": "minecraft:copper_block",
+      "modern_output": "minecraft:cut_copper_slab",
+      "input": {
+        "item": "etfuturum:copper_block",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:cut_copper_slab",
+        "meta": 0,
+        "count": 8
+      }
+    },
+    {
+      "id": "minecraft:cut_copper_slab_from_cut_copper_stonecutting",
+      "modern_input": "minecraft:cut_copper",
+      "modern_output": "minecraft:cut_copper_slab",
+      "input": {
+        "item": "etfuturum:copper_block",
+        "meta": 4
+      },
+      "output": {
+        "item": "etfuturum:cut_copper_slab",
+        "meta": 0,
+        "count": 2
+      }
+    },
+    {
+      "id": "minecraft:cut_copper_stairs_from_copper_block_stonecutting",
+      "modern_input": "minecraft:copper_block",
+      "modern_output": "minecraft:cut_copper_stairs",
+      "input": {
+        "item": "etfuturum:copper_block",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:cut_copper_stairs",
+        "meta": 0,
+        "count": 4
+      }
+    },
+    {
+      "id": "minecraft:cut_copper_stairs_from_cut_copper_stonecutting",
+      "modern_input": "minecraft:cut_copper",
+      "modern_output": "minecraft:cut_copper_stairs",
+      "input": {
+        "item": "etfuturum:copper_block",
+        "meta": 4
+      },
+      "output": {
+        "item": "etfuturum:cut_copper_stairs",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:cut_red_sandstone_from_red_sandstone_stonecutting",
+      "modern_input": "minecraft:red_sandstone",
+      "modern_output": "minecraft:cut_red_sandstone",
+      "input": {
+        "item": "etfuturum:red_sandstone",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:red_sandstone",
+        "meta": 2,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:cut_red_sandstone_slab_from_cut_red_sandstone_stonecutting",
+      "modern_input": "minecraft:cut_red_sandstone",
+      "modern_output": "minecraft:cut_red_sandstone_slab",
+      "input": {
+        "item": "etfuturum:red_sandstone",
+        "meta": 2
+      },
+      "output": {
+        "item": "etfuturum:red_sandstone_slab",
+        "meta": 1,
+        "count": 2
+      }
+    },
+    {
+      "id": "minecraft:cut_red_sandstone_slab_from_red_sandstone_stonecutting",
+      "modern_input": "minecraft:red_sandstone",
+      "modern_output": "minecraft:cut_red_sandstone_slab",
+      "input": {
+        "item": "etfuturum:red_sandstone",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:red_sandstone_slab",
+        "meta": 1,
+        "count": 2
+      }
+    },
+    {
+      "id": "minecraft:cut_sandstone_from_sandstone_stonecutting",
+      "modern_input": "minecraft:sandstone",
+      "modern_output": "minecraft:cut_sandstone",
+      "input": {
+        "item": "minecraft:sandstone",
+        "meta": 0
+      },
+      "output": {
+        "item": "minecraft:sandstone",
+        "meta": 2,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:cut_sandstone_slab_from_cut_sandstone_stonecutting",
+      "modern_input": "minecraft:cut_sandstone",
+      "modern_output": "minecraft:cut_sandstone_slab",
+      "input": {
+        "item": "minecraft:sandstone",
+        "meta": 2
+      },
+      "output": {
+        "item": "etfuturum:stone_slab",
+        "meta": 3,
+        "count": 2
+      }
+    },
+    {
+      "id": "minecraft:cut_sandstone_slab_from_sandstone_stonecutting",
+      "modern_input": "minecraft:sandstone",
+      "modern_output": "minecraft:cut_sandstone_slab",
+      "input": {
+        "item": "minecraft:sandstone",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:stone_slab",
+        "meta": 3,
+        "count": 2
+      }
+    },
+    {
+      "id": "minecraft:dark_prismarine_slab_from_dark_prismarine_stonecutting",
+      "modern_input": "minecraft:dark_prismarine",
+      "modern_output": "minecraft:dark_prismarine_slab",
+      "input": {
+        "item": "etfuturum:prismarine_block",
+        "meta": 2
+      },
+      "output": {
+        "item": "etfuturum:prismarine_slab",
+        "meta": 2,
+        "count": 2
+      }
+    },
+    {
+      "id": "minecraft:dark_prismarine_stairs_from_dark_prismarine_stonecutting",
+      "modern_input": "minecraft:dark_prismarine",
+      "modern_output": "minecraft:dark_prismarine_stairs",
+      "input": {
+        "item": "etfuturum:prismarine_block",
+        "meta": 2
+      },
+      "output": {
+        "item": "etfuturum:prismarine_stairs_dark",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:deepslate_brick_slab_from_cobbled_deepslate_stonecutting",
+      "modern_input": "minecraft:cobbled_deepslate",
+      "modern_output": "minecraft:deepslate_brick_slab",
+      "input": {
+        "item": "etfuturum:cobbled_deepslate",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:deepslate_brick_slab",
+        "meta": 0,
+        "count": 2
+      }
+    },
+    {
+      "id": "minecraft:deepslate_brick_slab_from_deepslate_bricks_stonecutting",
+      "modern_input": "minecraft:deepslate_bricks",
+      "modern_output": "minecraft:deepslate_brick_slab",
+      "input": {
+        "item": "etfuturum:deepslate_bricks",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:deepslate_brick_slab",
+        "meta": 0,
+        "count": 2
+      }
+    },
+    {
+      "id": "minecraft:deepslate_brick_slab_from_polished_deepslate_stonecutting",
+      "modern_input": "minecraft:polished_deepslate",
+      "modern_output": "minecraft:deepslate_brick_slab",
+      "input": {
+        "item": "etfuturum:polished_deepslate",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:deepslate_brick_slab",
+        "meta": 0,
+        "count": 2
+      }
+    },
+    {
+      "id": "minecraft:deepslate_brick_stairs_from_cobbled_deepslate_stonecutting",
+      "modern_input": "minecraft:cobbled_deepslate",
+      "modern_output": "minecraft:deepslate_brick_stairs",
+      "input": {
+        "item": "etfuturum:cobbled_deepslate",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:deepslate_brick_stairs",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:deepslate_brick_stairs_from_deepslate_bricks_stonecutting",
+      "modern_input": "minecraft:deepslate_bricks",
+      "modern_output": "minecraft:deepslate_brick_stairs",
+      "input": {
+        "item": "etfuturum:deepslate_bricks",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:deepslate_brick_stairs",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:deepslate_brick_stairs_from_polished_deepslate_stonecutting",
+      "modern_input": "minecraft:polished_deepslate",
+      "modern_output": "minecraft:deepslate_brick_stairs",
+      "input": {
+        "item": "etfuturum:polished_deepslate",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:deepslate_brick_stairs",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:deepslate_brick_wall_from_cobbled_deepslate_stonecutting",
+      "modern_input": "minecraft:cobbled_deepslate",
+      "modern_output": "minecraft:deepslate_brick_wall",
+      "input": {
+        "item": "etfuturum:cobbled_deepslate",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:deepslate_brick_wall",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:deepslate_brick_wall_from_deepslate_bricks_stonecutting",
+      "modern_input": "minecraft:deepslate_bricks",
+      "modern_output": "minecraft:deepslate_brick_wall",
+      "input": {
+        "item": "etfuturum:deepslate_bricks",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:deepslate_brick_wall",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:deepslate_brick_wall_from_polished_deepslate_stonecutting",
+      "modern_input": "minecraft:polished_deepslate",
+      "modern_output": "minecraft:deepslate_brick_wall",
+      "input": {
+        "item": "etfuturum:polished_deepslate",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:deepslate_brick_wall",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:deepslate_bricks_from_cobbled_deepslate_stonecutting",
+      "modern_input": "minecraft:cobbled_deepslate",
+      "modern_output": "minecraft:deepslate_bricks",
+      "input": {
+        "item": "etfuturum:cobbled_deepslate",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:deepslate_bricks",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:deepslate_bricks_from_polished_deepslate_stonecutting",
+      "modern_input": "minecraft:polished_deepslate",
+      "modern_output": "minecraft:deepslate_bricks",
+      "input": {
+        "item": "etfuturum:polished_deepslate",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:deepslate_bricks",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:deepslate_tile_slab_from_cobbled_deepslate_stonecutting",
+      "modern_input": "minecraft:cobbled_deepslate",
+      "modern_output": "minecraft:deepslate_tile_slab",
+      "input": {
+        "item": "etfuturum:cobbled_deepslate",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:deepslate_brick_slab",
+        "meta": 1,
+        "count": 2
+      }
+    },
+    {
+      "id": "minecraft:deepslate_tile_slab_from_deepslate_bricks_stonecutting",
+      "modern_input": "minecraft:deepslate_bricks",
+      "modern_output": "minecraft:deepslate_tile_slab",
+      "input": {
+        "item": "etfuturum:deepslate_bricks",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:deepslate_brick_slab",
+        "meta": 1,
+        "count": 2
+      }
+    },
+    {
+      "id": "minecraft:deepslate_tile_slab_from_deepslate_tiles_stonecutting",
+      "modern_input": "minecraft:deepslate_tiles",
+      "modern_output": "minecraft:deepslate_tile_slab",
+      "input": {
+        "item": "etfuturum:deepslate_bricks",
+        "meta": 2
+      },
+      "output": {
+        "item": "etfuturum:deepslate_brick_slab",
+        "meta": 1,
+        "count": 2
+      }
+    },
+    {
+      "id": "minecraft:deepslate_tile_slab_from_polished_deepslate_stonecutting",
+      "modern_input": "minecraft:polished_deepslate",
+      "modern_output": "minecraft:deepslate_tile_slab",
+      "input": {
+        "item": "etfuturum:polished_deepslate",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:deepslate_brick_slab",
+        "meta": 1,
+        "count": 2
+      }
+    },
+    {
+      "id": "minecraft:deepslate_tile_stairs_from_cobbled_deepslate_stonecutting",
+      "modern_input": "minecraft:cobbled_deepslate",
+      "modern_output": "minecraft:deepslate_tile_stairs",
+      "input": {
+        "item": "etfuturum:cobbled_deepslate",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:deepslate_tile_stairs",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:deepslate_tile_stairs_from_deepslate_bricks_stonecutting",
+      "modern_input": "minecraft:deepslate_bricks",
+      "modern_output": "minecraft:deepslate_tile_stairs",
+      "input": {
+        "item": "etfuturum:deepslate_bricks",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:deepslate_tile_stairs",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:deepslate_tile_stairs_from_deepslate_tiles_stonecutting",
+      "modern_input": "minecraft:deepslate_tiles",
+      "modern_output": "minecraft:deepslate_tile_stairs",
+      "input": {
+        "item": "etfuturum:deepslate_bricks",
+        "meta": 2
+      },
+      "output": {
+        "item": "etfuturum:deepslate_tile_stairs",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:deepslate_tile_stairs_from_polished_deepslate_stonecutting",
+      "modern_input": "minecraft:polished_deepslate",
+      "modern_output": "minecraft:deepslate_tile_stairs",
+      "input": {
+        "item": "etfuturum:polished_deepslate",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:deepslate_tile_stairs",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:deepslate_tile_wall_from_cobbled_deepslate_stonecutting",
+      "modern_input": "minecraft:cobbled_deepslate",
+      "modern_output": "minecraft:deepslate_tile_wall",
+      "input": {
+        "item": "etfuturum:cobbled_deepslate",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:deepslate_brick_wall",
+        "meta": 1,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:deepslate_tile_wall_from_deepslate_bricks_stonecutting",
+      "modern_input": "minecraft:deepslate_bricks",
+      "modern_output": "minecraft:deepslate_tile_wall",
+      "input": {
+        "item": "etfuturum:deepslate_bricks",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:deepslate_brick_wall",
+        "meta": 1,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:deepslate_tile_wall_from_deepslate_tiles_stonecutting",
+      "modern_input": "minecraft:deepslate_tiles",
+      "modern_output": "minecraft:deepslate_tile_wall",
+      "input": {
+        "item": "etfuturum:deepslate_bricks",
+        "meta": 2
+      },
+      "output": {
+        "item": "etfuturum:deepslate_brick_wall",
+        "meta": 1,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:deepslate_tile_wall_from_polished_deepslate_stonecutting",
+      "modern_input": "minecraft:polished_deepslate",
+      "modern_output": "minecraft:deepslate_tile_wall",
+      "input": {
+        "item": "etfuturum:polished_deepslate",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:deepslate_brick_wall",
+        "meta": 1,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:deepslate_tiles_from_cobbled_deepslate_stonecutting",
+      "modern_input": "minecraft:cobbled_deepslate",
+      "modern_output": "minecraft:deepslate_tiles",
+      "input": {
+        "item": "etfuturum:cobbled_deepslate",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:deepslate_bricks",
+        "meta": 2,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:deepslate_tiles_from_deepslate_bricks_stonecutting",
+      "modern_input": "minecraft:deepslate_bricks",
+      "modern_output": "minecraft:deepslate_tiles",
+      "input": {
+        "item": "etfuturum:deepslate_bricks",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:deepslate_bricks",
+        "meta": 2,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:deepslate_tiles_from_polished_deepslate_stonecutting",
+      "modern_input": "minecraft:polished_deepslate",
+      "modern_output": "minecraft:deepslate_tiles",
+      "input": {
+        "item": "etfuturum:polished_deepslate",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:deepslate_bricks",
+        "meta": 2,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:diorite_slab_from_diorite_stonecutting",
+      "modern_input": "minecraft:diorite",
+      "modern_output": "minecraft:diorite_slab",
+      "input": {
+        "item": "etfuturum:stone",
+        "meta": 3
+      },
+      "output": {
+        "item": "etfuturum:stone_slab_2",
+        "meta": 2,
+        "count": 2
+      }
+    },
+    {
+      "id": "minecraft:diorite_stairs_from_diorite_stonecutting",
+      "modern_input": "minecraft:diorite",
+      "modern_output": "minecraft:diorite_stairs",
+      "input": {
+        "item": "etfuturum:stone",
+        "meta": 3
+      },
+      "output": {
+        "item": "etfuturum:diorite_stairs",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:diorite_wall_from_diorite_stonecutting",
+      "modern_input": "minecraft:diorite",
+      "modern_output": "minecraft:diorite_wall",
+      "input": {
+        "item": "etfuturum:stone",
+        "meta": 3
+      },
+      "output": {
+        "item": "etfuturum:stone_wall_2",
+        "meta": 1,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:end_stone_brick_slab_from_end_stone_brick_stonecutting",
+      "modern_input": "minecraft:end_stone_bricks",
+      "modern_output": "minecraft:end_stone_brick_slab",
+      "input": {
+        "item": "etfuturum:end_bricks",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:end_brick_slab",
+        "meta": 0,
+        "count": 2
+      }
+    },
+    {
+      "id": "minecraft:end_stone_brick_slab_from_end_stone_stonecutting",
+      "modern_input": "minecraft:end_stone",
+      "modern_output": "minecraft:end_stone_brick_slab",
+      "input": {
+        "item": "minecraft:end_stone",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:end_brick_slab",
+        "meta": 0,
+        "count": 2
+      }
+    },
+    {
+      "id": "minecraft:end_stone_brick_stairs_from_end_stone_brick_stonecutting",
+      "modern_input": "minecraft:end_stone_bricks",
+      "modern_output": "minecraft:end_stone_brick_stairs",
+      "input": {
+        "item": "etfuturum:end_bricks",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:end_brick_stairs",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:end_stone_brick_stairs_from_end_stone_stonecutting",
+      "modern_input": "minecraft:end_stone",
+      "modern_output": "minecraft:end_stone_brick_stairs",
+      "input": {
+        "item": "minecraft:end_stone",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:end_brick_stairs",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:end_stone_brick_wall_from_end_stone_brick_stonecutting",
+      "modern_input": "minecraft:end_stone_bricks",
+      "modern_output": "minecraft:end_stone_brick_wall",
+      "input": {
+        "item": "etfuturum:end_bricks",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:end_brick_wall",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:end_stone_brick_wall_from_end_stone_stonecutting",
+      "modern_input": "minecraft:end_stone",
+      "modern_output": "minecraft:end_stone_brick_wall",
+      "input": {
+        "item": "minecraft:end_stone",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:end_brick_wall",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:end_stone_bricks_from_end_stone_stonecutting",
+      "modern_input": "minecraft:end_stone",
+      "modern_output": "minecraft:end_stone_bricks",
+      "input": {
+        "item": "minecraft:end_stone",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:end_bricks",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:exposed_chiseled_copper_from_exposed_copper_stonecutting",
+      "modern_input": "minecraft:exposed_copper",
+      "modern_output": "minecraft:exposed_chiseled_copper",
+      "input": {
+        "item": "etfuturum:copper_block",
+        "meta": 1
+      },
+      "output": {
+        "item": "etfuturum:chiseled_copper",
+        "meta": 1,
+        "count": 4
+      }
+    },
+    {
+      "id": "minecraft:exposed_chiseled_copper_from_exposed_cut_copper_stonecutting",
+      "modern_input": "minecraft:exposed_cut_copper",
+      "modern_output": "minecraft:exposed_chiseled_copper",
+      "input": {
+        "item": "etfuturum:copper_block",
+        "meta": 5
+      },
+      "output": {
+        "item": "etfuturum:chiseled_copper",
+        "meta": 1,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:exposed_copper_grate_from_exposed_copper_stonecutting",
+      "modern_input": "minecraft:exposed_copper",
+      "modern_output": "minecraft:exposed_copper_grate",
+      "input": {
+        "item": "etfuturum:copper_block",
+        "meta": 1
+      },
+      "output": {
+        "item": "etfuturum:copper_grate",
+        "meta": 1,
+        "count": 4
+      }
+    },
+    {
+      "id": "minecraft:exposed_cut_copper_from_exposed_copper_stonecutting",
+      "modern_input": "minecraft:exposed_copper",
+      "modern_output": "minecraft:exposed_cut_copper",
+      "input": {
+        "item": "etfuturum:copper_block",
+        "meta": 1
+      },
+      "output": {
+        "item": "etfuturum:copper_block",
+        "meta": 5,
+        "count": 4
+      }
+    },
+    {
+      "id": "minecraft:exposed_cut_copper_slab_from_exposed_copper_stonecutting",
+      "modern_input": "minecraft:exposed_copper",
+      "modern_output": "minecraft:exposed_cut_copper_slab",
+      "input": {
+        "item": "etfuturum:copper_block",
+        "meta": 1
+      },
+      "output": {
+        "item": "etfuturum:cut_copper_slab",
+        "meta": 1,
+        "count": 8
+      }
+    },
+    {
+      "id": "minecraft:exposed_cut_copper_slab_from_exposed_cut_copper_stonecutting",
+      "modern_input": "minecraft:exposed_cut_copper",
+      "modern_output": "minecraft:exposed_cut_copper_slab",
+      "input": {
+        "item": "etfuturum:copper_block",
+        "meta": 5
+      },
+      "output": {
+        "item": "etfuturum:cut_copper_slab",
+        "meta": 1,
+        "count": 2
+      }
+    },
+    {
+      "id": "minecraft:exposed_cut_copper_stairs_from_exposed_copper_stonecutting",
+      "modern_input": "minecraft:exposed_copper",
+      "modern_output": "minecraft:exposed_cut_copper_stairs",
+      "input": {
+        "item": "etfuturum:copper_block",
+        "meta": 1
+      },
+      "output": {
+        "item": "etfuturum:exposed_cut_copper_stairs",
+        "meta": 0,
+        "count": 4
+      }
+    },
+    {
+      "id": "minecraft:exposed_cut_copper_stairs_from_exposed_cut_copper_stonecutting",
+      "modern_input": "minecraft:exposed_cut_copper",
+      "modern_output": "minecraft:exposed_cut_copper_stairs",
+      "input": {
+        "item": "etfuturum:copper_block",
+        "meta": 5
+      },
+      "output": {
+        "item": "etfuturum:exposed_cut_copper_stairs",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:granite_slab_from_granite_stonecutting",
+      "modern_input": "minecraft:granite",
+      "modern_output": "minecraft:granite_slab",
+      "input": {
+        "item": "etfuturum:stone",
+        "meta": 1
+      },
+      "output": {
+        "item": "etfuturum:stone_slab_2",
+        "meta": 0,
+        "count": 2
+      }
+    },
+    {
+      "id": "minecraft:granite_stairs_from_granite_stonecutting",
+      "modern_input": "minecraft:granite",
+      "modern_output": "minecraft:granite_stairs",
+      "input": {
+        "item": "etfuturum:stone",
+        "meta": 1
+      },
+      "output": {
+        "item": "etfuturum:granite_stairs",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:granite_wall_from_granite_stonecutting",
+      "modern_input": "minecraft:granite",
+      "modern_output": "minecraft:granite_wall",
+      "input": {
+        "item": "etfuturum:stone",
+        "meta": 1
+      },
+      "output": {
+        "item": "etfuturum:stone_wall_2",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:mossy_cobblestone_slab_from_mossy_cobblestone_stonecutting",
+      "modern_input": "minecraft:mossy_cobblestone",
+      "modern_output": "minecraft:mossy_cobblestone_slab",
+      "input": {
+        "item": "minecraft:mossy_cobblestone",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:stone_slab",
+        "meta": 1,
+        "count": 2
+      }
+    },
+    {
+      "id": "minecraft:mossy_cobblestone_stairs_from_mossy_cobblestone_stonecutting",
+      "modern_input": "minecraft:mossy_cobblestone",
+      "modern_output": "minecraft:mossy_cobblestone_stairs",
+      "input": {
+        "item": "minecraft:mossy_cobblestone",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:mossy_cobblestone_stairs",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:mossy_cobblestone_wall_from_mossy_cobblestone_stonecutting",
+      "modern_input": "minecraft:mossy_cobblestone",
+      "modern_output": "minecraft:mossy_cobblestone_wall",
+      "input": {
+        "item": "minecraft:mossy_cobblestone",
+        "meta": 0
+      },
+      "output": {
+        "item": "minecraft:cobblestone_wall",
+        "meta": 1,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:mossy_stone_brick_slab_from_mossy_stone_brick_stonecutting",
+      "modern_input": "minecraft:mossy_stone_bricks",
+      "modern_output": "minecraft:mossy_stone_brick_slab",
+      "input": {
+        "item": "minecraft:stonebrick",
+        "meta": 1
+      },
+      "output": {
+        "item": "etfuturum:stone_slab",
+        "meta": 2,
+        "count": 2
+      }
+    },
+    {
+      "id": "minecraft:mossy_stone_brick_stairs_from_mossy_stone_brick_stonecutting",
+      "modern_input": "minecraft:mossy_stone_bricks",
+      "modern_output": "minecraft:mossy_stone_brick_stairs",
+      "input": {
+        "item": "minecraft:stonebrick",
+        "meta": 1
+      },
+      "output": {
+        "item": "etfuturum:mossy_stone_brick_stairs",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:mossy_stone_brick_wall_from_mossy_stone_brick_stonecutting",
+      "modern_input": "minecraft:mossy_stone_bricks",
+      "modern_output": "minecraft:mossy_stone_brick_wall",
+      "input": {
+        "item": "minecraft:stonebrick",
+        "meta": 1
+      },
+      "output": {
+        "item": "etfuturum:stone_wall",
+        "meta": 1,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:mud_brick_slab_from_mud_bricks_stonecutting",
+      "modern_input": "minecraft:mud_bricks",
+      "modern_output": "minecraft:mud_brick_slab",
+      "input": {
+        "item": "etfuturum:packed_mud",
+        "meta": 1
+      },
+      "output": {
+        "item": "etfuturum:mud_brick_slab",
+        "meta": 0,
+        "count": 2
+      }
+    },
+    {
+      "id": "minecraft:mud_brick_stairs_from_mud_bricks_stonecutting",
+      "modern_input": "minecraft:mud_bricks",
+      "modern_output": "minecraft:mud_brick_stairs",
+      "input": {
+        "item": "etfuturum:packed_mud",
+        "meta": 1
+      },
+      "output": {
+        "item": "etfuturum:mud_brick_stairs",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:mud_brick_wall_from_mud_bricks_stonecutting",
+      "modern_input": "minecraft:mud_bricks",
+      "modern_output": "minecraft:mud_brick_wall",
+      "input": {
+        "item": "etfuturum:packed_mud",
+        "meta": 1
+      },
+      "output": {
+        "item": "etfuturum:mud_brick_wall",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:nether_brick_slab_from_nether_bricks_stonecutting",
+      "modern_input": "minecraft:nether_bricks",
+      "modern_output": "minecraft:nether_brick_slab",
+      "input": {
+        "item": "minecraft:nether_brick",
+        "meta": 0
+      },
+      "output": {
+        "item": "minecraft:stone_slab",
+        "meta": 6,
+        "count": 2
+      }
+    },
+    {
+      "id": "minecraft:nether_brick_stairs_from_nether_bricks_stonecutting",
+      "modern_input": "minecraft:nether_bricks",
+      "modern_output": "minecraft:nether_brick_stairs",
+      "input": {
+        "item": "minecraft:nether_brick",
+        "meta": 0
+      },
+      "output": {
+        "item": "minecraft:nether_brick_stairs",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:nether_brick_wall_from_nether_bricks_stonecutting",
+      "modern_input": "minecraft:nether_bricks",
+      "modern_output": "minecraft:nether_brick_wall",
+      "input": {
+        "item": "minecraft:nether_brick",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:nether_brick_wall",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:oxidized_chiseled_copper_from_oxidized_copper_stonecutting",
+      "modern_input": "minecraft:oxidized_copper",
+      "modern_output": "minecraft:oxidized_chiseled_copper",
+      "input": {
+        "item": "etfuturum:copper_block",
+        "meta": 3
+      },
+      "output": {
+        "item": "etfuturum:chiseled_copper",
+        "meta": 3,
+        "count": 4
+      }
+    },
+    {
+      "id": "minecraft:oxidized_chiseled_copper_from_oxidized_cut_copper_stonecutting",
+      "modern_input": "minecraft:oxidized_cut_copper",
+      "modern_output": "minecraft:oxidized_chiseled_copper",
+      "input": {
+        "item": "etfuturum:copper_block",
+        "meta": 7
+      },
+      "output": {
+        "item": "etfuturum:chiseled_copper",
+        "meta": 3,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:oxidized_copper_grate_from_oxidized_copper_stonecutting",
+      "modern_input": "minecraft:oxidized_copper",
+      "modern_output": "minecraft:oxidized_copper_grate",
+      "input": {
+        "item": "etfuturum:copper_block",
+        "meta": 3
+      },
+      "output": {
+        "item": "etfuturum:copper_grate",
+        "meta": 3,
+        "count": 4
+      }
+    },
+    {
+      "id": "minecraft:oxidized_cut_copper_from_oxidized_copper_stonecutting",
+      "modern_input": "minecraft:oxidized_copper",
+      "modern_output": "minecraft:oxidized_cut_copper",
+      "input": {
+        "item": "etfuturum:copper_block",
+        "meta": 3
+      },
+      "output": {
+        "item": "etfuturum:copper_block",
+        "meta": 7,
+        "count": 4
+      }
+    },
+    {
+      "id": "minecraft:oxidized_cut_copper_slab_from_oxidized_copper_stonecutting",
+      "modern_input": "minecraft:oxidized_copper",
+      "modern_output": "minecraft:oxidized_cut_copper_slab",
+      "input": {
+        "item": "etfuturum:copper_block",
+        "meta": 3
+      },
+      "output": {
+        "item": "etfuturum:cut_copper_slab",
+        "meta": 3,
+        "count": 8
+      }
+    },
+    {
+      "id": "minecraft:oxidized_cut_copper_slab_from_oxidized_cut_copper_stonecutting",
+      "modern_input": "minecraft:oxidized_cut_copper",
+      "modern_output": "minecraft:oxidized_cut_copper_slab",
+      "input": {
+        "item": "etfuturum:copper_block",
+        "meta": 7
+      },
+      "output": {
+        "item": "etfuturum:cut_copper_slab",
+        "meta": 3,
+        "count": 2
+      }
+    },
+    {
+      "id": "minecraft:oxidized_cut_copper_stairs_from_oxidized_copper_stonecutting",
+      "modern_input": "minecraft:oxidized_copper",
+      "modern_output": "minecraft:oxidized_cut_copper_stairs",
+      "input": {
+        "item": "etfuturum:copper_block",
+        "meta": 3
+      },
+      "output": {
+        "item": "etfuturum:oxidized_cut_copper_stairs",
+        "meta": 0,
+        "count": 4
+      }
+    },
+    {
+      "id": "minecraft:oxidized_cut_copper_stairs_from_oxidized_cut_copper_stonecutting",
+      "modern_input": "minecraft:oxidized_cut_copper",
+      "modern_output": "minecraft:oxidized_cut_copper_stairs",
+      "input": {
+        "item": "etfuturum:copper_block",
+        "meta": 7
+      },
+      "output": {
+        "item": "etfuturum:oxidized_cut_copper_stairs",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:polished_andesite_from_andesite_stonecutting",
+      "modern_input": "minecraft:andesite",
+      "modern_output": "minecraft:polished_andesite",
+      "input": {
+        "item": "etfuturum:stone",
+        "meta": 5
+      },
+      "output": {
+        "item": "etfuturum:stone",
+        "meta": 6,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:polished_andesite_slab_from_andesite_stonecutting",
+      "modern_input": "minecraft:andesite",
+      "modern_output": "minecraft:polished_andesite_slab",
+      "input": {
+        "item": "etfuturum:stone",
+        "meta": 5
+      },
+      "output": {
+        "item": "etfuturum:stone_slab_2",
+        "meta": 5,
+        "count": 2
+      }
+    },
+    {
+      "id": "minecraft:polished_andesite_slab_from_polished_andesite_stonecutting",
+      "modern_input": "minecraft:polished_andesite",
+      "modern_output": "minecraft:polished_andesite_slab",
+      "input": {
+        "item": "etfuturum:stone",
+        "meta": 6
+      },
+      "output": {
+        "item": "etfuturum:stone_slab_2",
+        "meta": 5,
+        "count": 2
+      }
+    },
+    {
+      "id": "minecraft:polished_andesite_stairs_from_andesite_stonecutting",
+      "modern_input": "minecraft:andesite",
+      "modern_output": "minecraft:polished_andesite_stairs",
+      "input": {
+        "item": "etfuturum:stone",
+        "meta": 5
+      },
+      "output": {
+        "item": "etfuturum:polished_andesite_stairs",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:polished_andesite_stairs_from_polished_andesite_stonecutting",
+      "modern_input": "minecraft:polished_andesite",
+      "modern_output": "minecraft:polished_andesite_stairs",
+      "input": {
+        "item": "etfuturum:stone",
+        "meta": 6
+      },
+      "output": {
+        "item": "etfuturum:polished_andesite_stairs",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:polished_basalt_from_basalt_stonecutting",
+      "modern_input": "minecraft:basalt",
+      "modern_output": "minecraft:polished_basalt",
+      "input": {
+        "item": "etfuturum:basalt",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:basalt",
+        "meta": 1,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:polished_blackstone_brick_slab_from_blackstone_stonecutting",
+      "modern_input": "minecraft:blackstone",
+      "modern_output": "minecraft:polished_blackstone_brick_slab",
+      "input": {
+        "item": "etfuturum:blackstone",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:blackstone_slab",
+        "meta": 2,
+        "count": 2
+      }
+    },
+    {
+      "id": "minecraft:polished_blackstone_brick_slab_from_polished_blackstone_bricks_stonecutting",
+      "modern_input": "minecraft:polished_blackstone_bricks",
+      "modern_output": "minecraft:polished_blackstone_brick_slab",
+      "input": {
+        "item": "etfuturum:blackstone",
+        "meta": 2
+      },
+      "output": {
+        "item": "etfuturum:blackstone_slab",
+        "meta": 2,
+        "count": 2
+      }
+    },
+    {
+      "id": "minecraft:polished_blackstone_brick_slab_from_polished_blackstone_stonecutting",
+      "modern_input": "minecraft:polished_blackstone",
+      "modern_output": "minecraft:polished_blackstone_brick_slab",
+      "input": {
+        "item": "etfuturum:blackstone",
+        "meta": 1
+      },
+      "output": {
+        "item": "etfuturum:blackstone_slab",
+        "meta": 2,
+        "count": 2
+      }
+    },
+    {
+      "id": "minecraft:polished_blackstone_brick_stairs_from_blackstone_stonecutting",
+      "modern_input": "minecraft:blackstone",
+      "modern_output": "minecraft:polished_blackstone_brick_stairs",
+      "input": {
+        "item": "etfuturum:blackstone",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:polished_blackstone_brick_stairs",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:polished_blackstone_brick_stairs_from_polished_blackstone_bricks_stonecutting",
+      "modern_input": "minecraft:polished_blackstone_bricks",
+      "modern_output": "minecraft:polished_blackstone_brick_stairs",
+      "input": {
+        "item": "etfuturum:blackstone",
+        "meta": 2
+      },
+      "output": {
+        "item": "etfuturum:polished_blackstone_brick_stairs",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:polished_blackstone_brick_stairs_from_polished_blackstone_stonecutting",
+      "modern_input": "minecraft:polished_blackstone",
+      "modern_output": "minecraft:polished_blackstone_brick_stairs",
+      "input": {
+        "item": "etfuturum:blackstone",
+        "meta": 1
+      },
+      "output": {
+        "item": "etfuturum:polished_blackstone_brick_stairs",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:polished_blackstone_brick_wall_from_blackstone_stonecutting",
+      "modern_input": "minecraft:blackstone",
+      "modern_output": "minecraft:polished_blackstone_brick_wall",
+      "input": {
+        "item": "etfuturum:blackstone",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:blackstone_wall",
+        "meta": 2,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:polished_blackstone_brick_wall_from_polished_blackstone_bricks_stonecutting",
+      "modern_input": "minecraft:polished_blackstone_bricks",
+      "modern_output": "minecraft:polished_blackstone_brick_wall",
+      "input": {
+        "item": "etfuturum:blackstone",
+        "meta": 2
+      },
+      "output": {
+        "item": "etfuturum:blackstone_wall",
+        "meta": 2,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:polished_blackstone_brick_wall_from_polished_blackstone_stonecutting",
+      "modern_input": "minecraft:polished_blackstone",
+      "modern_output": "minecraft:polished_blackstone_brick_wall",
+      "input": {
+        "item": "etfuturum:blackstone",
+        "meta": 1
+      },
+      "output": {
+        "item": "etfuturum:blackstone_wall",
+        "meta": 2,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:polished_blackstone_bricks_from_blackstone_stonecutting",
+      "modern_input": "minecraft:blackstone",
+      "modern_output": "minecraft:polished_blackstone_bricks",
+      "input": {
+        "item": "etfuturum:blackstone",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:blackstone",
+        "meta": 2,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:polished_blackstone_bricks_from_polished_blackstone_stonecutting",
+      "modern_input": "minecraft:polished_blackstone",
+      "modern_output": "minecraft:polished_blackstone_bricks",
+      "input": {
+        "item": "etfuturum:blackstone",
+        "meta": 1
+      },
+      "output": {
+        "item": "etfuturum:blackstone",
+        "meta": 2,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:polished_blackstone_from_blackstone_stonecutting",
+      "modern_input": "minecraft:blackstone",
+      "modern_output": "minecraft:polished_blackstone",
+      "input": {
+        "item": "etfuturum:blackstone",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:blackstone",
+        "meta": 1,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:polished_blackstone_slab_from_blackstone_stonecutting",
+      "modern_input": "minecraft:blackstone",
+      "modern_output": "minecraft:polished_blackstone_slab",
+      "input": {
+        "item": "etfuturum:blackstone",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:blackstone_slab",
+        "meta": 1,
+        "count": 2
+      }
+    },
+    {
+      "id": "minecraft:polished_blackstone_slab_from_polished_blackstone_stonecutting",
+      "modern_input": "minecraft:polished_blackstone",
+      "modern_output": "minecraft:polished_blackstone_slab",
+      "input": {
+        "item": "etfuturum:blackstone",
+        "meta": 1
+      },
+      "output": {
+        "item": "etfuturum:blackstone_slab",
+        "meta": 1,
+        "count": 2
+      }
+    },
+    {
+      "id": "minecraft:polished_blackstone_stairs_from_blackstone_stonecutting",
+      "modern_input": "minecraft:blackstone",
+      "modern_output": "minecraft:polished_blackstone_stairs",
+      "input": {
+        "item": "etfuturum:blackstone",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:polished_blackstone_stairs",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:polished_blackstone_stairs_from_polished_blackstone_stonecutting",
+      "modern_input": "minecraft:polished_blackstone",
+      "modern_output": "minecraft:polished_blackstone_stairs",
+      "input": {
+        "item": "etfuturum:blackstone",
+        "meta": 1
+      },
+      "output": {
+        "item": "etfuturum:polished_blackstone_stairs",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:polished_blackstone_wall_from_blackstone_stonecutting",
+      "modern_input": "minecraft:blackstone",
+      "modern_output": "minecraft:polished_blackstone_wall",
+      "input": {
+        "item": "etfuturum:blackstone",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:blackstone_wall",
+        "meta": 1,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:polished_blackstone_wall_from_polished_blackstone_stonecutting",
+      "modern_input": "minecraft:polished_blackstone",
+      "modern_output": "minecraft:polished_blackstone_wall",
+      "input": {
+        "item": "etfuturum:blackstone",
+        "meta": 1
+      },
+      "output": {
+        "item": "etfuturum:blackstone_wall",
+        "meta": 1,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:polished_deepslate_from_cobbled_deepslate_stonecutting",
+      "modern_input": "minecraft:cobbled_deepslate",
+      "modern_output": "minecraft:polished_deepslate",
+      "input": {
+        "item": "etfuturum:cobbled_deepslate",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:polished_deepslate",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:polished_deepslate_slab_from_cobbled_deepslate_stonecutting",
+      "modern_input": "minecraft:cobbled_deepslate",
+      "modern_output": "minecraft:polished_deepslate_slab",
+      "input": {
+        "item": "etfuturum:cobbled_deepslate",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:deepslate_slab",
+        "meta": 1,
+        "count": 2
+      }
+    },
+    {
+      "id": "minecraft:polished_deepslate_slab_from_polished_deepslate_stonecutting",
+      "modern_input": "minecraft:polished_deepslate",
+      "modern_output": "minecraft:polished_deepslate_slab",
+      "input": {
+        "item": "etfuturum:polished_deepslate",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:deepslate_slab",
+        "meta": 1,
+        "count": 2
+      }
+    },
+    {
+      "id": "minecraft:polished_deepslate_stairs_from_cobbled_deepslate_stonecutting",
+      "modern_input": "minecraft:cobbled_deepslate",
+      "modern_output": "minecraft:polished_deepslate_stairs",
+      "input": {
+        "item": "etfuturum:cobbled_deepslate",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:polished_deepslate_stairs",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:polished_deepslate_stairs_from_polished_deepslate_stonecutting",
+      "modern_input": "minecraft:polished_deepslate",
+      "modern_output": "minecraft:polished_deepslate_stairs",
+      "input": {
+        "item": "etfuturum:polished_deepslate",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:polished_deepslate_stairs",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:polished_deepslate_wall_from_cobbled_deepslate_stonecutting",
+      "modern_input": "minecraft:cobbled_deepslate",
+      "modern_output": "minecraft:polished_deepslate_wall",
+      "input": {
+        "item": "etfuturum:cobbled_deepslate",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:deepslate_wall",
+        "meta": 1,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:polished_deepslate_wall_from_polished_deepslate_stonecutting",
+      "modern_input": "minecraft:polished_deepslate",
+      "modern_output": "minecraft:polished_deepslate_wall",
+      "input": {
+        "item": "etfuturum:polished_deepslate",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:deepslate_wall",
+        "meta": 1,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:polished_diorite_from_diorite_stonecutting",
+      "modern_input": "minecraft:diorite",
+      "modern_output": "minecraft:polished_diorite",
+      "input": {
+        "item": "etfuturum:stone",
+        "meta": 3
+      },
+      "output": {
+        "item": "etfuturum:stone",
+        "meta": 4,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:polished_diorite_slab_from_diorite_stonecutting",
+      "modern_input": "minecraft:diorite",
+      "modern_output": "minecraft:polished_diorite_slab",
+      "input": {
+        "item": "etfuturum:stone",
+        "meta": 3
+      },
+      "output": {
+        "item": "etfuturum:stone_slab_2",
+        "meta": 3,
+        "count": 2
+      }
+    },
+    {
+      "id": "minecraft:polished_diorite_slab_from_polished_diorite_stonecutting",
+      "modern_input": "minecraft:polished_diorite",
+      "modern_output": "minecraft:polished_diorite_slab",
+      "input": {
+        "item": "etfuturum:stone",
+        "meta": 4
+      },
+      "output": {
+        "item": "etfuturum:stone_slab_2",
+        "meta": 3,
+        "count": 2
+      }
+    },
+    {
+      "id": "minecraft:polished_diorite_stairs_from_diorite_stonecutting",
+      "modern_input": "minecraft:diorite",
+      "modern_output": "minecraft:polished_diorite_stairs",
+      "input": {
+        "item": "etfuturum:stone",
+        "meta": 3
+      },
+      "output": {
+        "item": "etfuturum:polished_diorite_stairs",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:polished_diorite_stairs_from_polished_diorite_stonecutting",
+      "modern_input": "minecraft:polished_diorite",
+      "modern_output": "minecraft:polished_diorite_stairs",
+      "input": {
+        "item": "etfuturum:stone",
+        "meta": 4
+      },
+      "output": {
+        "item": "etfuturum:polished_diorite_stairs",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:polished_granite_from_granite_stonecutting",
+      "modern_input": "minecraft:granite",
+      "modern_output": "minecraft:polished_granite",
+      "input": {
+        "item": "etfuturum:stone",
+        "meta": 1
+      },
+      "output": {
+        "item": "etfuturum:stone",
+        "meta": 2,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:polished_granite_slab_from_granite_stonecutting",
+      "modern_input": "minecraft:granite",
+      "modern_output": "minecraft:polished_granite_slab",
+      "input": {
+        "item": "etfuturum:stone",
+        "meta": 1
+      },
+      "output": {
+        "item": "etfuturum:stone_slab_2",
+        "meta": 1,
+        "count": 2
+      }
+    },
+    {
+      "id": "minecraft:polished_granite_slab_from_polished_granite_stonecutting",
+      "modern_input": "minecraft:polished_granite",
+      "modern_output": "minecraft:polished_granite_slab",
+      "input": {
+        "item": "etfuturum:stone",
+        "meta": 2
+      },
+      "output": {
+        "item": "etfuturum:stone_slab_2",
+        "meta": 1,
+        "count": 2
+      }
+    },
+    {
+      "id": "minecraft:polished_granite_stairs_from_granite_stonecutting",
+      "modern_input": "minecraft:granite",
+      "modern_output": "minecraft:polished_granite_stairs",
+      "input": {
+        "item": "etfuturum:stone",
+        "meta": 1
+      },
+      "output": {
+        "item": "etfuturum:polished_granite_stairs",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:polished_granite_stairs_from_polished_granite_stonecutting",
+      "modern_input": "minecraft:polished_granite",
+      "modern_output": "minecraft:polished_granite_stairs",
+      "input": {
+        "item": "etfuturum:stone",
+        "meta": 2
+      },
+      "output": {
+        "item": "etfuturum:polished_granite_stairs",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:polished_tuff_from_tuff_stonecutting",
+      "modern_input": "minecraft:tuff",
+      "modern_output": "minecraft:polished_tuff",
+      "input": {
+        "item": "etfuturum:tuff",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:tuff",
+        "meta": 1,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:polished_tuff_slab_from_polished_tuff_stonecutting",
+      "modern_input": "minecraft:polished_tuff",
+      "modern_output": "minecraft:polished_tuff_slab",
+      "input": {
+        "item": "etfuturum:tuff",
+        "meta": 1
+      },
+      "output": {
+        "item": "etfuturum:tuff_slab",
+        "meta": 1,
+        "count": 2
+      }
+    },
+    {
+      "id": "minecraft:polished_tuff_slab_from_tuff_stonecutting",
+      "modern_input": "minecraft:tuff",
+      "modern_output": "minecraft:polished_tuff_slab",
+      "input": {
+        "item": "etfuturum:tuff",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:tuff_slab",
+        "meta": 1,
+        "count": 2
+      }
+    },
+    {
+      "id": "minecraft:polished_tuff_stairs_from_polished_tuff_stonecutting",
+      "modern_input": "minecraft:polished_tuff",
+      "modern_output": "minecraft:polished_tuff_stairs",
+      "input": {
+        "item": "etfuturum:tuff",
+        "meta": 1
+      },
+      "output": {
+        "item": "etfuturum:polished_tuff_stairs",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:polished_tuff_stairs_from_tuff_stonecutting",
+      "modern_input": "minecraft:tuff",
+      "modern_output": "minecraft:polished_tuff_stairs",
+      "input": {
+        "item": "etfuturum:tuff",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:polished_tuff_stairs",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:polished_tuff_wall_from_polished_tuff_stonecutting",
+      "modern_input": "minecraft:polished_tuff",
+      "modern_output": "minecraft:polished_tuff_wall",
+      "input": {
+        "item": "etfuturum:tuff",
+        "meta": 1
+      },
+      "output": {
+        "item": "etfuturum:tuff_wall",
+        "meta": 1,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:polished_tuff_wall_from_tuff_stonecutting",
+      "modern_input": "minecraft:tuff",
+      "modern_output": "minecraft:polished_tuff_wall",
+      "input": {
+        "item": "etfuturum:tuff",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:tuff_wall",
+        "meta": 1,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:prismarine_brick_slab_from_prismarine_stonecutting",
+      "modern_input": "minecraft:prismarine_bricks",
+      "modern_output": "minecraft:prismarine_brick_slab",
+      "input": {
+        "item": "etfuturum:prismarine_block",
+        "meta": 1
+      },
+      "output": {
+        "item": "etfuturum:prismarine_slab",
+        "meta": 1,
+        "count": 2
+      }
+    },
+    {
+      "id": "minecraft:prismarine_brick_stairs_from_prismarine_stonecutting",
+      "modern_input": "minecraft:prismarine_bricks",
+      "modern_output": "minecraft:prismarine_brick_stairs",
+      "input": {
+        "item": "etfuturum:prismarine_block",
+        "meta": 1
+      },
+      "output": {
+        "item": "etfuturum:prismarine_stairs_brick",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:prismarine_slab_from_prismarine_stonecutting",
+      "modern_input": "minecraft:prismarine",
+      "modern_output": "minecraft:prismarine_slab",
+      "input": {
+        "item": "etfuturum:prismarine_block",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:prismarine_slab",
+        "meta": 0,
+        "count": 2
+      }
+    },
+    {
+      "id": "minecraft:prismarine_stairs_from_prismarine_stonecutting",
+      "modern_input": "minecraft:prismarine",
+      "modern_output": "minecraft:prismarine_stairs",
+      "input": {
+        "item": "etfuturum:prismarine_block",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:prismarine_stairs",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:prismarine_wall_from_prismarine_stonecutting",
+      "modern_input": "minecraft:prismarine",
+      "modern_output": "minecraft:prismarine_wall",
+      "input": {
+        "item": "etfuturum:prismarine_block",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:prismarine_wall",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:purpur_pillar_from_purpur_block_stonecutting",
+      "modern_input": "minecraft:purpur_block",
+      "modern_output": "minecraft:purpur_pillar",
+      "input": {
+        "item": "etfuturum:purpur_block",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:purpur_pillar",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:purpur_slab_from_purpur_block_stonecutting",
+      "modern_input": "minecraft:purpur_block",
+      "modern_output": "minecraft:purpur_slab",
+      "input": {
+        "item": "etfuturum:purpur_block",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:purpur_slab",
+        "meta": 0,
+        "count": 2
+      }
+    },
+    {
+      "id": "minecraft:purpur_stairs_from_purpur_block_stonecutting",
+      "modern_input": "minecraft:purpur_block",
+      "modern_output": "minecraft:purpur_stairs",
+      "input": {
+        "item": "etfuturum:purpur_block",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:purpur_stairs",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:quartz_bricks_from_quartz_block_stonecutting",
+      "modern_input": "minecraft:quartz_block",
+      "modern_output": "minecraft:quartz_bricks",
+      "input": {
+        "item": "minecraft:quartz_block",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:quartz_bricks",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:quartz_pillar_from_quartz_block_stonecutting",
+      "modern_input": "minecraft:quartz_block",
+      "modern_output": "minecraft:quartz_pillar",
+      "input": {
+        "item": "minecraft:quartz_block",
+        "meta": 0
+      },
+      "output": {
+        "item": "minecraft:quartz_block",
+        "meta": 2,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:quartz_slab_from_stonecutting",
+      "modern_input": "minecraft:quartz_block",
+      "modern_output": "minecraft:quartz_slab",
+      "input": {
+        "item": "minecraft:quartz_block",
+        "meta": 0
+      },
+      "output": {
+        "item": "minecraft:stone_slab",
+        "meta": 7,
+        "count": 2
+      }
+    },
+    {
+      "id": "minecraft:quartz_stairs_from_quartz_block_stonecutting",
+      "modern_input": "minecraft:quartz_block",
+      "modern_output": "minecraft:quartz_stairs",
+      "input": {
+        "item": "minecraft:quartz_block",
+        "meta": 0
+      },
+      "output": {
+        "item": "minecraft:quartz_stairs",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:red_nether_brick_slab_from_red_nether_bricks_stonecutting",
+      "modern_input": "minecraft:red_nether_bricks",
+      "modern_output": "minecraft:red_nether_brick_slab",
+      "input": {
+        "item": "etfuturum:red_netherbrick",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:red_netherbrick_slab",
+        "meta": 0,
+        "count": 2
+      }
+    },
+    {
+      "id": "minecraft:red_nether_brick_stairs_from_red_nether_bricks_stonecutting",
+      "modern_input": "minecraft:red_nether_bricks",
+      "modern_output": "minecraft:red_nether_brick_stairs",
+      "input": {
+        "item": "etfuturum:red_netherbrick",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:red_netherbrick_stairs",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:red_nether_brick_wall_from_red_nether_bricks_stonecutting",
+      "modern_input": "minecraft:red_nether_bricks",
+      "modern_output": "minecraft:red_nether_brick_wall",
+      "input": {
+        "item": "etfuturum:red_netherbrick",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:red_nether_brick_wall",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:red_sandstone_slab_from_red_sandstone_stonecutting",
+      "modern_input": "minecraft:red_sandstone",
+      "modern_output": "minecraft:red_sandstone_slab",
+      "input": {
+        "item": "etfuturum:red_sandstone",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:red_sandstone_slab",
+        "meta": 0,
+        "count": 2
+      }
+    },
+    {
+      "id": "minecraft:red_sandstone_stairs_from_red_sandstone_stonecutting",
+      "modern_input": "minecraft:red_sandstone",
+      "modern_output": "minecraft:red_sandstone_stairs",
+      "input": {
+        "item": "etfuturum:red_sandstone",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:red_sandstone_stairs",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:red_sandstone_wall_from_red_sandstone_stonecutting",
+      "modern_input": "minecraft:red_sandstone",
+      "modern_output": "minecraft:red_sandstone_wall",
+      "input": {
+        "item": "etfuturum:red_sandstone",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:red_sandstone_wall",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:resin_brick_slab_from_resin_bricks_stonecutting",
+      "modern_input": "minecraft:resin_bricks",
+      "modern_output": "minecraft:resin_brick_slab",
+      "input": {
+        "item": "etfuturum:resin_bricks",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:resin_brick_slab",
+        "meta": 0,
+        "count": 2
+      }
+    },
+    {
+      "id": "minecraft:resin_brick_stairs_from_resin_bricks_stonecutting",
+      "modern_input": "minecraft:resin_bricks",
+      "modern_output": "minecraft:resin_brick_stairs",
+      "input": {
+        "item": "etfuturum:resin_bricks",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:resin_brick_stairs",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:resin_brick_wall_from_resin_bricks_stonecutting",
+      "modern_input": "minecraft:resin_bricks",
+      "modern_output": "minecraft:resin_brick_wall",
+      "input": {
+        "item": "etfuturum:resin_bricks",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:resin_brick_wall",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:sandstone_slab_from_sandstone_stonecutting",
+      "modern_input": "minecraft:sandstone",
+      "modern_output": "minecraft:sandstone_slab",
+      "input": {
+        "item": "minecraft:sandstone",
+        "meta": 0
+      },
+      "output": {
+        "item": "minecraft:stone_slab",
+        "meta": 1,
+        "count": 2
+      }
+    },
+    {
+      "id": "minecraft:sandstone_stairs_from_sandstone_stonecutting",
+      "modern_input": "minecraft:sandstone",
+      "modern_output": "minecraft:sandstone_stairs",
+      "input": {
+        "item": "minecraft:sandstone",
+        "meta": 0
+      },
+      "output": {
+        "item": "minecraft:sandstone_stairs",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:sandstone_wall_from_sandstone_stonecutting",
+      "modern_input": "minecraft:sandstone",
+      "modern_output": "minecraft:sandstone_wall",
+      "input": {
+        "item": "minecraft:sandstone",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:stone_wall",
+        "meta": 2,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:smooth_quartz_slab_from_smooth_quartz_stonecutting",
+      "modern_input": "minecraft:smooth_quartz",
+      "modern_output": "minecraft:smooth_quartz_slab",
+      "input": {
+        "item": "etfuturum:smooth_quartz",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:smooth_quartz_slab",
+        "meta": 0,
+        "count": 2
+      }
+    },
+    {
+      "id": "minecraft:smooth_quartz_stairs_from_smooth_quartz_stonecutting",
+      "modern_input": "minecraft:smooth_quartz",
+      "modern_output": "minecraft:smooth_quartz_stairs",
+      "input": {
+        "item": "etfuturum:smooth_quartz",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:smooth_quartz_stairs",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:smooth_red_sandstone_slab_from_smooth_red_sandstone_stonecutting",
+      "modern_input": "minecraft:smooth_red_sandstone",
+      "modern_output": "minecraft:smooth_red_sandstone_slab",
+      "input": {
+        "item": "etfuturum:smooth_red_sandstone",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:smooth_red_sandstone_slab",
+        "meta": 0,
+        "count": 2
+      }
+    },
+    {
+      "id": "minecraft:smooth_red_sandstone_stairs_from_smooth_red_sandstone_stonecutting",
+      "modern_input": "minecraft:smooth_red_sandstone",
+      "modern_output": "minecraft:smooth_red_sandstone_stairs",
+      "input": {
+        "item": "etfuturum:smooth_red_sandstone",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:smooth_red_sandstone_stairs",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:smooth_sandstone_slab_from_smooth_sandstone_stonecutting",
+      "modern_input": "minecraft:smooth_sandstone",
+      "modern_output": "minecraft:smooth_sandstone_slab",
+      "input": {
+        "item": "etfuturum:smooth_sandstone",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:smooth_sandstone_slab",
+        "meta": 0,
+        "count": 2
+      }
+    },
+    {
+      "id": "minecraft:smooth_sandstone_stairs_from_smooth_sandstone_stonecutting",
+      "modern_input": "minecraft:smooth_sandstone",
+      "modern_output": "minecraft:smooth_sandstone_stairs",
+      "input": {
+        "item": "etfuturum:smooth_sandstone",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:smooth_sandstone_stairs",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:smooth_stone_slab_from_smooth_stone_stonecutting",
+      "modern_input": "minecraft:smooth_stone",
+      "modern_output": "minecraft:smooth_stone_slab",
+      "input": {
+        "item": "etfuturum:smooth_stone",
+        "meta": 0
+      },
+      "output": {
+        "item": "minecraft:stone_slab",
+        "meta": 0,
+        "count": 2
+      }
+    },
+    {
+      "id": "minecraft:stone_brick_slab_from_stone_bricks_stonecutting",
+      "modern_input": "minecraft:stone_bricks",
+      "modern_output": "minecraft:stone_brick_slab",
+      "input": {
+        "item": "minecraft:stonebrick",
+        "meta": 0
+      },
+      "output": {
+        "item": "minecraft:stone_slab",
+        "meta": 5,
+        "count": 2
+      }
+    },
+    {
+      "id": "minecraft:stone_brick_slab_from_stone_stonecutting",
+      "modern_input": "minecraft:stone",
+      "modern_output": "minecraft:stone_brick_slab",
+      "input": {
+        "item": "minecraft:stone",
+        "meta": 0
+      },
+      "output": {
+        "item": "minecraft:stone_slab",
+        "meta": 5,
+        "count": 2
+      }
+    },
+    {
+      "id": "minecraft:stone_brick_stairs_from_stone_bricks_stonecutting",
+      "modern_input": "minecraft:stone_bricks",
+      "modern_output": "minecraft:stone_brick_stairs",
+      "input": {
+        "item": "minecraft:stonebrick",
+        "meta": 0
+      },
+      "output": {
+        "item": "minecraft:stone_brick_stairs",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:stone_brick_stairs_from_stone_stonecutting",
+      "modern_input": "minecraft:stone",
+      "modern_output": "minecraft:stone_brick_stairs",
+      "input": {
+        "item": "minecraft:stone",
+        "meta": 0
+      },
+      "output": {
+        "item": "minecraft:stone_brick_stairs",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:stone_brick_wall_from_stone_bricks_stonecutting",
+      "modern_input": "minecraft:stone_bricks",
+      "modern_output": "minecraft:stone_brick_wall",
+      "input": {
+        "item": "minecraft:stonebrick",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:stone_wall",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:stone_brick_walls_from_stone_stonecutting",
+      "modern_input": "minecraft:stone",
+      "modern_output": "minecraft:stone_brick_wall",
+      "input": {
+        "item": "minecraft:stone",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:stone_wall",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:stone_bricks_from_stone_stonecutting",
+      "modern_input": "minecraft:stone",
+      "modern_output": "minecraft:stone_bricks",
+      "input": {
+        "item": "minecraft:stone",
+        "meta": 0
+      },
+      "output": {
+        "item": "minecraft:stonebrick",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:stone_slab_from_stone_stonecutting",
+      "modern_input": "minecraft:stone",
+      "modern_output": "minecraft:stone_slab",
+      "input": {
+        "item": "minecraft:stone",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:stone_slab",
+        "meta": 0,
+        "count": 2
+      }
+    },
+    {
+      "id": "minecraft:stone_stairs_from_stone_stonecutting",
+      "modern_input": "minecraft:stone",
+      "modern_output": "minecraft:stone_stairs",
+      "input": {
+        "item": "minecraft:stone",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:stone_stairs",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:tuff_brick_slab_from_polished_tuff_stonecutting",
+      "modern_input": "minecraft:polished_tuff",
+      "modern_output": "minecraft:tuff_brick_slab",
+      "input": {
+        "item": "etfuturum:tuff",
+        "meta": 1
+      },
+      "output": {
+        "item": "etfuturum:tuff_slab",
+        "meta": 2,
+        "count": 2
+      }
+    },
+    {
+      "id": "minecraft:tuff_brick_slab_from_tuff_bricks_stonecutting",
+      "modern_input": "minecraft:tuff_bricks",
+      "modern_output": "minecraft:tuff_brick_slab",
+      "input": {
+        "item": "etfuturum:tuff",
+        "meta": 2
+      },
+      "output": {
+        "item": "etfuturum:tuff_slab",
+        "meta": 2,
+        "count": 2
+      }
+    },
+    {
+      "id": "minecraft:tuff_brick_slab_from_tuff_stonecutting",
+      "modern_input": "minecraft:tuff",
+      "modern_output": "minecraft:tuff_brick_slab",
+      "input": {
+        "item": "etfuturum:tuff",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:tuff_slab",
+        "meta": 2,
+        "count": 2
+      }
+    },
+    {
+      "id": "minecraft:tuff_brick_stairs_from_polished_tuff_stonecutting",
+      "modern_input": "minecraft:polished_tuff",
+      "modern_output": "minecraft:tuff_brick_stairs",
+      "input": {
+        "item": "etfuturum:tuff",
+        "meta": 1
+      },
+      "output": {
+        "item": "etfuturum:tuff_brick_stairs",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:tuff_brick_stairs_from_tuff_bricks_stonecutting",
+      "modern_input": "minecraft:tuff_bricks",
+      "modern_output": "minecraft:tuff_brick_stairs",
+      "input": {
+        "item": "etfuturum:tuff",
+        "meta": 2
+      },
+      "output": {
+        "item": "etfuturum:tuff_brick_stairs",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:tuff_brick_stairs_from_tuff_stonecutting",
+      "modern_input": "minecraft:tuff",
+      "modern_output": "minecraft:tuff_brick_stairs",
+      "input": {
+        "item": "etfuturum:tuff",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:tuff_brick_stairs",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:tuff_brick_wall_from_polished_tuff_stonecutting",
+      "modern_input": "minecraft:polished_tuff",
+      "modern_output": "minecraft:tuff_brick_wall",
+      "input": {
+        "item": "etfuturum:tuff",
+        "meta": 1
+      },
+      "output": {
+        "item": "etfuturum:tuff_wall",
+        "meta": 2,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:tuff_brick_wall_from_tuff_bricks_stonecutting",
+      "modern_input": "minecraft:tuff_bricks",
+      "modern_output": "minecraft:tuff_brick_wall",
+      "input": {
+        "item": "etfuturum:tuff",
+        "meta": 2
+      },
+      "output": {
+        "item": "etfuturum:tuff_wall",
+        "meta": 2,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:tuff_brick_wall_from_tuff_stonecutting",
+      "modern_input": "minecraft:tuff",
+      "modern_output": "minecraft:tuff_brick_wall",
+      "input": {
+        "item": "etfuturum:tuff",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:tuff_wall",
+        "meta": 2,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:tuff_bricks_from_polished_tuff_stonecutting",
+      "modern_input": "minecraft:polished_tuff",
+      "modern_output": "minecraft:tuff_bricks",
+      "input": {
+        "item": "etfuturum:tuff",
+        "meta": 1
+      },
+      "output": {
+        "item": "etfuturum:tuff",
+        "meta": 2,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:tuff_bricks_from_tuff_stonecutting",
+      "modern_input": "minecraft:tuff",
+      "modern_output": "minecraft:tuff_bricks",
+      "input": {
+        "item": "etfuturum:tuff",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:tuff",
+        "meta": 2,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:tuff_slab_from_tuff_stonecutting",
+      "modern_input": "minecraft:tuff",
+      "modern_output": "minecraft:tuff_slab",
+      "input": {
+        "item": "etfuturum:tuff",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:tuff_slab",
+        "meta": 0,
+        "count": 2
+      }
+    },
+    {
+      "id": "minecraft:tuff_stairs_from_tuff_stonecutting",
+      "modern_input": "minecraft:tuff",
+      "modern_output": "minecraft:tuff_stairs",
+      "input": {
+        "item": "etfuturum:tuff",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:tuff_stairs",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:tuff_wall_from_tuff_stonecutting",
+      "modern_input": "minecraft:tuff",
+      "modern_output": "minecraft:tuff_wall",
+      "input": {
+        "item": "etfuturum:tuff",
+        "meta": 0
+      },
+      "output": {
+        "item": "etfuturum:tuff_wall",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:waxed_chiseled_copper_from_waxed_copper_block_stonecutting",
+      "modern_input": "minecraft:waxed_copper_block",
+      "modern_output": "minecraft:waxed_chiseled_copper",
+      "input": {
+        "item": "etfuturum:copper_block",
+        "meta": 8
+      },
+      "output": {
+        "item": "etfuturum:chiseled_copper",
+        "meta": 4,
+        "count": 4
+      }
+    },
+    {
+      "id": "minecraft:waxed_chiseled_copper_from_waxed_cut_copper_stonecutting",
+      "modern_input": "minecraft:waxed_cut_copper",
+      "modern_output": "minecraft:waxed_chiseled_copper",
+      "input": {
+        "item": "etfuturum:copper_block",
+        "meta": 12
+      },
+      "output": {
+        "item": "etfuturum:chiseled_copper",
+        "meta": 4,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:waxed_copper_grate_from_waxed_copper_block_stonecutting",
+      "modern_input": "minecraft:waxed_copper_block",
+      "modern_output": "minecraft:waxed_copper_grate",
+      "input": {
+        "item": "etfuturum:copper_block",
+        "meta": 8
+      },
+      "output": {
+        "item": "etfuturum:copper_grate",
+        "meta": 4,
+        "count": 4
+      }
+    },
+    {
+      "id": "minecraft:waxed_cut_copper_from_waxed_copper_block_stonecutting",
+      "modern_input": "minecraft:waxed_copper_block",
+      "modern_output": "minecraft:waxed_cut_copper",
+      "input": {
+        "item": "etfuturum:copper_block",
+        "meta": 8
+      },
+      "output": {
+        "item": "etfuturum:copper_block",
+        "meta": 12,
+        "count": 4
+      }
+    },
+    {
+      "id": "minecraft:waxed_cut_copper_slab_from_waxed_copper_block_stonecutting",
+      "modern_input": "minecraft:waxed_copper_block",
+      "modern_output": "minecraft:waxed_cut_copper_slab",
+      "input": {
+        "item": "etfuturum:copper_block",
+        "meta": 8
+      },
+      "output": {
+        "item": "etfuturum:cut_copper_slab",
+        "meta": 4,
+        "count": 8
+      }
+    },
+    {
+      "id": "minecraft:waxed_cut_copper_slab_from_waxed_cut_copper_stonecutting",
+      "modern_input": "minecraft:waxed_cut_copper",
+      "modern_output": "minecraft:waxed_cut_copper_slab",
+      "input": {
+        "item": "etfuturum:copper_block",
+        "meta": 12
+      },
+      "output": {
+        "item": "etfuturum:cut_copper_slab",
+        "meta": 4,
+        "count": 2
+      }
+    },
+    {
+      "id": "minecraft:waxed_cut_copper_stairs_from_waxed_copper_block_stonecutting",
+      "modern_input": "minecraft:waxed_copper_block",
+      "modern_output": "minecraft:waxed_cut_copper_stairs",
+      "input": {
+        "item": "etfuturum:copper_block",
+        "meta": 8
+      },
+      "output": {
+        "item": "etfuturum:waxed_cut_copper_stairs",
+        "meta": 0,
+        "count": 4
+      }
+    },
+    {
+      "id": "minecraft:waxed_cut_copper_stairs_from_waxed_cut_copper_stonecutting",
+      "modern_input": "minecraft:waxed_cut_copper",
+      "modern_output": "minecraft:waxed_cut_copper_stairs",
+      "input": {
+        "item": "etfuturum:copper_block",
+        "meta": 12
+      },
+      "output": {
+        "item": "etfuturum:waxed_cut_copper_stairs",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:waxed_exposed_chiseled_copper_from_waxed_exposed_copper_stonecutting",
+      "modern_input": "minecraft:waxed_exposed_copper",
+      "modern_output": "minecraft:waxed_exposed_chiseled_copper",
+      "input": {
+        "item": "etfuturum:copper_block",
+        "meta": 9
+      },
+      "output": {
+        "item": "etfuturum:chiseled_copper",
+        "meta": 5,
+        "count": 4
+      }
+    },
+    {
+      "id": "minecraft:waxed_exposed_chiseled_copper_from_waxed_exposed_cut_copper_stonecutting",
+      "modern_input": "minecraft:waxed_exposed_cut_copper",
+      "modern_output": "minecraft:waxed_exposed_chiseled_copper",
+      "input": {
+        "item": "etfuturum:copper_block",
+        "meta": 13
+      },
+      "output": {
+        "item": "etfuturum:chiseled_copper",
+        "meta": 5,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:waxed_exposed_copper_grate_from_waxed_exposed_copper_stonecutting",
+      "modern_input": "minecraft:waxed_exposed_copper",
+      "modern_output": "minecraft:waxed_exposed_copper_grate",
+      "input": {
+        "item": "etfuturum:copper_block",
+        "meta": 9
+      },
+      "output": {
+        "item": "etfuturum:copper_grate",
+        "meta": 5,
+        "count": 4
+      }
+    },
+    {
+      "id": "minecraft:waxed_exposed_cut_copper_from_waxed_exposed_copper_stonecutting",
+      "modern_input": "minecraft:waxed_exposed_copper",
+      "modern_output": "minecraft:waxed_exposed_cut_copper",
+      "input": {
+        "item": "etfuturum:copper_block",
+        "meta": 9
+      },
+      "output": {
+        "item": "etfuturum:copper_block",
+        "meta": 13,
+        "count": 4
+      }
+    },
+    {
+      "id": "minecraft:waxed_exposed_cut_copper_slab_from_waxed_exposed_copper_stonecutting",
+      "modern_input": "minecraft:waxed_exposed_copper",
+      "modern_output": "minecraft:waxed_exposed_cut_copper_slab",
+      "input": {
+        "item": "etfuturum:copper_block",
+        "meta": 9
+      },
+      "output": {
+        "item": "etfuturum:cut_copper_slab",
+        "meta": 5,
+        "count": 8
+      }
+    },
+    {
+      "id": "minecraft:waxed_exposed_cut_copper_slab_from_waxed_exposed_cut_copper_stonecutting",
+      "modern_input": "minecraft:waxed_exposed_cut_copper",
+      "modern_output": "minecraft:waxed_exposed_cut_copper_slab",
+      "input": {
+        "item": "etfuturum:copper_block",
+        "meta": 13
+      },
+      "output": {
+        "item": "etfuturum:cut_copper_slab",
+        "meta": 5,
+        "count": 2
+      }
+    },
+    {
+      "id": "minecraft:waxed_exposed_cut_copper_stairs_from_waxed_exposed_copper_stonecutting",
+      "modern_input": "minecraft:waxed_exposed_copper",
+      "modern_output": "minecraft:waxed_exposed_cut_copper_stairs",
+      "input": {
+        "item": "etfuturum:copper_block",
+        "meta": 9
+      },
+      "output": {
+        "item": "etfuturum:waxed_exposed_cut_copper_stairs",
+        "meta": 0,
+        "count": 4
+      }
+    },
+    {
+      "id": "minecraft:waxed_exposed_cut_copper_stairs_from_waxed_exposed_cut_copper_stonecutting",
+      "modern_input": "minecraft:waxed_exposed_cut_copper",
+      "modern_output": "minecraft:waxed_exposed_cut_copper_stairs",
+      "input": {
+        "item": "etfuturum:copper_block",
+        "meta": 13
+      },
+      "output": {
+        "item": "etfuturum:waxed_exposed_cut_copper_stairs",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:waxed_oxidized_chiseled_copper_from_waxed_oxidized_copper_stonecutting",
+      "modern_input": "minecraft:waxed_oxidized_copper",
+      "modern_output": "minecraft:waxed_oxidized_chiseled_copper",
+      "input": {
+        "item": "etfuturum:copper_block",
+        "meta": 11
+      },
+      "output": {
+        "item": "etfuturum:chiseled_copper",
+        "meta": 7,
+        "count": 4
+      }
+    },
+    {
+      "id": "minecraft:waxed_oxidized_chiseled_copper_from_waxed_oxidized_cut_copper_stonecutting",
+      "modern_input": "minecraft:waxed_oxidized_cut_copper",
+      "modern_output": "minecraft:waxed_oxidized_chiseled_copper",
+      "input": {
+        "item": "etfuturum:copper_block",
+        "meta": 15
+      },
+      "output": {
+        "item": "etfuturum:chiseled_copper",
+        "meta": 7,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:waxed_oxidized_copper_grate_from_waxed_oxidized_copper_stonecutting",
+      "modern_input": "minecraft:waxed_oxidized_copper",
+      "modern_output": "minecraft:waxed_oxidized_copper_grate",
+      "input": {
+        "item": "etfuturum:copper_block",
+        "meta": 11
+      },
+      "output": {
+        "item": "etfuturum:copper_grate",
+        "meta": 7,
+        "count": 4
+      }
+    },
+    {
+      "id": "minecraft:waxed_oxidized_cut_copper_from_waxed_oxidized_copper_stonecutting",
+      "modern_input": "minecraft:waxed_oxidized_copper",
+      "modern_output": "minecraft:waxed_oxidized_cut_copper",
+      "input": {
+        "item": "etfuturum:copper_block",
+        "meta": 11
+      },
+      "output": {
+        "item": "etfuturum:copper_block",
+        "meta": 15,
+        "count": 4
+      }
+    },
+    {
+      "id": "minecraft:waxed_oxidized_cut_copper_slab_from_waxed_oxidized_copper_stonecutting",
+      "modern_input": "minecraft:waxed_oxidized_copper",
+      "modern_output": "minecraft:waxed_oxidized_cut_copper_slab",
+      "input": {
+        "item": "etfuturum:copper_block",
+        "meta": 11
+      },
+      "output": {
+        "item": "etfuturum:cut_copper_slab",
+        "meta": 7,
+        "count": 8
+      }
+    },
+    {
+      "id": "minecraft:waxed_oxidized_cut_copper_slab_from_waxed_oxidized_cut_copper_stonecutting",
+      "modern_input": "minecraft:waxed_oxidized_cut_copper",
+      "modern_output": "minecraft:waxed_oxidized_cut_copper_slab",
+      "input": {
+        "item": "etfuturum:copper_block",
+        "meta": 15
+      },
+      "output": {
+        "item": "etfuturum:cut_copper_slab",
+        "meta": 7,
+        "count": 2
+      }
+    },
+    {
+      "id": "minecraft:waxed_oxidized_cut_copper_stairs_from_waxed_oxidized_copper_stonecutting",
+      "modern_input": "minecraft:waxed_oxidized_copper",
+      "modern_output": "minecraft:waxed_oxidized_cut_copper_stairs",
+      "input": {
+        "item": "etfuturum:copper_block",
+        "meta": 11
+      },
+      "output": {
+        "item": "etfuturum:waxed_oxidized_cut_copper_stairs",
+        "meta": 0,
+        "count": 4
+      }
+    },
+    {
+      "id": "minecraft:waxed_oxidized_cut_copper_stairs_from_waxed_oxidized_cut_copper_stonecutting",
+      "modern_input": "minecraft:waxed_oxidized_cut_copper",
+      "modern_output": "minecraft:waxed_oxidized_cut_copper_stairs",
+      "input": {
+        "item": "etfuturum:copper_block",
+        "meta": 15
+      },
+      "output": {
+        "item": "etfuturum:waxed_oxidized_cut_copper_stairs",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:waxed_weathered_chiseled_copper_from_waxed_weathered_copper_stonecutting",
+      "modern_input": "minecraft:waxed_weathered_copper",
+      "modern_output": "minecraft:waxed_weathered_chiseled_copper",
+      "input": {
+        "item": "etfuturum:copper_block",
+        "meta": 10
+      },
+      "output": {
+        "item": "etfuturum:chiseled_copper",
+        "meta": 6,
+        "count": 4
+      }
+    },
+    {
+      "id": "minecraft:waxed_weathered_chiseled_copper_from_waxed_weathered_cut_copper_stonecutting",
+      "modern_input": "minecraft:waxed_weathered_cut_copper",
+      "modern_output": "minecraft:waxed_weathered_chiseled_copper",
+      "input": {
+        "item": "etfuturum:copper_block",
+        "meta": 14
+      },
+      "output": {
+        "item": "etfuturum:chiseled_copper",
+        "meta": 6,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:waxed_weathered_copper_grate_from_waxed_weathered_copper_stonecutting",
+      "modern_input": "minecraft:waxed_weathered_copper",
+      "modern_output": "minecraft:waxed_weathered_copper_grate",
+      "input": {
+        "item": "etfuturum:copper_block",
+        "meta": 10
+      },
+      "output": {
+        "item": "etfuturum:copper_grate",
+        "meta": 6,
+        "count": 4
+      }
+    },
+    {
+      "id": "minecraft:waxed_weathered_cut_copper_from_waxed_weathered_copper_stonecutting",
+      "modern_input": "minecraft:waxed_weathered_copper",
+      "modern_output": "minecraft:waxed_weathered_cut_copper",
+      "input": {
+        "item": "etfuturum:copper_block",
+        "meta": 10
+      },
+      "output": {
+        "item": "etfuturum:copper_block",
+        "meta": 14,
+        "count": 4
+      }
+    },
+    {
+      "id": "minecraft:waxed_weathered_cut_copper_slab_from_waxed_weathered_copper_stonecutting",
+      "modern_input": "minecraft:waxed_weathered_copper",
+      "modern_output": "minecraft:waxed_weathered_cut_copper_slab",
+      "input": {
+        "item": "etfuturum:copper_block",
+        "meta": 10
+      },
+      "output": {
+        "item": "etfuturum:cut_copper_slab",
+        "meta": 6,
+        "count": 8
+      }
+    },
+    {
+      "id": "minecraft:waxed_weathered_cut_copper_slab_from_waxed_weathered_cut_copper_stonecutting",
+      "modern_input": "minecraft:waxed_weathered_cut_copper",
+      "modern_output": "minecraft:waxed_weathered_cut_copper_slab",
+      "input": {
+        "item": "etfuturum:copper_block",
+        "meta": 14
+      },
+      "output": {
+        "item": "etfuturum:cut_copper_slab",
+        "meta": 6,
+        "count": 2
+      }
+    },
+    {
+      "id": "minecraft:waxed_weathered_cut_copper_stairs_from_waxed_weathered_copper_stonecutting",
+      "modern_input": "minecraft:waxed_weathered_copper",
+      "modern_output": "minecraft:waxed_weathered_cut_copper_stairs",
+      "input": {
+        "item": "etfuturum:copper_block",
+        "meta": 10
+      },
+      "output": {
+        "item": "etfuturum:waxed_weathered_cut_copper_stairs",
+        "meta": 0,
+        "count": 4
+      }
+    },
+    {
+      "id": "minecraft:waxed_weathered_cut_copper_stairs_from_waxed_weathered_cut_copper_stonecutting",
+      "modern_input": "minecraft:waxed_weathered_cut_copper",
+      "modern_output": "minecraft:waxed_weathered_cut_copper_stairs",
+      "input": {
+        "item": "etfuturum:copper_block",
+        "meta": 14
+      },
+      "output": {
+        "item": "etfuturum:waxed_weathered_cut_copper_stairs",
+        "meta": 0,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:weathered_chiseled_copper_from_weathered_copper_stonecutting",
+      "modern_input": "minecraft:weathered_copper",
+      "modern_output": "minecraft:weathered_chiseled_copper",
+      "input": {
+        "item": "etfuturum:copper_block",
+        "meta": 2
+      },
+      "output": {
+        "item": "etfuturum:chiseled_copper",
+        "meta": 2,
+        "count": 4
+      }
+    },
+    {
+      "id": "minecraft:weathered_chiseled_copper_from_weathered_cut_copper_stonecutting",
+      "modern_input": "minecraft:weathered_cut_copper",
+      "modern_output": "minecraft:weathered_chiseled_copper",
+      "input": {
+        "item": "etfuturum:copper_block",
+        "meta": 6
+      },
+      "output": {
+        "item": "etfuturum:chiseled_copper",
+        "meta": 2,
+        "count": 1
+      }
+    },
+    {
+      "id": "minecraft:weathered_copper_grate_from_weathered_copper_stonecutting",
+      "modern_input": "minecraft:weathered_copper",
+      "modern_output": "minecraft:weathered_copper_grate",
+      "input": {
+        "item": "etfuturum:copper_block",
+        "meta": 2
+      },
+      "output": {
+        "item": "etfuturum:copper_grate",
+        "meta": 2,
+        "count": 4
+      }
+    },
+    {
+      "id": "minecraft:weathered_cut_copper_from_weathered_copper_stonecutting",
+      "modern_input": "minecraft:weathered_copper",
+      "modern_output": "minecraft:weathered_cut_copper",
+      "input": {
+        "item": "etfuturum:copper_block",
+        "meta": 2
+      },
+      "output": {
+        "item": "etfuturum:copper_block",
+        "meta": 6,
+        "count": 4
+      }
+    },
+    {
+      "id": "minecraft:weathered_cut_copper_slab_from_weathered_copper_stonecutting",
+      "modern_input": "minecraft:weathered_copper",
+      "modern_output": "minecraft:weathered_cut_copper_slab",
+      "input": {
+        "item": "etfuturum:copper_block",
+        "meta": 2
+      },
+      "output": {
+        "item": "etfuturum:cut_copper_slab",
+        "meta": 2,
+        "count": 8
+      }
+    },
+    {
+      "id": "minecraft:weathered_cut_copper_slab_from_weathered_cut_copper_stonecutting",
+      "modern_input": "minecraft:weathered_cut_copper",
+      "modern_output": "minecraft:weathered_cut_copper_slab",
+      "input": {
+        "item": "etfuturum:copper_block",
+        "meta": 6
+      },
+      "output": {
+        "item": "etfuturum:cut_copper_slab",
+        "meta": 2,
+        "count": 2
+      }
+    },
+    {
+      "id": "minecraft:weathered_cut_copper_stairs_from_weathered_copper_stonecutting",
+      "modern_input": "minecraft:weathered_copper",
+      "modern_output": "minecraft:weathered_cut_copper_stairs",
+      "input": {
+        "item": "etfuturum:copper_block",
+        "meta": 2
+      },
+      "output": {
+        "item": "etfuturum:weathered_cut_copper_stairs",
+        "meta": 0,
+        "count": 4
+      }
+    },
+    {
+      "id": "minecraft:weathered_cut_copper_stairs_from_weathered_cut_copper_stonecutting",
+      "modern_input": "minecraft:weathered_cut_copper",
+      "modern_output": "minecraft:weathered_cut_copper_stairs",
+      "input": {
+        "item": "etfuturum:copper_block",
+        "meta": 6
+      },
+      "output": {
+        "item": "etfuturum:weathered_cut_copper_stairs",
+        "meta": 0,
+        "count": 1
+      }
+    }
+  ]
+}

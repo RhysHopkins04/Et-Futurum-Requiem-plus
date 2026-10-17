@@ -1,0 +1,926 @@
+{
+  "schema": 1,
+  "vanilla_sha1": "ba2df812c2d12e0219c489c4cd9a5e1f0760f5bd",
+  "entries": [
+    {
+      "modern": "minecraft:acacia_leaves",
+      "percent": 30,
+      "target": {
+        "item": "minecraft:leaves2",
+        "meta": 0
+      }
+    },
+    {
+      "modern": "minecraft:acacia_sapling",
+      "percent": 30,
+      "target": {
+        "item": "minecraft:sapling",
+        "meta": 4
+      }
+    },
+    {
+      "modern": "minecraft:allium",
+      "percent": 65,
+      "target": {
+        "item": "minecraft:red_flower",
+        "meta": 2
+      }
+    },
+    {
+      "modern": "minecraft:apple",
+      "percent": 65,
+      "target": {
+        "item": "minecraft:apple",
+        "meta": 0
+      }
+    },
+    {
+      "modern": "minecraft:azalea",
+      "percent": 65,
+      "target": {
+        "item": "etfuturum:azalea",
+        "meta": 0
+      }
+    },
+    {
+      "modern": "minecraft:azalea_leaves",
+      "percent": 30,
+      "target": {
+        "item": "etfuturum:azalea_leaves",
+        "meta": 0
+      }
+    },
+    {
+      "modern": "minecraft:azure_bluet",
+      "percent": 65,
+      "target": {
+        "item": "minecraft:red_flower",
+        "meta": 3
+      }
+    },
+    {
+      "modern": "minecraft:baked_potato",
+      "percent": 85,
+      "target": {
+        "item": "minecraft:baked_potato",
+        "meta": 0
+      }
+    },
+    {
+      "modern": "minecraft:beetroot",
+      "percent": 65,
+      "target": {
+        "item": "etfuturum:beetroot",
+        "meta": 0
+      }
+    },
+    {
+      "modern": "minecraft:beetroot_seeds",
+      "percent": 30,
+      "target": {
+        "item": "etfuturum:beetroot_seeds",
+        "meta": 0
+      }
+    },
+    {
+      "modern": "minecraft:big_dripleaf",
+      "percent": 65,
+      "target": {
+        "item": "etfuturum:big_dripleaf",
+        "meta": 0
+      }
+    },
+    {
+      "modern": "minecraft:birch_leaves",
+      "percent": 30,
+      "target": {
+        "item": "minecraft:leaves",
+        "meta": 2
+      }
+    },
+    {
+      "modern": "minecraft:birch_sapling",
+      "percent": 30,
+      "target": {
+        "item": "minecraft:sapling",
+        "meta": 2
+      }
+    },
+    {
+      "modern": "minecraft:blue_orchid",
+      "percent": 65,
+      "target": {
+        "item": "minecraft:red_flower",
+        "meta": 1
+      }
+    },
+    {
+      "modern": "minecraft:bread",
+      "percent": 85,
+      "target": {
+        "item": "minecraft:bread",
+        "meta": 0
+      }
+    },
+    {
+      "modern": "minecraft:brown_mushroom",
+      "percent": 65,
+      "target": {
+        "item": "minecraft:brown_mushroom",
+        "meta": 0
+      }
+    },
+    {
+      "modern": "minecraft:brown_mushroom_block",
+      "percent": 85,
+      "target": {
+        "item": "minecraft:brown_mushroom_block",
+        "meta": 0
+      }
+    },
+    {
+      "modern": "minecraft:bush",
+      "percent": 30,
+      "target": {
+        "item": "etfuturum:bush",
+        "meta": 0
+      }
+    },
+    {
+      "modern": "minecraft:cactus",
+      "percent": 50,
+      "target": {
+        "item": "minecraft:cactus",
+        "meta": 0
+      }
+    },
+    {
+      "modern": "minecraft:cactus_flower",
+      "percent": 30,
+      "target": {
+        "item": "etfuturum:cactus_flower",
+        "meta": 0
+      }
+    },
+    {
+      "modern": "minecraft:cake",
+      "percent": 100,
+      "target": {
+        "item": "minecraft:cake",
+        "meta": 0
+      }
+    },
+    {
+      "modern": "minecraft:carrot",
+      "percent": 65,
+      "target": {
+        "item": "minecraft:carrot",
+        "meta": 0
+      }
+    },
+    {
+      "modern": "minecraft:carved_pumpkin",
+      "percent": 65,
+      "target": {
+        "item": "minecraft:pumpkin",
+        "meta": 0
+      }
+    },
+    {
+      "modern": "minecraft:cherry_leaves",
+      "percent": 30,
+      "target": {
+        "item": "etfuturum:leaves",
+        "meta": 1
+      }
+    },
+    {
+      "modern": "minecraft:cherry_sapling",
+      "percent": 30,
+      "target": {
+        "item": "etfuturum:sapling",
+        "meta": 1
+      }
+    },
+    {
+      "modern": "minecraft:closed_eyeblossom",
+      "percent": 65,
+      "target": {
+        "item": "etfuturum:closed_eyeblossom",
+        "meta": 0
+      }
+    },
+    {
+      "modern": "minecraft:cocoa_beans",
+      "percent": 65,
+      "target": {
+        "item": "minecraft:dye",
+        "meta": 3
+      }
+    },
+    {
+      "modern": "minecraft:cookie",
+      "percent": 85,
+      "target": {
+        "item": "minecraft:cookie",
+        "meta": 0
+      }
+    },
+    {
+      "modern": "minecraft:cornflower",
+      "percent": 65,
+      "target": {
+        "item": "etfuturum:cornflower",
+        "meta": 0
+      }
+    },
+    {
+      "modern": "minecraft:crimson_fungus",
+      "percent": 65,
+      "target": {
+        "item": "etfuturum:nether_fungus",
+        "meta": 0
+      }
+    },
+    {
+      "modern": "minecraft:crimson_roots",
+      "percent": 65,
+      "target": {
+        "item": "etfuturum:nether_roots",
+        "meta": 0
+      }
+    },
+    {
+      "modern": "minecraft:dandelion",
+      "percent": 65,
+      "target": {
+        "item": "minecraft:yellow_flower",
+        "meta": 0
+      }
+    },
+    {
+      "modern": "minecraft:dark_oak_leaves",
+      "percent": 30,
+      "target": {
+        "item": "minecraft:leaves2",
+        "meta": 1
+      }
+    },
+    {
+      "modern": "minecraft:dark_oak_sapling",
+      "percent": 30,
+      "target": {
+        "item": "minecraft:sapling",
+        "meta": 5
+      }
+    },
+    {
+      "modern": "minecraft:dried_kelp",
+      "percent": 30,
+      "target": {
+        "item": "etfuturum:dried_kelp",
+        "meta": 0
+      }
+    },
+    {
+      "modern": "minecraft:dried_kelp_block",
+      "percent": 50,
+      "target": {
+        "item": "etfuturum:dried_kelp_block",
+        "meta": 0
+      }
+    },
+    {
+      "modern": "minecraft:dry_short_grass",
+      "percent": 30,
+      "target": {
+        "item": "etfuturum:short_dry_grass",
+        "meta": 0
+      }
+    },
+    {
+      "modern": "minecraft:dry_tall_grass",
+      "percent": 30,
+      "target": {
+        "item": "etfuturum:tall_dry_grass",
+        "meta": 0
+      }
+    },
+    {
+      "modern": "minecraft:fern",
+      "percent": 65,
+      "target": {
+        "item": "minecraft:tallgrass",
+        "meta": 2
+      }
+    },
+    {
+      "modern": "minecraft:firefly_bush",
+      "percent": 30,
+      "target": {
+        "item": "etfuturum:firefly_bush",
+        "meta": 0
+      }
+    },
+    {
+      "modern": "minecraft:flowering_azalea",
+      "percent": 85,
+      "target": {
+        "item": "etfuturum:azalea",
+        "meta": 1
+      }
+    },
+    {
+      "modern": "minecraft:flowering_azalea_leaves",
+      "percent": 50,
+      "target": {
+        "item": "etfuturum:azalea_leaves",
+        "meta": 1
+      }
+    },
+    {
+      "modern": "minecraft:glow_berries",
+      "percent": 30,
+      "target": {
+        "item": "etfuturum:glow_berries_item",
+        "meta": 0
+      }
+    },
+    {
+      "modern": "minecraft:glow_lichen",
+      "percent": 50,
+      "target": {
+        "item": "etfuturum:glow_lichen",
+        "meta": 0
+      }
+    },
+    {
+      "modern": "minecraft:hanging_roots",
+      "percent": 30,
+      "target": {
+        "item": "etfuturum:hanging_roots",
+        "meta": 0
+      }
+    },
+    {
+      "modern": "minecraft:hay_block",
+      "percent": 85,
+      "target": {
+        "item": "minecraft:hay_block",
+        "meta": 0
+      }
+    },
+    {
+      "modern": "minecraft:jungle_leaves",
+      "percent": 30,
+      "target": {
+        "item": "minecraft:leaves",
+        "meta": 3
+      }
+    },
+    {
+      "modern": "minecraft:jungle_sapling",
+      "percent": 30,
+      "target": {
+        "item": "minecraft:sapling",
+        "meta": 3
+      }
+    },
+    {
+      "modern": "minecraft:kelp",
+      "percent": 30,
+      "target": {
+        "item": "etfuturum:kelp",
+        "meta": 0
+      }
+    },
+    {
+      "modern": "minecraft:large_fern",
+      "percent": 65,
+      "target": {
+        "item": "minecraft:double_plant",
+        "meta": 3
+      }
+    },
+    {
+      "modern": "minecraft:leaf_litter",
+      "percent": 30,
+      "target": {
+        "item": "etfuturum:leaf_litter",
+        "meta": 0
+      }
+    },
+    {
+      "modern": "minecraft:lilac",
+      "percent": 65,
+      "target": {
+        "item": "minecraft:double_plant",
+        "meta": 1
+      }
+    },
+    {
+      "modern": "minecraft:lily_of_the_valley",
+      "percent": 65,
+      "target": {
+        "item": "etfuturum:lily_of_the_valley",
+        "meta": 0
+      }
+    },
+    {
+      "modern": "minecraft:lily_pad",
+      "percent": 65,
+      "target": {
+        "item": "minecraft:waterlily",
+        "meta": 0
+      }
+    },
+    {
+      "modern": "minecraft:mangrove_leaves",
+      "percent": 30,
+      "target": {
+        "item": "etfuturum:mangrove_leaves",
+        "meta": 0
+      }
+    },
+    {
+      "modern": "minecraft:mangrove_propagule",
+      "percent": 30,
+      "target": {
+        "item": "etfuturum:mangrove_propagule",
+        "meta": 0
+      }
+    },
+    {
+      "modern": "minecraft:mangrove_roots",
+      "percent": 30,
+      "target": {
+        "item": "etfuturum:mangrove_roots",
+        "meta": 0
+      }
+    },
+    {
+      "modern": "minecraft:melon",
+      "percent": 65,
+      "target": {
+        "item": "minecraft:melon_block",
+        "meta": 0
+      }
+    },
+    {
+      "modern": "minecraft:melon_seeds",
+      "percent": 30,
+      "target": {
+        "item": "minecraft:melon_seeds",
+        "meta": 0
+      }
+    },
+    {
+      "modern": "minecraft:melon_slice",
+      "percent": 50,
+      "target": {
+        "item": "minecraft:melon",
+        "meta": 0
+      }
+    },
+    {
+      "modern": "minecraft:moss_block",
+      "percent": 65,
+      "target": {
+        "item": "etfuturum:moss_block",
+        "meta": 0
+      }
+    },
+    {
+      "modern": "minecraft:moss_carpet",
+      "percent": 30,
+      "target": {
+        "item": "etfuturum:moss_carpet",
+        "meta": 0
+      }
+    },
+    {
+      "modern": "minecraft:mushroom_stem",
+      "percent": 65,
+      "target": {
+        "item": "minecraft:brown_mushroom_block",
+        "meta": 10
+      }
+    },
+    {
+      "modern": "minecraft:nether_sprouts",
+      "percent": 50,
+      "target": {
+        "item": "etfuturum:nether_sprouts",
+        "meta": 0
+      }
+    },
+    {
+      "modern": "minecraft:nether_wart",
+      "percent": 65,
+      "target": {
+        "item": "minecraft:nether_wart",
+        "meta": 0
+      }
+    },
+    {
+      "modern": "minecraft:nether_wart_block",
+      "percent": 85,
+      "target": {
+        "item": "etfuturum:nether_wart",
+        "meta": 0
+      }
+    },
+    {
+      "modern": "minecraft:oak_leaves",
+      "percent": 30,
+      "target": {
+        "item": "minecraft:leaves",
+        "meta": 0
+      }
+    },
+    {
+      "modern": "minecraft:oak_sapling",
+      "percent": 30,
+      "target": {
+        "item": "minecraft:sapling",
+        "meta": 0
+      }
+    },
+    {
+      "modern": "minecraft:open_eyeblossom",
+      "percent": 65,
+      "target": {
+        "item": "etfuturum:open_eyeblossom",
+        "meta": 0
+      }
+    },
+    {
+      "modern": "minecraft:orange_tulip",
+      "percent": 65,
+      "target": {
+        "item": "minecraft:red_flower",
+        "meta": 5
+      }
+    },
+    {
+      "modern": "minecraft:oxeye_daisy",
+      "percent": 65,
+      "target": {
+        "item": "minecraft:red_flower",
+        "meta": 8
+      }
+    },
+    {
+      "modern": "minecraft:pale_hanging_moss",
+      "percent": 30,
+      "target": {
+        "item": "etfuturum:pale_hanging_moss",
+        "meta": 0
+      }
+    },
+    {
+      "modern": "minecraft:pale_moss_block",
+      "percent": 65,
+      "target": {
+        "item": "etfuturum:pale_moss_block",
+        "meta": 0
+      }
+    },
+    {
+      "modern": "minecraft:pale_moss_carpet",
+      "percent": 30,
+      "target": {
+        "item": "etfuturum:pale_moss_carpet",
+        "meta": 0
+      }
+    },
+    {
+      "modern": "minecraft:pale_oak_leaves",
+      "percent": 30,
+      "target": {
+        "item": "etfuturum:pale_oak_leaves",
+        "meta": 0
+      }
+    },
+    {
+      "modern": "minecraft:pale_oak_sapling",
+      "percent": 30,
+      "target": {
+        "item": "etfuturum:pale_oak_sapling",
+        "meta": 0
+      }
+    },
+    {
+      "modern": "minecraft:peony",
+      "percent": 65,
+      "target": {
+        "item": "minecraft:double_plant",
+        "meta": 5
+      }
+    },
+    {
+      "modern": "minecraft:pink_petals",
+      "percent": 30,
+      "target": {
+        "item": "etfuturum:pink_petals",
+        "meta": 0
+      }
+    },
+    {
+      "modern": "minecraft:pink_tulip",
+      "percent": 65,
+      "target": {
+        "item": "minecraft:red_flower",
+        "meta": 7
+      }
+    },
+    {
+      "modern": "minecraft:pitcher_plant",
+      "percent": 85,
+      "target": {
+        "item": "etfuturum:pitcher_plant",
+        "meta": 0
+      }
+    },
+    {
+      "modern": "minecraft:pitcher_pod",
+      "percent": 30,
+      "target": {
+        "item": "etfuturum:pitcher_pod",
+        "meta": 0
+      }
+    },
+    {
+      "modern": "minecraft:poppy",
+      "percent": 65,
+      "target": {
+        "item": "minecraft:red_flower",
+        "meta": 0
+      }
+    },
+    {
+      "modern": "minecraft:potato",
+      "percent": 65,
+      "target": {
+        "item": "minecraft:potato",
+        "meta": 0
+      }
+    },
+    {
+      "modern": "minecraft:pumpkin",
+      "percent": 65,
+      "target": {
+        "item": "minecraft:pumpkin",
+        "meta": 0
+      }
+    },
+    {
+      "modern": "minecraft:pumpkin_pie",
+      "percent": 100,
+      "target": {
+        "item": "minecraft:pumpkin_pie",
+        "meta": 0
+      }
+    },
+    {
+      "modern": "minecraft:pumpkin_seeds",
+      "percent": 30,
+      "target": {
+        "item": "minecraft:pumpkin_seeds",
+        "meta": 0
+      }
+    },
+    {
+      "modern": "minecraft:red_mushroom",
+      "percent": 65,
+      "target": {
+        "item": "minecraft:red_mushroom",
+        "meta": 0
+      }
+    },
+    {
+      "modern": "minecraft:red_mushroom_block",
+      "percent": 85,
+      "target": {
+        "item": "minecraft:red_mushroom_block",
+        "meta": 0
+      }
+    },
+    {
+      "modern": "minecraft:red_tulip",
+      "percent": 65,
+      "target": {
+        "item": "minecraft:red_flower",
+        "meta": 4
+      }
+    },
+    {
+      "modern": "minecraft:rose_bush",
+      "percent": 65,
+      "target": {
+        "item": "minecraft:double_plant",
+        "meta": 4
+      }
+    },
+    {
+      "modern": "minecraft:sea_pickle",
+      "percent": 65,
+      "target": {
+        "item": "etfuturum:sea_pickle",
+        "meta": 0
+      }
+    },
+    {
+      "modern": "minecraft:seagrass",
+      "percent": 30,
+      "target": {
+        "item": "etfuturum:seagrass",
+        "meta": 0
+      }
+    },
+    {
+      "modern": "minecraft:short_grass",
+      "percent": 30,
+      "target": {
+        "item": "minecraft:tallgrass",
+        "meta": 1
+      }
+    },
+    {
+      "modern": "minecraft:shroomlight",
+      "percent": 65,
+      "target": {
+        "item": "etfuturum:shroomlight",
+        "meta": 0
+      }
+    },
+    {
+      "modern": "minecraft:small_dripleaf",
+      "percent": 30,
+      "target": {
+        "item": "etfuturum:small_dripleaf",
+        "meta": 0
+      }
+    },
+    {
+      "modern": "minecraft:spore_blossom",
+      "percent": 65,
+      "target": {
+        "item": "etfuturum:spore_blossom",
+        "meta": 0
+      }
+    },
+    {
+      "modern": "minecraft:spruce_leaves",
+      "percent": 30,
+      "target": {
+        "item": "minecraft:leaves",
+        "meta": 1
+      }
+    },
+    {
+      "modern": "minecraft:spruce_sapling",
+      "percent": 30,
+      "target": {
+        "item": "minecraft:sapling",
+        "meta": 1
+      }
+    },
+    {
+      "modern": "minecraft:sugar_cane",
+      "percent": 50,
+      "target": {
+        "item": "minecraft:reeds",
+        "meta": 0
+      }
+    },
+    {
+      "modern": "minecraft:sunflower",
+      "percent": 65,
+      "target": {
+        "item": "minecraft:double_plant",
+        "meta": 0
+      }
+    },
+    {
+      "modern": "minecraft:sweet_berries",
+      "percent": 30,
+      "target": {
+        "item": "etfuturum:sweet_berries",
+        "meta": 0
+      }
+    },
+    {
+      "modern": "minecraft:tall_grass",
+      "percent": 50,
+      "target": {
+        "item": "minecraft:double_plant",
+        "meta": 2
+      }
+    },
+    {
+      "modern": "minecraft:torchflower",
+      "percent": 85,
+      "target": {
+        "item": "etfuturum:torchflower",
+        "meta": 0
+      }
+    },
+    {
+      "modern": "minecraft:torchflower_seeds",
+      "percent": 30,
+      "target": {
+        "item": "etfuturum:torchflower_seeds",
+        "meta": 0
+      }
+    },
+    {
+      "modern": "minecraft:twisting_vines",
+      "percent": 50,
+      "target": {
+        "item": "etfuturum:twisting_vines",
+        "meta": 0
+      }
+    },
+    {
+      "modern": "minecraft:vine",
+      "percent": 50,
+      "target": {
+        "item": "minecraft:vine",
+        "meta": 0
+      }
+    },
+    {
+      "modern": "minecraft:warped_fungus",
+      "percent": 65,
+      "target": {
+        "item": "etfuturum:nether_fungus",
+        "meta": 1
+      }
+    },
+    {
+      "modern": "minecraft:warped_roots",
+      "percent": 65,
+      "target": {
+        "item": "etfuturum:nether_roots",
+        "meta": 1
+      }
+    },
+    {
+      "modern": "minecraft:warped_wart_block",
+      "percent": 85,
+      "target": {
+        "item": "etfuturum:nether_wart",
+        "meta": 1
+      }
+    },
+    {
+      "modern": "minecraft:weeping_vines",
+      "percent": 50,
+      "target": {
+        "item": "etfuturum:weeping_vines",
+        "meta": 0
+      }
+    },
+    {
+      "modern": "minecraft:wheat",
+      "percent": 65,
+      "target": {
+        "item": "minecraft:wheat",
+        "meta": 0
+      }
+    },
+    {
+      "modern": "minecraft:wheat_seeds",
+      "percent": 30,
+      "target": {
+        "item": "minecraft:wheat_seeds",
+        "meta": 0
+      }
+    },
+    {
+      "modern": "minecraft:white_tulip",
+      "percent": 65,
+      "target": {
+        "item": "minecraft:red_flower",
+        "meta": 6
+      }
+    },
+    {
+      "modern": "minecraft:wildflowers",
+      "percent": 30,
+      "target": {
+        "item": "etfuturum:wildflowers",
+        "meta": 0
+      }
+    },
+    {
+      "modern": "minecraft:wither_rose",
+      "percent": 65,
+      "target": {
+        "item": "etfuturum:wither_rose",
+        "meta": 0
+      }
+    }
+  ]
+}

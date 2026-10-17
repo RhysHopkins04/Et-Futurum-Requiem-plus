@@ -1,0 +1,10 @@
+{
+  "version": "3.5.23",
+  "baseline": "after-scholarly-workstations (3.5.22)",
+  "previously_matching_regressions": [],
+  "matches_before": 1295,
+  "matches_after": 1295,
+  "runtime_queries": 4786,
+  "existing_registry_ids_unchanged": true,
+  "scope": "Recipe witness count unchanged; map operations and composting probabilities are behavioral tests, not new crafting recipe definitions."
+}

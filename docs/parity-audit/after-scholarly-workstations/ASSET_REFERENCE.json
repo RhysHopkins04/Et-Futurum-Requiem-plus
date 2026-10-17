@@ -1,0 +1,169 @@
+{
+  "reference_client_sha1": "ba2df812c2d12e0219c489c4cd9a5e1f0760f5bd",
+  "asset_catalog_sha256": "ef4dcb519a2953a7a9617da9bd5d6fd5943c41c99f83ff47acfa99311810e733",
+  "aliases": [
+    {
+      "legacy": "textures/entity/banner/flow.png",
+      "modern": "textures/entity/banner/flow.png",
+      "reference_sha256": "956dece7efe9c9a90fb6ca8691c00c8d42265dfdd8839b34b265c71dd62e3477"
+    },
+    {
+      "legacy": "textures/entity/banner/globe.png",
+      "modern": "textures/entity/banner/globe.png",
+      "reference_sha256": "d0f2e381e978a91188df7d42d7af6ce214846f27b4c638eb18d46ab53d41f981"
+    },
+    {
+      "legacy": "textures/entity/banner/guster.png",
+      "modern": "textures/entity/banner/guster.png",
+      "reference_sha256": "faa911379f2899f14407da72dec5de2ffbe7d7f637a954bb10cf5a96dc330584"
+    },
+    {
+      "legacy": "textures/entity/banner/piglin.png",
+      "modern": "textures/entity/banner/piglin.png",
+      "reference_sha256": "2de67026ba43d012109517d20ebf2ccb595e94234672d248d7412a913e23f474"
+    },
+    {
+      "legacy": "textures/gui/container/grindstone.png",
+      "modern": "textures/gui/container/grindstone.png",
+      "reference_sha256": "3d4cf374bbda72d2450f07e73b277811324eb91a09b86f08b0a9b45f515ae190"
+    },
+    {
+      "legacy": "textures/gui/container/loom.png",
+      "modern": "textures/gui/container/loom.png",
+      "reference_sha256": "5bbcae9d0ecf810b039c6b520a95b64f7b6e0a294853866568aac376691c515d"
+    },
+    {
+      "legacy": "textures/gui/container/stonecutter.png",
+      "modern": "textures/gui/container/stonecutter.png",
+      "reference_sha256": "1d8801b30c8500913775b771354d06e3fb540ce9d21cb5082252484e49909137"
+    },
+    {
+      "legacy": "textures/gui/sprites/container/grindstone/error.png",
+      "modern": "textures/gui/sprites/container/grindstone/error.png",
+      "reference_sha256": "2230c045290ecbfaaa445919ce7586810f66a4bcd192635e7d21d5f91d4fa0b9"
+    },
+    {
+      "legacy": "textures/gui/sprites/container/loom/error.png",
+      "modern": "textures/gui/sprites/container/loom/error.png",
+      "reference_sha256": "77469bad6a9931ead3a3db4c78b73a8c517be346c58739e3b985eeb7df0d24bc"
+    },
+    {
+      "legacy": "textures/gui/sprites/container/loom/pattern.png",
+      "modern": "textures/gui/sprites/container/loom/pattern.png",
+      "reference_sha256": "651d0b79cfc5afa36a6084870cbdf53d584ef0da410e4ac556fd64e2b2976fb2"
+    },
+    {
+      "legacy": "textures/gui/sprites/container/loom/pattern_highlighted.png",
+      "modern": "textures/gui/sprites/container/loom/pattern_highlighted.png",
+      "reference_sha256": "df7afb5e9db9c1e802a9aa775d53d780d2dc553a2c1cabcaba110695613f292f"
+    },
+    {
+      "legacy": "textures/gui/sprites/container/loom/pattern_selected.png",
+      "modern": "textures/gui/sprites/container/loom/pattern_selected.png",
+      "reference_sha256": "518692a5023a36af06fd56e9c9597970eba95b8fae4a12efdfe79438d67477dc"
+    },
+    {
+      "legacy": "textures/gui/sprites/container/loom/scroller.png",
+      "modern": "textures/gui/sprites/container/loom/scroller.png",
+      "reference_sha256": "bbd2e9c7a41c5b2c9b95933c2115a12a46657ad114495632e13daaa9b25a13e6"
+    },
+    {
+      "legacy": "textures/gui/sprites/container/loom/scroller_disabled.png",
+      "modern": "textures/gui/sprites/container/loom/scroller_disabled.png",
+      "reference_sha256": "75924aba42ca1b957893359e29b28b97b664189639ea920d6dbf96c568966f07"
+    },
+    {
+      "legacy": "textures/gui/sprites/container/stonecutter/recipe.png",
+      "modern": "textures/gui/sprites/container/stonecutter/recipe.png",
+      "reference_sha256": "642b32beccb33bdf6afede388988ed12029d20ee85827858108f417a4801c825"
+    },
+    {
+      "legacy": "textures/gui/sprites/container/stonecutter/recipe_highlighted.png",
+      "modern": "textures/gui/sprites/container/stonecutter/recipe_highlighted.png",
+      "reference_sha256": "014f37d70f38ca3cb925273cace6f79263dd93b64a744dd5cbb25e79555fe9a2"
+    },
+    {
+      "legacy": "textures/gui/sprites/container/stonecutter/recipe_selected.png",
+      "modern": "textures/gui/sprites/container/stonecutter/recipe_selected.png",
+      "reference_sha256": "d8760f9f1908166a71ecb576a58e0d7e5352ae35fd9e0bc49f7f457a5713242b"
+    },
+    {
+      "legacy": "textures/gui/sprites/container/stonecutter/scroller.png",
+      "modern": "textures/gui/sprites/container/stonecutter/scroller.png",
+      "reference_sha256": "bbd2e9c7a41c5b2c9b95933c2115a12a46657ad114495632e13daaa9b25a13e6"
+    },
+    {
+      "legacy": "textures/gui/sprites/container/stonecutter/scroller_disabled.png",
+      "modern": "textures/gui/sprites/container/stonecutter/scroller_disabled.png",
+      "reference_sha256": "75924aba42ca1b957893359e29b28b97b664189639ea920d6dbf96c568966f07"
+    },
+    {
+      "legacy": "textures/items/bordure_indented_banner_pattern.png",
+      "modern": "textures/item/bordure_indented_banner_pattern.png",
+      "reference_sha256": "f4e1f47265b8bd9bb8377eff22b4734bd3da4310266c365853a12bac2ea14567"
+    },
+    {
+      "legacy": "textures/items/copper_nugget.png",
+      "modern": "textures/item/copper_nugget.png",
+      "reference_sha256": "e8df01be2948ff96884980d06211303ba058bc7e668a0b19a7d69dc6789c219c"
+    },
+    {
+      "legacy": "textures/items/creeper_banner_pattern.png",
+      "modern": "textures/item/creeper_banner_pattern.png",
+      "reference_sha256": "10e3cd4159c5919703f43f0c06bc1d02009d24d53b6f57f6129549bc208702c5"
+    },
+    {
+      "legacy": "textures/items/dried_kelp.png",
+      "modern": "textures/item/dried_kelp.png",
+      "reference_sha256": "1c55c9ce599ad41b9682bb220ea7e025778eb76eb2ef0f74e2acccdc9b7d6729"
+    },
+    {
+      "legacy": "textures/items/field_masoned_banner_pattern.png",
+      "modern": "textures/item/field_masoned_banner_pattern.png",
+      "reference_sha256": "50a5a11af0e49dd32dac8be3c14edc4526f4f1f40e94b0d655344bc94e7ca8c1"
+    },
+    {
+      "legacy": "textures/items/flow_banner_pattern.png",
+      "modern": "textures/item/flow_banner_pattern.png",
+      "reference_sha256": "ad54add9d72437c08ad29df4ed91f35e506faa9df28262f57b1704f311ca5244"
+    },
+    {
+      "legacy": "textures/items/flower_banner_pattern.png",
+      "modern": "textures/item/flower_banner_pattern.png",
+      "reference_sha256": "05b0fbd7237d5cea5cff24241b7b7ad81bd1c75b7a2aa042e676440ee7617bec"
+    },
+    {
+      "legacy": "textures/items/globe_banner_pattern.png",
+      "modern": "textures/item/globe_banner_pattern.png",
+      "reference_sha256": "8147b5e9f8ed24dd9fb5692d6fcad914f6f9970f2c00f46b87058e6c7fc920f0"
+    },
+    {
+      "legacy": "textures/items/guster_banner_pattern.png",
+      "modern": "textures/item/guster_banner_pattern.png",
+      "reference_sha256": "ac10c115fe89891d64ae2cd3e768e3e6dcfa1a54c9b8143c3336e653ad0559f1"
+    },
+    {
+      "legacy": "textures/items/mojang_banner_pattern.png",
+      "modern": "textures/item/mojang_banner_pattern.png",
+      "reference_sha256": "92687681d87b7b566fc3c236d6edcfa4c457605463f27407d293dffeb75e82ca"
+    },
+    {
+      "legacy": "textures/items/piglin_banner_pattern.png",
+      "modern": "textures/item/piglin_banner_pattern.png",
+      "reference_sha256": "09f379750be601fe6bdba8080483e17d831b1799c2708e6460c57300f9ba4320"
+    },
+    {
+      "legacy": "textures/items/resin_brick.png",
+      "modern": "textures/item/resin_brick.png",
+      "reference_sha256": "e7d73d5495b3357a0efd5971c932ac5f9e9aa369339190b8b14c6cac9ddbff3c"
+    },
+    {
+      "legacy": "textures/items/skull_banner_pattern.png",
+      "modern": "textures/item/skull_banner_pattern.png",
+      "reference_sha256": "baf2c744e9cdd8ac4125c9cba1413d31d116fbedc48eb0e3e83024275899a8d6"
+    }
+  ],
+  "release_jar": "build/libs/etfuturum-3.5.22-master.8-2fe04e1fd4-dirty.jar",
+  "release_sha256": "3c4c6c9c9d967f6ae81945b894d402541351b2b34da689097620350e8304ca3b",
+  "scope": "Exact reference assets exist, migration source/release PNGs are absent, and catalog bytes match. Runtime Java contracts separately exercise the actual bridge routing; OpenGL/client visual checks are separate."
+}

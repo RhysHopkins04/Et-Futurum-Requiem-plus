@@ -33,6 +33,13 @@ public class BlockLoom extends Block {
 		this.setCreativeTab(EtFuturum.creativeTabBlocks);
 	}
 
+    @Override public boolean onBlockActivated(World world,int x,int y,int z,net.minecraft.entity.player.EntityPlayer player,int side,float hitX,float hitY,float hitZ) {
+        if (!ganymedes01.etfuturum.recipes.LoomRecipes.enabled()
+                || ganymedes01.etfuturum.api.spectator.SpectatorUtils.isSpectator(player)) return false;
+        if (!world.isRemote) player.openGui(EtFuturum.instance,ganymedes01.etfuturum.lib.GUIIDs.LOOM,world,x,y,z);
+        return true;
+    }
+
 	@Override
 	public void onBlockPlacedBy(World worldIn, int x, int y, int z, EntityLivingBase placer, ItemStack itemIn) {
 		int ordinal = MathHelper.floor_double((double) (placer.rotationYaw / 90.0F) + 0.5D) & 3;

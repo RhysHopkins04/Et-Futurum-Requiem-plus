@@ -190,6 +190,10 @@ public final class ModernJsonModelBridge {
             Model multiface = models.multifaceModels[mask];
             if (multiface != null) return multiface;
         }
+        if ("lectern".equals(entry.getRegistryName())) {
+            Model oriented=models.facingModels[world.getBlockMetadata(x,y,z)&3];
+            if(oriented!=null)return oriented;
+        }
         if ("grindstone".equals(entry.getRegistryName())) {
             int state = world.getBlockMetadata(x, y, z) & 15;
             if (state < 0 || state >= 12) state = 0;
@@ -1152,6 +1156,14 @@ public final class ModernJsonModelBridge {
                     state.put("in_wall", "false");
                     prepared.facingModels[direction | (open << 2)] = loadBlockStateModel(entry, state);
                 }
+            }
+        }
+        if ("lectern".equals(entry.getRegistryName())) {
+            String[] facings={"north","east","south","west"};
+            for(int i=0;i<4;i++) {
+                Map<String,String> state=defaultsFor(entry);state.put("facing",facings[i]);
+                state.put("has_book","false");state.put("powered","false");
+                prepared.facingModels[i]=loadBlockStateModel(entry,state);
             }
         }
         if ("grindstone".equals(entry.getRegistryName())) {

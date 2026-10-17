@@ -110,7 +110,12 @@ public enum ModItems {
 	RAW_ADAMANTIUM(ModsList.SIMPLEORES.isLoaded(), new BaseRawOre("simpleores", "adamantium")),
 
 	//Debug Item
-	DEBUGGING_TOOL(Reference.DEV_ENVIRONMENT, new DebugTestItem());
+	DEBUGGING_TOOL(Reference.DEV_ENVIRONMENT, new DebugTestItem()),
+	COPPER_NUGGET(ConfigBlocksItems.enableCopper, new BaseItem("copper_nugget")),
+    DRIED_KELP(ConfigBlocksItems.enableModernMapParityBlocks, new ItemDriedKelp()),
+    RESIN_BRICK(ConfigBlocksItems.enableModernMapParityBlocks, new BaseItem("resin_brick")),
+    BANNER_PATTERN(ConfigBlocksItems.enableLoom && ConfigBlocksItems.enableBanners, new BaseSubtypesItem("bordure_indented_banner_pattern","creeper_banner_pattern","field_masoned_banner_pattern","flower_banner_pattern","mojang_banner_pattern","skull_banner_pattern","globe_banner_pattern","piglin_banner_pattern","flow_banner_pattern","guster_banner_pattern").setNames("banner_pattern").setMaxStackSize(1)),
+    SMITHING_TEMPLATE(ConfigBlocksItems.enableSmithingTable, new ItemSmithingTemplate());
 
 	public static final ModItems[] CHEST_BOATS = new ModItems[]{OAK_CHEST_BOAT, SPRUCE_CHEST_BOAT, BIRCH_CHEST_BOAT, JUNGLE_CHEST_BOAT, ACACIA_CHEST_BOAT, DARK_OAK_CHEST_BOAT, MANGROVE_CHEST_BOAT, CHERRY_CHEST_BOAT, BAMBOO_CHEST_RAFT};
 	public static final ModItems[] BOATS = new ModItems[]{OAK_BOAT, SPRUCE_BOAT, BIRCH_BOAT, JUNGLE_BOAT, ACACIA_BOAT, DARK_OAK_BOAT, MANGROVE_OAK_BOAT, CHERRY_BOAT, BAMBOO_RAFT};

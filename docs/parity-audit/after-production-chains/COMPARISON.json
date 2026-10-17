@@ -1,0 +1,39 @@
+{
+  "version": "3.5.19",
+  "comparison_baseline": "after-cooking-usage (3.5.18)",
+  "newly_matching_recipe_definitions": [
+    "chiseled_resin_bricks",
+    "dried_kelp",
+    "dried_kelp_block",
+    "dried_kelp_from_smelting",
+    "dried_kelp_from_smoking",
+    "resin_block",
+    "resin_brick",
+    "resin_brick_slab",
+    "resin_brick_stairs",
+    "resin_brick_wall",
+    "resin_bricks",
+    "resin_clump"
+  ],
+  "previously_matching_regressions": [],
+  "existing_block_and_item_numeric_ids_unchanged": true,
+  "added_registry_ids": {
+    "blockIds": [],
+    "itemIds": [
+      "etfuturum:dried_kelp",
+      "etfuturum:resin_brick"
+    ]
+  },
+  "after_status_counts": {
+    "WITNESSES_MATCH": 1035,
+    "WORKSTATION_NOT_IMPLEMENTED": 254,
+    "SPECIAL_SERIALIZER_REQUIRES_BEHAVIOURAL_TEST": 30,
+    "CAMPFIRE_REQUIRES_WORLD_TICK_TEST": 9,
+    "OUTPUT_NOT_RESOLVED": 106,
+    "INPUT_NOT_RESOLVED": 3,
+    "RUNTIME_DIFFERENCE_REQUIRES_REVIEW": 8,
+    "MODERN_TEMPLATE_SYSTEM_NOT_IMPLEMENTED": 9,
+    "COMPONENT_OUTPUT_REQUIRES_NBT_TEST": 16
+  },
+  "scope": "Production recipes and focused food/fuel/cooking contracts, not complete parity or renewable resin generation."
+}

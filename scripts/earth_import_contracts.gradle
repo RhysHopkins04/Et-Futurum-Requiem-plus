@@ -15,3 +15,28 @@ def earthContracts = tasks.register('earthImportContracts', JavaExec) {
     mainClass = 'efrtest.EarthImportContracts'
 }
 tasks.named('check') { dependsOn earthContracts }
+
+// Headless development probes cannot catch missing production client method mappings.
+def earthArchiveBase = tasks.named('jar').get().archiveBaseName.get()
+def earthReleaseJar = layout.buildDirectory.file("libs/${earthArchiveBase}-${project.version}.jar").get().asFile
+def earthReleaseMappings = tasks.register('earthImportReleaseMappings') {
+    dependsOn tasks.named('reobfJar')
+    doLast {
+        def releaseJar = earthReleaseJar
+        def archive = new java.util.zip.ZipFile(releaseJar)
+        try {
+            def entry = archive.getEntry('mixins.etfuturum.refmap.json')
+            if (entry == null) throw new GradleException('Release jar is missing the mixin refmap')
+            def refmap = new groovy.json.JsonSlurper().parse(archive.getInputStream(entry))
+            def owner = 'ganymedes01/etfuturum/mixins/early/imported/client/MixinWorldProvider'
+            def expected = 'Lnet/minecraft/world/WorldProvider;func_76571_f()F'
+            if (refmap.mappings[owner]?.getCloudHeight != expected) {
+                throw new GradleException('Imported client cloud hook is missing its production mapping')
+            }
+            logger.lifecycle('Imported client cloud hook production mapping verified in {}', releaseJar.name)
+        } finally {
+            archive.close()
+        }
+    }
+}
+tasks.named('check') { dependsOn earthReleaseMappings }

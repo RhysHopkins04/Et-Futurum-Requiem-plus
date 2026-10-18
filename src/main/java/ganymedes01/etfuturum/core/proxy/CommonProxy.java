@@ -50,6 +50,7 @@ public class CommonProxy implements IGuiHandler {
 	public void registerEvents() {
         MinecraftForge.EVENT_BUS.register(ganymedes01.etfuturum.api.imported.ImportedBiomeData.EVENTS);
         MinecraftForge.EVENT_BUS.register(ganymedes01.etfuturum.world.imported.ImportedWorldIdentity.EVENTS);
+        MinecraftForge.EVENT_BUS.register(ganymedes01.etfuturum.world.imported.ImportedStructureActions.EVENTS);
         ganymedes01.etfuturum.ModernPowderSnowBucket.init();
         MinecraftForge.EVENT_BUS.register(new ganymedes01.etfuturum.core.handlers.ModernFluidEventHandler());
 		MinecraftForge.EVENT_BUS.register(EntityEventHandler.INSTANCE);

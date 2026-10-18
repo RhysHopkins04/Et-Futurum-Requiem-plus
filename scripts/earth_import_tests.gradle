@@ -4,12 +4,34 @@ gradle.projectsEvaluated {
     if (p.hasProperty('earthNtmJar')) {
         p.dependencies.add('runtimeOnlyNonPublishable', p.dependencies.rfg.deobf(p.files(p.property('earthNtmJar'))))
     }
+    if (p.hasProperty('earthGtnhLibJar')) p.dependencies.add('runtimeOnlyNonPublishable',p.dependencies.rfg.deobf(p.files(p.property('earthGtnhLibJar'))))
+    if (p.hasProperty('earthAe2Jar')) p.dependencies.add('runtimeOnlyNonPublishable',p.dependencies.rfg.deobf(p.files(p.property('earthAe2Jar'))))
     if (p.hasProperty('earthIronChestsDevJar')) p.dependencies.add('runtimeOnlyNonPublishable',p.files(p.property('earthIronChestsDevJar')))
     p.tasks.named('runServer', JavaExec) {
         dependsOn p.tasks.named('compileEarthImportTests')
+        if (p.hasProperty('earthGtnhLibJar')) doFirst {
+            classpath = p.files(classpath.files.findAll { !it.name.startsWith('GTNHLib-0.11.4-') })
+        }
         classpath += p.files(p.layout.buildDirectory.dir('earth-import-tests/classes'))
         workingDir = p.file('build/earth-import-tests/' + (p.hasProperty('earthNtmJar') ? 'ntm-' : '') + (p.hasProperty('earthIronChestsDevJar') ? 'ironchests-' : '') + (p.findProperty('earthProfile') == 'legacy' ? 'legacy-server' : 'server'))
         systemProperty 'efr.earthImportProbe', 'true'
         systemProperty 'efr.earthImportProfile', p.findProperty('earthProfile') ?: 'earth'
+        if (p.hasProperty('earthAe2Only')) {
+            workingDir = p.file('build/earth-ae2-tests/server')
+            systemProperty 'efr.ae2ResourceProbe', 'true'
+            if (p.hasProperty('earthAe2Artifacts')) systemProperty 'efr.ae2Artifacts', p.property('earthAe2Artifacts')
+        }
+        if (p.hasProperty('earthConvertedDungeons')) systemProperty 'efr.ntmConvertedDungeons', p.property('earthConvertedDungeons')
+        if (p.hasProperty('earthConvertedRuins')) systemProperty 'efr.ntmConvertedRuins', p.property('earthConvertedRuins')
+        if (p.hasProperty('earthStructureCapture')) {
+            systemProperty 'efr.ntmStructureCaptureProbe', 'true'
+            classpath += p.files('src/testEarthImport/resources')
+            args '--tweakClass','efrtweak.StructureCaptureTweaker'
+        }
+        if (p.hasProperty('earthResourcesOnly')) {
+            workingDir = p.file(p.findProperty('earthResourceWorkdir') ?: 'build/earth-resource-tests/server')
+            systemProperty 'efr.ntmResourceProbe', 'true'
+            if (p.hasProperty('earthConvertedChunk')) systemProperty 'efr.convertedResourceChunk', p.property('earthConvertedChunk')
+        }
     }
 }

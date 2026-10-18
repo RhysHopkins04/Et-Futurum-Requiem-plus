@@ -28,6 +28,33 @@ public final class EarthImportProbe {
         if (!Boolean.getBoolean("efr.earthImportProbe")) return;
         MinecraftServer server=MinecraftServer.getServer(); WorldServer world=server.worldServerForDimension(0);
         try {
+            if (System.getProperty("efr.ntmConvertedDungeons")!=null) {
+                NtmConvertedDungeonsProbe.run(world,new File(System.getProperty("efr.ntmConvertedDungeons")));
+                ImportCapabilities.export(world);world.saveAllChunks(true,null);return;
+            }
+            if (System.getProperty("efr.ntmConvertedRuins")!=null) {
+                NtmConvertedRuinsProbe.run(world,new File(System.getProperty("efr.ntmConvertedRuins")));
+                ImportCapabilities.export(world);world.saveAllChunks(true,null);return;
+            }
+            if (Boolean.getBoolean("efr.ntmStructureCaptureProbe")) {
+                NtmStructureCaptureProbe.run(world);
+                ImportedStructureActionsProbe.run(world);
+                ImportCapabilities.export(world);world.saveAllChunks(true,null);
+                return;
+            }
+            if (Boolean.getBoolean("efr.ae2ResourceProbe")) {
+                Ae2ResourcesProbe.run(world);
+                com.google.gson.JsonObject ae=Ae2ImportResources.describe(world);
+                check(ae.get("available").getAsBoolean(),"AE2 export failed: "+ae);
+                ImportCapabilities.export(world); world.saveAllChunks(true,null);
+                System.out.println("AE2_NATIVE_RESOURCES PASSED"); return;
+            }
+            if (Boolean.getBoolean("efr.ntmResourceProbe")) {
+                NtmResourcesProbe.run(world, new File("ntm-resource-fixture-created").exists());
+                NtmStructuresProbe.run(world);
+                ImportCapabilities.export(world); world.saveAllChunks(true,null);
+                System.out.println("NTM_RESOURCE_ONLY PASSED"); return;
+            }
             if ("legacy".equals(System.getProperty("efr.earthImportProfile"))) {
                 check(ConfigMapCompatibility.mapCompatibilityMode && !ConfigMapCompatibility.importedEarthMode,"legacy profile flags");
                 check(!ConfigWorld.extendedWorldHeight && world.getHeight()==256,"legacy height changed");
@@ -69,6 +96,7 @@ public final class EarthImportProbe {
             check(BiomeGenBase.plains.getFloatTemperature(0,128,0)<BiomeGenBase.plains.temperature,"vanilla altitude behavior changed");
             int x=-32,z=48; Chunk chunk=world.getChunkFromBlockCoords(x,z);
             boolean restart=new File("earth-import-fixture-created").exists();
+            NtmResourcesProbe.run(world, restart);
             if (restart) {
                 for(int y:new int[]{0,64,255,256,383}) check(world.getBlock(x,y,z)==Blocks.gold_block,"block restart at Y"+y);
                 check(chunk.isTerrainPopulated,"population flag lost after restart");

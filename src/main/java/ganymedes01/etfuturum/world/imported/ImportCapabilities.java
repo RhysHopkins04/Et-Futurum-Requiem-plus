@@ -63,6 +63,11 @@ public final class ImportCapabilities {
         JsonObject mods = new JsonObject();
         for (ModContainer mod : Loader.instance().getActiveModList()) mods.addProperty(mod.getModId(), mod.getVersion());
         root.add("mods", mods);
+        root.addProperty("importedStructureActionsVersion", 1);
+        root.addProperty("importedStructureActionsKey", ImportedStructureActions.KEY);
+        root.add("ntmNativeResources", NtmImportResources.describe(world));
+        root.add("ntmNativeStructures", NtmImportStructures.describe(world));
+        root.add("ae2NativeResources", Ae2ImportResources.describe(world));
         return root;
     }
     public static File export(WorldServer world) throws IOException {

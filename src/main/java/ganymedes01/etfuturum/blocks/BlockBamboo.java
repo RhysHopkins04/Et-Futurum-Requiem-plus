@@ -170,7 +170,7 @@ public class BlockBamboo extends BaseBlock implements IPlantable, IGrowable {
 	}
 
 	public static int setStage(int meta, boolean complete) {
-		meta &= ~(1 << 0x8);
+		meta &= ~0x8;
 		return meta | (complete ? 0x8 : 0);
 	}
 
@@ -179,7 +179,7 @@ public class BlockBamboo extends BaseBlock implements IPlantable, IGrowable {
 	}
 
 	public static int setStalkSize(int meta, boolean large) {
-		meta &= ~(1 << 0x1);
+		meta &= ~0x1;
 		return meta | (large ? 0x1 : 0);
 	}
 

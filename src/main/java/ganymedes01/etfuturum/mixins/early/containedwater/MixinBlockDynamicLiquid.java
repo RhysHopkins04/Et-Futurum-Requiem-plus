@@ -49,7 +49,18 @@ public abstract class MixinBlockDynamicLiquid implements IContainedWaterFlow {
                 DripleafWater.fill(world, x, y, z);
             }
             ci.cancel();
+        } else if ((ModernMapParityBlocks.fromBlock(world.getBlock(x,y,z)) == ModernMapParityBlocks.CAMPFIRE
+                || ModernMapParityBlocks.fromBlock(world.getBlock(x,y,z)) == ModernMapParityBlocks.SOUL_CAMPFIRE)
+                && ModernMapParityBlocks.fillContainedWater(world,x,y,z)) {
+            ci.cancel();
         }
+    }
+
+    @Inject(method = "func_149807_p", at = @At("HEAD"), cancellable = true)
+    private void etfu$campfireAllowsIncomingWater(World world,int x,int y,int z,CallbackInfoReturnable<Boolean> cir) {
+        if (((Block)(Object)this).getMaterial() != Material.water || world.provider.isHellWorld) return;
+        ModernMapParityBlocks entry=ModernMapParityBlocks.fromBlock(world.getBlock(x,y,z));
+        if (entry==ModernMapParityBlocks.CAMPFIRE || entry==ModernMapParityBlocks.SOUL_CAMPFIRE) cir.setReturnValue(false);
     }
 
     public void etfu$spreadSource(World w,int x,int y,int z) {

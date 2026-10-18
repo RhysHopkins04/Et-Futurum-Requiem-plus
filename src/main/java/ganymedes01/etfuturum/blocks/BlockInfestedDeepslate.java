@@ -25,8 +25,16 @@ public class BlockInfestedDeepslate extends BlockSilverfish {
 
 	@Override
 	public IIcon getIcon(int side, int meta) {
-		return ModBlocks.DEEPSLATE.get().getBlockTextureFromSide(side);
+		return ModBlocks.DEEPSLATE.get().getIcon(side, meta & 12);
 	}
+
+	@Override
+	public int onBlockPlaced(World world, int x, int y, int z, int side, float hitX, float hitY, float hitZ, int meta) {
+		return ModBlocks.DEEPSLATE.get().onBlockPlaced(world,x,y,z,side,hitX,hitY,hitZ,0);
+	}
+
+	@Override
+	public int getRenderType() { return 31; }
 
 	public static boolean func_150196_a(Block p_150196_0_) {
 		return p_150196_0_ == ModBlocks.DEEPSLATE.get();

@@ -720,6 +720,7 @@ public enum ModernMapParityBlocks {
         int meta = world.getBlockMetadata(x, y, z);
         if (e == KELP || e == KELP_AGE_16 || e == KELP_PLANT || e == SEAGRASS || e == TALL_SEAGRASS) return true;
         if (e == SEA_PICKLE) return (meta & 4) != 0;
+        if (e == CAMPFIRE || e == SOUL_CAMPFIRE) return (meta & 8) != 0;
         String n = e.getRegistryName();
         return (n.endsWith("_coral") || n.endsWith("_coral_fan") || n.endsWith("_coral_wall_fan")) && (meta & 8) != 0;
     }
@@ -729,6 +730,8 @@ public enum ModernMapParityBlocks {
             return ganymedes01.etfuturum.core.utils.DripleafWater.drain(world,x,y,z);
         if (!containsWater(world, x, y, z)) return false;
         ModernMapParityBlocks e = fromBlock(world.getBlock(x, y, z));
+        if (e == CAMPFIRE || e == SOUL_CAMPFIRE)
+            return world.setBlockMetadataWithNotify(x,y,z,world.getBlockMetadata(x,y,z) & ~8,3);
         if (e == SEA_PICKLE) {
             boolean changed=world.setBlockMetadataWithNotify(x,y,z,world.getBlockMetadata(x,y,z) & ~4,3);
             world.updateLightByType(EnumSkyBlock.Block,x,y,z); return changed;
@@ -749,6 +752,12 @@ public enum ModernMapParityBlocks {
         if (e == null || world.provider.isHellWorld || containsWater(world,x,y,z)) return false;
         String n = e.getRegistryName();
         int bit = e == SEA_PICKLE ? 4 : (n.endsWith("_coral") || n.endsWith("_coral_fan") || n.endsWith("_coral_wall_fan")) ? 8 : 0;
+        if (e == CAMPFIRE || e == SOUL_CAMPFIRE) {
+            boolean changed=world.setBlockMetadataWithNotify(x,y,z,(world.getBlockMetadata(x,y,z)&3)|8,3);
+            world.updateLightByType(EnumSkyBlock.Block,x,y,z);
+            if (changed && !world.isRemote) world.scheduleBlockUpdate(x,y,z,e.get(),5);
+            return changed;
+        }
         if (bit == 0) return false;
         boolean changed=world.setBlockMetadataWithNotify(x,y,z,world.getBlockMetadata(x,y,z) | bit,3);
         if (e == SEA_PICKLE) world.updateLightByType(EnumSkyBlock.Block,x,y,z);
@@ -1639,7 +1648,7 @@ public enum ModernMapParityBlocks {
             Block block = worldObj.getBlock(xCoord, yCoord, zCoord);
             ModernMapParityBlocks parity = ModernMapParityBlocks.fromBlock(block);
             if (parity == null || !("campfire".equals(parity.getRegistryName()) || "soul_campfire".equals(parity.getRegistryName()))) return;
-            if ((worldObj.getBlockMetadata(xCoord, yCoord, zCoord) & 4) == 0) return;
+            if ((worldObj.getBlockMetadata(xCoord, yCoord, zCoord) & 12) != 4) return;
 
             boolean changed = false;
             for (int i = 0; i < cookingItems.length; i++) {
@@ -3572,7 +3581,7 @@ public enum ModernMapParityBlocks {
             if (isSeaPickle()) return 4; // one live pickle by default; bit 2 is bounded live/dead visual state
             if (isTorchflowerCrop() || isPitcherCrop() || isSnifferEgg() || isTallSeagrass()) return 0;
             if (isCandle() || isCandleCake() || isTurtleEgg()) return 0;
-            if (isCampfire()) return 4; // facing is filled by onBlockPlacedBy; campfires start lit.
+            if (isCampfire()) return isSourceWater(world,x,y,z) ? 8 : 4;
             if (isScaffolding()) return computeScaffoldingMeta(world, x, y, z);
             if (isSign()) {
                 if (isWallSignIdentity()) return side >= 2 && side <= 5 ? side : 3;
@@ -3763,8 +3772,8 @@ public enum ModernMapParityBlocks {
                 return;
             }
             if (isCampfire()) {
-                int lit = world.getBlockMetadata(x, y, z) & 4;
-                world.setBlockMetadataWithNotify(x, y, z, lit | ((quadrant + 2) & 3), 2);
+                int state = world.getBlockMetadata(x, y, z) & 12;
+                world.setBlockMetadataWithNotify(x, y, z, state | ((quadrant + 2) & 3), 2);
                 return;
             }
             if (isDecoratedPot()) {
@@ -4290,8 +4299,9 @@ public enum ModernMapParityBlocks {
             }
 
             if (isCampfire()) {
-                int meta = world.getBlockMetadata(x, y, z) & 7;
+                int meta = world.getBlockMetadata(x, y, z) & 15;
                 boolean lit = (meta & 4) != 0;
+                if ((meta & 8) != 0 && isIgnitionItem(held)) return false;
                 if (!lit && isIgnitionItem(held)) {
                     if (!world.isRemote) {
                         setMetadataAndRelight(world, x, y, z, meta | 4);
@@ -4302,7 +4312,8 @@ public enum ModernMapParityBlocks {
                 }
                 if (lit && held != null && (held.getItem() instanceof ItemSpade || held.getItem() == Items.water_bucket)) {
                     if (!world.isRemote) {
-                        setMetadataAndRelight(world, x, y, z, meta & 3);
+                        if (held.getItem() == Items.water_bucket) fillContainedWater(world,x,y,z);
+                        else setMetadataAndRelight(world, x, y, z, meta & 3);
                         if (held.getItem() == Items.water_bucket && !player.capabilities.isCreativeMode) {
                             player.inventory.setInventorySlotContents(player.inventory.currentItem, new ItemStack(Items.bucket));
                         }
@@ -4697,7 +4708,7 @@ public enum ModernMapParityBlocks {
             int meta = world.getBlockMetadata(x, y, z) & 15;
             if (isCandle()) return (meta & 4) != 0 ? ((meta & 3) + 1) * 3 : 0;
             if (isCandleCake()) return (meta & 1) != 0 ? 3 : 0;
-            if (isCampfire()) return (meta & 4) != 0 ? (isSoulCampfire() ? 10 : 15) : 0;
+            if (isCampfire()) return (meta & 12) == 4 ? (isSoulCampfire() ? 10 : 15) : 0;
             if (isSeaPickle()) return (meta & 4) != 0 ? 6 + (meta & 3) * 3 : 0;
             if (isRespawnAnchor()) {
                 final int[] light = {0, 3, 7, 11, 15};
@@ -5161,6 +5172,15 @@ public enum ModernMapParityBlocks {
 
         @Override
         public void updateTick(World world, int x, int y, int z, Random random) {
+            if (isCampfire() && containsWater(world,x,y,z)) {
+                if (!world.isRemote) {
+                    int meta=world.getBlockMetadata(x,y,z);
+                    if ((meta&4)!=0) setMetadataAndRelight(world,x,y,z,meta&~4);
+                    ((ganymedes01.etfuturum.core.utils.IContainedWaterFlow)Blocks.flowing_water).etfu$spreadSource(world,x,y,z);
+                    world.scheduleBlockUpdate(x,y,z,this,5);
+                }
+                return;
+            }
             if(isCrafter()) { TileEntity tile=world.getTileEntity(x,y,z);if(tile instanceof ParityCrafterStateTileEntity)((ParityCrafterStateTileEntity)tile).craft();return; }
             if (isLectern()) {
                 int meta=world.getBlockMetadata(x,y,z);
@@ -5460,7 +5480,7 @@ public enum ModernMapParityBlocks {
             if (isPaleOakButton() && !world.isRemote && buttonPowered(world, x, y, z)) {
                 notifyPaleOakButtonNeighbors(world, x, y, z, meta & 15);
             }
-            boolean releaseWater = isDecoratedPot() && (meta & 4) != 0;
+            boolean releaseWater = (isDecoratedPot() && (meta & 4) != 0) || (isCampfire() && (meta & 8) != 0);
             if (isCampfire()) {
                 TileEntity tile = world.getTileEntity(x, y, z);
                 if (tile instanceof ParityCampfireTileEntity) ((ParityCampfireTileEntity) tile).ejectAll();
@@ -5661,10 +5681,10 @@ public enum ModernMapParityBlocks {
             // translucency. Keep them in legacy pass 0 so the normal alpha-test path discards the
             // transparent texels after the resource bridge has repaired their colour-key alpha.
             // Advertise pass 1 so WorldRenderer does not skip it in sections containing only plants.
-            return isPass37AquaticContainedWaterBlock() ? 1 : 0;
+            return isPass37AquaticContainedWaterBlock() || isCampfire() ? 1 : 0;
         }
         @Override @SideOnly(Side.CLIENT)
-        public boolean canRenderInPass(int pass) { return pass == 0 || (pass == 1 && isPass37AquaticContainedWaterBlock()); }
+        public boolean canRenderInPass(int pass) { return pass == 0 || (pass == 1 && (isPass37AquaticContainedWaterBlock() || isCampfire())); }
         @Override public boolean renderAsNormalBlock() { return false; }
         @Override public boolean isOpaqueCube() {
             // Vanilla Block() calls this before the subclass constructor assigns entry.

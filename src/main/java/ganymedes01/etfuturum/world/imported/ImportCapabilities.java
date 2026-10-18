@@ -39,6 +39,9 @@ public final class ImportCapabilities {
         root.addProperty("chunkManagerClass", world.provider.worldChunkMgr.getClass().getName());
         root.addProperty("height", world.getHeight()); root.addProperty("actualHeight", world.getActualHeight());
         root.addProperty("yOffset", ConfigMapCompatibility.importedEarthMode ? 64 : 0);
+        JsonObject stateEncodings = new JsonObject();
+        stateEncodings.addProperty("campfireWater", 1);
+        root.add("blockStateEncodings", stateEncodings);
         JsonObject ids = new JsonObject();
         for (Map.Entry<String, BiomeGenBase> entry : ImportedBiomes.registered().entrySet()) ids.addProperty(entry.getKey(), entry.getValue().biomeID);
         root.add("surfaceBiomeIds", ids);

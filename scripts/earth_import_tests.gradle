@@ -16,6 +16,10 @@ gradle.projectsEvaluated {
         workingDir = p.file('build/earth-import-tests/' + (p.hasProperty('earthNtmJar') ? 'ntm-' : '') + (p.hasProperty('earthIronChestsDevJar') ? 'ironchests-' : '') + (p.findProperty('earthProfile') == 'legacy' ? 'legacy-server' : 'server'))
         systemProperty 'efr.earthImportProbe', 'true'
         systemProperty 'efr.earthImportProfile', p.findProperty('earthProfile') ?: 'earth'
+        if (p.hasProperty('earthFlaggedStateProbe')) {
+            workingDir = p.file('build/earth-flagged-state-tests/server')
+            systemProperty 'efr.flaggedStateProbe', 'true'
+        }
         if (p.hasProperty('earthAe2Only')) {
             workingDir = p.file('build/earth-ae2-tests/server')
             systemProperty 'efr.ae2ResourceProbe', 'true'

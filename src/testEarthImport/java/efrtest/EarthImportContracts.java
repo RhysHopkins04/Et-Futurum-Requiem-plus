@@ -26,6 +26,11 @@ public final class EarthImportContracts {
     }
     public static void main(String[] args) throws Exception {
         NtmTextureContracts.run();
+        ganymedes01.etfuturum.world.imported.ImportedWaterProfiles.Profile ocean=ganymedes01.etfuturum.world.imported.ImportedWaterProfiles.named("minecraft:ocean");
+        check(ocean.waterColor==0x3f76e4 && ocean.fogColor==0x050533 && ocean.start==-8F && ocean.end==96F,"official ocean water defaults");
+        check(ganymedes01.etfuturum.world.imported.ImportedWaterProfiles.named("minecraft:swamp").end<ocean.end,"swamp reduced visibility");
+        check(ganymedes01.etfuturum.world.imported.ImportedWaterProfiles.named("minecraft:warm_ocean").fogColor==0x041f33,"warm ocean fog");
+        check(ganymedes01.etfuturum.world.imported.ImportedWaterProfiles.named("unknown:biome")==ganymedes01.etfuturum.world.imported.ImportedWaterProfiles.named("minecraft:plains"),"unknown water fallback");
         ImportedBiomeVolume volume = fixture();
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         CompressedStreamTools.writeCompressed(volume.toNBT(), bytes);

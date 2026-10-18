@@ -57,6 +57,7 @@ public class ClientProxy extends CommonProxy {
 		super.registerEvents();
         ((net.minecraft.client.resources.IReloadableResourceManager)Minecraft.getMinecraft().getResourceManager()).registerReloadListener(new ganymedes01.etfuturum.client.renderer.trim.ArmorTrimRenderer());
         MinecraftForge.EVENT_BUS.register(new ganymedes01.etfuturum.client.handlers.PowderSnowClientHandler());
+        MinecraftForge.EVENT_BUS.register(new ganymedes01.etfuturum.client.handlers.ImportedWaterHandler());
 		FMLCommonHandler.instance().bus().register(ClientEventHandler.INSTANCE);
 		MinecraftForge.EVENT_BUS.register(ClientEventHandler.INSTANCE);
 

@@ -15,6 +15,7 @@ public final class ImportedBiomeData {
     public static final ImportedBiomeData EVENTS = new ImportedBiomeData();
     private static final Map<Chunk, ImportedBiomeVolume> DATA = Collections.synchronizedMap(new WeakHashMap<>());
     private ImportedBiomeData() {}
+    public static boolean isImportedChunk(Chunk chunk) { return DATA.containsKey(chunk); }
 
     @SubscribeEvent public void load(ChunkDataEvent.Load event) {
         if (!event.getData().hasKey(ImportedBiomeVolume.NBT_KEY)) return;

@@ -25,6 +25,9 @@ public class EtFuturumLateMixins implements ILateMixinLoader {
 	@Override
 	public List<String> getMixins(Set<String> loadedMods) {
 		List<String> mixins = new ObjectArrayList<>();
+		if (loadedMods.contains("harvestcraft") && ganymedes01.etfuturum.configuration.configs.ConfigMapCompatibility.importedEarthMode) {
+			mixins.add("harvestcraft.MixinFruitTreeHeight");
+		}
 		if (loadedMods.contains("hbm")) {
 			mixins.add("ntm.MixinCoalDustBreakEffects");
 			mixins.add("ntm.MixinShredderRecipes");

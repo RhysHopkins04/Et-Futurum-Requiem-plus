@@ -382,9 +382,14 @@ public class EtFuturumEarlyMixins implements IFMLLoadingPlugin, IEarlyMixinLoade
 		// including the Map Compatibility Mode runtime override - none of these engine/protocol mixins
 		// are applied, leaving ordinary 1.7.10 world architecture untouched.
 		if (ConfigMapCompatibility.importedEarthMode) {
+            mixins.add("imported.MixinChunkProviderServer");
+            mixins.add("imported.MixinWorld");
 			mixins.add("imported.MixinBiomeGenBase");
 			mixins.add("imported.MixinWorldProvider");
-			if (side == MixinEnvironment.Side.CLIENT) mixins.add("imported.client.MixinWorldProvider");
+			if (side == MixinEnvironment.Side.CLIENT) {
+                mixins.add("imported.client.MixinWorldProvider");
+                mixins.add("imported.client.MixinBlockLiquid");
+            }
 		}
 		if (ConfigWorld.extendedWorldHeight && ConfigMapCompatibility.allowsExtendedHeight()) {
 			mixins.add("extendedheight.MixinWorldProvider");

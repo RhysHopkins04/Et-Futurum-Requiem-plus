@@ -13,6 +13,7 @@ import java.io.File;
  * ordinary Et Futurum settings from their existing config files.
  */
 public class ConfigMapCompatibility extends ConfigBase {
+    public static boolean modernImportedWater=true;
 
     public static boolean mapCompatibilityMode;
     public static boolean importedEarthMode;
@@ -36,6 +37,7 @@ public class ConfigMapCompatibility extends ConfigBase {
                 "RTG or another world generator remains authoritative while Et Futurum supplies blocks and items. " +
                 "This does not delete or rewrite your other Et Futurum configuration values; it overrides selected values at runtime. " +
                 "REQUIRES A FULL RESTART.");
+        modernImportedWater=getBoolean("modernImportedWater",CATEGORY,true,"Use AssetDirector modern water textures and biome tint, plus modern biome underwater fog distances/colors in the imported Overworld. Disable for legacy rendering or shader compatibility. Requires restart/resource reload.");
         importedEarthMode = getBoolean("importedEarthMode", CATEGORY, false,
                 "Imported modern Earth profile: suppress EFR automatic terrain generation and provider replacement, " +
                 "but retain the 384-block engine and configured ore/content registrations. " +

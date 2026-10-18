@@ -39,6 +39,8 @@ public final class ImportCapabilities {
         root.addProperty("chunkManagerClass", world.provider.worldChunkMgr.getClass().getName());
         root.addProperty("height", world.getHeight()); root.addProperty("actualHeight", world.getActualHeight());
         root.addProperty("yOffset", ConfigMapCompatibility.importedEarthMode ? 64 : 0);
+        root.addProperty("importedPopulationProtection",1);
+        root.add("harvestNativeResources",HarvestImportResources.describe());
         JsonObject stateEncodings = new JsonObject();
         stateEncodings.addProperty("campfireWater", 1);
         root.add("blockStateEncodings", stateEncodings);

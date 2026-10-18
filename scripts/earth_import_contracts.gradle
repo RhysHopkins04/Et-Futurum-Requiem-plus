@@ -33,7 +33,18 @@ def earthReleaseMappings = tasks.register('earthImportReleaseMappings') {
             if (refmap.mappings[owner]?.getCloudHeight != expected) {
                 throw new GradleException('Imported client cloud hook is missing its production mapping')
             }
-            logger.lifecycle('Imported client cloud hook production mapping verified in {}', releaseJar.name)
+            def prefix = 'ganymedes01/etfuturum/mixins/early/imported/'
+            def required = [
+                'MixinWorld': ['setBlock(IIILnet/minecraft/block/Block;II)Z': 'func_147465_d', setBlockMetadataWithNotify: 'func_72921_c', setTileEntity: 'func_147455_a', removeTileEntity: 'func_147475_p', getTileEntity: 'func_147438_o'],
+                'MixinChunkProviderServer': [populate: 'func_73153_a', 'Lnet/minecraft/world/chunk/IChunkProvider;populate(Lnet/minecraft/world/chunk/IChunkProvider;II)V': 'func_73153_a'],
+                'client/MixinBlockLiquid': [colorMultiplier: 'func_149720_d']
+            ]
+            required.each { mixin, methods -> methods.each { method, srg ->
+                if (!refmap.mappings[prefix+mixin]?.get(method)?.contains(srg))
+                    throw new GradleException("Imported-world production mapping missing: ${mixin}/${method}")
+            } }
+            if (archive.entries().any { it.name.startsWith('efrtest/') }) throw new GradleException('Test fixture leaked into release jar')
+            logger.lifecycle('Imported cloud, population guard and water production mappings verified in {}', releaseJar.name)
         } finally {
             archive.close()
         }

@@ -1,0 +1,278 @@
+{
+  "schemaVersion": 1,
+  "jarSha256": "b0dc253702948d19d9c2d5191ae78ae022b65fac73210ca7313d7ef3b1cd7a57",
+  "trees": [
+    {
+      "group": "temperate",
+      "toggle": "appletreeGeneration",
+      "generator": "WorldGenPamFruitTree",
+      "wood": 0,
+      "leaves": 0,
+      "field": "pamApple"
+    },
+    {
+      "group": "temperate",
+      "toggle": "avocadotreeGeneration",
+      "generator": "WorldGenPamFruitTree",
+      "wood": 0,
+      "leaves": 0,
+      "field": "pamAvocado"
+    },
+    {
+      "group": "temperate",
+      "toggle": "cherrytreeGeneration",
+      "generator": "WorldGenPamFruitTree",
+      "wood": 0,
+      "leaves": 0,
+      "field": "pamCherry"
+    },
+    {
+      "group": "temperate",
+      "toggle": "chestnuttreeGeneration",
+      "generator": "WorldGenPamFruitTree",
+      "wood": 0,
+      "leaves": 0,
+      "field": "pamChestnut"
+    },
+    {
+      "group": "temperate",
+      "toggle": "nutmegtreeGeneration",
+      "generator": "WorldGenPamFruitTree",
+      "wood": 0,
+      "leaves": 0,
+      "field": "pamNutmeg"
+    },
+    {
+      "group": "temperate",
+      "toggle": "peartreeGeneration",
+      "generator": "WorldGenPamFruitTree",
+      "wood": 0,
+      "leaves": 0,
+      "field": "pamPear"
+    },
+    {
+      "group": "temperate",
+      "toggle": "walnuttreeGeneration",
+      "generator": "WorldGenPamFruitTree",
+      "wood": 0,
+      "leaves": 0,
+      "field": "pamWalnut"
+    },
+    {
+      "group": "temperate",
+      "toggle": "gooseberrytreeGeneration",
+      "generator": "WorldGenPamFruitTree",
+      "wood": 0,
+      "leaves": 0,
+      "field": "pamGooseberry"
+    },
+    {
+      "group": "coastal",
+      "toggle": "coconuttreeGeneration",
+      "generator": "WorldGenPamFruitTree",
+      "wood": 3,
+      "leaves": 3,
+      "field": "pamCoconut"
+    },
+    {
+      "group": "tropical",
+      "toggle": "bananatreeGeneration",
+      "generator": "WorldGenPamFruitTree",
+      "wood": 3,
+      "leaves": 3,
+      "field": "pamBanana"
+    },
+    {
+      "group": "tropical",
+      "toggle": "cinnamontreeGeneration",
+      "generator": "WorldGenPamFruitLogTree",
+      "wood": 3,
+      "leaves": 3,
+      "field": "pamCinnamon"
+    },
+    {
+      "group": "tropical",
+      "toggle": "coconuttreeGeneration",
+      "generator": "WorldGenPamFruitTree",
+      "wood": 3,
+      "leaves": 3,
+      "field": "pamCoconut"
+    },
+    {
+      "group": "tropical",
+      "toggle": "datetreeGeneration",
+      "generator": "WorldGenPamFruitTree",
+      "wood": 3,
+      "leaves": 3,
+      "field": "pamDate"
+    },
+    {
+      "group": "tropical",
+      "toggle": "dragonfruittreeGeneration",
+      "generator": "WorldGenPamFruitTree",
+      "wood": 3,
+      "leaves": 3,
+      "field": "pamDragonfruit"
+    },
+    {
+      "group": "tropical",
+      "toggle": "papayatreeGeneration",
+      "generator": "WorldGenPamFruitTree",
+      "wood": 3,
+      "leaves": 3,
+      "field": "pamPapaya"
+    },
+    {
+      "group": "tropical",
+      "toggle": "almondtreeGeneration",
+      "generator": "WorldGenPamFruitTree",
+      "wood": 3,
+      "leaves": 3,
+      "field": "pamAlmond"
+    },
+    {
+      "group": "tropical",
+      "toggle": "apricottreeGeneration",
+      "generator": "WorldGenPamFruitTree",
+      "wood": 3,
+      "leaves": 3,
+      "field": "pamApricot"
+    },
+    {
+      "group": "tropical",
+      "toggle": "cashewtreeGeneration",
+      "generator": "WorldGenPamFruitTree",
+      "wood": 3,
+      "leaves": 3,
+      "field": "pamCashew"
+    },
+    {
+      "group": "tropical",
+      "toggle": "duriantreeGeneration",
+      "generator": "WorldGenPamFruitTree",
+      "wood": 3,
+      "leaves": 3,
+      "field": "pamDurian"
+    },
+    {
+      "group": "tropical",
+      "toggle": "figtreeGeneration",
+      "generator": "WorldGenPamFruitTree",
+      "wood": 3,
+      "leaves": 3,
+      "field": "pamFig"
+    },
+    {
+      "group": "tropical",
+      "toggle": "grapefruittreeGeneration",
+      "generator": "WorldGenPamFruitTree",
+      "wood": 3,
+      "leaves": 3,
+      "field": "pamGrapefruit"
+    },
+    {
+      "group": "tropical",
+      "toggle": "lemontreeGeneration",
+      "generator": "WorldGenPamFruitTree",
+      "wood": 3,
+      "leaves": 3,
+      "field": "pamLemon"
+    },
+    {
+      "group": "tropical",
+      "toggle": "limetreeGeneration",
+      "generator": "WorldGenPamFruitTree",
+      "wood": 3,
+      "leaves": 3,
+      "field": "pamLime"
+    },
+    {
+      "group": "tropical",
+      "toggle": "mangotreeGeneration",
+      "generator": "WorldGenPamFruitTree",
+      "wood": 3,
+      "leaves": 3,
+      "field": "pamMango"
+    },
+    {
+      "group": "tropical",
+      "toggle": "orangetreeGeneration",
+      "generator": "WorldGenPamFruitTree",
+      "wood": 3,
+      "leaves": 3,
+      "field": "pamOrange"
+    },
+    {
+      "group": "tropical",
+      "toggle": "paperbarktreeGeneration",
+      "generator": "WorldGenPamFruitLogTree",
+      "wood": 3,
+      "leaves": 3,
+      "field": "pamPaperbark"
+    },
+    {
+      "group": "tropical",
+      "toggle": "peachtreeGeneration",
+      "generator": "WorldGenPamFruitTree",
+      "wood": 3,
+      "leaves": 3,
+      "field": "pamPeach"
+    },
+    {
+      "group": "tropical",
+      "toggle": "pecantreeGeneration",
+      "generator": "WorldGenPamFruitTree",
+      "wood": 3,
+      "leaves": 3,
+      "field": "pamPecan"
+    },
+    {
+      "group": "tropical",
+      "toggle": "peppercorntreeGeneration",
+      "generator": "WorldGenPamFruitTree",
+      "wood": 3,
+      "leaves": 3,
+      "field": "pamPeppercorn"
+    },
+    {
+      "group": "tropical",
+      "toggle": "persimmontreeGeneration",
+      "generator": "WorldGenPamFruitTree",
+      "wood": 3,
+      "leaves": 3,
+      "field": "pamPersimmon"
+    },
+    {
+      "group": "tropical",
+      "toggle": "pistachiotreeGeneration",
+      "generator": "WorldGenPamFruitTree",
+      "wood": 3,
+      "leaves": 3,
+      "field": "pamPistachio"
+    },
+    {
+      "group": "tropical",
+      "toggle": "pomegranatetreeGeneration",
+      "generator": "WorldGenPamFruitTree",
+      "wood": 3,
+      "leaves": 3,
+      "field": "pamPomegranate"
+    },
+    {
+      "group": "tropical",
+      "toggle": "starfruittreeGeneration",
+      "generator": "WorldGenPamFruitTree",
+      "wood": 3,
+      "leaves": 3,
+      "field": "pamStarfruit"
+    },
+    {
+      "group": "tropical",
+      "toggle": "vanillabeantreeGeneration",
+      "generator": "WorldGenPamFruitTree",
+      "wood": 3,
+      "leaves": 3,
+      "field": "pamVanillabean"
+    }
+  ]
+}

@@ -5,6 +5,7 @@ gradle.projectsEvaluated {
         p.dependencies.add('runtimeOnlyNonPublishable', p.dependencies.rfg.deobf(p.files(p.property('earthNtmJar'))))
     }
     if (p.hasProperty('earthGtnhLibJar')) p.dependencies.add('runtimeOnlyNonPublishable',p.dependencies.rfg.deobf(p.files(p.property('earthGtnhLibJar'))))
+    if (p.hasProperty('earthHarvestJar')) p.dependencies.add('runtimeOnlyNonPublishable',p.dependencies.rfg.deobf(p.files(p.property('earthHarvestJar'))))
     if (p.hasProperty('earthAe2Jar')) p.dependencies.add('runtimeOnlyNonPublishable',p.dependencies.rfg.deobf(p.files(p.property('earthAe2Jar'))))
     if (p.hasProperty('earthIronChestsDevJar')) p.dependencies.add('runtimeOnlyNonPublishable',p.files(p.property('earthIronChestsDevJar')))
     p.tasks.named('runServer', JavaExec) {
@@ -16,6 +17,10 @@ gradle.projectsEvaluated {
         workingDir = p.file('build/earth-import-tests/' + (p.hasProperty('earthNtmJar') ? 'ntm-' : '') + (p.hasProperty('earthIronChestsDevJar') ? 'ironchests-' : '') + (p.findProperty('earthProfile') == 'legacy' ? 'legacy-server' : 'server'))
         systemProperty 'efr.earthImportProbe', 'true'
         systemProperty 'efr.earthImportProfile', p.findProperty('earthProfile') ?: 'earth'
+        if (p.hasProperty('earthHarvestJar')) {
+            workingDir = p.file('build/earth-harvest-tests/server')
+            systemProperty 'efr.harvestCaptureProbe', 'true'
+        }
         if (p.hasProperty('earthFlaggedStateProbe')) {
             workingDir = p.file('build/earth-flagged-state-tests/server')
             systemProperty 'efr.flaggedStateProbe', 'true'

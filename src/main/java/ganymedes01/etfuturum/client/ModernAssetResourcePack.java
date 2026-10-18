@@ -40,6 +40,9 @@ import java.util.Set;
  */
 @SideOnly(Side.CLIENT)
 public final class ModernAssetResourcePack extends DefaultResourcePack {
+    private static final Set<String> WATER_PATHS=Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
+            "textures/blocks/water_still.png","textures/blocks/water_still.png.mcmeta",
+            "textures/blocks/water_flow.png","textures/blocks/water_flow.png.mcmeta","textures/misc/underwater.png")));
 
     private static final Set<String> ALIASED_PATHS = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
             "textures/blocks/amethyst_block.png",
@@ -240,10 +243,13 @@ public final class ModernAssetResourcePack extends DefaultResourcePack {
     }
 
     private static boolean isAliasedPath(String path) {
+        if(WATER_PATHS.contains(path))return ganymedes01.etfuturum.world.imported.ImportedWaterProfiles.enabled();
         return ALIASED_PATHS.contains(path) || MODERN_MAP_PARITY_ALIASES.containsKey(path) || DYNAMIC_MODEL_ALIASES.containsKey(path);
     }
 
     private static ResourceLocation toModernLocation(ResourceLocation legacy) {
+        if(WATER_PATHS.contains(legacy.getResourcePath()))return new ResourceLocation(Tags.MC_ASSET_VER,
+                legacy.getResourcePath().replace("textures/blocks/","textures/block/"));
         // Cave Vines are mature EFR blocks that still request the legacy plural atlas path.
         // AssetDirector exposes the 1.21.11 client jar verbatim, where these live under block/.
         if (legacy.getResourcePath().startsWith("textures/blocks/cave_vines")) {

@@ -19,7 +19,8 @@ public enum ImportedBiome {
     DEEP_LUKEWARM_OCEAN("deep_lukewarm_ocean", .5F, .5F, 0x45ADF2, Type.OCEAN),
     DEEP_COLD_OCEAN("deep_cold_ocean", .5F, .5F, 0x3D57D6, Type.OCEAN, Type.COLD),
     DEEP_FROZEN_OCEAN("deep_frozen_ocean", 0F, .5F, 0x3938C9, Type.OCEAN, Type.COLD, Type.SNOWY),
-    PALE_GARDEN("pale_garden", .7F, .8F, 0x76889D, Type.FOREST);
+    PALE_GARDEN("pale_garden", .7F, .8F, 0x76889D, Type.FOREST),
+    THE_VOID("the_void", .5F, .5F, 0x3F76E4, Type.DEAD);
 
     public final String path;
     public final float temperature, rainfall;

@@ -20,6 +20,11 @@ public final class ImportedSurfaceBiome extends BiomeGenBase {
         spawnableCreatureList.clear(); spawnableCreatureList.addAll(fallback.getSpawnableList(net.minecraft.entity.EnumCreatureType.creature));
         spawnableWaterCreatureList.clear(); spawnableWaterCreatureList.addAll(fallback.getSpawnableList(net.minecraft.entity.EnumCreatureType.waterCreature));
         spawnableCaveCreatureList.clear(); spawnableCaveCreatureList.addAll(fallback.getSpawnableList(net.minecraft.entity.EnumCreatureType.ambient));
+        if(definition==ImportedBiome.THE_VOID) {
+            setDisableRain();
+            spawnableMonsterList.clear();spawnableCreatureList.clear();
+            spawnableWaterCreatureList.clear();spawnableCaveCreatureList.clear();
+        }
     }
     @Override public void decorate(World world, Random random, int x, int z) {
         // Deliberately empty: importing a biome never grants ownership of the Earth's surface.

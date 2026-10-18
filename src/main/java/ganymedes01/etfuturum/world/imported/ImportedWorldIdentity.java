@@ -38,7 +38,18 @@ public final class ImportedWorldIdentity extends WorldSavedData {
         tag.setTag("Biomes", list);
     }
     public void validate(Map<String, Integer> actual) {
-        if (!ids.equals(actual)) throw new IllegalStateException("Imported Earth biome IDs changed or identities disabled. Restore this world's original importedbiomes.cfg before loading it.");
+        // Existing names/IDs are immutable; new distinct registrations may be
+        // appended without reinterpreting any previously saved biome identity.
+        for(Map.Entry<String,Integer> old:ids.entrySet()) {
+            if(!old.getValue().equals(actual.get(old.getKey())))
+                throw new IllegalStateException("Imported Earth biome IDs changed or identities disabled. Restore this world's original importedbiomes.cfg before loading it.");
+        }
+        java.util.Set<Integer> assigned=new java.util.HashSet<>();
+        for(Integer id:actual.values()) {
+            if(id==null || id<0 || id>=255 || !assigned.add(id))
+                throw new IllegalStateException("Invalid or reused imported biome ID in updated allocation");
+        }
+        if(!ids.equals(actual)) {ids.putAll(actual);markDirty();}
     }
     @SubscribeEvent public void load(WorldEvent.Load event) {
         if (event.world.isRemote || event.world.provider.dimensionId != 0) return;

@@ -63,6 +63,15 @@ public final class EarthImportContracts {
         Map<String,Integer> actual=new LinkedHashMap<>();actual.put("minecraft:cherry_grove",210);saved.validate(actual);
         actual.put("minecraft:cherry_grove",211);boolean changed=false;try {saved.validate(actual);}catch(IllegalStateException expected){changed=true;}
         check(changed,"changed saved biome ID accepted");
+        actual.put("minecraft:cherry_grove",210);actual.put("minecraft:the_void",226);saved.validate(actual);
+        NBTTagCompound expanded=new NBTTagCompound();saved.writeToNBT(expanded);
+        ImportedWorldIdentity expandedReload=new ImportedWorldIdentity("test");expandedReload.readFromNBT(expanded);expandedReload.validate(actual);
+        Map<String,Integer> reused=new LinkedHashMap<>(actual);reused.put("minecraft:new_biome",210);
+        boolean collision=false;try{expandedReload.validate(reused);}catch(IllegalStateException expected){collision=true;}
+        check(collision,"additive biome allocation reused a saved ID");
+        Map<String,Integer> removed=new LinkedHashMap<>(actual);removed.remove("minecraft:cherry_grove");
+        boolean disabled=false;try{expandedReload.validate(removed);}catch(IllegalStateException expected){disabled=true;}
+        check(disabled,"additive allocation allowed removal of a saved identity");
         System.out.println("EARTH_IMPORT_CONTRACTS PASSED: all 1536 quarts, 24 sections, compressed NBT, malformed data, unknown names, sparse fallback, immutable storage");
     }
 }

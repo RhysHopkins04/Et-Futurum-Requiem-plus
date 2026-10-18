@@ -15,6 +15,10 @@ final class ImportedWaterTintProbe {
         MinecraftForge.EVENT_BUS.register(handler);
         boolean enabled=ConfigMapCompatibility.modernImportedWater;
         try {
+            BiomeGenBase empty=ImportedBiomes.resolve("minecraft:the_void");
+            check(empty!=null && !empty.canSpawnLightningBolt() && !empty.getEnableSnow(),"Void precipitation must be disabled");
+            for(net.minecraft.entity.EnumCreatureType type:net.minecraft.entity.EnumCreatureType.values())
+                check(empty.getSpawnableList(type).isEmpty(),"Void must not inherit natural spawns: "+type);
             ConfigMapCompatibility.modernImportedWater=true;
             check(ConfigMapCompatibility.importedEarthMode,"probe needs imported profile");
             check(BiomeGenBase.ocean.getWaterColorMultiplier()==0x3f76e4,"Angelica biome ocean tint remained white");

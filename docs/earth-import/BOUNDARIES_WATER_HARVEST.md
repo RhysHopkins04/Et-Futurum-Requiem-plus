@@ -108,3 +108,20 @@ swamp. It checks agreement with the block path, custom tint retention and the
 disabled-option fallback without mutating biome fields. Native probe and release
 check/build passed. The remaining client check is to reopen the existing
 converted world and confirm ordinary water matches the waterlogged-plant tint.
+
+## Larger-area Void biome registration
+
+The 1,048,576-chunk natural review area exposed source minecraft:the_void surface
+identities. A distinct THE_VOID entry is appended to ImportedBiome, leaving all
+existing ordinals/default IDs unchanged and defaulting the new ID to 226. It has
+no natural spawn lists or precipitation and uses the DEAD dictionary type.
+Existing saved allocations may now grow additively; every old name/ID must still
+match, all IDs must be unique/in range, and removals, renames or reassignment
+still abort loading. Added allocations are persisted and marked dirty.
+
+The native server reopened an existing imported test world after this addition;
+Void weather/spawn checks, water tint, block-state and boundary probes passed.
+Release check/build also passed, including additive-map persistence, duplicate
+ID rejection and removal rejection. A new genuine full-pack /efrimportreport is
+required before refreshing the larger template: no capability export was
+fabricated or silently changed to claim the new registration.

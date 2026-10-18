@@ -30,6 +30,7 @@ public class EtFuturumLateMixins implements ILateMixinLoader {
 		}
 		if (loadedMods.contains("hbm")) {
 			mixins.add("ntm.MixinCoalDustBreakEffects");
+            mixins.add("ntm.MixinStructureGround");
 			mixins.add("ntm.MixinShredderRecipes");
 			mixins.add("ntm.MixinCentrifugeRecipes");
 			mixins.add("ntm.MixinCrystallizerRecipes");

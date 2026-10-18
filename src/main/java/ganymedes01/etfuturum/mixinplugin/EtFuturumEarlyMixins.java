@@ -386,6 +386,8 @@ public class EtFuturumEarlyMixins implements IFMLLoadingPlugin, IEarlyMixinLoade
             mixins.add("imported.MixinWorld");
 			mixins.add("imported.MixinBiomeGenBase");
 			mixins.add("imported.MixinWorldProvider");
+            mixins.add("imported.MixinVillageGround");
+            mixins.add("imported.MixinScatteredFeatureGround");
 			if (side == MixinEnvironment.Side.CLIENT) {
                 mixins.add("imported.client.MixinWorldProvider");
                 mixins.add("imported.client.MixinBlockLiquid");

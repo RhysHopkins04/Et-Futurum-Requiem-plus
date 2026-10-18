@@ -29,7 +29,8 @@ public final class EarthImportProbe {
         MinecraftServer server=MinecraftServer.getServer(); WorldServer world=server.worldServerForDimension(0);
         try {
             if (Boolean.getBoolean("efr.harvestCaptureProbe")) {HarvestCaptureProbe.run(world);ImportCapabilities.export(world);return;}
-            if (Boolean.getBoolean("efr.flaggedStateProbe")) { FlaggedStateProbe.run(world);ImportedWaterTintProbe.run();CampfireWaterProbe.run(world);ImportedBoundaryProbe.run(world);ImportCapabilities.export(world);return; }
+            if (Boolean.getBoolean("efr.structureGroundProbe")) {ImportedStructureGroundProbe.run(world);return;}
+            if (Boolean.getBoolean("efr.flaggedStateProbe")) { FlaggedStateProbe.run(world);ImportedWaterTintProbe.run();ImportedStructureGroundProbe.run(world);CampfireWaterProbe.run(world);ImportedBoundaryProbe.run(world);ImportCapabilities.export(world);return; }
             if (System.getProperty("efr.ntmConvertedDungeons")!=null) {
                 NtmConvertedDungeonsProbe.run(world,new File(System.getProperty("efr.ntmConvertedDungeons")));
                 ImportCapabilities.export(world);world.saveAllChunks(true,null);return;

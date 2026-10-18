@@ -21,6 +21,7 @@ gradle.projectsEvaluated {
             workingDir = p.file('build/earth-harvest-tests/server')
             systemProperty 'efr.harvestCaptureProbe', 'true'
         }
+        if (p.hasProperty('earthStructureGroundProbe')) systemProperty 'efr.structureGroundProbe', 'true'
         if (p.hasProperty('earthFlaggedStateProbe')) {
             workingDir = p.file('build/earth-flagged-state-tests/server')
             systemProperty 'efr.flaggedStateProbe', 'true'

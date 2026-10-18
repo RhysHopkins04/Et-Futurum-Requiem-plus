@@ -37,12 +37,17 @@ def earthReleaseMappings = tasks.register('earthImportReleaseMappings') {
             def required = [
                 'MixinWorld': ['setBlock(IIILnet/minecraft/block/Block;II)Z': 'func_147465_d', setBlockMetadataWithNotify: 'func_72921_c', setTileEntity: 'func_147455_a', removeTileEntity: 'func_147475_p', getTileEntity: 'func_147438_o'],
                 'MixinChunkProviderServer': [populate: 'func_73153_a', 'Lnet/minecraft/world/chunk/IChunkProvider;populate(Lnet/minecraft/world/chunk/IChunkProvider;II)V': 'func_73153_a'],
-                'client/MixinBlockLiquid': [colorMultiplier: 'func_149720_d']
+                'client/MixinBlockLiquid': [colorMultiplier: 'func_149720_d'],
+                'MixinVillageGround': [getAverageGroundLevel: 'func_74889_b', 'Lnet/minecraft/world/WorldProvider;getAverageGroundLevel()I': 'func_76557_i'],
+                'MixinScatteredFeatureGround': [func_74935_a: 'func_74935_a', 'Lnet/minecraft/world/WorldProvider;getAverageGroundLevel()I': 'func_76557_i']
             ]
             required.each { mixin, methods -> methods.each { method, srg ->
                 if (!refmap.mappings[prefix+mixin]?.get(method)?.contains(srg))
                     throw new GradleException("Imported-world production mapping missing: ${mixin}/${method}")
             } }
+            def ntmGround = refmap.mappings['ganymedes01/etfuturum/mixins/late/ntm/MixinStructureGround']
+            if (ntmGround?.get('Lnet/minecraft/world/WorldProvider;getAverageGroundLevel()I') != 'Lnet/minecraft/world/WorldProvider;func_76557_i()I')
+                throw new GradleException('NTM structure ground hook is missing its production mapping')
             if (archive.entries().any { it.name.startsWith('efrtest/') }) throw new GradleException('Test fixture leaked into release jar')
             logger.lifecycle('Imported cloud, population guard and water production mappings verified in {}', releaseJar.name)
         } finally {

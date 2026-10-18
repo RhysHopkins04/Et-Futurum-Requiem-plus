@@ -87,3 +87,24 @@ run `/efrimportreport`, save and quit. Refresh the clean test template and build
 schema-4 resource plan with that genuine export before using the downloaded dev
 Backporter. In the new test conversion, check water visibility and one garden,
 fruit tree and beehive. Do not reuse the already altered played test save.
+
+## Angelica water tint correction
+
+The first water pass only hooked BlockLiquid.colorMultiplier. The installed
+Angelica 2.2.14 wraps that method and uses SmoothBiomeColorCache.resolveColor,
+whose WATER branch calls BiomeGenBase.getWaterColorMultiplier directly. Ordinary
+legacy ocean biomes return white, leaving the modern grayscale asset untinted;
+contained-water plants used the correctly tinted RenderBlocks path.
+
+ClientProxy now registers a Forge GetWaterColor listener using the same profile
+resolver as the block hook. The resolver accepts the existing event tint, avoids
+recursive getter calls and retains custom mod tints. No optional-renderer API or
+additional mixin is needed; Angelica's reusable biome event still runs through
+the Forge event bus. No saved blocks, light arrays or biome IDs change.
+
+ImportedWaterTintProbe exercises actual Forge biome getters for ordinary ocean,
+river, swamp, frozen ocean and imported warm/lukewarm/cold oceans and mangrove
+swamp. It checks agreement with the block path, custom tint retention and the
+disabled-option fallback without mutating biome fields. Native probe and release
+check/build passed. The remaining client check is to reopen the existing
+converted world and confirm ordinary water matches the waterlogged-plant tint.

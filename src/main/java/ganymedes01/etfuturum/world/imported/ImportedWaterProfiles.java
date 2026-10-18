@@ -40,9 +40,12 @@ public final class ImportedWaterProfiles {
         }
     }
     public static int color(BiomeGenBase biome) {
+        return color(biome,biome.getWaterColorMultiplier());
+    }
+    /** Shared by block rendering and renderers that query the Forge biome getter directly. */
+    public static int color(BiomeGenBase biome,int own) {
         if(biome instanceof ImportedSurfaceBiome)return forBiome(biome).waterColor;
         // Other mods may deliberately color their water; retain their non-default tint.
-        int own=biome.getWaterColorMultiplier();
         if(biome.biomeID!=6 && biome.biomeID!=134 && own!=0xffffff)return own;
         return forBiome(biome).waterColor;
     }

@@ -57,7 +57,7 @@ public final class NtmStructureCaptureProbe {
             String name=row.get("name").getAsString();
             long captureSeed=row.has("sampleSeed")?row.get("sampleSeed").getAsLong():12345L;
             String captureFile=name+(row.has("child")?"-"+row.get("child").getAsString():"")+(row.has("variant")&&row.get("variant").getAsInt()>0?"-v"+row.get("variant").getAsInt():"")+(row.has("rotation")?"-r"+row.get("rotation").getAsInt():"")+".nbt";
-            boolean ocean=Arrays.asList("oil_rig","lighthouse","aircraft_carrier","beached_patrol").contains(name);
+            boolean ocean=Arrays.asList("oil_rig","lighthouse","aircraft_carrier","beached_patrol","submarine").contains(name);
             BiomeGenBase biome=ocean?BiomeGenBase.ocean:name.startsWith("desert_")||name.contains("vertibird")||name.equals("dead_dish_small")?BiomeGenBase.desert:BiomeGenBase.plains;
             if(name.equals("legacy-arctic_vault"))biome=BiomeGenBase.icePlains;
             if(name.equals("legacy-jungle_dungeon"))biome=BiomeGenBase.jungle;
@@ -151,6 +151,7 @@ public final class NtmStructureCaptureProbe {
                 if(name.equals("bunker")&&world.loot.isEmpty())throw new AssertionError("Native bunker loot instrumentation did not run");
                 if(generatedStart!=null)capture.setTag("structureStart",generatedStart.func_143021_a(0,0));
                 try(FileOutputStream stream=new FileOutputStream(new File(output,captureFile))){CompressedStreamTools.writeCompressed(capture,stream);}
+                result.addProperty("captureSha256",sha256(new File(output,captureFile)));
                 result.addProperty("captured",true);result.addProperty("blocks",world.written.size());result.addProperty("deferredLoot",deferredLoot);
                 result.add("tileTypes",new Gson().toJsonTree(tileTypes));result.add("entityAttempts",new Gson().toJsonTree(world.entities));
                 result.add("pendingTicks",new Gson().toJsonTree(world.pendingTicks));
@@ -171,6 +172,7 @@ public final class NtmStructureCaptureProbe {
             results.add(result);System.out.println("NTM_STRUCTURE_CAPTURE "+name+" captured="+result.get("captured")+" blocks="+result.get("blocks")+" error="+result.get("error"));
         }
         JsonObject report=new JsonObject();report.addProperty("schemaVersion",1);report.addProperty("captured",count);report.addProperty("productionReady",false);
+        report.addProperty("ntmJarSha256",sha256(new File(System.getProperty("efr.ntmOriginalJar"))));
         report.add("structures",results);report.add("structureFluidIds",catalogue.get("structureFluidIds"));
         JsonObject itemIds=new JsonObject();
         for(Object key:net.minecraft.item.Item.itemRegistry.getKeys()){
@@ -185,7 +187,18 @@ public final class NtmStructureCaptureProbe {
         verifyDeferredLoot(real,deferredExample,-320,"native-structure-loot-fixture.nbt");
         if(deferredLooseExample==null)throw new AssertionError("No native loose loot captured");
         verifyDeferredLoot(real,deferredLooseExample,-324,"native-structure-loose-loot-fixture.nbt");
-        System.out.println("NTM_STRUCTURE_CAPTURE PASSED: 274 captures: all 35 modern choices, 23 legacy entry points and a high-terrain tomb, bounded memory world, transformed blocks and native tile NBT reload; capture evidence requires production adapters");
+        System.out.println("NTM_STRUCTURE_CAPTURE PASSED: "+count+"/"+expected+" captures; bounded memory world, transformed blocks and native tile NBT reload; capture evidence requires production adapters");
+    }
+
+    private static String sha256(File file) throws Exception {
+        java.security.MessageDigest digest=java.security.MessageDigest.getInstance("SHA-256");
+        try(InputStream in=new FileInputStream(file)) {
+            byte[] buffer=new byte[65536];int count;
+            while((count=in.read(buffer))!=-1)digest.update(buffer,0,count);
+        }
+        StringBuilder hex=new StringBuilder();
+        for(byte value:digest.digest())hex.append(String.format("%02x",value&255));
+        return hex.toString();
     }
 
     /** Native wand logic omits its transient replacement flag from NBT. Resolve

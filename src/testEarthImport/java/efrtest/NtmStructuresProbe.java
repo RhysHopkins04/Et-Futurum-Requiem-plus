@@ -21,6 +21,9 @@ public final class NtmStructuresProbe {
             + "aircraft_carrier oil_rig lighthouse dish water_pump forestchem labolatory forest_post radio factory crane "
             + "broadcaster_tower plane1 plane2 desert_shack_1 desert_shack_2 desert_shack_3 dead_dish_small "
             + "ruinA ruinB ruinC ruinD ruinE ruinF ruinG ruinH ruinI ruinJ tower_base").split(" ")));
+        Class<?> registryType=Class.forName("com.hbm.world.gen.nbt.NBTStructure");
+        for(String name:new String[]{"falloutshelter_house","abandoned_arcticstation","military_base","submarine"})
+            if(registryType.getMethod("getStructure",String.class).invoke(null,name)!=null)expected.add(name);
         Set<String> actual = new HashSet<>(); int nulls = 0, roots = 0;
         Class<?> registry = Class.forName("com.hbm.world.gen.nbt.NBTStructure");
         for (JsonElement element : first.getAsJsonArray("entries")) {
@@ -42,8 +45,8 @@ public final class NtmStructuresProbe {
                 && row.getAsJsonObject("rootPiece").get("heightOffset").getAsInt()==-20, "ocean anchor contract changed");
             if (name.startsWith("ruin")) check(row.getAsJsonObject("rootPiece").get("conformToTerrain").getAsBoolean(), "terrain-conforming ruins lost");
         }
-        check(actual.equals(expected) && roots==33 && nulls==2, "Earth catalogue incomplete: " + actual);
-        check(first.get("namedCount").getAsInt()==35, "wrong native catalogue count");
+        check(actual.equals(expected) && roots==expected.size()-2 && nulls==2, "Earth catalogue incomplete: " + actual);
+        check(first.get("namedCount").getAsInt()==expected.size(), "wrong native catalogue count");
         check(first.equals(NtmImportStructures.describe(world)), "native catalogue unstable across repeated read-only export");
         // Sample the actual native private weighted chooser with independent RNGs.
         Object generator = Class.forName("com.hbm.world.gen.nbt.NBTStructure$GenStructure").getConstructor().newInstance();
@@ -80,6 +83,6 @@ public final class NtmStructuresProbe {
         evidence.add("gridSamples", grids);
         java.nio.file.Files.write(new java.io.File("ntm-native-structure-selection.json").toPath(),
             new com.google.gson.GsonBuilder().setPrettyPrinting().create().toJson(evidence).getBytes(java.nio.charset.StandardCharsets.UTF_8));
-        System.out.println("NTM_NATIVE_STRUCTURES PASSED: 35 Earth choices, 33 loaded native templates, 2 procedural families, biome predicates, null weights and native ocean/terrain anchors");
+        System.out.println("NTM_NATIVE_STRUCTURES PASSED: native Earth choices/templates (including optional X5852 families), 2 procedural families, biome predicates, null weights and native ocean/terrain anchors");
     }
 }

@@ -40,6 +40,7 @@ gradle.projectsEvaluated {
             systemProperty 'efr.ae2ResourceProbe', 'true'
             if (p.hasProperty('earthAe2Artifacts')) systemProperty 'efr.ae2Artifacts', p.property('earthAe2Artifacts')
         }
+        if (p.hasProperty('earthWaterFlowProbe')) systemProperty 'efr.waterFlowProbe','true'
         if (p.hasProperty('earthAdaptedNtmTiles')) systemProperty 'efr.adaptedNtmTiles',p.property('earthAdaptedNtmTiles')
         if (p.hasProperty('earthConvertedDungeons')) systemProperty 'efr.ntmConvertedDungeons', p.property('earthConvertedDungeons')
         if (p.hasProperty('earthConvertedRuins')) systemProperty 'efr.ntmConvertedRuins', p.property('earthConvertedRuins')

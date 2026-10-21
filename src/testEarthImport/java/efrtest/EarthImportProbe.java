@@ -28,6 +28,7 @@ public final class EarthImportProbe {
         if (!Boolean.getBoolean("efr.earthImportProbe")) return;
         MinecraftServer server=MinecraftServer.getServer(); WorldServer world=server.worldServerForDimension(0);
         try {
+            if (Boolean.getBoolean("efr.waterFlowProbe")) {ImportedWaterFlowProbe.run(world);return;}
             if (System.getProperty("efr.adaptedNtmTiles")!=null) {NtmAdaptedTilesProbe.run();return;}
             if (System.getProperty("efr.structureDetailCaptures")!=null) {NtmStructureDetailProbe.run(world);return;}
             if (Boolean.getBoolean("efr.skyLightProbe")) {ImportedSkyLightProbe.run(world);return;}

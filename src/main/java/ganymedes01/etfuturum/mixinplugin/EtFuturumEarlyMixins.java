@@ -373,15 +373,22 @@ public class EtFuturumEarlyMixins implements IFMLLoadingPlugin, IEarlyMixinLoade
 		}
 		mixins.add("blocks.MixinTileEntitySkull");
 
+        mixins.add("profile.MixinHandshakeCodec");
+        mixins.add("profile.MixinHandshakeHandler");
+        if (side == MixinEnvironment.Side.CLIENT) {
+            mixins.add("profile.client.MixinNetworkDispatcher");
+            mixins.add("profile.client.MixinMinecraft");
+            mixins.add("profile.client.MixinChunk");
+        }
+
 		if (!ConfigMapCompatibility.isEnabled()) {
 			mixins.add("geninfo.MixinChunkProviderServer");
 			mixins.add("deepslateores.MixinChunk");
 		}
 
-		// Extended height is selected before Minecraft core classes are transformed. When disabled -
-		// including the Map Compatibility Mode runtime override - none of these engine/protocol mixins
-		// are applied, leaving ordinary 1.7.10 world architecture untouched.
-		if (ConfigMapCompatibility.importedEarthMode) {
+		// Clients load both protocol capabilities at startup; runtime gates select the server profile.
+        // Dedicated servers retain their configured engine selection.
+		if (ConfigMapCompatibility.importedEarthMode || side == MixinEnvironment.Side.CLIENT) {
             mixins.add("imported.MixinChunkProviderServer");
             mixins.add("imported.MixinWorld");
 			mixins.add("imported.MixinBiomeGenBase");
@@ -394,7 +401,7 @@ public class EtFuturumEarlyMixins implements IFMLLoadingPlugin, IEarlyMixinLoade
                 mixins.add("imported.client.MixinRenderBlocks");
             }
 		}
-		if (ConfigWorld.extendedWorldHeight && ConfigMapCompatibility.allowsExtendedHeight()) {
+		if ((ConfigWorld.extendedWorldHeight && ConfigMapCompatibility.allowsExtendedHeight()) || side == MixinEnvironment.Side.CLIENT) {
 			mixins.add("extendedheight.MixinWorldProvider");
 			mixins.add("extendedheight.MixinWorld");
 			mixins.add("extendedheight.MixinChunk");

@@ -23,7 +23,7 @@ public class MixinItemBlock {
     private int etfu$moveLegacySolidPlacementGuard(
             int original, ItemStack stack, EntityPlayer player, World world,
             int x, int y, int z, int side, float hitX, float hitY, float hitZ) {
-        return world.provider != null && world.provider.dimensionId == 0
+        return WorldHeightCompat.extended(world)
                 ? WorldHeightCompat.EXTENDED_HEIGHT
                 : original;
     }

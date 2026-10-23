@@ -12,6 +12,6 @@ public class MixinWorldClient {
 
     @ModifyConstant(method = "doPreChunk", constant = @Constant(intValue = WorldHeightCompat.LEGACY_HEIGHT))
     private int etfu$extendChunkRenderInvalidation(int original) {
-        return WorldHeightCompat.EXTENDED_HEIGHT;
+        return WorldHeightCompat.clientHeight();
     }
 }

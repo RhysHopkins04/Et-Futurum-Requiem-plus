@@ -41,7 +41,7 @@ public class ConfigMapCompatibility extends ConfigBase {
         importedEarthMode = getBoolean("importedEarthMode", CATEGORY, false,
                 "Imported modern Earth profile: suppress EFR automatic terrain generation and provider replacement, " +
                 "but retain the 384-block engine and configured ore/content registrations. " +
-                "Enable on BOTH client and server. Mutually exclusive with mapCompatibilityMode. REQUIRES A FULL RESTART.");
+                "Enable on the server (or for local singleplayer worlds). Updated multiplayer clients receive the profile automatically during login. Mutually exclusive with mapCompatibilityMode. REQUIRES A FULL SERVER/GAME RESTART.");
     }
 
     public static boolean isEnabled() {

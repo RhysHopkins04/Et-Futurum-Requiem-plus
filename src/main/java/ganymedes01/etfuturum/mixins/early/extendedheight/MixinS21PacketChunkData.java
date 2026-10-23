@@ -2,6 +2,7 @@ package ganymedes01.etfuturum.mixins.early.extendedheight;
 
 import ganymedes01.etfuturum.core.utils.WorldHeightCompat;
 import net.minecraft.network.PacketBuffer;
+import ganymedes01.etfuturum.network.profile.ProfilePacketFormat;
 import net.minecraft.network.play.server.S21PacketChunkData;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
@@ -58,8 +59,8 @@ public abstract class MixinS21PacketChunkData {
         this.field_149284_a = data.readInt();
         this.field_149282_b = data.readInt();
         this.field_149279_g = data.readBoolean();
-        this.field_149283_c = data.readInt();
-        this.field_149280_d = data.readInt();
+        this.field_149283_c = ProfilePacketFormat.readMask(data, ProfilePacketFormat.clientExtended());
+        this.field_149280_d = ProfilePacketFormat.readMask(data, ProfilePacketFormat.clientExtended());
         this.field_149285_h = data.readInt();
 
         if (field_149286_i.length < this.field_149285_h) {
@@ -114,8 +115,8 @@ public abstract class MixinS21PacketChunkData {
         data.writeInt(this.field_149284_a);
         data.writeInt(this.field_149282_b);
         data.writeBoolean(this.field_149279_g);
-        data.writeInt(this.field_149283_c);
-        data.writeInt(this.field_149280_d);
+        ProfilePacketFormat.writeMask(data, this.field_149283_c, ProfilePacketFormat.serverExtended());
+        ProfilePacketFormat.writeMask(data, this.field_149280_d, ProfilePacketFormat.serverExtended());
         data.writeInt(this.field_149285_h);
         data.writeBytes(this.field_149281_e, 0, this.field_149285_h);
     }

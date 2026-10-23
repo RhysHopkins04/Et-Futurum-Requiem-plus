@@ -1,0 +1,11 @@
+// Opt-in real local TCP client/server probe. No installed pack or save is touched.
+apply from: 'earth_import_tests.gradle'
+gradle.projectsEvaluated {
+    def p = gradle.rootProject
+    p.tasks.named('runClient', JavaExec) {
+        dependsOn p.tasks.named('compileEarthImportTests')
+        classpath += p.files(p.layout.buildDirectory.dir('earth-import-tests/classes'))
+        workingDir = p.file('build/profile-network-tests/client')
+        systemProperty 'efr.profileNetworkClient', 'true'
+    }
+}

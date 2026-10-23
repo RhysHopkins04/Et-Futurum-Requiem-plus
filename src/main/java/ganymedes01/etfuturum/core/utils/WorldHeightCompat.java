@@ -59,8 +59,27 @@ public final class WorldHeightCompat {
         if (access instanceof net.minecraft.world.World) {
             return ((net.minecraft.world.World) access).getHeight();
         }
+        if (access instanceof net.minecraft.world.ChunkCache) {
+            return ((net.minecraft.world.ChunkCache) access).getHeight();
+        }
         return ganymedes01.etfuturum.configuration.configs.ConfigWorld.extendedWorldHeight
                 ? EXTENDED_HEIGHT : LEGACY_HEIGHT;
+    }
+
+    public static boolean extended(net.minecraft.world.World world) {
+        return world != null && world.provider != null && world.provider.dimensionId == 0
+                && (world.isRemote ? ganymedes01.etfuturum.network.profile.ClientWorldProfile.server().extended
+                    : ganymedes01.etfuturum.configuration.configs.ConfigWorld.extendedWorldHeight);
+    }
+
+    public static boolean imported(net.minecraft.world.World world) {
+        return world != null && world.provider != null && world.provider.dimensionId == 0
+                && (world.isRemote ? ganymedes01.etfuturum.network.profile.ClientWorldProfile.server().imported
+                    : ganymedes01.etfuturum.configuration.configs.ConfigMapCompatibility.importedEarthMode);
+    }
+
+    public static int clientHeight() {
+        return ganymedes01.etfuturum.network.profile.ClientWorldProfile.server().extended ? EXTENDED_HEIGHT : LEGACY_HEIGHT;
     }
 
     private WorldHeightCompat() {}

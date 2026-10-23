@@ -2,9 +2,6 @@ package ganymedes01.etfuturum.mixins.early.extendedheight;
 
 import ganymedes01.etfuturum.core.utils.WorldHeightCompat;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldProvider;
-import org.spongepowered.asm.mixin.Final;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Constant;
@@ -17,8 +14,6 @@ import org.spongepowered.asm.mixin.injection.ModifyConstant;
 @Mixin(World.class)
 public class MixinWorld {
 
-    @Shadow @Final public WorldProvider provider;
-
     @ModifyConstant(
             method = {
                     "getBlock", "blockExists", "checkChunksExist", "setBlock", "getBlockMetadata",
@@ -28,7 +23,7 @@ public class MixinWorld {
             constant = @Constant(intValue = WorldHeightCompat.LEGACY_HEIGHT)
     )
     private int etfu$extendWorldHeightBound(int original) {
-        return this.provider != null && this.provider.dimensionId == 0 ? WorldHeightCompat.EXTENDED_HEIGHT : original;
+        return WorldHeightCompat.extended((World)(Object)this) ? WorldHeightCompat.EXTENDED_HEIGHT : original;
     }
 
     /**
@@ -42,7 +37,7 @@ public class MixinWorld {
             remap = false
     )
     private int etfu$extendForgeWeatherHeightBound(int original) {
-        return this.provider != null && this.provider.dimensionId == 0 ? WorldHeightCompat.EXTENDED_HEIGHT : original;
+        return WorldHeightCompat.extended((World)(Object)this) ? WorldHeightCompat.EXTENDED_HEIGHT : original;
     }
 
     /** Forge adds this helper after the MCP/SRG mappings are produced, so its literal name must not be remapped. */
@@ -52,7 +47,7 @@ public class MixinWorld {
             remap = false
     )
     private int etfu$extendForgeLightOpacityHeightBound(int original) {
-        return this.provider != null && this.provider.dimensionId == 0 ? WorldHeightCompat.EXTENDED_HEIGHT : original;
+        return WorldHeightCompat.extended((World)(Object)this) ? WorldHeightCompat.EXTENDED_HEIGHT : original;
     }
 
     @ModifyConstant(
@@ -60,6 +55,6 @@ public class MixinWorld {
             constant = @Constant(intValue = WorldHeightCompat.LEGACY_MAX_Y)
     )
     private int etfu$extendWorldMaxY(int original) {
-        return this.provider != null && this.provider.dimensionId == 0 ? WorldHeightCompat.EXTENDED_MAX_Y : original;
+        return WorldHeightCompat.extended((World)(Object)this) ? WorldHeightCompat.EXTENDED_MAX_Y : original;
     }
 }

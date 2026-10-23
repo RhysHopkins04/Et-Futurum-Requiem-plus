@@ -12,6 +12,6 @@ public class MixinNetHandlerPlayClient {
 
     @ModifyConstant(method = {"handleChunkData", "handleMapChunkBulk"}, constant = @Constant(intValue = WorldHeightCompat.LEGACY_HEIGHT))
     private int etfu$extendReceivedChunkRenderRange(int original) {
-        return WorldHeightCompat.EXTENDED_HEIGHT;
+        return WorldHeightCompat.clientHeight();
     }
 }

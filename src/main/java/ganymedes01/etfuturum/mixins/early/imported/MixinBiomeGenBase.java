@@ -12,6 +12,6 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 public class MixinBiomeGenBase {
     @ModifyVariable(method = "getFloatTemperature", at = @At("HEAD"), argsOnly = true, ordinal = 1, require = 1)
     private int etfu$importedLogicalAltitude(int y) {
-        return (Object) this instanceof ImportedSurfaceBiome ? WorldHeightCompat.physicalToModernY(y) : y;
+        return (Object) this instanceof ImportedSurfaceBiome && ((ImportedSurfaceBiome)(Object)this).importedAltitude ? WorldHeightCompat.physicalToModernY(y) : y;
     }
 }

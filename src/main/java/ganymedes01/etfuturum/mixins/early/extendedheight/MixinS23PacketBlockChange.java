@@ -2,6 +2,7 @@ package ganymedes01.etfuturum.mixins.early.extendedheight;
 
 import net.minecraft.block.Block;
 import net.minecraft.network.PacketBuffer;
+import ganymedes01.etfuturum.network.profile.ProfilePacketFormat;
 import net.minecraft.network.play.server.S23PacketBlockChange;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
@@ -23,7 +24,7 @@ public class MixinS23PacketBlockChange {
     @Overwrite
     public void readPacketData(PacketBuffer data) throws IOException {
         this.field_148887_a = data.readInt();
-        this.field_148885_b = data.readUnsignedShort();
+        this.field_148885_b = ProfilePacketFormat.readY(data, ProfilePacketFormat.clientExtended());
         this.field_148886_c = data.readInt();
         this.field_148883_d = Block.getBlockById(data.readVarIntFromBuffer());
         this.field_148884_e = data.readUnsignedByte();
@@ -33,7 +34,7 @@ public class MixinS23PacketBlockChange {
     @Overwrite
     public void writePacketData(PacketBuffer data) throws IOException {
         data.writeInt(this.field_148887_a);
-        data.writeShort(this.field_148885_b);
+        ProfilePacketFormat.writeY(data, this.field_148885_b, ProfilePacketFormat.serverExtended());
         data.writeInt(this.field_148886_c);
         data.writeVarIntToBuffer(Block.getIdFromBlock(this.field_148883_d));
         data.writeByte(this.field_148884_e);

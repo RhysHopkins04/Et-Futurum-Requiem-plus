@@ -24,10 +24,15 @@ import static efrtest.EarthImportContracts.check;
 
 @Mod(modid="earth_import_probe",name="Earth import runtime probe",version="test",dependencies="required-after:etfuturum",acceptableRemoteVersions="*")
 public final class EarthImportProbe {
+    @Mod.EventHandler public void loaded(cpw.mods.fml.common.event.FMLLoadCompleteEvent event) throws Exception {
+        if (Boolean.getBoolean("efr.profileNetworkClient")) Class.forName("efrtest.NetworkProfileClient").getMethod("start").invoke(null);
+    }
     @Mod.EventHandler public void start(FMLServerStartedEvent event) throws Exception {
         if (!Boolean.getBoolean("efr.earthImportProbe")) return;
         MinecraftServer server=MinecraftServer.getServer(); WorldServer world=server.worldServerForDimension(0);
+        if (Boolean.getBoolean("efr.profileNetworkServer")) { NetworkProfileServer.start(world); return; }
         try {
+            WorldProfileProbe.run(world);
             if (Boolean.getBoolean("efr.waterFlowProbe")) {ImportedWaterFlowProbe.run(world);return;}
             if (System.getProperty("efr.adaptedNtmTiles")!=null) {NtmAdaptedTilesProbe.run();return;}
             if (System.getProperty("efr.structureDetailCaptures")!=null) {NtmStructureDetailProbe.run(world);return;}

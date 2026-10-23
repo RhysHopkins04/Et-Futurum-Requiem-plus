@@ -12,13 +12,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(WorldProvider.class)
 public class MixinWorldProvider {
     @Shadow public int dimensionId;
+    @Shadow protected net.minecraft.world.World worldObj;
     @Inject(method="getCloudHeight", at=@At("HEAD"), cancellable=true, require=1)
     private void etfu$importedCloudReference(CallbackInfoReturnable<Float> cir) {
-        if (dimensionId==0) cir.setReturnValue((float)WorldHeightCompat.PHYSICAL_CLOUD_HEIGHT);
+        if (WorldHeightCompat.imported(worldObj)) cir.setReturnValue((float)WorldHeightCompat.PHYSICAL_CLOUD_HEIGHT);
     }
     // Forge-added method: unlike vanilla getCloudHeight, this keeps its name in production.
     @Inject(method="getHorizon", at=@At("HEAD"), cancellable=true, remap=false, require=1)
     private void etfu$importedHorizonReference(CallbackInfoReturnable<Double> cir) {
-        if (dimensionId==0) cir.setReturnValue((double)WorldHeightCompat.PHYSICAL_SEA_LEVEL);
+        if (WorldHeightCompat.imported(worldObj)) cir.setReturnValue((double)WorldHeightCompat.PHYSICAL_SEA_LEVEL);
     }
 }

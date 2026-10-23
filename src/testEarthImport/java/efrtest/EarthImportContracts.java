@@ -25,6 +25,7 @@ public final class EarthImportContracts {
         return new ImportedBiomeVolume(sections);
     }
     public static void main(String[] args) throws Exception {
+        WorldProfileContracts.run();
         NtmTextureContracts.run();
         ganymedes01.etfuturum.world.imported.ImportedWaterProfiles.Profile ocean=ganymedes01.etfuturum.world.imported.ImportedWaterProfiles.named("minecraft:ocean");
         check(ocean.waterColor==0x3f76e4 && ocean.fogColor==0x050533 && ocean.start==-8F && ocean.end==96F,"official ocean water defaults");

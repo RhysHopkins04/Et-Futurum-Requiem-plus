@@ -30,7 +30,7 @@ public abstract class MixinChunk {
 
     @Inject(method = "<init>(Lnet/minecraft/world/World;II)V", at = @At("RETURN"))
     private void etfu$extendVerticalArrays(World world, int chunkX, int chunkZ, CallbackInfo ci) {
-        if (world.provider != null && world.provider.dimensionId == 0) {
+        if (WorldHeightCompat.extended(world)) {
             this.storageArrays = new ExtendedBlockStorage[WorldHeightCompat.EXTENDED_SECTION_COUNT];
             this.entityLists = new List[WorldHeightCompat.EXTENDED_SECTION_COUNT];
             for (int i = 0; i < this.entityLists.length; ++i) {
@@ -42,18 +42,18 @@ public abstract class MixinChunk {
 
     @ModifyConstant(method = "getAreLevelsEmpty", constant = @Constant(intValue = WorldHeightCompat.LEGACY_HEIGHT))
     private int etfu$extendEmptyCheckHeight(int original) {
-        return this.worldObj.provider != null && this.worldObj.provider.dimensionId == 0 ? WorldHeightCompat.EXTENDED_HEIGHT : original;
+        return WorldHeightCompat.extended(this.worldObj) ? WorldHeightCompat.EXTENDED_HEIGHT : original;
     }
 
     @ModifyConstant(method = "getAreLevelsEmpty", constant = @Constant(intValue = WorldHeightCompat.LEGACY_MAX_Y))
     private int etfu$extendEmptyCheckMaxY(int original) {
-        return this.worldObj.provider != null && this.worldObj.provider.dimensionId == 0 ? WorldHeightCompat.EXTENDED_MAX_Y : original;
+        return WorldHeightCompat.extended(this.worldObj) ? WorldHeightCompat.EXTENDED_MAX_Y : original;
     }
 
     /** Height-map values are ints; the vanilla unsigned-byte mask truncates values above 255. */
     @ModifyConstant(method = "relightBlock", constant = @Constant(intValue = 255, ordinal = 0))
     private int etfu$removeHeightMapByteMask(int original) {
-        return -1;
+        return WorldHeightCompat.extended(worldObj) ? -1 : original;
     }
 
     /**

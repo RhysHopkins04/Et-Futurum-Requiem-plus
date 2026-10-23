@@ -13,17 +13,18 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class MixinWorldProvider {
 
     @Shadow public int dimensionId;
+    @Shadow protected net.minecraft.world.World worldObj;
 
     @Inject(method = "getHeight", at = @At("HEAD"), cancellable = true, remap = false)
     private void etfu$extendedHeight(CallbackInfoReturnable<Integer> cir) {
-        if (this.dimensionId == 0) {
+        if (WorldHeightCompat.extended(worldObj)) {
             cir.setReturnValue(WorldHeightCompat.EXTENDED_HEIGHT);
         }
     }
 
     @Inject(method = "getActualHeight", at = @At("HEAD"), cancellable = true, remap = false)
     private void etfu$extendedActualHeight(CallbackInfoReturnable<Integer> cir) {
-        if (this.dimensionId == 0) {
+        if (WorldHeightCompat.extended(worldObj)) {
             cir.setReturnValue(WorldHeightCompat.EXTENDED_HEIGHT);
         }
     }

@@ -12,11 +12,11 @@ public class MixinRenderGlobal {
 
     @ModifyConstant(method = "<init>", constant = @Constant(intValue = WorldHeightCompat.LEGACY_SECTION_COUNT, ordinal = 0))
     private int etfu$extendRendererAllocationHeight(int original) {
-        return WorldHeightCompat.EXTENDED_SECTION_COUNT;
+        return WorldHeightCompat.clientHeight() / 16;
     }
 
     @ModifyConstant(method = "loadRenderers", constant = @Constant(intValue = WorldHeightCompat.LEGACY_SECTION_COUNT, ordinal = 0))
     private int etfu$extendRendererGridHeight(int original) {
-        return WorldHeightCompat.EXTENDED_SECTION_COUNT;
+        return WorldHeightCompat.clientHeight() / 16;
     }
 }

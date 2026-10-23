@@ -7,9 +7,17 @@ import java.util.Random;
 /** An import identity, not a promise to reproduce modern terrain generation or spawning. */
 public final class ImportedSurfaceBiome extends BiomeGenBase {
     public final ImportedBiome definition;
+    public final boolean importedAltitude;
     ImportedSurfaceBiome(int id, ImportedBiome definition) {
-        super(id);
+        this(id, definition, true, ganymedes01.etfuturum.configuration.configs.ConfigMapCompatibility.importedEarthMode);
+    }
+    public static ImportedSurfaceBiome forConnection(int id, ImportedBiome definition, boolean importedAltitude) {
+        return new ImportedSurfaceBiome(id, definition, false, importedAltitude);
+    }
+    private ImportedSurfaceBiome(int id, ImportedBiome definition, boolean register, boolean importedAltitude) {
+        super(id, register);
         this.definition = definition;
+        this.importedAltitude = importedAltitude;
         setBiomeName(definition.sourceName());
         setTemperatureRainfall(definition.temperature, definition.rainfall);
         waterColorMultiplier = definition.waterColor;

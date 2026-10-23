@@ -12,6 +12,6 @@ public abstract class MixinScatteredFeatureGround {
             target = "Lnet/minecraft/world/WorldProvider;getAverageGroundLevel()I"), require = 1)
     private int etfu$useActualSurface(WorldProvider provider) {
         // Math.max still uses the queried solid surface. Other dimensions retain native policy.
-        return provider.dimensionId == 0 ? 0 : provider.getAverageGroundLevel();
+        return ganymedes01.etfuturum.configuration.configs.ConfigMapCompatibility.importedEarthMode && provider.dimensionId == 0 ? 0 : provider.getAverageGroundLevel();
     }
 }

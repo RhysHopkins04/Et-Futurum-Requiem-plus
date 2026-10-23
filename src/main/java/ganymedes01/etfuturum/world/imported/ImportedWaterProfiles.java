@@ -28,7 +28,7 @@ public final class ImportedWaterProfiles {
         } catch(Exception failure) {throw new IllegalStateException("Cannot load modern biome water profiles",failure);}
         return Collections.unmodifiableMap(result);
     }
-    public static boolean enabled(){return ConfigMapCompatibility.importedEarthMode && ConfigMapCompatibility.modernImportedWater;}
+    public static boolean enabled(){return ganymedes01.etfuturum.network.profile.ClientWorldProfile.server().imported && ConfigMapCompatibility.modernImportedWater;}
     public static Profile named(String name){Profile p=PROFILES.get(name);return p==null?PROFILES.get("minecraft:plains"):p;}
     public static Profile forBiome(BiomeGenBase biome) {
         if(biome instanceof ImportedSurfaceBiome)return named(((ImportedSurfaceBiome)biome).definition.sourceName());

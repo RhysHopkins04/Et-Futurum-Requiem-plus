@@ -13,7 +13,7 @@ public class MixinEntityPlayerMP {
     @ModifyConstant(method = "onUpdate", constant = @Constant(intValue = WorldHeightCompat.LEGACY_HEIGHT))
     private int etfu$extendInitialChunkTileEntitySync(int original) {
         EntityPlayerMP self = (EntityPlayerMP)(Object)this;
-        return self.worldObj != null && self.worldObj.provider != null && self.worldObj.provider.dimensionId == 0
+        return WorldHeightCompat.extended(self.worldObj)
                 ? WorldHeightCompat.EXTENDED_HEIGHT
                 : original;
     }

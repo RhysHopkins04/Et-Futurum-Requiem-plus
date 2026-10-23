@@ -2,6 +2,7 @@ package ganymedes01.etfuturum.mixins.early.extendedheight;
 
 import ganymedes01.etfuturum.core.utils.WorldHeightCompat;
 import net.minecraft.network.PacketBuffer;
+import ganymedes01.etfuturum.network.profile.ProfilePacketFormat;
 import net.minecraft.network.play.server.S21PacketChunkData;
 import net.minecraft.network.play.server.S26PacketMapChunkBulk;
 import org.spongepowered.asm.mixin.Mixin;
@@ -34,7 +35,7 @@ public abstract class MixinS26PacketMapChunkBulk {
 
     @ModifyConstant(method = "<init>(Ljava/util/List;)V", constant = @Constant(intValue = 65535))
     private int etfu$sendAllExtendedSections(int original) {
-        return WorldHeightCompat.FULL_SECTION_MASK;
+        return ProfilePacketFormat.serverExtended() ? WorldHeightCompat.FULL_SECTION_MASK : original;
     }
 
     /**
@@ -72,8 +73,8 @@ public abstract class MixinS26PacketMapChunkBulk {
         for (int index = 0; index < chunkCount; ++index) {
             this.field_149266_a[index] = data.readInt();
             this.field_149264_b[index] = data.readInt();
-            this.field_149265_c[index] = data.readInt();
-            this.field_149262_d[index] = data.readInt();
+            this.field_149265_c[index] = ProfilePacketFormat.readMask(data, ProfilePacketFormat.clientExtended());
+            this.field_149262_d[index] = ProfilePacketFormat.readMask(data, ProfilePacketFormat.clientExtended());
             int sectionCount = 0;
             int msbCount = 0;
 
@@ -110,8 +111,8 @@ public abstract class MixinS26PacketMapChunkBulk {
         for (int i = 0; i < this.field_149266_a.length; ++i) {
             data.writeInt(this.field_149266_a[i]);
             data.writeInt(this.field_149264_b[i]);
-            data.writeInt(this.field_149265_c[i]);
-            data.writeInt(this.field_149262_d[i]);
+            ProfilePacketFormat.writeMask(data, this.field_149265_c[i], ProfilePacketFormat.serverExtended());
+            ProfilePacketFormat.writeMask(data, this.field_149262_d[i], ProfilePacketFormat.serverExtended());
         }
     }
     /**

@@ -33,6 +33,14 @@ def earthReleaseMappings = tasks.register('earthImportReleaseMappings') {
             if (refmap.mappings[owner]?.getCloudHeight != expected) {
                 throw new GradleException('Imported client cloud hook is missing its production mapping')
             }
+            def profileMappings = [
+                'ganymedes01/etfuturum/mixins/early/profile/client/MixinChunk': [getBiomeGenForWorldCoords: 'func_76591_a'],
+                'ganymedes01/etfuturum/mixins/early/profile/client/MixinMinecraft': ['loadWorld(Lnet/minecraft/client/multiplayer/WorldClient;Ljava/lang/String;)V': 'func_71353_a', runTick: 'func_71407_l']
+            ]
+            profileMappings.each { ownerName, methods -> methods.each { method, srg ->
+                if (!refmap.mappings[ownerName]?.get(method)?.contains(srg))
+                    throw new GradleException("Server profile production mapping missing: ${ownerName}/${method}")
+            } }
             def prefix = 'ganymedes01/etfuturum/mixins/early/imported/'
             def required = [
                 'MixinWorld': ['setBlock(IIILnet/minecraft/block/Block;II)Z': 'func_147465_d', setBlockMetadataWithNotify: 'func_72921_c', setTileEntity: 'func_147455_a', removeTileEntity: 'func_147475_p', getTileEntity: 'func_147438_o'],

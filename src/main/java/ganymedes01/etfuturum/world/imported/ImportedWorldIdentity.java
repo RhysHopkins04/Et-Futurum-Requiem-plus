@@ -56,7 +56,7 @@ public final class ImportedWorldIdentity extends WorldSavedData {
         ImportedBiomes.verifyRegistry();
         ImportedWorldIdentity saved = (ImportedWorldIdentity)event.world.mapStorage.loadData(ImportedWorldIdentity.class, KEY);
         if (saved != null && !ConfigMapCompatibility.importedEarthMode)
-            throw new IllegalStateException("This world requires importedEarthMode and its 384-block engine on both client and server.");
+            throw new IllegalStateException("This world requires importedEarthMode and its 384-block engine on the server. Enable importedEarthMode in config/etfuturum/mapcompat.cfg and fully restart the server; updated clients negotiate automatically.");
         if (!ConfigMapCompatibility.importedEarthMode) return;
         if (saved == null && event.world.getSaveHandler().getMapFileFromName(KEY).isFile())
             throw new IllegalStateException("Saved imported Earth identity could not be read; refusing to replace it.");

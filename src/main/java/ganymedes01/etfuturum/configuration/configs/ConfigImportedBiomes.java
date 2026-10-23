@@ -20,7 +20,7 @@ public final class ConfigImportedBiomes extends ConfigBase {
     @Override protected void syncConfigOptions() {
         enableModernImportBiomes = getBoolean("enableModernImportBiomes", "registration", false,
                 "Register modern surface biome identities without generating terrain. Also enabled by importedEarthMode. " +
-                "Client and server must use the same IDs. Full restart required; never change IDs of an existing imported world.");
+                "Server/local-world IDs must match the conversion template. Updated multiplayer clients use the server mapping automatically. Full restart required; never change IDs of an existing imported world.");
         for (ImportedBiome entry : ImportedBiome.values()) {
             IDS.put(entry.sourceName(), getInt(entry.path, "biome ids", 210 + entry.ordinal(), -1, 254,
                     "Legacy ID for " + entry.sourceName() + ". -1 disables this identity. " +

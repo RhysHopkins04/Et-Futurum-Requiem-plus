@@ -12,6 +12,6 @@ public class MixinAnvilChunkLoader {
 
     @ModifyConstant(method = "readChunkFromNBT", constant = @Constant(intValue = WorldHeightCompat.LEGACY_SECTION_COUNT))
     private int etfu$allocateExtendedSectionArray(int original) {
-        return WorldHeightCompat.EXTENDED_SECTION_COUNT;
+        return ganymedes01.etfuturum.configuration.configs.ConfigWorld.extendedWorldHeight ? WorldHeightCompat.EXTENDED_SECTION_COUNT : original;
     }
 }

@@ -12,8 +12,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(WorldProvider.class)
 public class MixinWorldProvider {
     @Shadow public int dimensionId;
+    @Shadow protected net.minecraft.world.World worldObj;
     @Inject(method="getAverageGroundLevel", at=@At("HEAD"), cancellable=true, require=1)
     private void etfu$importedGroundReference(CallbackInfoReturnable<Integer> cir) {
-        if (dimensionId==0) cir.setReturnValue(WorldHeightCompat.PHYSICAL_AVERAGE_GROUND_LEVEL);
+        if (WorldHeightCompat.imported(worldObj)) cir.setReturnValue(WorldHeightCompat.PHYSICAL_AVERAGE_GROUND_LEVEL);
     }
 }

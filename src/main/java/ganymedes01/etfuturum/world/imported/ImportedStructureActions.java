@@ -24,7 +24,7 @@ public final class ImportedStructureActions {
 
     public static void attach(Chunk chunk,NBTTagCompound data) {
         if(chunk.worldObj.isRemote||chunk.worldObj.provider.dimensionId!=0||!ConfigMapCompatibility.importedEarthMode)
-            throw new IllegalStateException("Imported structure actions require the server imported Earth profile");
+            throw new IllegalStateException("Imported structure actions require the server imported Earth profile: enable importedEarthMode=true and mapCompatibilityMode=false in config/etfuturum/mapcompat.cfg, then fully restart the server");
         if(!data.hasKey("Version",3)||(data.getInteger("Version")!=1&&data.getInteger("Version")!=2)||data.func_150296_c().size()!=2||!data.hasKey("Entries",9))
             throw new IllegalArgumentException("Unsupported imported structure action contract");
         NBTTagList entries=data.getTagList("Entries",10);

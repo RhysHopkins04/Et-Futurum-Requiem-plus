@@ -16,6 +16,10 @@ gradle.projectsEvaluated {
         }
         classpath += p.files(p.layout.buildDirectory.dir('earth-import-tests/classes'))
         workingDir = p.file('build/earth-import-tests/' + (p.hasProperty('earthNtmJar') ? 'ntm-' : '') + (p.hasProperty('earthIronChestsDevJar') ? 'ironchests-' : '') + (p.findProperty('earthProfile') == 'legacy' ? 'legacy-server' : 'server'))
+        if (p.hasProperty('profileNetworkServer')) {
+            workingDir = p.file('build/profile-network-tests/' + p.property('profileNetworkServer'))
+            systemProperty 'efr.profileNetworkServer', 'true'
+        }
         systemProperty 'efr.earthImportProbe', 'true'
         systemProperty 'efr.earthImportProfile', p.findProperty('earthProfile') ?: 'earth'
         if (p.hasProperty('earthHarvestJar')) {

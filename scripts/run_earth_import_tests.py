@@ -102,7 +102,7 @@ def main():
     if 'CRAFTER_RESTART PASSED' not in restarted: raise RuntimeError('Crafter persistence did not run')
     if 'CARTOGRAPHY_RESTART PASSED' not in restarted: raise RuntimeError('Saved map restart check did not run')
     report = json.loads((SERVER/'world/efr-import-capabilities.json').read_text())
-    if report['height'] != 384 or len(report['surfaceBiomeIds']) != 16: raise RuntimeError('Bad capability export')
+    if report['height'] != 384 or len(report['surfaceBiomeIds']) != 17: raise RuntimeError('Bad capability export')
     print('Earth import build, Forge load/save, fresh-process restart and capability export PASSED.', flush=True)
 
 if __name__ == '__main__':

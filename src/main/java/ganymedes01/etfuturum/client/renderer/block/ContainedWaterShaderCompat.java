@@ -21,16 +21,9 @@ public final class ContainedWaterShaderCompat {
     public static Scope water(Object tessellator) {
         if (BRIDGE == null || !BRIDGE.tessellatorType.isInstance(tessellator)) return NONE;
         try {
-            // Read the current map on every scope: shader reloads replace this map.
-            Map<?, ?> mappings = (Map<?, ?>) BRIDGE.mappings.invokeExact();
-            if (mappings == null) return NONE;
-            Object values = mappings.get(Blocks.water);
-            if (!(values instanceof Map)) values = mappings.get(Blocks.flowing_water);
-            if (!(values instanceof Map)) return NONE;
-            Object value = ((Map<?, ?>) values).get(Integer.valueOf(0));
-            if (!(value instanceof Number)) return NONE;
-            short id = ((Number) value).shortValue();
-            if (id == -1) return NONE;
+            Short mapped = waterId();
+            if (mapped == null) return NONE;
+            short id = mapped.shortValue();
             Scope scope = new Scope(tessellator, ACTIVE.get());
             scope.id = id;
             BRIDGE.override.invokeExact(tessellator, id);
@@ -39,6 +32,85 @@ public final class ContainedWaterShaderCompat {
         } catch (Throwable failure) {
             warn(failure);
             return NONE;
+        }
+    }
+
+    /** Resolve the current pack, never a hard-coded shader material ID. */
+    private static Short waterId() throws Throwable {
+        if (BRIDGE == null) return null;
+        // Shader reloads replace this map.
+        Map<?, ?> mappings = (Map<?, ?>) BRIDGE.mappings.invokeExact();
+        if (mappings == null) return null;
+        Short still = sourceWaterId(mappings.get(Blocks.water));
+        return still != null ? still : sourceWaterId(mappings.get(Blocks.flowing_water));
+    }
+
+    private static Short sourceWaterId(Object values) {
+        if (!(values instanceof Map)) return null;
+        Object value = ((Map<?, ?>) values).get(Integer.valueOf(0));
+        if (!(value instanceof Number) || ((Number) value).shortValue() == -1) return null;
+        return Short.valueOf(((Number) value).shortValue());
+    }
+
+    /**
+     * Angelica encodes the completed block after renderBlockLiquid has returned.
+     * Only a batch entirely emitted with our water override may use fluid lighting.
+     * Plant/mixed batches and unmapped packs retain the original context.
+     */
+    public static FluidScope fluidBatch(Object builder, int[] overrides, int vertexCount) {
+        if (overrides == null || vertexCount <= 0 || (vertexCount & 3) != 0
+                || vertexCount > overrides.length || overrides[0] == -1) return FluidScope.NONE;
+        try {
+            Short mapped = waterId();
+            if (mapped == null) return FluidScope.NONE;
+            short id = mapped.shortValue();
+            for (int i = 0; i < vertexCount; i++) if (overrides[i] != id) return FluidScope.NONE;
+            FluidBridge bridge = FluidBridgeHolder.BRIDGE;
+            if (bridge == null || !bridge.builderType.isInstance(builder)) return FluidScope.NONE;
+            Object context = (Object) bridge.context.invokeExact(builder);
+            short previous = (short) bridge.getType.invokeExact(context);
+            // prepareToRenderFluid uses renderType=1, independently of the block's render ID.
+            bridge.setType.invokeExact(context, (short) 1);
+            return new FluidScope(context, previous, bridge);
+        } catch (Throwable failure) { warn(failure); return FluidScope.NONE; }
+    }
+
+    public static final class FluidScope implements AutoCloseable {
+        private static final FluidScope NONE = new FluidScope(null, (short) 0, null);
+        private final Object context;
+        private final short previous;
+        private final FluidBridge bridge;
+        private boolean closed;
+        private FluidScope(Object context, short previous, FluidBridge bridge) {
+            this.context = context; this.previous = previous; this.bridge = bridge;
+        }
+        @Override public void close() {
+            if (context == null || closed) return;
+            closed = true;
+            try { bridge.setType.invokeExact(context, previous); }
+            catch (Throwable failure) { warn(failure); }
+        }
+    }
+
+    private static final class FluidBridgeHolder { private static final FluidBridge BRIDGE = FluidBridge.find(); }
+    private static final class FluidBridge {
+        private final Class<?> builderType;
+        private final MethodHandle context, getType, setType;
+        private FluidBridge(Class<?> builderType, MethodHandle context, MethodHandle getType, MethodHandle setType) {
+            this.builderType = builderType; this.context = context; this.getType = getType; this.setType = setType;
+        }
+        private static FluidBridge find() {
+            try {
+                ClassLoader loader = ContainedWaterShaderCompat.class.getClassLoader();
+                Class<?> builder = Class.forName("com.gtnewhorizons.angelica.rendering.celeritas.AngelicaChunkBuildContext", false, loader);
+                Class<?> context = Class.forName("com.gtnewhorizons.angelica.rendering.celeritas.iris.BlockRenderContext", false, loader);
+                MethodHandles.Lookup lookup = MethodHandles.publicLookup();
+                return new FluidBridge(builder,
+                    lookup.unreflect(builder.getMethod("getBlockRenderContext")).asType(MethodType.methodType(Object.class, Object.class)),
+                    lookup.unreflectGetter(context.getField("renderType")).asType(MethodType.methodType(short.class, Object.class)),
+                    lookup.unreflectSetter(context.getField("renderType")).asType(MethodType.methodType(void.class, Object.class, short.class)));
+            } catch (ClassNotFoundException | NoSuchMethodException | NoSuchFieldException olderAngelica) { return null; }
+            catch (ReflectiveOperationException | LinkageError failure) { warn(failure); return null; }
         }
     }
 

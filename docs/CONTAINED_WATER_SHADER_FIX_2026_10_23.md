@@ -1,5 +1,7 @@
 # Contained water shader material fix
 
+See [the 26 October follow-up](CONTAINED_WATER_FLUID_CONTEXT_2026_10_26.md) for the additional Angelica fluid-context correction.
+
 The kelp/coral/dripleaf renderers emit plant geometry in pass 0 and vanilla water geometry in pass 1. Angelica 2.2.14 otherwise attaches the enclosing plant's shader material ID to that water. BountifulStars ALPHA 0.0.3 assigns water ID 32000 and kelp ID 10017; water faces classified as kelp therefore bypass the shader's normal water treatment.
 
 Scope Angelica's existing StateAwareTessellator per-vertex shader-ID override around contained-water renderBlockLiquid calls only. Look up the active shader pack's vanilla source-water material dynamically (flowing-water mapping fallback), never hard-code 32000 or change the plant's global block mapping. Use GTNHLib's current tessellator so worker-thread meshing writes the override to the tessellator actually collecting geometry. This includes parity kelp ages/plants, seagrass, wet coral/pickles/campfires/dripleaf and bubble columns through their common liquid renderer. Dry states and plant quads retain their existing classification. The fluid world-access view and override are restored in finally/try-with-resources, including exceptions; nested scopes restore the outer override.

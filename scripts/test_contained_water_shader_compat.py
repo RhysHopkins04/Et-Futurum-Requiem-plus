@@ -35,7 +35,19 @@ public class BlockRenderingSettings {
  public Map<Object,Map<Integer,Integer>> ids;
  public Map<Object,Map<Integer,Integer>> getBlockMetaMatches() { return ids; }
 }''')]
+        old_fixtures = list(fixtures)
+        fixtures += [
+            write(root, 'fixtures/com/gtnewhorizons/angelica/rendering/celeritas/iris/BlockRenderContext.java', '''package com.gtnewhorizons.angelica.rendering.celeritas.iris;
+public class BlockRenderContext { public short renderType=42; }'''),
+            write(root, 'fixtures/com/gtnewhorizons/angelica/rendering/celeritas/AngelicaChunkBuildContext.java', '''package com.gtnewhorizons.angelica.rendering.celeritas;
+import com.gtnewhorizons.angelica.rendering.celeritas.iris.BlockRenderContext;
+public class AngelicaChunkBuildContext {
+ public final BlockRenderContext context=new BlockRenderContext();
+ public BlockRenderContext getBlockRenderContext() { return context; }
+}''')]
         subprocess.run([str(JDK/'javac'), '-d', str(api), *fixtures], check=True)
+        old_api = root / 'old-api'; old_api.mkdir()
+        subprocess.run([str(JDK/'javac'), '-d', str(old_api), *old_fixtures], check=True)
         harness = write(root, 'Harness.java', '''import java.util.*;
 import net.minecraft.init.Blocks;
 import net.coderbot.iris.block_rendering.BlockRenderingSettings;
@@ -53,11 +65,42 @@ public class Harness {
   BlockRenderingSettings.INSTANCE.ids=map;
  }
  public static void main(String[] args) {
-  if(args.length>0) {
+  if(args.length>0 && args[0].equals("absent")) {
    try(ContainedWaterShaderCompat.Scope s=ContainedWaterShaderCompat.water(new Object())) { }
+   try(ContainedWaterShaderCompat.FluidScope f=ContainedWaterShaderCompat.fluidBatch(new Object(),new int[]{32000,32000,32000,32000},4)) { }
    System.out.println("PASS without Angelica"); return;
   }
   Tess tess=new Tess(); mapping(32000);
+  if(args.length>0 && args[0].equals("old")) {
+   try(ContainedWaterShaderCompat.Scope s=ContainedWaterShaderCompat.water(tess)) { check(tess.id==32000); }
+   try(ContainedWaterShaderCompat.FluidScope f=ContainedWaterShaderCompat.fluidBatch(new Object(),new int[]{32000,32000,32000,32000},4)) { }
+   System.out.println("PASS older Angelica without fluid context"); return;
+  }
+  com.gtnewhorizons.angelica.rendering.celeritas.AngelicaChunkBuildContext batch=new com.gtnewhorizons.angelica.rendering.celeritas.AngelicaChunkBuildContext();
+  int[] ids=new int[]{32000,32000,32000,32000,32000,32000,32000,32000,-1};
+  try(ContainedWaterShaderCompat.FluidScope f=ContainedWaterShaderCompat.fluidBatch(batch,ids,8)) {
+   check(batch.context.renderType==1);
+   try(ContainedWaterShaderCompat.FluidScope nested=ContainedWaterShaderCompat.fluidBatch(batch,ids,4)) { check(batch.context.renderType==1); }
+   check(batch.context.renderType==1);
+  }
+  check(batch.context.renderType==42);
+  try {
+   try(ContainedWaterShaderCompat.FluidScope f=ContainedWaterShaderCompat.fluidBatch(batch,ids,8)) {
+    check(batch.context.renderType==1);throw new IllegalStateException();
+   }
+  } catch(IllegalStateException expected) { }
+  check(batch.context.renderType==42);
+  for(int count:new int[]{0,3,12}) {
+   try(ContainedWaterShaderCompat.FluidScope f=ContainedWaterShaderCompat.fluidBatch(batch,ids,count)) { check(batch.context.renderType==42); }
+  }
+  ids[4]=10017;
+  try(ContainedWaterShaderCompat.FluidScope f=ContainedWaterShaderCompat.fluidBatch(batch,ids,8)) { check(batch.context.renderType==42); }
+  try(ContainedWaterShaderCompat.FluidScope f=ContainedWaterShaderCompat.fluidBatch(batch,null,4)) { check(batch.context.renderType==42); }
+  ids[4]=32000;
+  mapping(33000);int[] signed=new int[]{(short)33000,(short)33000,(short)33000,(short)33000};
+  try(ContainedWaterShaderCompat.FluidScope f=ContainedWaterShaderCompat.fluidBatch(batch,signed,4)) { check(batch.context.renderType==1); }
+  check(batch.context.renderType==42);
+  mapping(32000);
   try(ContainedWaterShaderCompat.Scope s=ContainedWaterShaderCompat.water(tess)) {
    check(tess.id==32000); mapping(1234);
    try(ContainedWaterShaderCompat.Scope nested=ContainedWaterShaderCompat.water(tess)) { check(tess.id==1234); }
@@ -81,14 +124,21 @@ public class Harness {
   BlockRenderingSettings.INSTANCE.ids.put(Blocks.flowing_water,fallback);
   try(ContainedWaterShaderCompat.Scope s=ContainedWaterShaderCompat.water(tess)) { check(tess.id==32123); }
   check(tess.id==-1);
+  BlockRenderingSettings.INSTANCE.ids.put(Blocks.water,new HashMap<Integer,Integer>());
+  try(ContainedWaterShaderCompat.Scope s=ContainedWaterShaderCompat.water(tess)) { check(tess.id==32123); }
+  check(tess.id==-1);
+  int[] flowingIds=new int[]{32123,32123,32123,32123};
+  try(ContainedWaterShaderCompat.FluidScope f=ContainedWaterShaderCompat.fluidBatch(batch,flowingIds,4)) { check(batch.context.renderType==1); }
+  check(batch.context.renderType==42);
   try(ContainedWaterShaderCompat.Scope s=ContainedWaterShaderCompat.water(new Object())) { }
   try(ContainedWaterShaderCompat.Scope s=ContainedWaterShaderCompat.water(null)) { }
-  System.out.println("PASS scoped IDs, shader reload, exception cleanup, missing maps, flowing-water fallback, optional API");
+  System.out.println("PASS scoped IDs, complete water batches, mixed-batch exclusion, nested/exception cleanup, unsigned IDs, shader reload, optional API");
  }
 }''')
         cp = f'{common}:{api}'
         subprocess.run([str(JDK/'javac'), '-cp', cp, '-d', str(test), harness], check=True)
         subprocess.run([str(JDK/'java'), '-cp', f'{test}:{cp}', 'Harness'], check=True)
         subprocess.run([str(JDK/'java'), '-cp', f'{test}:{common}', 'Harness', 'absent'], check=True)
+        subprocess.run([str(JDK/'java'), '-cp', f'{test}:{common}:{old_api}', 'Harness', 'old'], check=True)
 
 if __name__ == '__main__': main()

@@ -31,23 +31,23 @@ public abstract class MixinChunk {
     @Inject(method = "<init>(Lnet/minecraft/world/World;II)V", at = @At("RETURN"))
     private void etfu$extendVerticalArrays(World world, int chunkX, int chunkZ, CallbackInfo ci) {
         if (WorldHeightCompat.extended(world)) {
-            this.storageArrays = new ExtendedBlockStorage[WorldHeightCompat.EXTENDED_SECTION_COUNT];
-            this.entityLists = new List[WorldHeightCompat.EXTENDED_SECTION_COUNT];
+            this.storageArrays = new ExtendedBlockStorage[(WorldHeightCompat.height(this.worldObj) / 16)];
+            this.entityLists = new List[(WorldHeightCompat.height(this.worldObj) / 16)];
             for (int i = 0; i < this.entityLists.length; ++i) {
                 this.entityLists[i] = new ArrayList();
             }
-            this.queuedLightChecks = WorldHeightCompat.EXTENDED_SECTION_COUNT * 16 * 16;
+            this.queuedLightChecks = (WorldHeightCompat.height(this.worldObj) / 16) * 16 * 16;
         }
     }
 
     @ModifyConstant(method = "getAreLevelsEmpty", constant = @Constant(intValue = WorldHeightCompat.LEGACY_HEIGHT))
     private int etfu$extendEmptyCheckHeight(int original) {
-        return WorldHeightCompat.extended(this.worldObj) ? WorldHeightCompat.EXTENDED_HEIGHT : original;
+        return WorldHeightCompat.extended(this.worldObj) ? WorldHeightCompat.height(this.worldObj) : original;
     }
 
     @ModifyConstant(method = "getAreLevelsEmpty", constant = @Constant(intValue = WorldHeightCompat.LEGACY_MAX_Y))
     private int etfu$extendEmptyCheckMaxY(int original) {
-        return WorldHeightCompat.extended(this.worldObj) ? WorldHeightCompat.EXTENDED_MAX_Y : original;
+        return WorldHeightCompat.extended(this.worldObj) ? (WorldHeightCompat.height(this.worldObj) - 1) : original;
     }
 
     /** Height-map values are ints; the vanilla unsigned-byte mask truncates values above 255. */

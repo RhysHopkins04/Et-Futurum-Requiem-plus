@@ -41,6 +41,11 @@ def earthReleaseMappings = tasks.register('earthImportReleaseMappings') {
                 if (!refmap.mappings[ownerName]?.get(method)?.contains(srg))
                     throw new GradleException("Server profile production mapping missing: ${ownerName}/${method}")
             } }
+            def heightPrefix = 'ganymedes01/etfuturum/mixins/early/extendedheight/'
+            if (refmap.mappings[heightPrefix + 'MixinMinecraftServer']?.getBuildLimit != 'Lnet/minecraft/server/MinecraftServer;func_71207_Z()I')
+                throw new GradleException('Configurable server ceiling is missing its production mapping')
+            if (!refmap.mappings[heightPrefix + 'MixinNetHandlerHeight']?.get('processPlayerBlockPlacement')?.contains('func_147346_a'))
+                throw new GradleException('Dimension-aware placement ceiling is missing its production mapping')
             def prefix = 'ganymedes01/etfuturum/mixins/early/imported/'
             def required = [
                 'MixinWorld': ['setBlock(IIILnet/minecraft/block/Block;II)Z': 'func_147465_d', setBlockMetadataWithNotify: 'func_72921_c', setTileEntity: 'func_147455_a', removeTileEntity: 'func_147475_p', getTileEntity: 'func_147438_o'],

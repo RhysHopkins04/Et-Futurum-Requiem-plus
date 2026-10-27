@@ -45,10 +45,10 @@ public final class WorldHeightCompat {
     public static final int FULL_SECTION_MASK = (1 << EXTENDED_SECTION_COUNT) - 1;
 
     /**
-     * Upper bound for the uncompressed S21/S26 chunk payload when all 24 sections use Add/MSB data.
+     * Upper bound for the uncompressed S21/S26 chunk payload when all 32 supported sections use Add/MSB data.
      * This deliberately has headroom above the exact theoretical payload size.
      */
-    public static final int MAX_CHUNK_DATA_BYTES = 393728;
+    public static final int MAX_CHUNK_DATA_BYTES = 524800;
 
 
     /**
@@ -62,8 +62,9 @@ public final class WorldHeightCompat {
         if (access instanceof net.minecraft.world.ChunkCache) {
             return ((net.minecraft.world.ChunkCache) access).getHeight();
         }
+        if (cpw.mods.fml.common.FMLCommonHandler.instance().getEffectiveSide().isClient()) return clientHeight();
         return ganymedes01.etfuturum.configuration.configs.ConfigWorld.extendedWorldHeight
-                ? EXTENDED_HEIGHT : LEGACY_HEIGHT;
+                ? configuredHeight() : LEGACY_HEIGHT;
     }
 
     public static boolean extended(net.minecraft.world.World world) {
@@ -79,7 +80,22 @@ public final class WorldHeightCompat {
     }
 
     public static int clientHeight() {
-        return ganymedes01.etfuturum.network.profile.ClientWorldProfile.server().extended ? EXTENDED_HEIGHT : LEGACY_HEIGHT;
+        return ganymedes01.etfuturum.network.profile.ClientWorldProfile.server().height;
+    }
+
+    /** Physical storage/build ceiling; modern terrain constants above remain fixed. */
+    public static int configuredHeight() {
+        return ganymedes01.etfuturum.configuration.configs.ConfigWorld.extendedWorldHeightBlocks;
+    }
+
+    public static int height(net.minecraft.world.World world) {
+        if (!extended(world)) return world == null ? LEGACY_HEIGHT : world.getHeight();
+        return world.isRemote ? clientHeight() : configuredHeight();
+    }
+
+    public static int sectionMask(int sections) {
+        if (sections < 1 || sections > 32) throw new IllegalArgumentException("Invalid section count");
+        return (int)((1L << sections) - 1);
     }
 
     private WorldHeightCompat() {}

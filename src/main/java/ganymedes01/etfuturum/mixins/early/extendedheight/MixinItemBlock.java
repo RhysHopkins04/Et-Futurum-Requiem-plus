@@ -24,7 +24,7 @@ public class MixinItemBlock {
             int original, ItemStack stack, EntityPlayer player, World world,
             int x, int y, int z, int side, float hitX, float hitY, float hitZ) {
         return WorldHeightCompat.extended(world)
-                ? WorldHeightCompat.EXTENDED_HEIGHT
+                ? WorldHeightCompat.height(world)
                 : original;
     }
 }

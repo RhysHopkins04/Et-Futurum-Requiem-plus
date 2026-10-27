@@ -21,6 +21,11 @@ import java.util.zip.Inflater;
 /** Extends bulk chunk section masks from 16 bits to the 24-section positive-Y world. */
 @Mixin(S26PacketMapChunkBulk.class)
 public abstract class MixinS26PacketMapChunkBulk {
+    @Unique private Boolean etfu$receivedExtendedFormat;
+    @Unique private boolean etfu$writeExtendedFormat() {
+        return etfu$receivedExtendedFormat != null ? etfu$receivedExtendedFormat : ProfilePacketFormat.serverExtended();
+    }
+
 
     @Shadow private int[] field_149266_a;
     @Shadow private int[] field_149264_b;
@@ -35,7 +40,7 @@ public abstract class MixinS26PacketMapChunkBulk {
 
     @ModifyConstant(method = "<init>(Ljava/util/List;)V", constant = @Constant(intValue = 65535))
     private int etfu$sendAllExtendedSections(int original) {
-        return ProfilePacketFormat.serverExtended() ? WorldHeightCompat.FULL_SECTION_MASK : original;
+        return ProfilePacketFormat.serverExtended() ? WorldHeightCompat.sectionMask(WorldHeightCompat.configuredHeight() / 16) : original;
     }
 
     /**
@@ -44,6 +49,7 @@ public abstract class MixinS26PacketMapChunkBulk {
      */
     @Overwrite
     public void readPacketData(PacketBuffer data) throws IOException {
+        etfu$receivedExtendedFormat = ProfilePacketFormat.clientExtended();
         short chunkCount = data.readShort();
         this.field_149261_g = data.readInt();
         this.field_149267_h = data.readBoolean();
@@ -78,7 +84,7 @@ public abstract class MixinS26PacketMapChunkBulk {
             int sectionCount = 0;
             int msbCount = 0;
 
-            for (int section = 0; section < WorldHeightCompat.EXTENDED_SECTION_COUNT; ++section) {
+            for (int section = 0; section < (WorldHeightCompat.clientHeight() / 16); ++section) {
                 sectionCount += this.field_149265_c[index] >> section & 1;
                 msbCount += this.field_149262_d[index] >> section & 1;
             }
@@ -111,8 +117,8 @@ public abstract class MixinS26PacketMapChunkBulk {
         for (int i = 0; i < this.field_149266_a.length; ++i) {
             data.writeInt(this.field_149266_a[i]);
             data.writeInt(this.field_149264_b[i]);
-            ProfilePacketFormat.writeMask(data, this.field_149265_c[i], ProfilePacketFormat.serverExtended());
-            ProfilePacketFormat.writeMask(data, this.field_149262_d[i], ProfilePacketFormat.serverExtended());
+            ProfilePacketFormat.writeMask(data, this.field_149265_c[i], etfu$writeExtendedFormat());
+            ProfilePacketFormat.writeMask(data, this.field_149262_d[i], etfu$writeExtendedFormat());
         }
     }
     /**

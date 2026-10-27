@@ -12,7 +12,7 @@ public final class ProfilePacketFormat {
     public static boolean clientExtended() { return ClientWorldProfile.server().extended; }
     public static int readMask(ByteBuf data, boolean extended) {
         int mask = extended ? data.readInt() : data.readUnsignedShort();
-        if ((mask & ~(extended ? 0xffffff : 0xffff)) != 0)
+        if ((mask & ~(extended ? ganymedes01.etfuturum.core.utils.WorldHeightCompat.sectionMask(ClientWorldProfile.server().height / 16) : 0xffff)) != 0)
             throw new IllegalArgumentException("Invalid EFR chunk section mask");
         return mask;
     }

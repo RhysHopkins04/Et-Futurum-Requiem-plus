@@ -44,6 +44,10 @@ gradle.projectsEvaluated {
             systemProperty 'efr.ae2ResourceProbe', 'true'
             if (p.hasProperty('earthAe2Artifacts')) systemProperty 'efr.ae2Artifacts', p.property('earthAe2Artifacts')
         }
+        if (p.hasProperty('configuredHeightProbe')) {
+            workingDir = p.file('build/configured-height-tests/server-' + p.property('configuredHeightProbe'))
+            systemProperty 'efr.configuredHeightProbe', 'true'
+        }
         if (p.hasProperty('earthWaterFlowProbe')) systemProperty 'efr.waterFlowProbe','true'
         if (p.hasProperty('earthAdaptedNtmTiles')) systemProperty 'efr.adaptedNtmTiles',p.property('earthAdaptedNtmTiles')
         if (p.hasProperty('earthConvertedDungeons')) systemProperty 'efr.ntmConvertedDungeons', p.property('earthConvertedDungeons')

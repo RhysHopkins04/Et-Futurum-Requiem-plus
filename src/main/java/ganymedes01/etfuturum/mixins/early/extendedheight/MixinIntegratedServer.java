@@ -13,6 +13,6 @@ public class MixinIntegratedServer {
 
     @ModifyConstant(method = "<init>", constant = @Constant(intValue = WorldHeightCompat.LEGACY_HEIGHT))
     private int etfu$extendedIntegratedBuildLimit(int original) {
-        return ganymedes01.etfuturum.configuration.configs.ConfigWorld.extendedWorldHeight ? WorldHeightCompat.EXTENDED_HEIGHT : original;
+        return ganymedes01.etfuturum.configuration.configs.ConfigWorld.extendedWorldHeight ? WorldHeightCompat.configuredHeight() : original;
     }
 }

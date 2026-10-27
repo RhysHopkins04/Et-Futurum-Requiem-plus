@@ -23,7 +23,7 @@ public class MixinWorld {
             constant = @Constant(intValue = WorldHeightCompat.LEGACY_HEIGHT)
     )
     private int etfu$extendWorldHeightBound(int original) {
-        return WorldHeightCompat.extended((World)(Object)this) ? WorldHeightCompat.EXTENDED_HEIGHT : original;
+        return WorldHeightCompat.extended((World)(Object)this) ? WorldHeightCompat.height((World)(Object)this) : original;
     }
 
     /**
@@ -37,7 +37,7 @@ public class MixinWorld {
             remap = false
     )
     private int etfu$extendForgeWeatherHeightBound(int original) {
-        return WorldHeightCompat.extended((World)(Object)this) ? WorldHeightCompat.EXTENDED_HEIGHT : original;
+        return WorldHeightCompat.extended((World)(Object)this) ? WorldHeightCompat.height((World)(Object)this) : original;
     }
 
     /** Forge adds this helper after the MCP/SRG mappings are produced, so its literal name must not be remapped. */
@@ -47,7 +47,7 @@ public class MixinWorld {
             remap = false
     )
     private int etfu$extendForgeLightOpacityHeightBound(int original) {
-        return WorldHeightCompat.extended((World)(Object)this) ? WorldHeightCompat.EXTENDED_HEIGHT : original;
+        return WorldHeightCompat.extended((World)(Object)this) ? WorldHeightCompat.height((World)(Object)this) : original;
     }
 
     @ModifyConstant(
@@ -55,6 +55,6 @@ public class MixinWorld {
             constant = @Constant(intValue = WorldHeightCompat.LEGACY_MAX_Y)
     )
     private int etfu$extendWorldMaxY(int original) {
-        return WorldHeightCompat.extended((World)(Object)this) ? WorldHeightCompat.EXTENDED_MAX_Y : original;
+        return WorldHeightCompat.extended((World)(Object)this) ? (WorldHeightCompat.height((World)(Object)this) - 1) : original;
     }
 }

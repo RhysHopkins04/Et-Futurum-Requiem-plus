@@ -14,7 +14,7 @@ public class MixinEntityPlayerMP {
     private int etfu$extendInitialChunkTileEntitySync(int original) {
         EntityPlayerMP self = (EntityPlayerMP)(Object)this;
         return WorldHeightCompat.extended(self.worldObj)
-                ? WorldHeightCompat.EXTENDED_HEIGHT
+                ? WorldHeightCompat.height(self.worldObj)
                 : original;
     }
 }

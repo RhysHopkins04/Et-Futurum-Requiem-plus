@@ -5,6 +5,7 @@ import net.minecraft.network.PacketBuffer;
 import ganymedes01.etfuturum.network.profile.ProfilePacketFormat;
 import net.minecraft.network.play.server.S21PacketChunkData;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -19,6 +20,11 @@ import java.util.zip.Inflater;
 /** Extends the S21 section masks from the vanilla 16-bit wire format to 24 usable bits. */
 @Mixin(S21PacketChunkData.class)
 public abstract class MixinS21PacketChunkData {
+    @Unique private Boolean etfu$receivedExtendedFormat;
+    @Unique private boolean etfu$writeExtendedFormat() {
+        return etfu$receivedExtendedFormat != null ? etfu$receivedExtendedFormat : ProfilePacketFormat.serverExtended();
+    }
+
 
     @Shadow private int field_149284_a;
     @Shadow private int field_149282_b;
@@ -56,6 +62,7 @@ public abstract class MixinS21PacketChunkData {
      */
     @Overwrite
     public void readPacketData(PacketBuffer data) throws IOException {
+        etfu$receivedExtendedFormat = ProfilePacketFormat.clientExtended();
         this.field_149284_a = data.readInt();
         this.field_149282_b = data.readInt();
         this.field_149279_g = data.readBoolean();
@@ -63,15 +70,16 @@ public abstract class MixinS21PacketChunkData {
         this.field_149280_d = ProfilePacketFormat.readMask(data, ProfilePacketFormat.clientExtended());
         this.field_149285_h = data.readInt();
 
-        if (field_149286_i.length < this.field_149285_h) {
-            field_149286_i = new byte[this.field_149285_h];
-        }
-
-        data.readBytes(field_149286_i, 0, this.field_149285_h);
+        if (this.field_149285_h < 0 || this.field_149285_h > WorldHeightCompat.MAX_CHUNK_DATA_BYTES)
+            throw new IOException("Invalid compressed chunk length");
+        // Keep the received compressed bytes for ReplayMod's later serialization. A packet built
+        // by the no-arg reader constructor has no Forge server-side deflate semaphore.
+        this.field_149281_e = new byte[this.field_149285_h];
+        data.readBytes(this.field_149281_e, 0, this.field_149285_h);
         int sectionCount = 0;
         int msbCount = 0;
 
-        for (int section = 0; section < WorldHeightCompat.EXTENDED_SECTION_COUNT; ++section) {
+        for (int section = 0; section < (WorldHeightCompat.clientHeight() / 16); ++section) {
             sectionCount += this.field_149283_c >> section & 1;
             msbCount += this.field_149280_d >> section & 1;
         }
@@ -87,7 +95,7 @@ public abstract class MixinS21PacketChunkData {
 
         this.field_149278_f = new byte[length];
         Inflater inflater = new Inflater();
-        inflater.setInput(field_149286_i, 0, this.field_149285_h);
+        inflater.setInput(this.field_149281_e, 0, this.field_149285_h);
 
         try {
             inflater.inflate(this.field_149278_f);
@@ -115,8 +123,8 @@ public abstract class MixinS21PacketChunkData {
         data.writeInt(this.field_149284_a);
         data.writeInt(this.field_149282_b);
         data.writeBoolean(this.field_149279_g);
-        ProfilePacketFormat.writeMask(data, this.field_149283_c, ProfilePacketFormat.serverExtended());
-        ProfilePacketFormat.writeMask(data, this.field_149280_d, ProfilePacketFormat.serverExtended());
+        ProfilePacketFormat.writeMask(data, this.field_149283_c, etfu$writeExtendedFormat());
+        ProfilePacketFormat.writeMask(data, this.field_149280_d, etfu$writeExtendedFormat());
         data.writeInt(this.field_149285_h);
         data.writeBytes(this.field_149281_e, 0, this.field_149285_h);
     }

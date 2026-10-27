@@ -1,0 +1,14 @@
+// Apply via -I scripts/crucible_height_tests.gradle -PcrucibleHeightJar=/path/to/server.jar
+// Inspects the real production CraftEventFactory bytecode; no Bukkit classes join the runtime classpath.
+gradle.projectsEvaluated {
+    def p = gradle.rootProject
+    if (!p.hasProperty('crucibleHeightJar')) throw new GradleException('Supply -PcrucibleHeightJar=/path/to/Crucible.jar')
+    def sourceJar = p.file(p.property('crucibleHeightJar'))
+    if (!sourceJar.isFile()) throw new GradleException('Crucible jar does not exist')
+    p.tasks.register('crucibleHeightBytecodeContracts', JavaExec) {
+        dependsOn p.tasks.named('compileEarthImportTests'), p.tasks.named('reobfJar')
+        classpath = p.sourceSets.main.runtimeClasspath + p.files(p.layout.buildDirectory.dir('earth-import-tests/classes'))
+        mainClass = 'efrtest.CrucibleHeightBytecodeContracts'
+        args sourceJar.absolutePath, p.layout.buildDirectory.file("libs/${p.tasks.named('jar').get().archiveBaseName.get()}-${p.version}.jar").get().asFile.absolutePath
+    }
+}

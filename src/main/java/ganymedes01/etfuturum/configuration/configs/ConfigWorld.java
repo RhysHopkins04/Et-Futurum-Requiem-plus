@@ -58,6 +58,7 @@ public class ConfigWorld extends ConfigBase {
 	public static boolean bambooWorldgen;
 	public static boolean lushCavesWorldgen;
 	public static boolean extendedWorldHeight;
+    public static int extendedWorldHeightBlocks = 384;
 	public static boolean modernOverworldGeneration;
 	public static boolean modernOreGeneration;
 	public static boolean modernLargeOreVeins;
@@ -194,6 +195,14 @@ public class ConfigWorld extends ConfigBase {
 				"This option changes core chunk storage/network/render behaviour and REQUIRES A FULL GAME RESTART. " +
 				"It is intentionally opt-in until the extended-height foundation has completed runtime validation. " +
 				"Map Compatibility Mode always forces it off regardless of this saved value.");
+        extendedWorldHeightBlocks = getInt("extendedWorldHeightBlocks", catGeneration, 384, 384, 512,
+                "Server-authoritative Overworld height in blocks (exclusive upper Y). Multiples of 16 only: 384, 400, ... 512. " +
+                "Requires extendedWorldHeight and a full restart. 400 permits Y=0..399. " +
+                "Clients negotiate this automatically; taller worlds require updated EFR on both sides. " +
+                "Modern terrain and map conversion retain their existing 384-block terrain and +64 offset. " +
+                "Never reduce this after building above the old ceiling; saved worlds reject height reductions.");
+        if ((extendedWorldHeightBlocks & 15) != 0)
+            throw new IllegalArgumentException("extendedWorldHeightBlocks must be a multiple of 16 (384..512)");
 		modernOverworldGeneration = getBoolean("modernOverworldGeneration", catGeneration, false,
 				"EXPERIMENTAL PLUS OVERWORLD GENERATION. Use the modern -64..319 logical vertical coordinate model " +
 				"inside the positive 0..383 physical world and enable the Plus modern base-terrain path: translated Y63 sea level, " +

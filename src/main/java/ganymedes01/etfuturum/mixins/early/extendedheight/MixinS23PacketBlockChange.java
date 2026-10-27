@@ -5,6 +5,7 @@ import net.minecraft.network.PacketBuffer;
 import ganymedes01.etfuturum.network.profile.ProfilePacketFormat;
 import net.minecraft.network.play.server.S23PacketBlockChange;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 
@@ -13,6 +14,11 @@ import java.io.IOException;
 /** Extends single block-change packet Y coordinates to an unsigned short. */
 @Mixin(S23PacketBlockChange.class)
 public class MixinS23PacketBlockChange {
+    @Unique private Boolean etfu$receivedExtendedFormat;
+    @Unique private boolean etfu$writeExtendedFormat() {
+        return etfu$receivedExtendedFormat != null ? etfu$receivedExtendedFormat : ProfilePacketFormat.serverExtended();
+    }
+
 
     @Shadow private int field_148887_a;
     @Shadow private int field_148885_b;
@@ -23,6 +29,7 @@ public class MixinS23PacketBlockChange {
     /** @author Et Futurum Requiem Plus @reason Extend packet Y from 8 to 16 bits. */
     @Overwrite
     public void readPacketData(PacketBuffer data) throws IOException {
+        etfu$receivedExtendedFormat = ProfilePacketFormat.clientExtended();
         this.field_148887_a = data.readInt();
         this.field_148885_b = ProfilePacketFormat.readY(data, ProfilePacketFormat.clientExtended());
         this.field_148886_c = data.readInt();
@@ -34,7 +41,7 @@ public class MixinS23PacketBlockChange {
     @Overwrite
     public void writePacketData(PacketBuffer data) throws IOException {
         data.writeInt(this.field_148887_a);
-        ProfilePacketFormat.writeY(data, this.field_148885_b, ProfilePacketFormat.serverExtended());
+        ProfilePacketFormat.writeY(data, this.field_148885_b, etfu$writeExtendedFormat());
         data.writeInt(this.field_148886_c);
         data.writeVarIntToBuffer(Block.getIdFromBlock(this.field_148883_d));
         data.writeByte(this.field_148884_e);

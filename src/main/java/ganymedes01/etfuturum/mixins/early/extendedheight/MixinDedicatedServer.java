@@ -12,6 +12,6 @@ public class MixinDedicatedServer {
 
     @ModifyConstant(method = "startServer", constant = @Constant(intValue = WorldHeightCompat.LEGACY_HEIGHT))
     private int etfu$extendedDedicatedBuildLimit(int original) {
-        return WorldHeightCompat.EXTENDED_HEIGHT;
+        return WorldHeightCompat.configuredHeight();
     }
 }

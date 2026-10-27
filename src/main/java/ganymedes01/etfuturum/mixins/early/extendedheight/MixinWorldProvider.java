@@ -18,14 +18,14 @@ public class MixinWorldProvider {
     @Inject(method = "getHeight", at = @At("HEAD"), cancellable = true, remap = false)
     private void etfu$extendedHeight(CallbackInfoReturnable<Integer> cir) {
         if (WorldHeightCompat.extended(worldObj)) {
-            cir.setReturnValue(WorldHeightCompat.EXTENDED_HEIGHT);
+            cir.setReturnValue(WorldHeightCompat.height(worldObj));
         }
     }
 
     @Inject(method = "getActualHeight", at = @At("HEAD"), cancellable = true, remap = false)
     private void etfu$extendedActualHeight(CallbackInfoReturnable<Integer> cir) {
         if (WorldHeightCompat.extended(worldObj)) {
-            cir.setReturnValue(WorldHeightCompat.EXTENDED_HEIGHT);
+            cir.setReturnValue(WorldHeightCompat.height(worldObj));
         }
     }
 }

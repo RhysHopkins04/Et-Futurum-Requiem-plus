@@ -403,6 +403,8 @@ public class EtFuturumEarlyMixins implements IFMLLoadingPlugin, IEarlyMixinLoade
             }
 		}
 		if ((ConfigWorld.extendedWorldHeight && ConfigMapCompatibility.allowsExtendedHeight()) || side == MixinEnvironment.Side.CLIENT) {
+			mixins.add("extendedheight.MixinMinecraftServer");
+			mixins.add("extendedheight.MixinNetHandlerHeight");
 			mixins.add("extendedheight.MixinWorldProvider");
 			mixins.add("extendedheight.MixinWorld");
 			mixins.add("extendedheight.MixinChunk");
@@ -413,6 +415,7 @@ public class EtFuturumEarlyMixins implements IFMLLoadingPlugin, IEarlyMixinLoade
 			mixins.add("extendedheight.MixinC07PacketPlayerDigging");
 			mixins.add("extendedheight.MixinC08PacketPlayerBlockPlacement");
 			mixins.add("extendedheight.MixinS23PacketBlockChange");
+            mixins.add("extendedheight.MixinS28PacketEffect");
 			mixins.add("extendedheight.MixinItemBlock");
 			mixins.add("extendedheight.MixinEntityPlayerMP");
 			mixins.add("extendedheight.MixinPlayerInstance");
@@ -461,7 +464,7 @@ public class EtFuturumEarlyMixins implements IFMLLoadingPlugin, IEarlyMixinLoade
 
 	@Override
 	public String[] getASMTransformerClass() {
-		return null;
+        return new String[] {"ganymedes01.etfuturum.core.transformers.CrucibleInteractionHeightTransformer"};
 	}
 
 	@Override

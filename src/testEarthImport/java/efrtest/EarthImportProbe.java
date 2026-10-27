@@ -32,6 +32,7 @@ public final class EarthImportProbe {
         MinecraftServer server=MinecraftServer.getServer(); WorldServer world=server.worldServerForDimension(0);
         if (Boolean.getBoolean("efr.profileNetworkServer")) { NetworkProfileServer.start(world); return; }
         try {
+            if (Boolean.getBoolean("efr.configuredHeightProbe")) { ConfiguredHeightProbe.run(world); return; }
             WorldProfileProbe.run(world);
             if (Boolean.getBoolean("efr.waterFlowProbe")) {ImportedWaterFlowProbe.run(world);return;}
             if (System.getProperty("efr.adaptedNtmTiles")!=null) {NtmAdaptedTilesProbe.run();return;}

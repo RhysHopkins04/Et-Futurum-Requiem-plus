@@ -19,7 +19,7 @@ public class MixinChunkCache {
             constant = @Constant(intValue = WorldHeightCompat.LEGACY_HEIGHT)
     )
     private int etfu$extendCacheHeight(int original) {
-        return WorldHeightCompat.extended(this.worldObj) ? WorldHeightCompat.EXTENDED_HEIGHT : original;
+        return WorldHeightCompat.extended(this.worldObj) ? WorldHeightCompat.height(this.worldObj) : original;
     }
 
     @ModifyConstant(
@@ -27,6 +27,6 @@ public class MixinChunkCache {
             constant = @Constant(intValue = WorldHeightCompat.LEGACY_MAX_Y)
     )
     private int etfu$extendCacheMaxY(int original) {
-        return WorldHeightCompat.extended(this.worldObj) ? WorldHeightCompat.EXTENDED_MAX_Y : original;
+        return WorldHeightCompat.extended(this.worldObj) ? (WorldHeightCompat.height(this.worldObj) - 1) : original;
     }
 }

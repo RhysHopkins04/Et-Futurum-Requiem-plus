@@ -32,6 +32,13 @@ def main():
         if end>=0:body=body[:end]
         assert body.count(call)==1,('Unexpected fluid-copy call layout',version)
         print('PASS fluid batch hook target:',version or 'base')
+        copy_source=inspect(OWNER.replace('/','.'),version)
+        copy_start=copy_source.index('public void copyRawBuffer(')
+        copy_body=copy_source[copy_start:copy_source.index('\n  private void calculateQuadLight(',copy_start)]
+        assert copy_body.count('Method calculateQuadLight:(IIIIIIIZZZ)V')==2,('Unexpected water-light calculation call layout',version)
+        assert 'private final org.embeddedt.embeddium.impl.render.chunk.vertex.format.ChunkVertexEncoder$Vertex[] vertices;' in copy_source
+        assert 'private final org.embeddedt.embeddium.impl.model.light.data.QuadLightData quadLightData;' in copy_source
+        print('PASS water skylight hook targets and private data fields:',version or 'base')
     context=inspect(OWNER.replace('/','.'))
     assert 'public com.gtnewhorizons.angelica.rendering.celeritas.iris.BlockRenderContext getBlockRenderContext();' in context
     fields=inspect('com.gtnewhorizons.angelica.rendering.celeritas.iris.BlockRenderContext')

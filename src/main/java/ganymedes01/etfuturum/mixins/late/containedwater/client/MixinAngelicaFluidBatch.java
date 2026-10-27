@@ -18,7 +18,11 @@ public abstract class MixinAngelicaFluidBatch {
             int[] states, int[] shaderOverrides, @Coerce Object buffers, @Coerce Object material,
             boolean shaderPackOverride, boolean vanillaAo, Operation<Void> original) {
         try (ContainedWaterShaderCompat.FluidScope scope = ContainedWaterShaderCompat.fluidBatch(builder, shaderOverrides, vertexCount)) {
-            original.call(builder, vertices, vertexCount, states, shaderOverrides, buffers, material, shaderPackOverride, vanillaAo);
+            // A water atlas sprite may have opaque pixels; water transparency comes from
+            // the shader. Promoting this batch to cutout selects the terrain shader,
+            // which loses water displacement/reflections despite the correct material ID.
+            original.call(builder, vertices, vertexCount, states, shaderOverrides, buffers, material,
+                    shaderPackOverride || scope.preservesWaterPass(), vanillaAo);
         }
     }
 }

@@ -23,7 +23,8 @@ def main():
 public class Blocks { public static final Object water=new Object(),flowing_water=new Object(); }'''),
             write(root, 'stubs/ganymedes01/etfuturum/core/utils/Logger.java', '''package ganymedes01.etfuturum.core.utils;
 public class Logger { public static void warn(Object value) { throw new AssertionError(value); } }'''),
-            str(ROOT/'src/main/java/ganymedes01/etfuturum/client/renderer/block/ContainedWaterShaderCompat.java')]
+            str(ROOT/'src/main/java/ganymedes01/etfuturum/client/renderer/block/ContainedWaterShaderCompat.java'),
+            str(ROOT/'src/main/java/ganymedes01/etfuturum/client/renderer/block/ContainedWaterSkylightCompat.java')]
         subprocess.run([str(JDK/'javac'), '-d', str(common), *sources], check=True)
         fixtures = [
             write(root, 'fixtures/com/gtnewhorizons/angelica/rendering/StateAwareTessellator.java', '''package com.gtnewhorizons.angelica.rendering;
@@ -38,11 +39,18 @@ public class BlockRenderingSettings {
         old_fixtures = list(fixtures)
         fixtures += [
             write(root, 'fixtures/com/gtnewhorizons/angelica/rendering/celeritas/iris/BlockRenderContext.java', '''package com.gtnewhorizons.angelica.rendering.celeritas.iris;
-public class BlockRenderContext { public short renderType=42; }'''),
+public class BlockRenderContext { public short renderType=42,blockId=-1; }'''),
             write(root, 'fixtures/com/gtnewhorizons/angelica/rendering/celeritas/AngelicaChunkBuildContext.java', '''package com.gtnewhorizons.angelica.rendering.celeritas;
 import com.gtnewhorizons.angelica.rendering.celeritas.iris.BlockRenderContext;
 public class AngelicaChunkBuildContext {
  public final BlockRenderContext context=new BlockRenderContext();
+ public static class Vertex { public int light; }
+ public static class LightData { public int[] lm=new int[4]; }
+ private final Vertex[] vertices=new Vertex[]{new Vertex(),new Vertex(),new Vertex(),new Vertex()};
+ private final LightData quadLightData=new LightData();
+ public void input(int i,int value){vertices[i].light=value;}
+ public void output(int i,int value){quadLightData.lm[i]=value;}
+ public int output(int i){return quadLightData.lm[i];}
  public BlockRenderContext getBlockRenderContext() { return context; }
 }''')]
         subprocess.run([str(JDK/'javac'), '-d', str(api), *fixtures], check=True)
@@ -53,6 +61,7 @@ import net.minecraft.init.Blocks;
 import net.coderbot.iris.block_rendering.BlockRenderingSettings;
 import com.gtnewhorizons.angelica.rendering.StateAwareTessellator;
 import ganymedes01.etfuturum.client.renderer.block.ContainedWaterShaderCompat;
+import ganymedes01.etfuturum.client.renderer.block.ContainedWaterSkylightCompat;
 public class Harness {
  public static class Tess implements StateAwareTessellator {
   public short id=-1;
@@ -67,19 +76,26 @@ public class Harness {
  public static void main(String[] args) {
   if(args.length>0 && args[0].equals("absent")) {
    try(ContainedWaterShaderCompat.Scope s=ContainedWaterShaderCompat.water(new Object())) { }
-   try(ContainedWaterShaderCompat.FluidScope f=ContainedWaterShaderCompat.fluidBatch(new Object(),new int[]{32000,32000,32000,32000},4)) { }
+   try(ContainedWaterShaderCompat.FluidScope f=ContainedWaterShaderCompat.fluidBatch(new Object(),new int[]{32000,32000,32000,32000},4)) { check(!f.preservesWaterPass()); }
    System.out.println("PASS without Angelica"); return;
   }
   Tess tess=new Tess(); mapping(32000);
   if(args.length>0 && args[0].equals("old")) {
    try(ContainedWaterShaderCompat.Scope s=ContainedWaterShaderCompat.water(tess)) { check(tess.id==32000); }
-   try(ContainedWaterShaderCompat.FluidScope f=ContainedWaterShaderCompat.fluidBatch(new Object(),new int[]{32000,32000,32000,32000},4)) { }
+   try(ContainedWaterShaderCompat.FluidScope f=ContainedWaterShaderCompat.fluidBatch(new Object(),new int[]{32000,32000,32000,32000},4)) { check(!f.preservesWaterPass()); }
    System.out.println("PASS older Angelica without fluid context"); return;
   }
   com.gtnewhorizons.angelica.rendering.celeritas.AngelicaChunkBuildContext batch=new com.gtnewhorizons.angelica.rendering.celeritas.AngelicaChunkBuildContext();
   int[] ids=new int[]{32000,32000,32000,32000,32000,32000,32000,32000,-1};
   try(ContainedWaterShaderCompat.FluidScope f=ContainedWaterShaderCompat.fluidBatch(batch,ids,8)) {
-   check(batch.context.renderType==1);
+   check(batch.context.renderType==1); check(f.preservesWaterPass());
+   check(ContainedWaterShaderCompat.isWaterFluidContext(batch));
+   for(int i=0;i<4;i++) batch.input(i,((i*80)<<16)|0x20);
+   long sky=ContainedWaterSkylightCompat.capture(batch);
+   check(sky!=0);
+   for(int i=0;i<4;i++) batch.output(i,0x40+i*16);
+   ContainedWaterSkylightCompat.restore(batch,sky);
+   for(int i=0;i<4;i++) check(batch.output(i)==((i*80)<<16|0x40+i*16));
    try(ContainedWaterShaderCompat.FluidScope nested=ContainedWaterShaderCompat.fluidBatch(batch,ids,4)) { check(batch.context.renderType==1); }
    check(batch.context.renderType==1);
   }
@@ -91,16 +107,26 @@ public class Harness {
   } catch(IllegalStateException expected) { }
   check(batch.context.renderType==42);
   for(int count:new int[]{0,3,12}) {
-   try(ContainedWaterShaderCompat.FluidScope f=ContainedWaterShaderCompat.fluidBatch(batch,ids,count)) { check(batch.context.renderType==42); }
+   try(ContainedWaterShaderCompat.FluidScope f=ContainedWaterShaderCompat.fluidBatch(batch,ids,count)) { check(batch.context.renderType==42); check(!f.preservesWaterPass()); }
   }
   ids[4]=10017;
-  try(ContainedWaterShaderCompat.FluidScope f=ContainedWaterShaderCompat.fluidBatch(batch,ids,8)) { check(batch.context.renderType==42); }
-  try(ContainedWaterShaderCompat.FluidScope f=ContainedWaterShaderCompat.fluidBatch(batch,null,4)) { check(batch.context.renderType==42); }
+  try(ContainedWaterShaderCompat.FluidScope f=ContainedWaterShaderCompat.fluidBatch(batch,ids,8)) { check(batch.context.renderType==42); check(!f.preservesWaterPass()); }
+  try(ContainedWaterShaderCompat.FluidScope f=ContainedWaterShaderCompat.fluidBatch(batch,null,4)) { check(batch.context.renderType==42); check(!f.preservesWaterPass()); }
   ids[4]=32000;
   mapping(33000);int[] signed=new int[]{(short)33000,(short)33000,(short)33000,(short)33000};
   try(ContainedWaterShaderCompat.FluidScope f=ContainedWaterShaderCompat.fluidBatch(batch,signed,4)) { check(batch.context.renderType==1); }
   check(batch.context.renderType==42);
   mapping(32000);
+  check(!ContainedWaterShaderCompat.isWaterFluidContext(batch));
+  check(ContainedWaterSkylightCompat.capture(batch)==0);
+  batch.context.renderType=1;batch.context.blockId=32000;
+  check(ContainedWaterShaderCompat.isWaterFluidContext(batch));
+  check(ContainedWaterSkylightCompat.capture(batch)!=0);
+  batch.context.blockId=32004;
+  check(!ContainedWaterShaderCompat.isWaterFluidContext(batch));
+  check(ContainedWaterSkylightCompat.capture(batch)==0);
+  batch.output(0,0x12345678);ContainedWaterSkylightCompat.restore(batch,0);check(batch.output(0)==0x12345678);
+  batch.context.renderType=42;batch.context.blockId=-1;
   try(ContainedWaterShaderCompat.Scope s=ContainedWaterShaderCompat.water(tess)) {
    check(tess.id==32000); mapping(1234);
    try(ContainedWaterShaderCompat.Scope nested=ContainedWaterShaderCompat.water(tess)) { check(tess.id==1234); }

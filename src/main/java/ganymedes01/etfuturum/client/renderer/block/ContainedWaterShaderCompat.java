@@ -14,6 +14,7 @@ public final class ContainedWaterShaderCompat {
     private static final Bridge BRIDGE = Bridge.find();
     private static final AtomicBoolean WARNED = new AtomicBoolean();
     private static final ThreadLocal<Scope> ACTIVE = new ThreadLocal<>();
+    private static final ThreadLocal<FluidScope> ACTIVE_FLUID = new ThreadLocal<>();
     private static final Scope NONE = new Scope(null, null);
 
     private ContainedWaterShaderCompat() { }
@@ -75,29 +76,51 @@ public final class ContainedWaterShaderCompat {
         } catch (Throwable failure) { warn(failure); return FluidScope.NONE; }
     }
 
+    /** Only verified contained-water scopes or native water IDs may retain liquid skylight. */
+    public static boolean isWaterFluidContext(Object builder) {
+        try {
+            FluidBridge bridge = FluidBridgeHolder.BRIDGE;
+            if (bridge == null || !bridge.builderType.isInstance(builder)) return false;
+            Object context = (Object) bridge.context.invokeExact(builder);
+            if ((short) bridge.getType.invokeExact(context) != 1) return false;
+            FluidScope active = ACTIVE_FLUID.get();
+            if (active != null && active.context == context && !active.closed) return true;
+            Short mapped = waterId();
+            return mapped != null && (short) bridge.getId.invokeExact(context) == mapped.shortValue();
+        } catch (Throwable failure) { warn(failure); return false; }
+    }
+
     public static final class FluidScope implements AutoCloseable {
         private static final FluidScope NONE = new FluidScope(null, (short) 0, null);
         private final Object context;
         private final short previous;
         private final FluidBridge bridge;
+        private final FluidScope previousScope;
         private boolean closed;
         private FluidScope(Object context, short previous, FluidBridge bridge) {
             this.context = context; this.previous = previous; this.bridge = bridge;
+            this.previousScope = context == null ? null : ACTIVE_FLUID.get();
+            if (context != null) ACTIVE_FLUID.set(this);
         }
+        /** Keep verified water batches in the translucent shader pass, even for opaque atlas pixels. */
+        public boolean preservesWaterPass() { return context != null; }
         @Override public void close() {
             if (context == null || closed) return;
             closed = true;
             try { bridge.setType.invokeExact(context, previous); }
             catch (Throwable failure) { warn(failure); }
+            finally {
+                if (previousScope == null) ACTIVE_FLUID.remove(); else ACTIVE_FLUID.set(previousScope);
+            }
         }
     }
 
     private static final class FluidBridgeHolder { private static final FluidBridge BRIDGE = FluidBridge.find(); }
     private static final class FluidBridge {
         private final Class<?> builderType;
-        private final MethodHandle context, getType, setType;
-        private FluidBridge(Class<?> builderType, MethodHandle context, MethodHandle getType, MethodHandle setType) {
-            this.builderType = builderType; this.context = context; this.getType = getType; this.setType = setType;
+        private final MethodHandle context, getType, setType, getId;
+        private FluidBridge(Class<?> builderType, MethodHandle context, MethodHandle getType, MethodHandle setType, MethodHandle getId) {
+            this.builderType = builderType; this.context = context; this.getType = getType; this.setType = setType; this.getId = getId;
         }
         private static FluidBridge find() {
             try {
@@ -108,7 +131,8 @@ public final class ContainedWaterShaderCompat {
                 return new FluidBridge(builder,
                     lookup.unreflect(builder.getMethod("getBlockRenderContext")).asType(MethodType.methodType(Object.class, Object.class)),
                     lookup.unreflectGetter(context.getField("renderType")).asType(MethodType.methodType(short.class, Object.class)),
-                    lookup.unreflectSetter(context.getField("renderType")).asType(MethodType.methodType(void.class, Object.class, short.class)));
+                    lookup.unreflectSetter(context.getField("renderType")).asType(MethodType.methodType(void.class, Object.class, short.class)),
+                    lookup.unreflectGetter(context.getField("blockId")).asType(MethodType.methodType(short.class, Object.class)));
             } catch (ClassNotFoundException | NoSuchMethodException | NoSuchFieldException olderAngelica) { return null; }
             catch (ReflectiveOperationException | LinkageError failure) { warn(failure); return null; }
         }

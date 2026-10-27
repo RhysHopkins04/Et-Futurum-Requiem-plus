@@ -290,6 +290,7 @@ public class EtFuturumEarlyMixins implements IFMLLoadingPlugin, IEarlyMixinLoade
 		}
 
 		if (side == MixinEnvironment.Side.CLIENT) {
+            mixins.add("fmlicon.client.MixinServerListEntryNormal");
             mixins.add("bookinput.client.MixinGuiScreenBook");
             mixins.add("armortrim.client.MixinArmorLayers");
             mixins.add("armortrim.client.MixinTrimIcons");

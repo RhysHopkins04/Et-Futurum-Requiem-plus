@@ -28,6 +28,7 @@ public class EtFuturumLateMixins implements ILateMixinLoader {
         if (side == MixinEnvironment.Side.CLIENT && loadedMods.contains("angelica")
                 && getClass().getClassLoader().getResource("com/gtnewhorizons/angelica/rendering/celeritas/AngelicaChunkBuilderMeshingTask.class") != null) {
             mixins.add("containedwater.client.MixinAngelicaFluidBatch");
+            mixins.add("containedwater.client.MixinAngelicaWaterSkylight");
         }
 		if (loadedMods.contains("harvestcraft") && ganymedes01.etfuturum.configuration.configs.ConfigMapCompatibility.importedEarthMode) {
 			mixins.add("harvestcraft.MixinFruitTreeHeight");

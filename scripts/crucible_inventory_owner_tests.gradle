@@ -1,0 +1,20 @@
+gradle.projectsEvaluated {
+ def p=gradle.rootProject
+ if (!p.hasProperty('crucibleNativeTileClass')) throw new GradleException('Supply -PcrucibleNativeTileClass=/path/to/extracted/TileEntity.class')
+ def nativeTile=p.file(p.property('crucibleNativeTileClass'))
+ if (!nativeTile.isFile()) throw new GradleException('Extracted Crucible TileEntity class does not exist')
+ if (!p.hasProperty('crucibleHeightJar')) throw new GradleException('Supply -PcrucibleHeightJar=/path/to/unchanged/Crucible.jar')
+ def serverJar=p.file(p.property('crucibleHeightJar'))
+ if (!serverJar.isFile()) throw new GradleException('Crucible jar does not exist')
+ p.tasks.register('crucibleInventoryContextCases',JavaExec) {
+  dependsOn p.tasks.named('compileEarthImportTests')
+  classpath=p.sourceSets.main.runtimeClasspath+p.files(p.layout.buildDirectory.dir('earth-import-tests/classes'))
+  mainClass='efrtest.CrucibleInventoryContextCases'
+ }
+ p.tasks.register('crucibleInventoryOwnerContracts',JavaExec) {
+  dependsOn p.tasks.named('compileEarthImportTests'),p.tasks.named('reobfJar'),p.tasks.named('crucibleInventoryContextCases')
+  classpath=p.sourceSets.main.runtimeClasspath+p.files(p.layout.buildDirectory.dir('earth-import-tests/classes'))
+  mainClass='efrtest.CrucibleInventoryOwnerContracts'
+  args nativeTile.absolutePath,p.layout.buildDirectory.file("libs/${p.tasks.named('jar').get().archiveBaseName.get()}-${p.version}.jar").get().asFile.absolutePath,serverJar.absolutePath
+ }
+}

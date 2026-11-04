@@ -74,6 +74,7 @@ public class EtFuturumEarlyMixins implements IFMLLoadingPlugin, IEarlyMixinLoade
 		// Pass 32c: explicit modern single/left/right chest relationships. Runtime methods
 		// self-gate on enableModernMapParityBlocks so disabling the parity layer preserves 1.7 behavior.
 		mixins.add("chestpairing.MixinTileEntity");
+        mixins.add("extendedheight.MixinChunkInventoryOwner");
 		mixins.add("chestpairing.MixinTileEntityChest");
 		mixins.add("chestpairing.MixinBlockChest");
 		mixins.add("chestpairing.MixinItemBlock");
@@ -464,7 +465,7 @@ public class EtFuturumEarlyMixins implements IFMLLoadingPlugin, IEarlyMixinLoade
 
 	@Override
 	public String[] getASMTransformerClass() {
-        return new String[] {"ganymedes01.etfuturum.core.transformers.CrucibleInteractionHeightTransformer"};
+        return new String[] {"ganymedes01.etfuturum.core.transformers.CrucibleInteractionHeightTransformer", "ganymedes01.etfuturum.core.transformers.CrucibleInventoryOwnerTransformer"};
 	}
 
 	@Override

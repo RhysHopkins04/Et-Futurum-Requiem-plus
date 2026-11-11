@@ -5783,6 +5783,23 @@ public enum ModernMapParityBlocks {
             if (e) addCollisionBox(mask, list, x, y, z, max, 0.0F, min, 1.0F, collisionHeight, max);
         }
 
+        /** Optional DH v1 seam: native laser selection boxes, not entity movement collision.
+         * The caller supplies read-only known state; unavailable neighbours/tiles must
+         * reject the query rather than being substituted with air. */
+        public double[] getDistantLaserRayBoxesV1(IBlockAccess state, int x, int y, int z) {
+            if (isMultiface()) return null; // Face masks require tile state absent from ordinary DH columns.
+            if (isLectern() || isGrindstone()) {
+                float[][] outline = workstationOutline(state.getBlockMetadata(x, y, z));
+                double[] boxes = new double[outline.length * 6];
+                for (int i = 0; i < outline.length; i++)
+                    for (int axis = 0; axis < 6; axis++) boxes[i * 6 + axis] = outline[i][axis];
+                return boxes;
+            }
+            setBlockBoundsBasedOnState(state, x, y, z);
+            return new double[] {getBlockBoundsMinX(), getBlockBoundsMinY(), getBlockBoundsMinZ(),
+                    getBlockBoundsMaxX(), getBlockBoundsMaxY(), getBlockBoundsMaxZ()};
+        }
+
         @Override
         public MovingObjectPosition collisionRayTrace(World world, int x, int y, int z, Vec3 start, Vec3 end) {
             if(isLectern() || isGrindstone()) {

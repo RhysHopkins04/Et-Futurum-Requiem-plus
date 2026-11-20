@@ -5,11 +5,9 @@ import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
 import cpw.mods.fml.common.SidedProxy;
-import cpw.mods.fml.common.StartupQuery;
 import cpw.mods.fml.common.event.*;
 import cpw.mods.fml.common.event.FMLInterModComms.IMCEvent;
 import cpw.mods.fml.common.event.FMLInterModComms.IMCMessage;
-import cpw.mods.fml.common.network.NetworkCheckHandler;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import cpw.mods.fml.common.registry.GameRegistry;
@@ -35,7 +33,6 @@ import ganymedes01.etfuturum.entities.ModEntityList;
 import ganymedes01.etfuturum.items.ItemWoodSign;
 import ganymedes01.etfuturum.lib.Reference;
 import ganymedes01.etfuturum.network.*;
-import ganymedes01.etfuturum.network.profile.ProfilePacketFormat;
 import ganymedes01.etfuturum.potion.ModPotions;
 import ganymedes01.etfuturum.recipes.ModRecipes;
 import ganymedes01.etfuturum.recipes.ModTagging;
@@ -271,6 +268,7 @@ public class EtFuturum {
         networkWrapper.registerMessage(ganymedes01.etfuturum.network.FrozenStateHandler.class, ganymedes01.etfuturum.network.FrozenStateMessage.class, 9, Side.CLIENT);
         networkWrapper.registerMessage(ganymedes01.etfuturum.network.LecternBookActionHandler.class,ganymedes01.etfuturum.network.LecternBookActionMessage.class,10,Side.SERVER);
         cpw.mods.fml.common.FMLCommonHandler.instance().bus().register(new ganymedes01.etfuturum.network.LecternBookActionHandler());
+        networkWrapper.registerMessage(WaterloggedChunkHandler.class, WaterloggedChunkMessage.class, 11, Side.CLIENT);
 
 		if (!Reference.SNAPSHOT_BUILD && !Reference.DEV_ENVIRONMENT) {
 			MCLibModules.updateCheckAPI.submitModTask(Tags.MOD_ID, Tags.VERSION, Reference.VERSION_URL);
@@ -521,27 +519,6 @@ public class EtFuturum {
 		}
 	}
 
-
-	@EventHandler
-	public void serverAboutToStart(FMLServerAboutToStartEvent event) {
-		try {
-			CompatMisc.requireLegacyHeightForChunkApi(ProfilePacketFormat.serverExtended());
-		} catch (IllegalArgumentException incompatibleHeight) {
-			StartupQuery.notify(incompatibleHeight.getMessage().replace(". ", ".\n\n"));
-			StartupQuery.abort();
-		}
-	}
-
-	@NetworkCheckHandler
-	public boolean checkRemoteVersions(Map<String, String> remoteMods, Side remoteSide) {
-		// Both peers must agree on the base chunk format and the stored-fluid packet extension.
-		if (ModsList.CHUNK_API.isLoaded() != remoteMods.containsKey(ModsList.CHUNK_API.modID())
-				|| ModsList.LIQUID_LOGGED.isLoaded() != remoteMods.containsKey(ModsList.LIQUID_LOGGED.modID())) {
-			return false;
-		}
-		String remoteVersion = remoteMods.get(Tags.MOD_ID);
-		return remoteVersion == null ? remoteSide == Side.SERVER : Tags.VERSION.equals(remoteVersion);
-	}
 
 	@EventHandler
 	public void serverStarting(FMLServerStartingEvent event) {

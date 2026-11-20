@@ -4,6 +4,7 @@ import cpw.mods.fml.common.eventhandler.Event;
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import ganymedes01.etfuturum.Tags;
 import ganymedes01.etfuturum.core.utils.DripleafWater;
+import ganymedes01.etfuturum.core.utils.NativeWaterlogging;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import ganymedes01.etfuturum.ModernMapParityBlocks;
 import ganymedes01.etfuturum.ModernPowderSnowBucket;
@@ -50,6 +51,11 @@ public final class ModernFluidEventHandler {
                 e.result=new ItemStack(ModernPowderSnowBucket.get());
                 e.setResult(Event.Result.ALLOW);
                 e.world.playSoundEffect(x+0.5,y+0.5,z+0.5,"minecraft_1.21.11:item.bucket.fill_powder_snow",1,1);
+            } else if (NativeWaterlogging.drain(e.world, x, y, z)) {
+                e.result = new ItemStack(Items.water_bucket);
+                e.setResult(Event.Result.ALLOW);
+                if (!e.world.isRemote) e.world.playSoundEffect(x + .5, y + .5, z + .5,
+                        Tags.MC_ASSET_VER + ":item.bucket.fill", 1, 1);
             } else if (ModernMapParityBlocks.containsWater(e.world,x,y,z)) {
                 if (!e.world.isRemote) ModernMapParityBlocks.drainContainedWater(e.world,x,y,z);
                 e.result=new ItemStack(Items.water_bucket);
@@ -58,7 +64,8 @@ public final class ModernFluidEventHandler {
         } else if (e.current.getItem()==Items.water_bucket) {
             // Do not replace an already-wet aquatic block with vanilla water;
             // consume the bucket normally and preserve the existing source.
-            if (ModernMapParityBlocks.containsWater(e.world,x,y,z)
+            if (NativeWaterlogging.fill(e.world, x, y, z)
+                    || ModernMapParityBlocks.containsWater(e.world,x,y,z)
                     || ModernMapParityBlocks.fillContainedWater(e.world,x,y,z)) {
                 e.result=new ItemStack(Items.bucket);
                 e.setResult(Event.Result.ALLOW);

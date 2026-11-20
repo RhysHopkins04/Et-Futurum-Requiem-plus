@@ -57,8 +57,6 @@ public enum ModsList {
 	MC_PATCHER_FORGE("mcpatcherforge"),
 
 	RPLE("rple"),
-	CHUNK_API("chunkapi"),
-	LIQUID_LOGGED("liquidlogged"),
 
 	GTNH("dreamcraft");
 

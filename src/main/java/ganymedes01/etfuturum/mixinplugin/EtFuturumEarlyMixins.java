@@ -86,6 +86,8 @@ public class EtFuturumEarlyMixins implements IFMLLoadingPlugin, IEarlyMixinLoade
 
         mixins.add("containedwater.MixinAnvilChunkLoader");
         mixins.add("containedwater.MixinWorld");
+        mixins.add("containedwater.MixinWorldServer");
+        mixins.add("containedwater.MixinChunkCache");
         mixins.add("containedwater.MixinBlockLiquid");
         mixins.add("containedwater.MixinBlockDynamicLiquid");
         mixins.add("containedwater.MixinEntity");
@@ -93,6 +95,7 @@ public class EtFuturumEarlyMixins implements IFMLLoadingPlugin, IEarlyMixinLoade
         mixins.add("containedwater.MixinItemBucket");
         if (side == MixinEnvironment.Side.CLIENT) {
             mixins.add("containedwater.client.MixinRenderBlocks");
+            mixins.add("containedwater.client.MixinWorldRenderer");
             mixins.add("containedwater.client.MixinActiveRenderInfo");
         }
 
@@ -412,11 +415,7 @@ public class EtFuturumEarlyMixins implements IFMLLoadingPlugin, IEarlyMixinLoade
                 mixins.add("imported.client.MixinRenderBlocks");
             }
 		}
-		boolean chunkApi = loadedCoreMods.contains("com.falsepattern.chunk.internal.core.CoreLoadingPlugin")
-				|| Launch.classLoader.getResource("com/falsepattern/chunk/internal/core/CoreLoadingPlugin.class") != null;
-		// ChunkAPI owns the chunk loader and replaces the same packet methods with 16-section formats.
-		if (!chunkApi && ((ConfigWorld.extendedWorldHeight && ConfigMapCompatibility.allowsExtendedHeight())
-				|| side == MixinEnvironment.Side.CLIENT)) {
+		if ((ConfigWorld.extendedWorldHeight && ConfigMapCompatibility.allowsExtendedHeight()) || side == MixinEnvironment.Side.CLIENT) {
 			mixins.add("extendedheight.MixinMinecraftServer");
 			mixins.add("extendedheight.MixinNetHandlerHeight");
 			mixins.add("extendedheight.MixinWorldProvider");

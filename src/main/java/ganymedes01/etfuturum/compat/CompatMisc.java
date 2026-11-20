@@ -84,22 +84,6 @@ public class CompatMisc {
         if (ModsList.BATTLEGEAR_2.isLoaded()) {
             CompatBattlegear.init();
         }
-
-		if (ModsList.LIQUID_LOGGED.isLoaded()) {
-			if (ModsList.LIQUID_LOGGED.isVersionNewerOrEqual("0.2.4")
-					&& ModsList.CHUNK_API.isLoaded() && ModsList.CHUNK_API.isVersionNewerOrEqual("0.8.4")) {
-				CompatLiquidLogged.register();
-			} else {
-				Logger.warn("Plus waterlogging requires LiquidLogged 0.2.4+ and ChunkAPI 0.8.4+.");
-			}
-		}
-	}
-
-	public static void requireLegacyHeightForChunkApi(boolean extended) {
-		if (extended && ModsList.CHUNK_API.isLoaded()) {
-			throw new IllegalArgumentException("ChunkAPI and LiquidLogged require the 256-block world profile. "
-					+ "Remove them to open or join an extended-height EFR Plus world.");
-		}
 	}
 
 	public static void runModHooksPostInit() {

@@ -3,6 +3,7 @@ package ganymedes01.etfuturum.mixins.early.containedwater;
 import ganymedes01.etfuturum.ModernMapParityBlocks;
 import ganymedes01.etfuturum.Tags;
 import ganymedes01.etfuturum.core.utils.DripleafWater;
+import ganymedes01.etfuturum.core.utils.NativeWaterlogging;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemBucket;
@@ -37,7 +38,7 @@ public abstract class MixinItemBucket {
             return;
         }
 
-        if (ModernMapParityBlocks.containsWater(world, x, y, z)) {
+        if (NativeWaterlogging.fill(world, x, y, z) || ModernMapParityBlocks.containsWater(world, x, y, z)) {
             etfu$playEmptySound(world, x, y, z);
             cir.setReturnValue(true);
             return;

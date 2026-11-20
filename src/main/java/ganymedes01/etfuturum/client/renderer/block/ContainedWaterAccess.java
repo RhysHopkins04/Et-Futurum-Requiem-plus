@@ -12,6 +12,7 @@ import net.minecraftforge.common.util.ForgeDirection;
 public final class ContainedWaterAccess implements IBlockAccess {
     private final IBlockAccess source;
     public ContainedWaterAccess(IBlockAccess source) { this.source = source; }
+    public IBlockAccess source() { return source; }
     public Block getBlock(int x,int y,int z) { return ModernMapParityBlocks.containsWater(source,x,y,z) ? Blocks.water : source.getBlock(x,y,z); }
     public int getBlockMetadata(int x,int y,int z) { return ModernMapParityBlocks.containsWater(source,x,y,z) ? 0 : source.getBlockMetadata(x,y,z); }
     public TileEntity getTileEntity(int x,int y,int z) { return source.getTileEntity(x,y,z); }

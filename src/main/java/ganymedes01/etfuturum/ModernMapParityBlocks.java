@@ -711,11 +711,13 @@ public enum ModernMapParityBlocks {
         finally { ParityModelBlock.PASS37_INTERNAL_KELP_REPLACE.remove(); }
     }
 
-    /** Bounded source fluid only: metadata on other parity blocks is never waterlogging. */
+    /** Source water stored either by a native block state or beside a supported host. */
     public static boolean containsWater(IBlockAccess world, int x, int y, int z) {
         if (ganymedes01.etfuturum.core.utils.DripleafWater.contains(world,x,y,z)) return true;
         Block b = world.getBlock(x,y,z);
-        if (!(b instanceof ParityModelBlock)) return false;
+        if (!(b instanceof ParityModelBlock))
+            return ganymedes01.etfuturum.core.utils.NativeWaterlogging.canHold(b)
+                    && ganymedes01.etfuturum.core.utils.NativeWaterlogging.contains(world, x, y, z);
         ModernMapParityBlocks e = ((ParityModelBlock)b).entry;
         int meta = world.getBlockMetadata(x, y, z);
         if (e == KELP || e == KELP_AGE_16 || e == KELP_PLANT || e == SEAGRASS || e == TALL_SEAGRASS) return true;
@@ -726,6 +728,7 @@ public enum ModernMapParityBlocks {
     }
 
     public static boolean drainContainedWater(World world, int x, int y, int z) {
+        if (ganymedes01.etfuturum.core.utils.NativeWaterlogging.drain(world, x, y, z)) return true;
         if (ganymedes01.etfuturum.core.utils.DripleafWater.contains(world,x,y,z))
             return ganymedes01.etfuturum.core.utils.DripleafWater.drain(world,x,y,z);
         if (!containsWater(world, x, y, z)) return false;

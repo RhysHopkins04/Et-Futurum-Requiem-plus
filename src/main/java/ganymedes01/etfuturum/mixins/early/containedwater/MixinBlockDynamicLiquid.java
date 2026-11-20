@@ -2,6 +2,7 @@ package ganymedes01.etfuturum.mixins.early.containedwater;
 
 import ganymedes01.etfuturum.ModernMapParityBlocks;
 import ganymedes01.etfuturum.core.utils.IContainedWaterFlow;
+import ganymedes01.etfuturum.core.utils.NativeWaterlogging;
 import ganymedes01.etfuturum.core.utils.DripleafWater;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
@@ -11,6 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import net.minecraft.block.BlockDynamicLiquid;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.ForgeDirection;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
@@ -65,6 +67,14 @@ public abstract class MixinBlockDynamicLiquid implements IContainedWaterFlow {
 
     public void etfu$spreadSource(World w,int x,int y,int z) {
         if (w.isRemote || !ModernMapParityBlocks.containsWater(w,x,y,z)) return;
+        if (NativeWaterlogging.contains(w, x, y, z)) {
+            for (ForgeDirection direction : ForgeDirection.VALID_DIRECTIONS) {
+                if (direction == ForgeDirection.UP || NativeWaterlogging.faceCovered(w, x, y, z, direction)) continue;
+                int nx = x + direction.offsetX, ny = y + direction.offsetY, nz = z + direction.offsetZ;
+                if (func_149809_q(w, nx, ny, nz)) func_149813_h(w, nx, ny, nz, direction == ForgeDirection.DOWN ? 8 : 1);
+            }
+            return;
+        }
         if (func_149809_q(w,x,y-1,z)) { func_149813_h(w,x,y-1,z,8); return; }
         boolean[] flow=func_149808_o(w,x,y,z);
         if (flow[0]) func_149813_h(w,x-1,y,z,1);

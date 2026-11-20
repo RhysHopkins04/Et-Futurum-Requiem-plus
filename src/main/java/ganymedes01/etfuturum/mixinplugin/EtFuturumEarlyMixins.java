@@ -412,7 +412,11 @@ public class EtFuturumEarlyMixins implements IFMLLoadingPlugin, IEarlyMixinLoade
                 mixins.add("imported.client.MixinRenderBlocks");
             }
 		}
-		if ((ConfigWorld.extendedWorldHeight && ConfigMapCompatibility.allowsExtendedHeight()) || side == MixinEnvironment.Side.CLIENT) {
+		boolean chunkApi = loadedCoreMods.contains("com.falsepattern.chunk.internal.core.CoreLoadingPlugin")
+				|| Launch.classLoader.getResource("com/falsepattern/chunk/internal/core/CoreLoadingPlugin.class") != null;
+		// ChunkAPI owns the chunk loader and replaces the same packet methods with 16-section formats.
+		if (!chunkApi && ((ConfigWorld.extendedWorldHeight && ConfigMapCompatibility.allowsExtendedHeight())
+				|| side == MixinEnvironment.Side.CLIENT)) {
 			mixins.add("extendedheight.MixinMinecraftServer");
 			mixins.add("extendedheight.MixinNetHandlerHeight");
 			mixins.add("extendedheight.MixinWorldProvider");

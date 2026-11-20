@@ -3,6 +3,7 @@ package ganymedes01.etfuturum.mixins.early.profile;
 import cpw.mods.fml.common.network.handshake.FMLHandshakeCodec;
 import cpw.mods.fml.common.network.handshake.FMLHandshakeMessage;
 import cpw.mods.fml.common.network.handshake.NetworkDispatcher;
+import ganymedes01.etfuturum.compat.CompatMisc;
 import ganymedes01.etfuturum.network.profile.ClientWorldProfile;
 import ganymedes01.etfuturum.network.profile.ServerWorldProfile;
 import io.netty.buffer.ByteBuf;
@@ -27,6 +28,7 @@ public class MixinHandshakeCodec {
         try {
             ServerWorldProfile offered = ServerWorldProfile.read(source);
             if (msg instanceof FMLHandshakeMessage.ServerHello) {
+                CompatMisc.requireLegacyHeightForChunkApi(offered.extended);
                 ClientWorldProfile.accept(offered, ctx == null ? null : ctx.channel().attr(NetworkDispatcher.FML_DISPATCHER).get().manager);
             } else if (!ServerWorldProfile.local().equals(offered)) {
                 throw new IllegalArgumentException("This server requires automatic EFR world-profile support. Update Et Futurum Plus on the client to the server's build.");

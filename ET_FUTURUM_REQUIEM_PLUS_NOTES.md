@@ -4,6 +4,10 @@ This repository is a compatibility-focused fork of **Et Futurum Requiem** for Mi
 
 The original Et Futurum Requiem `LICENSE` remains in place. Fork-specific changes are recorded here so they can be reviewed independently of upstream work.
 
+## Development client audio
+
+Before launching Minecraft for testing, set `soundCategory_music:0.0` and `soundCategory_master:0.15` in the test client's `options.txt` to turn Music off and keep Master Volume at 15%. Create the file before launch for fresh disposable clients.
+
 ## P001 — Map Compatibility + Lush Roots
 
 This stage deliberately does three things only:

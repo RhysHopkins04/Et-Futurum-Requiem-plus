@@ -17,3 +17,11 @@ The earlier dependency-based prototype used [LiquidLogged](https://github.com/GT
 ## Candidate validation
 
 `3.8.0_X20` passed `check build`. Disposable Forge singleplayer fixtures passed at Y67, Y276, and Y500. They exercised Survival bucket use, placement into a source, source restoration on break, client sync, and the existing campfire and dripleaf states. The Y276 fixture passed save/reopen and an independent read of the stored Anvil tag. Angelica-WDG 2.2.14_X13 rendered the water at Y276 with shaders disabled and with the Bountiful Stars WDG shader pack active. Distant Horizons LOD rendering and a dedicated-server session remain untested.
+
+### Dedicated-server startup fix: 3.8.0_X21
+
+The reported Crucible `1.7.10-staging-667a28e2` startup crash came from reflective construction of `WaterloggedChunkHandler`. Its scheduled lambda caused the JVM to resolve `WorldClient` on the physical server. The handler's client entry point is now side stripped, and the scheduled work lives in a separate client-only receiver. The main-thread scheduling and connection/dimension checks are preserved.
+
+`check build` passed for X21, including release mapping checks. The opt-in `scripts/waterlogged_server_tests.gradle` regression uses the side transformer from the supplied Crucible dev-280 server JAR against the production mod archives, with client classes forbidden. X20 reproduced `NoClassDefFoundError: net/minecraft/client/multiplayer/WorldClient`; X21 instantiated successfully. A disposable Forge dedicated development server also reached `Done` with the fix.
+
+This validates startup and the reported classloading failure, not a full Crucible modpack session. Dedicated-server joining, waterlogging sync, reconnect/restart, and pack performance still need testing. The reported singleplayer slowdown, including with DH rendering and Angelica's deferred updates disabled, remains unresolved. No performance improvement is claimed by X21. Both master refs remain unchanged; this candidate belongs only to `feature/liquidlogged-waterlogging`.

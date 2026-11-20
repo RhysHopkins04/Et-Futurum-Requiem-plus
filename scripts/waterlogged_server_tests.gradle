@@ -1,0 +1,15 @@
+// ./gradlew --offline -I scripts/waterlogged_server_tests.gradle waterloggedServerClassloadingContracts \
+//   -PwaterloggingCrucibleJar=/path/to/Crucible.jar -PwaterloggingCandidateJar=/path/to/candidate.jar \
+//   -PwaterloggingPreviousJar=/path/to/X20.jar
+// Uses existing archives without packaging again or consuming a build number.
+gradle.projectsEvaluated {
+    def p = gradle.rootProject
+    p.tasks.register('waterloggedServerClassloadingContracts', JavaExec) {
+        dependsOn p.tasks.named('compileEarthImportTests')
+        classpath = p.sourceSets.main.runtimeClasspath + p.files(p.layout.buildDirectory.dir('earth-import-tests/classes'))
+        mainClass = 'efrtest.WaterloggedServerClassloadingContracts'
+        args p.file(p.property('waterloggingCrucibleJar')).absolutePath,
+                p.file(p.property('waterloggingCandidateJar')).absolutePath
+        if (p.hasProperty('waterloggingPreviousJar')) args p.file(p.property('waterloggingPreviousJar')).absolutePath
+    }
+}

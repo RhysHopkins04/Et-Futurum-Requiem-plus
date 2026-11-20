@@ -453,7 +453,8 @@ public class EntityNewBoat extends Entity {
 		super.onUpdate();
 		this.tickLerp();
 
-		if (this.canPassengerSteer()) {
+		boolean chunkMissing = this.isChunkMissingOnClient();
+		if (this.canPassengerSteer() && !chunkMissing) {
 			this.collideWithSurfaceBlocks();
 			if (this.getPassengers().size() == 0) {
 				this.setPaddleState(false, false);
@@ -516,9 +517,15 @@ public class EntityNewBoat extends Entity {
 			}
 		}
 
-		if (this.worldObj.isRemote && canPassengerSteer() && getControllingPassenger() instanceof EntityClientPlayerMP) {
+		if (this.worldObj.isRemote && canPassengerSteer() && !chunkMissing && getControllingPassenger() instanceof EntityClientPlayerMP) {
 			EtFuturum.networkWrapper.sendToServer(new BoatMoveMessage(this));
 		}
+	}
+
+	private boolean isChunkMissingOnClient() {
+		// On reconnect, the boat can arrive before its chunk. Wait for terrain before simulating or sending movement.
+		return this.worldObj.isRemote && this.worldObj
+				.getChunkFromBlockCoords(MathHelper.floor_double(this.posX), MathHelper.floor_double(this.posZ)).isEmpty();
 	}
 
 	private boolean canEntitySit(Entity entity) {

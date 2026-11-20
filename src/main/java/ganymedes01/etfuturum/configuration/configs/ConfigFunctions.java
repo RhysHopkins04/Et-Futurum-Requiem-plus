@@ -170,6 +170,7 @@ public class ConfigFunctions extends ConfigBase {
 	public static boolean inventoryBedModels;
 	public static boolean mobSpawnerEgging;
 	public static boolean fireworkRecipeFixes;
+	public static boolean petDeathMessages;
 	public static String subtitleBlacklist;
 	public static String[] extraDropRawOres = new String[]{"oreCopper", "oreTin"};
 
@@ -213,6 +214,7 @@ public class ConfigFunctions extends ConfigBase {
 		enableDoorRecipeBuffs = getBoolean("enableDoorRecipeBuffs", catChanges, true, "Backports recipe buffs to doors (from 1 to 3)");
 		mobSpawnerEgging = getBoolean("mobSpawnerEgging", catChanges, true, "Click a mob spawner with a vanilla or EFR egg, and it'll change the mob inside. Doesn't support modded eggs.");
 		fireworkRecipeFixes = getBoolean("fireworkRecipeFixes", catChanges, true, "Fixes fireworks not being able to have an extra duration without a star, and they'll output 3 instead of 1. Note: This currently does NOT update NEI, it'll still show the old recipe outputs.");
+		petDeathMessages = getBoolean("petDeathMessages", catChanges, true, "Send a death message only to the online owner when a tamed mob dies.");
 
         allowModdedArmorTrims=getBoolean("allowModdedArmorTrims",catSettings,false,
                 "Allow smithing trims on other mods' ItemArmor equipment. Off by default: only vanilla armor and EFR netherite accept trims. Opt-in rendering uses the standard humanoid armor UV layout; custom models/textures may need a dedicated adapter.");

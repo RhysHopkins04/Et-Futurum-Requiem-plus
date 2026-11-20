@@ -24,6 +24,7 @@ public class ConfigWorld extends ConfigBase {
 	public static BlockMetaPair amethystMiddleBlock;
 
 	public static boolean enableDmgIndicator;
+	public static boolean endFlashes;
 	public static boolean enableAirDebris;
 	public static int debrisMax = 3;
 	public static int maxNetherGoldPerCluster;
@@ -106,6 +107,8 @@ public class ConfigWorld extends ConfigBase {
 
 	@Override
 	protected void syncConfigOptions() {
+		endFlashes = getBoolean("endFlashes", catClient, true,
+				"Periodic flashes and distant rumbles in the End. Disable to avoid flashing lights. Requires a client restart.");
 		enableDmgIndicator = getBoolean("enableDmgIndicator", catClient, true, "Heart Damage Indicator");
 
 		enableAirDebris = getBoolean("enableAirDebris", catGeneration, false, "Can ancient debris generate next to air?");

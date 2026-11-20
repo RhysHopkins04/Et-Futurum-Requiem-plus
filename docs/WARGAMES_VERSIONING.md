@@ -9,6 +9,8 @@ Use `major.minor.patch_Xbuild` for release jar names and reported versions.
 
 EFR and DH automatically persist the next build number after successful packaging (including CI); failed builds, checks, configuration and dry runs do not consume it. Run one packaging invocation at a time in a checkout. Build through the repository root wrapper. Do not add branch names, git hashes, dirty markers or descriptive feature suffixes to release versions. Standard dev/sources classifiers identify different artifact types.
 
+The build counter is local to each checkout. Separate branches, worktrees, clones and CI jobs can package the same X number from the same committed counter. Before packaging a candidate, coordinate with other checkouts and reconcile the committed counter with the highest number already packaged. For End flashes, a local `3.6.0_X12` JAR had already been packaged while master still recorded X11. The first feature build used X13 and the clock correction fix used X14.
+
 The three release components are deliberate edits in gradle.properties; the build does not guess feature versus fix from source changes. Configuration cache is disabled so a cached task graph cannot reuse a consumed build number.
 
 WGMap keeps its existing version format and build policy. NTM keeps its upstream mod_version and mod_build_number untouched: only wdg_version is advanced manually, without a new automatic build counter. Leave disabled counters in other mods disabled.

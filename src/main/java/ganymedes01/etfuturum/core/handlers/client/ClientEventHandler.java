@@ -16,6 +16,7 @@ import ganymedes01.etfuturum.api.MultiBlockSoundRegistry;
 import ganymedes01.etfuturum.api.mappings.MultiBlockSoundContainer;
 import ganymedes01.etfuturum.api.spectator.SpectatorUtils;
 import ganymedes01.etfuturum.blocks.BlockShulkerBox;
+import ganymedes01.etfuturum.client.EndFlashClient;
 import ganymedes01.etfuturum.client.OpenGLHelper;
 import ganymedes01.etfuturum.client.SpawnChunkProgress;
 import ganymedes01.etfuturum.client.WorldIconManager;
@@ -162,7 +163,11 @@ public class ClientEventHandler {
 		World world = FMLClientHandler.instance().getWorldClient();
 		EntityPlayer player = FMLClientHandler.instance().getClientPlayerEntity();
 
-		if (world == null || event.phase == Phase.START || mc.isGamePaused()) {
+		if (event.phase == Phase.START) {
+			return;
+		}
+		EndFlashClient.tick(mc);
+		if (world == null || mc.isGamePaused()) {
 			return;
 		}
 
@@ -816,6 +821,9 @@ public class ClientEventHandler {
 
 	@SubscribeEvent
 	public void onWorldUnload(WorldEvent.Unload event) {
+		if (event.world.isRemote) {
+			EndFlashClient.onWorldUnload(mc, event.world);
+		}
 		if (ConfigMixins.worldSaveThumbnails && event.world.isRemote) {
 			WorldIconManager.resetData();
 		}

@@ -8,6 +8,12 @@ The original Et Futurum Requiem `LICENSE` remains in place. Fork-specific change
 
 Before launching Minecraft for testing, set `soundCategory_music:0.0` and `soundCategory_master:0.15` in the test client's `options.txt` to turn Music off and keep Master Volume at 15%. Create the file before launch for fresh disposable clients.
 
+## End flashes
+
+The End has periodic sky flashes and delayed weather rumbles based on Eclipse-Sol's [EFR backport in PR #702](https://github.com/Roadhog360/Et-Futurum-Requiem/pull/702), merged upstream as `f938a7f1`. The client uses MCLib AssetDirector for the 1.21.11 flash texture and sound variants. Set `B:endFlashes=false` in the client category of `config/etfuturum/world.cfg` and restart the client to disable the effect.
+
+The built-in renderer adds a sky flash and a temporary End lightmap boost. With Angelica-WDG and an active shader pack, the pack can render the flash from the published `EndFlashAPI` via Angelica's `endFlashIntensity`, `previousEndFlashIntensity` and `endFlashPosition` uniforms. Packs can opt in to flash-driven shadows with `endFlashShadows=true` in `shaders.properties`.
+
 ## P001 — Map Compatibility + Lush Roots
 
 This stage deliberately does three things only:

@@ -116,6 +116,11 @@ public class EtFuturumEarlyMixins implements IFMLLoadingPlugin, IEarlyMixinLoade
 			mixins.add("stepfix.MixinEntity");
 		}
 
+		if (ConfigWorld.endFlashes && side == MixinEnvironment.Side.CLIENT) {
+			mixins.add("endflashes.client.MixinEntityRenderer");
+			mixins.add("endflashes.client.MixinRenderGlobal");
+		}
+
 		if (ConfigMixins.enableSpectatorMode) {
 			mixins.add("spectator.MixinGameType");
 			mixins.add("spectator.MixinEntity");

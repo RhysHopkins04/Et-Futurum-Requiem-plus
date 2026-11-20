@@ -108,6 +108,10 @@ public class EtFuturumEarlyMixins implements IFMLLoadingPlugin, IEarlyMixinLoade
 			mixins.add("fencewallconnect.MixinBlockFence");
 		}
 
+		if (side == MixinEnvironment.Side.CLIENT && ConfigBlocksItems.enableNewBoats) {
+			mixins.add("boatcamera.client.MixinEntity");
+		}
+
 		if (ConfigMixins.stepHeightFix) {
 			mixins.add("stepfix.MixinEntity");
 		}

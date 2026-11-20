@@ -46,6 +46,7 @@ public class EntityNewBoat extends Entity {
 	private static final int DATA_ID_TYPE = 21;
 	private static final int DATA_ID_RESOURCELOCATION = 22;
 	private static final int DATA_ID_RAFT = 23;
+	private static final float PASSENGER_YAW_LIMIT = 105.0F;
 	private final float[] paddlePositions;
 
 	/**
@@ -569,7 +570,7 @@ public class EntityNewBoat extends Entity {
 
 	private void tickLerp() {
 		if (worldObj.isRemote && this.lerpSteps > 0) {
-			if (worldObj.isRemote && getSeat() != null && getSeat().riddenByEntity instanceof EntityClientPlayerMP) {
+			if (!ConfigTweaks.stopBoatRotationLock && getSeat() != null && getSeat().riddenByEntity instanceof EntityClientPlayerMP) {
 				double i = MathHelper.wrapAngleTo180_double(this.boatYaw - (double) this.rotationYaw);
 				getSeat().riddenByEntity.rotationYaw += i / lerpSteps;
 				i = MathHelper.wrapAngleTo180_double(this.boatYaw - (double) this.prevRotationYaw);
@@ -915,12 +916,26 @@ public class EntityNewBoat extends Entity {
 		Vec3 vec3d = (Vec3.createVectorHelper(f, 0.0D, 0.0D));
 		vec3d.rotateAroundY(-this.rotationYaw * 0.017453292F - ((float) Math.PI / 2F));
 		passenger.setPosition(this.posX + vec3d.xCoord, this.posY + (double) f1, this.posZ + vec3d.zCoord);
-		if (ConfigTweaks.stopBoatRotationLock) {
-			return;
-		}
-		else {
+		if (!ConfigTweaks.stopBoatRotationLock) {
 			passenger.rotationYaw += this.deltaRotation;
 			this.applyYawToEntity(passenger);
+			this.syncPassengerArmYaw(passenger);
+		}
+	}
+
+	/** Applies the boat's look limit immediately after local mouse input. */
+	public void updatePassengerCamera(EntityPlayer player) {
+		if (!ConfigTweaks.stopBoatRotationLock) {
+			this.applyYawToEntity(player);
+			this.syncPassengerArmYaw(player);
+		}
+	}
+
+	private void syncPassengerArmYaw(Entity passenger) {
+		if (this.worldObj.isRemote && passenger instanceof EntityClientPlayerMP player) {
+			// The first-person renderer otherwise applies its usual arm lag to the boat's rotation.
+			player.renderArmYaw = player.rotationYaw;
+			player.prevRenderArmYaw = player.rotationYaw;
 		}
 	}
 
@@ -928,6 +943,16 @@ public class EntityNewBoat extends Entity {
 	 * Applies this boat's yaw to the given entity. Used to update the orientation of its passenger.
 	 */
 	protected void applyYawToEntity(Entity entityToUpdate) {
+		if (entityToUpdate instanceof EntityPlayer player) {
+			player.rotationYaw = clampPassengerYaw(player.rotationYaw, this.rotationYaw);
+			player.prevRotationYaw = clampPassengerYaw(player.prevRotationYaw, this.prevRotationYaw);
+			player.rotationYawHead = player.rotationYaw;
+			player.prevRotationYawHead = player.prevRotationYaw;
+			player.renderYawOffset = this.rotationYaw;
+			player.prevRenderYawOffset = this.prevRotationYaw;
+			return;
+		}
+
 		int j = 0;
 		if (entityToUpdate instanceof EntityAnimal && this.getPassengers().size() > 1) {
 			j = entityToUpdate.getEntityId() % 2 == 0 ? 90 : 270;
@@ -942,6 +967,11 @@ public class EntityNewBoat extends Entity {
 			((EntityLivingBase) entityToUpdate).renderYawOffset = this.rotationYaw + j;
 			((EntityLivingBase) entityToUpdate).prevRenderYawOffset = this.rotationYaw + j;
 		}
+	}
+
+	private static float clampPassengerYaw(float yaw, float boatYaw) {
+		float relativeYaw = MathHelper.wrapAngleTo180_float(yaw - boatYaw);
+		return yaw + (MathHelper.clamp_float(relativeYaw, -PASSENGER_YAW_LIMIT, PASSENGER_YAW_LIMIT) - relativeYaw);
 	}
 
 	/**

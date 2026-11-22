@@ -720,7 +720,7 @@ public enum ModernMapParityBlocks {
         if (!(b instanceof ParityModelBlock)) return false;
         ModernMapParityBlocks e = ((ParityModelBlock)b).entry;
         int meta = world.getBlockMetadata(x, y, z);
-        if (e == KELP || e == KELP_AGE_16 || e == KELP_PLANT || e == SEAGRASS || e == TALL_SEAGRASS) return true;
+        if (e.hasInherentWater()) return true;
         if (e == SEA_PICKLE) return (meta & 4) != 0;
         if (e == CAMPFIRE || e == SOUL_CAMPFIRE) return (meta & 8) != 0;
         String n = e.getRegistryName();
@@ -733,20 +733,21 @@ public enum ModernMapParityBlocks {
             return ganymedes01.etfuturum.core.utils.DripleafWater.drain(world,x,y,z);
         if (!containsWater(world, x, y, z)) return false;
         ModernMapParityBlocks e = fromBlock(world.getBlock(x, y, z));
+        if (e == null || e.hasInherentWater()) return false;
+        if (world.isRemote) return true;
         if (e == CAMPFIRE || e == SOUL_CAMPFIRE)
             return world.setBlockMetadataWithNotify(x,y,z,world.getBlockMetadata(x,y,z) & ~8,3);
         if (e == SEA_PICKLE) {
             boolean changed=world.setBlockMetadataWithNotify(x,y,z,world.getBlockMetadata(x,y,z) & ~4,3);
             world.updateLightByType(EnumSkyBlock.Block,x,y,z); return changed;
         }
-        if (e != KELP && e != KELP_AGE_16 && e != KELP_PLANT && e != SEAGRASS && e != TALL_SEAGRASS) {
-            boolean changed=world.setBlockMetadataWithNotify(x,y,z,world.getBlockMetadata(x,y,z) & ~8,3);
-            if (!e.getRegistryName().startsWith("dead_")) world.scheduleBlockUpdate(x,y,z,e.get(),60+world.rand.nextInt(40));
-            return changed;
-        }
-        ParityModelBlock.DRAINING_WATER.set(new int[]{x,y,z});
-        try { return world.setBlockToAir(x, y, z); }
-        finally { ParityModelBlock.DRAINING_WATER.remove(); }
+        boolean changed=world.setBlockMetadataWithNotify(x,y,z,world.getBlockMetadata(x,y,z) & ~8,3);
+        if (!e.getRegistryName().startsWith("dead_")) world.scheduleBlockUpdate(x,y,z,e.get(),60+world.rand.nextInt(40));
+        return changed;
+    }
+
+    private boolean hasInherentWater() {
+        return this == KELP || this == KELP_AGE_16 || this == KELP_PLANT || this == SEAGRASS || this == TALL_SEAGRASS;
     }
 
     public static boolean fillContainedWater(World world, int x, int y, int z) {
@@ -776,6 +777,11 @@ public enum ModernMapParityBlocks {
 
     private static boolean isSourceWater(IBlockAccess world, int x, int y, int z) {
         return isWater(world, x, y, z) && (world.getBlockMetadata(x, y, z) & 15) == 0;
+    }
+
+    private static boolean isKelpPlacementWater(IBlockAccess world, int x, int y, int z) {
+        return isWater(world, x, y, z) && ((world.getBlockMetadata(x, y, z) & 15) == 0
+                || (world.getBlockMetadata(x, y, z) & 8) != 0);
     }
 
     private boolean usesDynamicLight() {
@@ -2170,10 +2176,11 @@ public enum ModernMapParityBlocks {
             if (!player.canPlayerEdit(x, y, z, side, stack)) return false;
             Block target = world.getBlock(x, y, z);
             boolean sourceWater = isSourceWater(world, x, y, z);
-            if (target != Blocks.air && !sourceWater && !target.isReplaceable(world, x, y, z)) return false;
             if (!(field_150939_a instanceof ParityModelBlock)) return false;
             ParityModelBlock parity = (ParityModelBlock) field_150939_a;
-            if ((parity.isKelp() || parity.isKelpPlant() || parity.isSeagrass() || parity.isTallSeagrass()) && !sourceWater) return false;
+            boolean placementWater = sourceWater || parity.isKelp() && isKelpPlacementWater(world, x, y, z);
+            if (target != Blocks.air && !placementWater && !target.isReplaceable(world, x, y, z)) return false;
+            if ((parity.isKelpPlant() || parity.isSeagrass() || parity.isTallSeagrass()) && !sourceWater) return false;
             if (parity.isTallSeagrass() && !isSourceWater(world, x, y + 1, z)) return false;
             if (!parity.canSurviveAtPlacement(world, x, y, z, side)) return false;
 
@@ -2231,7 +2238,6 @@ public enum ModernMapParityBlocks {
         private static final WorldGenPass37PaleOakTree PASS37_PALE_OAK_TREE = new WorldGenPass37PaleOakTree(true);
 
         private static final ThreadLocal<Boolean> PASS37_INTERNAL_KELP_REPLACE = new ThreadLocal<Boolean>();
-        private static final ThreadLocal<int[]> DRAINING_WATER = new ThreadLocal<int[]>();
         private final ModernMapParityBlocks entry;
         private final ThreadLocal<Integer> harvestedMultifaceMask = new ThreadLocal<Integer>();
 
@@ -2591,7 +2597,7 @@ public enum ModernMapParityBlocks {
         }
 
         private boolean canSurviveAtPlacement(World world, int x, int y, int z, int side) {
-            if (isKelp()) return isSourceWater(world, x, y, z) && canKelpSurvive(world, x, y, z);
+            if (isKelp()) return isKelpPlacementWater(world, x, y, z) && canKelpSurvive(world, x, y, z);
             if (isSeagrass()) return isSourceWater(world, x, y, z) && canSeagrassSurvive(world, x, y, z);
             if (isTallSeagrass()) return isSourceWater(world, x, y, z) && isSourceWater(world, x, y + 1, z)
                     && canSeagrassSurvive(world, x, y, z);
@@ -4862,7 +4868,7 @@ public enum ModernMapParityBlocks {
 
         @Override
         public boolean canPlaceBlockAt(World world, int x, int y, int z) {
-            if (isKelp()) return isSourceWater(world,x,y,z) && canKelpSurvive(world,x,y,z);
+            if (isKelp()) return isKelpPlacementWater(world,x,y,z) && canKelpSurvive(world,x,y,z);
             if (isKelpPlant()) return isSourceWater(world,x,y,z) && canKelpSurvive(world,x,y,z);
             if (isSeagrass()) return isSourceWater(world,x,y,z) && canSeagrassSurvive(world,x,y,z);
             if (isTorchflowerCrop() || isPitcherCrop())
@@ -5475,9 +5481,7 @@ public enum ModernMapParityBlocks {
             boolean internalKelpReplace = Boolean.TRUE.equals(PASS37_INTERNAL_KELP_REPLACE.get());
             boolean promoteKelpTip = (isKelp() || isKelpPlant()) && !internalKelpReplace && !world.isRemote
                     && world.getBlock(x,y-1,z)==KELP_PLANT.get();
-            int[] draining = DRAINING_WATER.get();
-            boolean drainedHere = draining != null && draining[0]==x && draining[1]==y && draining[2]==z;
-            boolean restoreAquaticWater = !drainedHere && !internalKelpReplace && (isKelp() || isKelpPlant() || isSeagrass() || isTallSeagrass()
+            boolean restoreAquaticWater = !internalKelpReplace && (entry.hasInherentWater()
                     || (isSeaPickle() && (meta&4)!=0)
                     || (!isCoralBlockForm() && isCoralFamily() && (meta&8)!=0));
             if (isPaleOakButton() && !world.isRemote && buttonPowered(world, x, y, z)) {
@@ -5597,6 +5601,11 @@ public enum ModernMapParityBlocks {
         public boolean removedByPlayer(World world, EntityPlayer player, int x, int y, int z, boolean willHarvest) {
             if (isMultiface() && willHarvest) {
                 harvestedMultifaceMask.set(getMultifaceFaceMask(world, x, y, z));
+            }
+            if (!world.isRemote && (isPass37AquaticContainedWaterBlock() || isCampfire())
+                    && containsWater(world, x, y, z)) {
+                // Replace the host directly so Forge sees a successful break and runs harvesting.
+                return world.setBlock(x, y, z, Blocks.flowing_water, 0, 3);
             }
             return super.removedByPlayer(world, player, x, y, z, willHarvest);
         }

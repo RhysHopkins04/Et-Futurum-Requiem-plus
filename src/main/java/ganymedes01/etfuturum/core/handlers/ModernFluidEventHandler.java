@@ -56,8 +56,7 @@ public final class ModernFluidEventHandler {
                 e.setResult(Event.Result.ALLOW);
                 if (!e.world.isRemote) e.world.playSoundEffect(x + .5, y + .5, z + .5,
                         Tags.MC_ASSET_VER + ":item.bucket.fill", 1, 1);
-            } else if (ModernMapParityBlocks.containsWater(e.world,x,y,z)) {
-                if (!e.world.isRemote) ModernMapParityBlocks.drainContainedWater(e.world,x,y,z);
+            } else if (ModernMapParityBlocks.drainContainedWater(e.world,x,y,z)) {
                 e.result=new ItemStack(Items.water_bucket);
                 e.setResult(Event.Result.ALLOW);
             }

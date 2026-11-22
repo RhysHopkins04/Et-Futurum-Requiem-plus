@@ -1,12 +1,14 @@
 # Native waterlogging
 
-Plus stores source water alongside the block state of stairs, single slabs, and leaves. These classes keep their existing block IDs and metadata. Campfires, dripleaf, and aquatic blocks keep their native water encodings. This uses the existing Plus runtime dependencies and works at both vanilla and extended world heights.
+Plus stores source water alongside the block state of stairs, single slabs, leaves, and regular mangrove roots. These blocks keep their existing IDs and metadata. Campfires, dripleaf, and aquatic blocks keep their native water encodings. This uses the existing Plus runtime dependencies and works at both vanilla and extended world heights.
 
 A water bucket fills a supported block and an empty bucket drains it. Placing a supported block into a source retains the water. Breaking a filled block releases a source. Water spreads through open faces using the Plus contained-water flow hooks.
 
 The standard renderer and Angelica-WDG use the existing Plus contained-water rendering path. The Angelica adapter snapshots the water alongside the host block, adds the water mesh to the translucent pass, and retains the shader material and lighting path used by aquatic blocks.
 
-Water in a leaf cell is visible through the foliage cutouts. The leaf cell holds a source without feeding outward flow, matching the Java Edition behavior described in [Minecraft Wiki’s Waterlogging reference](https://minecraft.wiki/w/Waterlogging). Eligibility uses the Forge leaf hook and the same leaf class or material check as Foliage+, including Plus mangrove and pale oak leaves. Foliage+ continues to decide which entities can enter each block. An entity that enters a wet leaf cell can be submerged.
+Water in leaves and regular mangrove roots is visible through the cutouts. These blocks hold a source without feeding outward flow. Muddy mangrove roots reject waterlogging. Leaf eligibility uses the Forge leaf hook and the same leaf class or material check as Foliage+, including Plus mangrove and pale oak leaves. Foliage+ continues to decide which entities can enter each leaf block. An entity that enters a wet leaf cell can be submerged. [Minecraft Wiki’s Waterlogging reference](https://minecraft.wiki/w/Waterlogging)
+
+Kelp and seagrass carry inherent water. An empty bucket leaves them intact and a successful break leaves a source. Kelp accepts source and downward-flowing water at placement. Sea pickles, coral plants and fans, campfires, and dripleaf use their own wet states. [Minecraft Wiki’s Kelp reference](https://minecraft.wiki/w/Kelp)
 
 ## Saved chunks
 
@@ -33,3 +35,11 @@ This validates startup and the reported classloading failure, not a full Crucibl
 `check build` and the Crucible classloading regression passed. Disposable clients verified vanilla oak, Plus mangrove and pale oak, and NTM rubber leaves. Water showed through the cutouts with standard Forge and with Angelica-WDG X13, including the Bountiful Stars WDG preset. Fill, drain, client sync, water at eye level, and sealed outward flow passed. With Foliage+ X15 in player-only mode, dry and wet leaves let players through and kept collision for mobs at Y67 and Y276.
 
 Foliage+ X15's separate contact scan for slowdown and rustling still stops at Y255. Slab and stair water heights are the same as X21.
+
+### BetterFoliage and aquatic behavior — 3.8.0_X24
+
+In a disposable copy of Wargames Event 2.0.16 with shaders off, X22 stored water in oak, mangrove, azalea, and NTM plastic leaves while BetterFoliage drew the foliage in place of the water overlay. The corrected render path, first packaged in X23 and carried into X24, showed water in all four, pale oak, NTM dead leaves, and regular mangrove roots with Angelica-WDG X15. The host still uses its usual renderer. Native water heights for stairs and slabs are the same as in X22.
+
+X24 passed `check build`, the Crucible classloading regression, and the Angelica-WDG X15 material and shader contract checks. Headless Forge fixtures at Y276 covered fill, drain, source placement, break, and persistence. Aquatic checks included kelp, seagrass, tall seagrass, sea pickles, tube coral, and both the campfire and big dripleaf wet states. The pack’s NTM JAR passed bucket fill and drain for plastic leaves, dead leaves, concrete stairs, and concrete slabs. In the confined ordinary-water test, the first step took five game ticks and the first cell cleared after 35 ticks once the source was removed. The previously reported singleplayer wall-clock slowdown remains unresolved.
+
+The first implementation covers a subset of the Java Edition table. Vanilla fences, panes, and other shapes outside the supported block classes need their own compatibility work. The general waterlogging path still needs support for automatic source formation in dry hosts between existing sources and for empty-bucket dispensers. The corrected renderer still needs an in-game shader-on check, and Distant Horizons water in generated LODs remains unverified.

@@ -25,6 +25,22 @@ import org.spongepowered.asm.mixin.injection.At;
 public abstract class MixinRenderBlocks {
     @Shadow public IBlockAccess blockAccess;
 
+    @WrapMethod(method = "renderBlockByRenderType")
+    private boolean etfu$dispatchContainedWater(Block block, int x, int y, int z, Operation<Boolean> original) {
+        IBlockAccess source = blockAccess;
+        if (block.getMaterial() != Material.water || !NativeWaterlogging.contains(source, x, y, z))
+            return original.call(block, x, y, z);
+
+        // BetterFoliage chooses a render type by looking up the block at this position.
+        // Show it the liquid during the overlay draw so it does not select the host's renderer.
+        blockAccess = new ContainedWaterAccess(source);
+        try {
+            return original.call(block, x, y, z);
+        } finally {
+            blockAccess = source;
+        }
+    }
+
     @WrapMethod(method = "renderBlockLiquid")
     private boolean etfu$fluidView(Block block, int x, int y, int z, Operation<Boolean> original) {
         IBlockAccess source = blockAccess;

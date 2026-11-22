@@ -3,6 +3,7 @@ package ganymedes01.etfuturum.core.utils;
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import ganymedes01.etfuturum.EtFuturum;
+import ganymedes01.etfuturum.blocks.BlockMangroveRoots;
 import ganymedes01.etfuturum.network.WaterloggedChunkMessage;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockLeaves;
@@ -44,9 +45,13 @@ public final class NativeWaterlogging {
                 && !block.isAir(world, x, y, z) && block.isLeaves(world, x, y, z);
     }
 
+    public static boolean holdsWaterWithoutSpreading(Block block, IBlockAccess world, int x, int y, int z) {
+        return block instanceof BlockMangroveRoots || isLeafHost(block, world, x, y, z);
+    }
+
     public static boolean canHold(Block block, IBlockAccess world, int x, int y, int z) {
         return block instanceof BlockStairs || block instanceof BlockSlab && !block.isOpaqueCube()
-                || isLeafHost(block, world, x, y, z);
+                || holdsWaterWithoutSpreading(block, world, x, y, z);
     }
 
     public static boolean contains(IBlockAccess world, int x, int y, int z) {
@@ -93,8 +98,8 @@ public final class NativeWaterlogging {
 
     public static boolean waterFaceHidden(IBlockAccess world, int x, int y, int z, ForgeDirection face) {
         Block host = world.getBlock(x, y, z);
-        // Cutout leaves let the water mesh show through their texture.
-        if (isLeafHost(host, world, x, y, z)) return false;
+        // Leaves and mangrove roots let the water mesh show through their cutouts.
+        if (holdsWaterWithoutSpreading(host, world, x, y, z)) return false;
         if (host instanceof BlockSlab) {
             boolean upper = (world.getBlockMetadata(x, y, z) & 8) != 0;
             return face == (upper ? ForgeDirection.UP : ForgeDirection.DOWN);

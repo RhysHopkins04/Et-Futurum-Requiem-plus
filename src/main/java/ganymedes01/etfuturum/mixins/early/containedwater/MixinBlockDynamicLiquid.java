@@ -68,8 +68,8 @@ public abstract class MixinBlockDynamicLiquid implements IContainedWaterFlow {
     public void etfu$spreadSource(World w,int x,int y,int z) {
         if (w.isRemote || !ModernMapParityBlocks.containsWater(w,x,y,z)) return;
         if (NativeWaterlogging.contains(w, x, y, z)) {
-            // A full leaf cell holds water even when an entity can pass through it.
-            if (NativeWaterlogging.isLeafHost(w.getBlock(x, y, z), w, x, y, z)) return;
+            // Full waterlogged cells hold water even when an entity can pass through the block.
+            if (NativeWaterlogging.holdsWaterWithoutSpreading(w.getBlock(x, y, z), w, x, y, z)) return;
             for (ForgeDirection direction : ForgeDirection.VALID_DIRECTIONS) {
                 if (direction == ForgeDirection.UP || NativeWaterlogging.waterFaceHidden(w, x, y, z, direction)) continue;
                 int nx = x + direction.offsetX, ny = y + direction.offsetY, nz = z + direction.offsetZ;

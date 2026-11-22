@@ -35,8 +35,11 @@ public abstract class MixinWorld {
     @Inject(method = "notifyBlockOfNeighborChange", at = @At("RETURN"))
     private void etfu$scheduleWaterlogged(int x, int y, int z, Block changed, CallbackInfo ci) {
         World world = (World) (Object) this;
-        if (!world.isRemote && NativeWaterlogging.contains(world, x, y, z))
-            world.scheduleBlockUpdate(x, y, z, world.getBlock(x, y, z), Blocks.flowing_water.tickRate(world));
+        if (world.isRemote || !world.blockExists(x, y, z)) return;
+        Block host = world.getBlock(x, y, z);
+        if (NativeWaterlogging.canHold(host, world, x, y, z)
+                && (NativeWaterlogging.contains(world, x, y, z) || NativeWaterlogging.canFillFromSources(world, host, x, y, z)))
+            world.scheduleBlockUpdate(x, y, z, host, Blocks.flowing_water.tickRate(world));
     }
     @Inject(method = "handleMaterialAcceleration", at = @At("RETURN"), cancellable = true)
     private void etfu$bodyWater(AxisAlignedBB box, Material material, Entity entity, CallbackInfoReturnable<Boolean> cir) {

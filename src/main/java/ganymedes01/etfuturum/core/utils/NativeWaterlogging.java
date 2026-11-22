@@ -3,10 +3,13 @@ package ganymedes01.etfuturum.core.utils;
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import ganymedes01.etfuturum.EtFuturum;
+import ganymedes01.etfuturum.ModernMapParityBlocks;
 import ganymedes01.etfuturum.blocks.BlockMangroveRoots;
 import ganymedes01.etfuturum.network.WaterloggedChunkMessage;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockFence;
 import net.minecraft.block.BlockLeaves;
+import net.minecraft.block.BlockPane;
 import net.minecraft.block.BlockSlab;
 import net.minecraft.block.BlockStairs;
 import net.minecraft.block.material.Material;
@@ -51,7 +54,33 @@ public final class NativeWaterlogging {
 
     public static boolean canHold(Block block, IBlockAccess world, int x, int y, int z) {
         return block instanceof BlockStairs || block instanceof BlockSlab && !block.isOpaqueCube()
+                || block instanceof BlockFence || block instanceof BlockPane
                 || holdsWaterWithoutSpreading(block, world, x, y, z);
+    }
+
+    public static boolean canFillFromSources(World world, Block host, int x, int y, int z) {
+        if (world.provider.isHellWorld || !canHold(host, world, x, y, z)
+                || holdsWaterWithoutSpreading(host, world, x, y, z)) return false;
+
+        if (!world.getBlock(x, y - 1, z).getMaterial().isSolid()
+                && !sourceCanFlowThrough(world, x, y - 1, z, ForgeDirection.UP)) return false;
+
+        int sources = 0;
+        for (ForgeDirection face : ForgeDirection.VALID_DIRECTIONS) {
+            if (face.offsetY != 0 || waterFaceHidden(world, x, y, z, face)) continue;
+            if (sourceCanFlowThrough(world, x + face.offsetX, y, z + face.offsetZ, face.getOpposite())
+                    && ++sources == 2) return true;
+        }
+        return false;
+    }
+
+    private static boolean sourceCanFlowThrough(World world, int x, int y, int z, ForgeDirection face) {
+        if (!world.blockExists(x, y, z)) return false;
+        Block block = world.getBlock(x, y, z);
+        if (block == Blocks.water || block == Blocks.flowing_water) return world.getBlockMetadata(x, y, z) == 0;
+        if (!ModernMapParityBlocks.containsWater(world, x, y, z)) return false;
+        return !canHold(block, world, x, y, z) || (!holdsWaterWithoutSpreading(block, world, x, y, z)
+                && !waterFaceHidden(world, x, y, z, face));
     }
 
     public static boolean contains(IBlockAccess world, int x, int y, int z) {
@@ -206,7 +235,11 @@ public final class NativeWaterlogging {
         Block old = snapshot.getReplacedBlock();
         if ((old == Blocks.water || old == Blocks.flowing_water) && snapshot.meta == 0)
             fill(world, snapshot.x, snapshot.y, snapshot.z);
-        else
+        else {
             onReplacement(world, snapshot.x, snapshot.y, snapshot.z);
+            Block host = world.getBlock(snapshot.x, snapshot.y, snapshot.z);
+            if (canFillFromSources(world, host, snapshot.x, snapshot.y, snapshot.z))
+                world.scheduleBlockUpdate(snapshot.x, snapshot.y, snapshot.z, host, Blocks.flowing_water.tickRate(world));
+        }
     }
 }

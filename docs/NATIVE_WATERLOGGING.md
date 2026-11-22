@@ -1,6 +1,6 @@
 # Native waterlogging
 
-Plus stores source water alongside the block state of stairs, single slabs, leaves, and regular mangrove roots. These blocks keep their existing IDs and metadata. Campfires, dripleaf, and aquatic blocks keep their native water encodings. This uses the existing Plus runtime dependencies and works at both vanilla and extended world heights.
+Plus stores source water alongside the block state of stairs, single slabs, fences, panes, iron bars, leaves, and regular mangrove roots. These blocks keep their existing IDs and metadata. Campfires, dripleaf, and aquatic blocks keep their native water encodings. This uses the existing Plus runtime dependencies and works at both vanilla and extended world heights.
 
 A water bucket fills a supported block and an empty bucket drains it. Placing a supported block into a source retains the water. Breaking a filled block releases a source. Water spreads through open faces using the Plus contained-water flow hooks.
 
@@ -42,4 +42,14 @@ In a disposable copy of Wargames Event 2.0.16 with shaders off, X22 stored water
 
 X24 passed `check build`, the Crucible classloading regression, and the Angelica-WDG X15 material and shader contract checks. Headless Forge fixtures at Y276 covered fill, drain, source placement, break, and persistence. Aquatic checks included kelp, seagrass, tall seagrass, sea pickles, tube coral, and both the campfire and big dripleaf wet states. The pack’s NTM JAR passed bucket fill and drain for plastic leaves, dead leaves, concrete stairs, and concrete slabs. In the confined ordinary-water test, the first step took five game ticks and the first cell cleared after 35 ticks once the source was removed. The previously reported singleplayer wall-clock slowdown remains unresolved.
 
-The first implementation covers a subset of the Java Edition table. Vanilla fences, panes, and other shapes outside the supported block classes need their own compatibility work. The general waterlogging path still needs support for automatic source formation in dry hosts between existing sources and for empty-bucket dispensers. The corrected renderer still needs an in-game shader-on check, and Distant Horizons water in generated LODs remains unverified.
+Pack testing on Wargames Event 2.0.16 confirmed leaf, stair, and slab water rendering with shaders on and off.
+
+### Fences, panes, and automation — 3.8.0_X25
+
+A supported dry partial block can become waterlogged between two accessible source cells, including sources held in other waterlogged blocks. The scheduled update checks that both sources are still present. Sealed faces, flowing water, and missing support can prevent source formation. [Minecraft Wiki’s Slab reference](https://minecraft.wiki/w/Slabs)
+
+An empty bucket in a dispenser now collects removable contained water. The underlying block stays in place, and the filled bucket goes into the inventory or is ejected if the other slots are full. Ordinary water, lava, and other targets use the pack's existing bucket behavior. [Minecraft Wiki’s Dispenser reference](https://minecraft.wiki/w/Dispenser)
+
+Headless Forge checks at Y67 and Y276 passed source formation, blocked-face behavior, normal five-tick water spread, and dispenser pickup for both general and aquatic water. The Y276 fixture retained the new waterlogged blocks after restart. The packaged JAR passed `check build` and the Crucible classloading regression.
+
+The full Java Edition table covers additional block families. Fence, pane, and iron bar visuals still need a pack check. Distant Horizons water in generated LODs remains unverified.

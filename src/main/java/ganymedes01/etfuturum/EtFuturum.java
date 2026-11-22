@@ -29,6 +29,7 @@ import ganymedes01.etfuturum.core.proxy.CommonProxy;
 import ganymedes01.etfuturum.core.utils.IInitAction;
 import ganymedes01.etfuturum.core.utils.Logger;
 import ganymedes01.etfuturum.core.utils.RecipeHelper;
+import ganymedes01.etfuturum.dispenser.DispenserBehaviourContainedWater;
 import ganymedes01.etfuturum.entities.ModEntityList;
 import ganymedes01.etfuturum.items.ItemWoodSign;
 import ganymedes01.etfuturum.lib.Reference;
@@ -339,6 +340,7 @@ public class EtFuturum {
 		}
 
 		CompatMisc.runModHooksPostInit();
+		DispenserBehaviourContainedWater.register();
 
 		Items.blaze_rod.setFull3D();
 		Blocks.trapped_chest.setCreativeTab(CreativeTabs.tabRedstone);

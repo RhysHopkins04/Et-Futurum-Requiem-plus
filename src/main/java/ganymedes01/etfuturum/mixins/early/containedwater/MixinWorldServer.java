@@ -22,5 +22,7 @@ public abstract class MixinWorldServer {
         original.call(host, world, x, y, z, random);
         if (NativeWaterlogging.contains(world, x, y, z))
             ((IContainedWaterFlow) Blocks.flowing_water).etfu$spreadSource(world, x, y, z);
+        else if (NativeWaterlogging.canFillFromSources(world, world.getBlock(x, y, z), x, y, z))
+            NativeWaterlogging.fill(world, x, y, z);
     }
 }

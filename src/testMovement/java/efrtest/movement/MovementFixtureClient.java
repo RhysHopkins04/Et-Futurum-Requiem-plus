@@ -13,11 +13,15 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.multiplayer.ServerData;
+import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.ScreenShotHelper;
 import net.minecraft.util.Vec3;
+import net.minecraftforge.client.event.RenderPlayerEvent;
+import net.minecraftforge.common.MinecraftForge;
 
 import java.io.File;
 import java.util.EnumSet;
@@ -32,9 +36,36 @@ public final class MovementFixtureClient {
     private final boolean observer = fixture.equals("observer");
     private int ticks, stage, elapsed, reconnects;
     private double edgeX;
+    private MovementPose loggedPose;
+    private boolean sawCrawlRender;
+    private boolean captureCrawl;
 
     public static void start() {
-        FMLCommonHandler.instance().bus().register(new MovementFixtureClient());
+        MovementFixtureClient fixture = new MovementFixtureClient();
+        FMLCommonHandler.instance().bus().register(fixture);
+        MinecraftForge.EVENT_BUS.register(fixture);
+    }
+
+    @SubscribeEvent
+    public void observeCrawlRender(RenderPlayerEvent.Specials.Pre event) {
+        if (!observer || sawCrawlRender || event.entityPlayer == mc.thePlayer
+                || PlayerMovement.pose(event.entityPlayer) != MovementPose.CRAWL) return;
+        ModelBiped model = event.renderer.modelBipedMain;
+        if (model.bipedLeftArm.rotateAngleX < -2.8F && model.bipedRightArm.rotateAngleX < -2.8F) {
+            sawCrawlRender = true;
+            captureCrawl = true;
+            System.out.println("MOVEMENT_FIXTURE_CRAWL_ARMS left=" + model.bipedLeftArm.rotateAngleX
+                    + " right=" + model.bipedRightArm.rotateAngleX);
+        }
+    }
+
+    @SubscribeEvent
+    public void captureCrawl(TickEvent.RenderTickEvent event) {
+        if (event.phase == TickEvent.Phase.END && captureCrawl) {
+            captureCrawl = false;
+            ScreenShotHelper.saveScreenshot(mc.mcDataDir, "movement-crawl.png", mc.displayWidth, mc.displayHeight,
+                    mc.getFramebuffer());
+        }
     }
 
     @SubscribeEvent
@@ -60,7 +91,16 @@ public final class MovementFixtureClient {
             }
             MovementMode expected = fixture.equals("legacy") ? MovementMode.LEGACY_SNEAK
                     : fixture.equals("disabled") ? MovementMode.DISABLED : MovementMode.MODERN;
-            require(ClientWorldProfile.server().movement == expected, "wrong negotiated movement mode");
+            MovementMode negotiated = ClientWorldProfile.server().movement;
+            require(negotiated == expected, "negotiated " + negotiated + ", expected " + expected);
+            MovementPose predicted = PlayerMovement.pose(player);
+            if (predicted != loggedPose) {
+                loggedPose = predicted;
+                System.out.println("MOVEMENT_FIXTURE_CLIENT_POSE mode=" + negotiated + " pose=" + predicted
+                        + " x=" + player.posX + " height=" + (player.boundingBox.maxY - player.boundingBox.minY)
+                        + " eye=" + (player.posY + player.getEyeHeight() - player.boundingBox.minY)
+                        + " pick=" + (player.getPosition(1.0F).yCoord - player.boundingBox.minY));
+            }
             switch (stage) {
                 case 1:
                     command(player, "bridge");
@@ -136,12 +176,8 @@ public final class MovementFixtureClient {
                             "sneak diagonal edge failed x=" + player.posX + " z=" + player.posZ);
                     System.out.println("MOVEMENT_FIXTURE_DIAGONAL mode=" + expected + " x=" + player.posX + " z=" + player.posZ);
                     keys(false, false, false);
-                    if (expected == MovementMode.DISABLED) {
-                        reconnect();
-                    } else {
-                        command(player, "slab");
-                        stage = 6;
-                    }
+                    command(player, "slab");
+                    stage = 6;
                     break;
                 case 6:
                     if (elapsed < 25) return;
@@ -149,7 +185,7 @@ public final class MovementFixtureClient {
                     advance();
                     break;
                 case 7:
-                    if (expected == MovementMode.LEGACY_SNEAK) {
+                    if (expected != MovementMode.MODERN) {
                         require(player.posX < 6.71D, "legacy sneak should keep its open-ground height at an overhead slab");
                     } else {
                         if (player.posX < 7.07D && elapsed < 60) return;
@@ -171,16 +207,50 @@ public final class MovementFixtureClient {
                     require(underside != null && underside.blockX == 7 && underside.blockY == 81 && underside.sideHit == 0,
                             "stationary slab underside pick missed: " + underside);
                     System.out.println("MOVEMENT_FIXTURE_SLAB_UNDERSIDE " + underside);
-                    command(player, "crawl");
+                    keys(true, false, false);
+                    stage = 25;
+                    elapsed = 0;
                     break;
                 case 9:
-                    pose(player, MovementPose.CRAWL);
+                    pose(player, MovementPose.VANILLA);
+                    require(mc.theWorld.getBlock(9, 81, 0) == Blocks.trapdoor
+                            && (mc.theWorld.getBlockMetadata(9, 81, 0) & 4) != 0, "trapdoor did not start open");
+                    MovingObjectPosition trapdoor = player.rayTrace(4.5D, 1.0F);
+                    require(trapdoor != null && trapdoor.blockX == 9 && trapdoor.blockY == 81 && trapdoor.blockZ == 0,
+                            "standing pick missed open trapdoor: " + trapdoor);
+                    require(mc.playerController.onPlayerRightClick(player, mc.theWorld, player.getHeldItem(),
+                            trapdoor.blockX, trapdoor.blockY, trapdoor.blockZ, trapdoor.sideHit, trapdoor.hitVec),
+                            "trapdoor right click rejected");
+                    stage = 26;
+                    elapsed = 0;
+                    break;
+                case 25:
+                    player.rotationPitch = player.prevRotationPitch = 0F;
+                    if ((player.posX < 8.31D || PlayerMovement.pose(player) != MovementPose.VANILLA)
+                            && elapsed < 60) return;
+                    require(player.posX >= 8.31D, "failed to walk out from under slab");
+                    pose(player, MovementPose.VANILLA);
+                    keys(false, false, false);
+                    command(player, "crawl");
+                    stage = 9;
+                    break;
+                case 26:
+                    require((mc.theWorld.getBlockMetadata(9, 81, 0) & 4) == 0, "trapdoor did not close on client");
+                    pose(player, expected == MovementMode.DISABLED ? MovementPose.VANILLA : MovementPose.CRAWL);
+                    player.sendChatMessage("fixture-check-trapdoor");
+                    if (expected == MovementMode.DISABLED) {
+                        command(player, "swim");
+                        stage = 11;
+                        break;
+                    }
+                    player.rotationYaw = player.prevRotationYaw = -90F;
                     keys(true, false, false);
-                    advance();
+                    stage = 10;
+                    elapsed = 0;
                     break;
                 case 10:
-                    if ((player.posX < 10.31D || PlayerMovement.pose(player) == MovementPose.CRAWL) && elapsed < 100) return;
-                    require(player.posX > 10.3D, "crawl did not exit tunnel x=" + player.posX);
+                    if ((player.posX < 11.31D || PlayerMovement.pose(player) == MovementPose.CRAWL) && elapsed < 100) return;
+                    require(player.posX > 11.3D, "crawl did not exit tunnel x=" + player.posX);
                     pose(player, MovementPose.VANILLA);
                     keys(false, false, false);
                     command(player, "swim");
@@ -191,6 +261,12 @@ public final class MovementFixtureClient {
                     advance();
                     break;
                 case 12:
+                    if (expected == MovementMode.DISABLED) {
+                        pose(player, MovementPose.VANILLA);
+                        require(player.isInWater(), "disabled swim check left the water");
+                        reconnect();
+                        break;
+                    }
                     pose(player, MovementPose.SWIM);
                     require(player.posX > 12.65D, "sprint swim did not move forward");
                     keys(false, false, false);
@@ -205,15 +281,21 @@ public final class MovementFixtureClient {
                     require(player.isInWater() && PlayerMovement.eyesInWater(player, MovementPose.CRAWL.eye),
                             "waterlogged floor and ceiling did not supply swim water");
                     player.rotationYaw = -90F;
-                    // Hold sprint forward against the next tall block in an isolated contained-water cell.
                     keys(true, false, true);
                     advance();
                     break;
                 case 15:
-                    if (PlayerMovement.pose(player) != MovementPose.SWIM && elapsed < 25) return;
+                    if (elapsed < 12 || PlayerMovement.pose(player) != MovementPose.SWIM && elapsed < 25) return;
                     pose(player, MovementPose.SWIM);
                     keys(false, false, false);
+                    stage = 27;
+                    elapsed = 0;
+                    break;
+                case 27:
+                    pose(player, MovementPose.CRAWL);
+                    require(player.isInWater(), "sprint release check left the waterlogged passage");
                     command(player, "elytra");
+                    stage = 16;
                     break;
                 case 16:
                     if (player.onGround || player.motionY >= 0) return;
@@ -253,10 +335,14 @@ public final class MovementFixtureClient {
             EntityPlayer other = (EntityPlayer) candidate;
             if (other != player) {
                 MovementPose pose = PlayerMovement.pose(other);
-                if (Math.abs(other.height - pose.height) < 0.003) seen.add(pose);
+                double height = other.boundingBox.maxY - other.boundingBox.minY;
+                if (Math.abs(height - pose.height) < 0.003 && seen.add(pose)) {
+                    System.out.println("MOVEMENT_FIXTURE_REMOTE_POSE mode=" + ClientWorldProfile.server().movement
+                            + " pose=" + pose + " x=" + other.posX + " height=" + height);
+                }
             }
         }
-        if (seen.containsAll(EnumSet.allOf(MovementPose.class))) {
+        if (sawCrawlRender && seen.containsAll(EnumSet.allOf(MovementPose.class))) {
             System.out.println("MOVEMENT_FIXTURE_REMOTE PASSED " + seen);
             mc.shutdown();
         }

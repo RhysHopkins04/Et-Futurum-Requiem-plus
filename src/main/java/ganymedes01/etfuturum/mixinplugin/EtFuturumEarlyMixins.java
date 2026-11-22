@@ -404,6 +404,7 @@ public class EtFuturumEarlyMixins implements IFMLLoadingPlugin, IEarlyMixinLoade
             mixins.add("movement.client.MixinEntityOtherPlayerMP");
             mixins.add("movement.client.MixinEntityRenderer");
             mixins.add("movement.client.MixinRenderPlayer");
+            mixins.add("movement.client.MixinModelBiped");
         }
 
         mixins.add("profile.MixinHandshakeCodec");

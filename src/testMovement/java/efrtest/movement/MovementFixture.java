@@ -10,6 +10,8 @@ import cpw.mods.fml.relauncher.Side;
 import ganymedes01.etfuturum.ModItems;
 import ganymedes01.etfuturum.core.utils.NativeWaterlogging;
 import ganymedes01.etfuturum.movement.MovementMode;
+import ganymedes01.etfuturum.movement.MovementPose;
+import ganymedes01.etfuturum.movement.PlayerMovement;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
@@ -20,10 +22,16 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.ServerChatEvent;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 @Mod(modid = "efr_movement_fixture", version = "1", acceptableRemoteVersions = "*", dependencies = "required-after:etfuturum")
 public final class MovementFixture {
     static final int Y = 80;
+    private final Map<Integer, MovementPose> serverPoses = new HashMap<>();
+    private final Queue<Runnable> commands = new ConcurrentLinkedQueue<>();
 
     @Mod.EventHandler
     public void load(FMLLoadCompleteEvent event) throws Exception {
@@ -41,16 +49,19 @@ public final class MovementFixture {
         }
         for (int x = 21; x <= 58; x++) world.setBlock(x, Y - 1, -2, Blocks.stone);
         world.setBlock(7, Y + 1, 0, Blocks.stone_slab, 8, 3);
-        world.setBlock(9, Y + 1, 0, Blocks.stone);
+        world.setBlock(9, Y + 1, 1, Blocks.stone);
+        world.setBlock(10, Y + 1, 0, Blocks.stone);
         for (int x = 12; x <= 14; x++) {
             for (int y = Y; y <= Y + 2; y++) {
                 for (int z = -1; z <= 1; z++) world.setBlock(x, y, z, Blocks.water);
             }
         }
-        world.setBlock(16, Y - 1, 0, Blocks.stone_slab, 0, 3);
-        world.setBlock(16, Y, 0, Blocks.stone_slab, 8, 3);
-        require(NativeWaterlogging.fill(world, 16, Y - 1, 0), "fixture could not waterlog floor slab");
-        require(NativeWaterlogging.fill(world, 16, Y, 0), "fixture could not waterlog ceiling slab");
+        for (int x = 16; x <= 18; x++) {
+            world.setBlock(x, Y - 1, 0, Blocks.stone_slab, 0, 3);
+            world.setBlock(x, Y, 0, Blocks.stone_slab, 8, 3);
+            require(NativeWaterlogging.fill(world, x, Y - 1, 0), "fixture could not waterlog floor slab");
+            require(NativeWaterlogging.fill(world, x, Y, 0), "fixture could not waterlog ceiling slab");
+        }
         MinecraftForge.EVENT_BUS.register(this);
         FMLCommonHandler.instance().bus().register(this);
         System.out.println("MOVEMENT_FIXTURE_SERVER_READY " + MovementMode.local());
@@ -58,17 +69,38 @@ public final class MovementFixture {
 
     @SubscribeEvent
     public void tick(TickEvent.ServerTickEvent event) {
-        if (event.phase == TickEvent.Phase.END && new File("FIXTURE_STOP").isFile())
-            MinecraftServer.getServer().initiateShutdown();
+        if (event.phase != TickEvent.Phase.END) return;
+        MinecraftServer server = MinecraftServer.getServer();
+        if (new File("FIXTURE_STOP").isFile()) {
+            server.initiateShutdown();
+            return;
+        }
+        for (Runnable command; (command = commands.poll()) != null; ) command.run();
+        WorldServer world = server.worldServerForDimension(0);
+        for (Object entry : world.playerEntities) {
+            EntityPlayerMP player = (EntityPlayerMP) entry;
+            MovementPose pose = PlayerMovement.pose(player);
+            if (serverPoses.put(player.getEntityId(), pose) == pose) continue;
+            double height = player.boundingBox.maxY - player.boundingBox.minY;
+            if (pose != MovementPose.VANILLA) {
+                near(height, pose.height, "server hitbox " + pose);
+                near(player.posY + player.getEyeHeight() - player.boundingBox.minY, pose.eye, "server eye " + pose);
+            }
+            System.out.println("MOVEMENT_FIXTURE_SERVER_POSE " + pose + " x=" + player.posX
+                    + " height=" + height + " eye=" + (player.posY + player.getEyeHeight() - player.boundingBox.minY));
+        }
     }
 
     @SubscribeEvent
     public void command(ServerChatEvent event) {
         if (!event.message.startsWith("fixture-")) return;
         event.setCanceled(true);
-        EntityPlayerMP player = event.player;
+        commands.add(() -> command(event.player, event.message));
+    }
+
+    private void command(EntityPlayerMP player, String message) {
         double y = Y;
-        switch (event.message) {
+        switch (message) {
             case "fixture-check-bridge":
                 require(player.worldObj.getBlock(1, Y - 1, 0) == Blocks.cobblestone, "bridge placement missing on server");
                 System.out.println("MOVEMENT_FIXTURE_SERVER_BRIDGE x=" + player.posX + " height=" + player.height
@@ -92,7 +124,18 @@ public final class MovementFixture {
                 player.playerNetServerHandler.setPlayerLocation(6.5D, y, 0.5D, -90F, 0);
                 break;
             case "fixture-crawl":
-                player.playerNetServerHandler.setPlayerLocation(9.5D, y, 0.5D, -90F, 0);
+                player.worldObj.setBlock(9, Y + 1, 0, Blocks.trapdoor, 4, 3);
+                player.inventory.currentItem = 0;
+                player.inventory.setInventorySlotContents(0, null);
+                player.playerNetServerHandler.setPlayerLocation(9.5D, y, 0.5D, 0, 0);
+                break;
+            case "fixture-check-trapdoor":
+                require(player.worldObj.getBlock(9, Y + 1, 0) == Blocks.trapdoor
+                                && (player.worldObj.getBlockMetadata(9, Y + 1, 0) & 4) == 0,
+                        "right click did not close trapdoor on the server");
+                MovementPose expected = MovementMode.local() == MovementMode.DISABLED ? MovementPose.VANILLA : MovementPose.CRAWL;
+                require(PlayerMovement.pose(player) == expected, "wrong server pose after trapdoor activation");
+                System.out.println("MOVEMENT_FIXTURE_SERVER_TRAPDOOR closed pose=" + expected);
                 break;
             case "fixture-swim":
                 player.playerNetServerHandler.setPlayerLocation(12.5D, y + 0.15D, 0.5D, -90F, 0);
@@ -105,12 +148,12 @@ public final class MovementFixture {
                 player.playerNetServerHandler.setPlayerLocation(4.5D, y + 12.0D, -1.5D, -90F, 23);
                 break;
             case "fixture-observe":
-                player.playerNetServerHandler.setPlayerLocation(3.5D, y, 1.5D, 0, 0);
+                player.playerNetServerHandler.setPlayerLocation(5.5D, y, 1.5D, -105F, 10F);
                 break;
             default:
                 return;
         }
-        System.out.println("MOVEMENT_FIXTURE_SERVER " + event.message + " " + player.getCommandSenderName());
+        System.out.println("MOVEMENT_FIXTURE_SERVER " + message + " " + player.getCommandSenderName());
     }
 
     static void require(boolean value, String message) {

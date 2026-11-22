@@ -11,6 +11,8 @@ import ganymedes01.etfuturum.client.renderer.block.ContainedWaterAccess;
 import ganymedes01.etfuturum.client.renderer.block.ContainedWaterShaderCompat;
 import ganymedes01.etfuturum.core.utils.NativeWaterlogging;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockChest;
+import net.minecraft.block.BlockEnderChest;
 import net.minecraft.block.BlockSlab;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.RenderBlocks;
@@ -73,12 +75,18 @@ public abstract class MixinRenderBlocks {
 
     @ModifyExpressionValue(method = "renderBlockLiquid", at = @At(value = "INVOKE", target =
             "Lnet/minecraft/client/renderer/RenderBlocks;getLiquidHeight(IIILnet/minecraft/block/material/Material;)F"))
-    private float etfu$clipUpperSlab(float height, @Local(argsOnly = true) Block liquid,
+    private float etfu$containedSurfaceHeight(float height, @Local(argsOnly = true) Block liquid,
             @Local(argsOnly = true, ordinal = 0) int x, @Local(argsOnly = true, ordinal = 1) int y,
             @Local(argsOnly = true, ordinal = 2) int z) {
         if (liquid.getMaterial() != Material.water || !(blockAccess instanceof ContainedWaterAccess)) return height;
-        IBlockAccess host = ((ContainedWaterAccess) blockAccess).source();
-        if (!NativeWaterlogging.contains(host, x, y, z) || !(host.getBlock(x, y, z) instanceof BlockSlab)) return height;
-        return (host.getBlockMetadata(x, y, z) & 8) != 0 ? Math.min(height, .5F) : height;
+        ContainedWaterAccess water = (ContainedWaterAccess) blockAccess;
+        IBlockAccess host = water.source();
+        if (!NativeWaterlogging.contains(host, x, y, z)) return height;
+        Block block = host.getBlock(x, y, z);
+        if (block instanceof BlockChest || block instanceof BlockEnderChest)
+            return water.chestWaterHeight(x, y, z, height);
+        if (block instanceof BlockSlab && (host.getBlockMetadata(x, y, z) & 8) != 0)
+            return Math.min(height, .5F);
+        return height;
     }
 }

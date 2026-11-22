@@ -77,3 +77,13 @@ Water prevents ignition and fire spread from a compatible host. The explosion ca
 Normal piston push and sticky pull clear the moved block's waterlogged state. When a sticky piston retracts while its push is still in progress and leaves the pushed block in place, the pushed block keeps its water. Normal and short-pulse movement passed with both vanilla pistons and Better Pistons at Y276, including a moving-tile NBT round trip. The transition byte is stored on the moving piston tile. Settled water remains in the same chunk overlay format. [Minecraft Wiki’s piston and waterlogging rules](https://minecraft.wiki/w/Waterlogging)
 
 The 430-row coverage matrix was rerun on X34. Its fill, break, placement, and reload results match X30. X34 passed `check build`, headless Forge startup, and the packaged Crucible classloading regression.
+
+### Chest rendering and pack review — 3.8.0_X35
+
+An isolated chest's contained water uses the source surface height at all four corners. Vanilla's corner blending still applies where the chest joins nearby water. The change covers normal, trapped, copper, and Ender chests.
+
+The follow-up save uses glow lichen attached to a solid face, level-15 Light blocks in wet and dry cells, and a level-0 control. The first review's lichen lacked an attached face, and its Light block was level 0.
+
+Offline `check build` passed. A headless Forge restart verified both lichen faces, block light at each source and in the cell above it, chest pairing and contents, and the isolated and joined corner-height cases. Wet and dry toggles preserved the lichen faces and Light levels. In-pack chest rendering still needs a visual check.
+
+Distant Horizons WDG 3.3.5_X87 reads the host block and metadata from 1.7.10 chunks. Its two chunk lookup paths omit the separate EFRP water state, so a wet pane and a dry pane give it the same input. LOD integration needs a position-aware fluid input and invalidation on contained-water changes. The follow-up save uses exposed wet panes, ordinary water, and dry panes with solid colored markers to compare the three at the LOD transition.

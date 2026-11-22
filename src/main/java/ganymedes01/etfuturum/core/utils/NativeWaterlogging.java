@@ -149,8 +149,12 @@ public final class NativeWaterlogging {
     }
 
     public static boolean drain(World world, int x, int y, int z) {
+        return drain(world, x, y, z, 3);
+    }
+
+    public static boolean drain(World world, int x, int y, int z, int flags) {
         if (!contains(world, x, y, z)) return false;
-        if (!world.isRemote && set(world, x, y, z, false))
+        if (!world.isRemote && set(world, x, y, z, false) && (flags & 1) != 0)
             world.notifyBlocksOfNeighborChange(x, y, z, Blocks.air);
         return true;
     }

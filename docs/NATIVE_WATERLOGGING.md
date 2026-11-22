@@ -62,4 +62,10 @@ Normal, trapped, Ender, and all eight copper chest variants were covered. Additi
 
 The fixture uses the registered 1.7.10 variant or documented metadata alias for each Java ID. The report was generated from the official server JAR with `-DbundlerMainClass=net.minecraft.data.Main -jar server.jar --reports`. Placement results include wall signs whose obtainable item produces the wall form through metadata. [Official Mojang Java 1.21.11 server JAR](https://piston-data.mojang.com/v1/objects/64bb6d763bed0a9f1d632ec347938594144943ed/server.jar)
 
-The matrix covers block-state and bucket behavior. Further Java parity work includes sponge absorption of contained water, Dried Ghast hydration, and Conduit activation. Piston transitions, fire and explosion behavior, and the newly added render families still need their own tests. Distant Horizons water in generated LODs remains unverified. [Minecraft Wiki’s Waterlogging reference](https://minecraft.wiki/w/Waterlogging)
+The matrix covers block-state and bucket behavior. Dried Ghast hydration and Conduit activation have their own gameplay requirements. Piston transitions, fire and explosion behavior, and the newly added render families still need their own tests. Distant Horizons water in generated LODs remains unverified. [Minecraft Wiki’s Waterlogging reference](https://minecraft.wiki/w/Waterlogging)
+
+### Sponge absorption — 3.8.0_X31
+
+Sponges drain removable contained water while keeping the host and its inventory. They absorb inherent water by removing kelp and seagrass, including both tall seagrass halves where reachable. A waterlogged barrier retains its Creative-only restriction and blocks traversal. Absorption follows connected wet cells up to six steps and 64 drained cells.
+
+Headless fixtures at Y67 and Y276 passed mixed sources, chest and decorated-pot inventory preservation, retained panes and dripleaf, both tall seagrass halves, dry gaps, barriers, range, and capacity. [Minecraft Wiki’s Sponge reference](https://minecraft.wiki/w/Sponge)

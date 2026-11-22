@@ -41,15 +41,19 @@ public final class DripleafWater {
     }
 
     public static boolean drain(World world, int x, int y, int z) {
+        return drain(world, x, y, z, 3);
+    }
+
+    public static boolean drain(World world, int x, int y, int z, int flags) {
         if (!contains(world,x,y,z)) return false;
         Block block = world.getBlock(x,y,z);
         int meta=world.getBlockMetadata(x,y,z);
         if (block instanceof BlockSmallDripleaf)
-            return world.setBlockMetadataWithNotify(x,y,z,meta & ~BlockSmallDripleaf.WATERLOGGED_BIT,3);
+            return world.setBlockMetadataWithNotify(x,y,z,meta & ~BlockSmallDripleaf.WATERLOGGED_BIT,flags);
         if (block instanceof BlockBigDripleafStem)
-            return world.setBlockMetadataWithNotify(x,y,z,meta & ~BlockBigDripleafStem.WATERLOGGED_BIT,3);
+            return world.setBlockMetadataWithNotify(x,y,z,meta & ~BlockBigDripleafStem.WATERLOGGED_BIT,flags);
         if (block == ModBlocks.BIG_DRIPLEAF_WET.get())
-            return world.setBlock(x,y,z,ModBlocks.BIG_DRIPLEAF.get(),meta,3);
+            return world.setBlock(x,y,z,ModBlocks.BIG_DRIPLEAF.get(),meta,flags);
         return false;
     }
 }

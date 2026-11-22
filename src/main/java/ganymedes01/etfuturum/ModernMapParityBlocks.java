@@ -23,6 +23,7 @@ import ganymedes01.etfuturum.recipes.crafting.RecipeDecoratedPot;
 import ganymedes01.etfuturum.tileentities.TileEntityWoodSign;
 import ganymedes01.etfuturum.tileentities.TileEntitySculkRuntime;
 import ganymedes01.etfuturum.tileentities.TileEntityLectern;
+import ganymedes01.etfuturum.world.WorldCoord;
 import ganymedes01.etfuturum.world.generate.decorate.WorldGenPass37PaleOakTree;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockChest;
@@ -756,31 +757,58 @@ public enum ModernMapParityBlocks {
     }
 
     public static boolean drainContainedWater(World world, int x, int y, int z) {
-        if (ganymedes01.etfuturum.core.utils.NativeWaterlogging.drain(world, x, y, z)) return true;
+        return drainContainedWater(world, x, y, z, 3);
+    }
+
+    private static boolean drainContainedWater(World world, int x, int y, int z, int flags) {
+        if (ganymedes01.etfuturum.core.utils.NativeWaterlogging.drain(world, x, y, z, flags)) return true;
         if (ganymedes01.etfuturum.core.utils.DripleafWater.contains(world,x,y,z))
-            return ganymedes01.etfuturum.core.utils.DripleafWater.drain(world,x,y,z);
+            return ganymedes01.etfuturum.core.utils.DripleafWater.drain(world,x,y,z,flags);
         if (!containsWater(world, x, y, z)) return false;
         Block block = world.getBlock(x, y, z);
         if (block instanceof ganymedes01.etfuturum.blocks.BlockBubbleColumn)
-            return world.isRemote || world.setBlockToAir(x, y, z);
+            return world.isRemote || world.setBlock(x, y, z, Blocks.air, 0, flags);
         ModernMapParityBlocks e = fromBlock(block);
         if (e == null || e.hasInherentWater()) return false;
         if (world.isRemote) return true;
         if (e == CAMPFIRE || e == SOUL_CAMPFIRE)
-            return world.setBlockMetadataWithNotify(x,y,z,world.getBlockMetadata(x,y,z) & ~8,3);
+            return world.setBlockMetadataWithNotify(x,y,z,world.getBlockMetadata(x,y,z) & ~8,flags);
         if (e == DECORATED_POT)
-            return world.setBlockMetadataWithNotify(x, y, z, world.getBlockMetadata(x, y, z) & ~4, 3);
+            return world.setBlockMetadataWithNotify(x, y, z, world.getBlockMetadata(x, y, z) & ~4, flags);
         if (e == SEA_PICKLE) {
-            boolean changed=world.setBlockMetadataWithNotify(x,y,z,world.getBlockMetadata(x,y,z) & ~4,3);
+            boolean changed=world.setBlockMetadataWithNotify(x,y,z,world.getBlockMetadata(x,y,z) & ~4,flags);
             world.updateLightByType(EnumSkyBlock.Block,x,y,z); return changed;
         }
-        boolean changed=world.setBlockMetadataWithNotify(x,y,z,world.getBlockMetadata(x,y,z) & ~8,3);
+        boolean changed=world.setBlockMetadataWithNotify(x,y,z,world.getBlockMetadata(x,y,z) & ~8,flags);
         if (!e.getRegistryName().startsWith("dead_")) world.scheduleBlockUpdate(x,y,z,e.get(),60+world.rand.nextInt(40));
         return changed;
     }
 
     private boolean hasInherentWater() {
         return this == KELP || this == KELP_AGE_16 || this == KELP_PLANT || this == SEAGRASS || this == TALL_SEAGRASS;
+    }
+
+    /** Sponge writes defer neighbor notifications until the absorption traversal has finished. */
+    public static boolean absorbWater(World world, int x, int y, int z) {
+        if (world.isRemote) return false;
+        Block block = world.getBlock(x, y, z);
+        if (ganymedes01.etfuturum.core.utils.NativeWaterlogging.creativeBucketOnly(block)) return false;
+        if (block.getMaterial() == Material.water) return world.setBlock(x, y, z, Blocks.air, 0, 2);
+
+        if (!(block instanceof ParityModelBlock) || !((ParityModelBlock) block).entry.hasInherentWater())
+            return drainContainedWater(world, x, y, z, 2);
+
+        int meta = world.getBlockMetadata(x, y, z);
+        WorldCoord previous = ParityModelBlock.ABSORBING_WATER.get();
+        ParityModelBlock.ABSORBING_WATER.set(new WorldCoord(x, y, z));
+        try {
+            if (!world.setBlock(x, y, z, Blocks.air, 0, 2)) return false;
+            block.dropBlockAsItem(world, x, y, z, meta, 0);
+            return true;
+        } finally {
+            if (previous == null) ParityModelBlock.ABSORBING_WATER.remove();
+            else ParityModelBlock.ABSORBING_WATER.set(previous);
+        }
     }
 
     public static boolean fillContainedWater(World world, int x, int y, int z) {
@@ -2271,6 +2299,7 @@ public enum ModernMapParityBlocks {
         private static final WorldGenPass37PaleOakTree PASS37_PALE_OAK_TREE = new WorldGenPass37PaleOakTree(true);
 
         private static final ThreadLocal<Boolean> PASS37_INTERNAL_KELP_REPLACE = new ThreadLocal<Boolean>();
+        private static final ThreadLocal<WorldCoord> ABSORBING_WATER = new ThreadLocal<>();
         private final ModernMapParityBlocks entry;
         private final ThreadLocal<Integer> harvestedMultifaceMask = new ThreadLocal<Integer>();
 
@@ -5512,9 +5541,11 @@ public enum ModernMapParityBlocks {
             boolean promotePaleHangingMossTip = isPaleHangingMoss() && !world.isRemote
                     && world.getBlock(x, y + 1, z) == this;
             boolean internalKelpReplace = Boolean.TRUE.equals(PASS37_INTERNAL_KELP_REPLACE.get());
-            boolean promoteKelpTip = (isKelp() || isKelpPlant()) && !internalKelpReplace && !world.isRemote
+            WorldCoord absorbing = ABSORBING_WATER.get();
+            boolean absorbed = absorbing != null && absorbing.x == x && absorbing.y == y && absorbing.z == z;
+            boolean promoteKelpTip = (isKelp() || isKelpPlant()) && !absorbed && !internalKelpReplace && !world.isRemote
                     && world.getBlock(x,y-1,z)==KELP_PLANT.get();
-            boolean restoreAquaticWater = !internalKelpReplace && (entry.hasInherentWater()
+            boolean restoreAquaticWater = !absorbed && !internalKelpReplace && (entry.hasInherentWater()
                     || (isSeaPickle() && (meta&4)!=0)
                     || (!isCoralBlockForm() && isCoralFamily() && (meta&8)!=0));
             if (isPaleOakButton() && !world.isRemote && buttonPowered(world, x, y, z)) {

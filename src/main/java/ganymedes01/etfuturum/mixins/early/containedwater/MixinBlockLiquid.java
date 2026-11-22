@@ -1,6 +1,7 @@
 package ganymedes01.etfuturum.mixins.early.containedwater;
 
 import ganymedes01.etfuturum.ModernMapParityBlocks;
+import ganymedes01.etfuturum.core.utils.NativeWaterlogging;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockLiquid;
 import net.minecraft.block.material.Material;
@@ -18,7 +19,8 @@ public abstract class MixinBlockLiquid {
     @Shadow protected abstract void func_149799_m(World world,int x,int y,int z);
     @Inject(method = "func_149804_e", at = @At("HEAD"), cancellable = true)
     private void etfu$sourceDecay(World world,int x,int y,int z,CallbackInfoReturnable<Integer> cir) {
-        if (((Block)(Object)this).getMaterial()==Material.water && ModernMapParityBlocks.containsWater(world,x,y,z)) cir.setReturnValue(0);
+        if (((Block)(Object)this).getMaterial()==Material.water && ModernMapParityBlocks.containsWater(world,x,y,z)
+                && !NativeWaterlogging.isLeafHost(world.getBlock(x, y, z), world, x, y, z)) cir.setReturnValue(0);
     }
     @Inject(method = "func_149805_n", at = @At("HEAD"))
     private void etfu$containedWaterCoolsLava(World world,int x,int y,int z,CallbackInfo ci) {

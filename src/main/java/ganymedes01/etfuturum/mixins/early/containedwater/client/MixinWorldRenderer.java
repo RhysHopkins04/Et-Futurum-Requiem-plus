@@ -6,7 +6,6 @@ import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalBooleanRef;
 import ganymedes01.etfuturum.core.utils.NativeWaterlogging;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockLeaves;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.init.Blocks;
@@ -21,7 +20,7 @@ public abstract class MixinWorldRenderer {
     private Block etfu$readHost(ChunkCache cache, int x, int y, int z, Operation<Block> original,
                                 @Share("drawWater") LocalBooleanRef drawWater) {
         Block host = original.call(cache, x, y, z);
-        drawWater.set(!(host instanceof BlockLeaves) && NativeWaterlogging.canHold(host)
+        drawWater.set(NativeWaterlogging.canHold(host, cache, x, y, z)
                 && NativeWaterlogging.contains(cache, x, y, z));
         return host;
     }

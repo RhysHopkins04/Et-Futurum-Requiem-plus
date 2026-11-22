@@ -6,6 +6,8 @@ A water bucket fills a supported block and an empty bucket drains it. Placing a 
 
 The standard renderer and Angelica-WDG use the existing Plus contained-water rendering path. The Angelica adapter snapshots the water alongside the host block, adds the water mesh to the translucent pass, and retains the shader material and lighting path used by aquatic blocks.
 
+Water in a leaf cell is visible through the foliage cutouts. The leaf cell holds a source without feeding outward flow, matching the Java Edition behavior described in [Minecraft Wiki’s Waterlogging reference](https://minecraft.wiki/w/Waterlogging). Eligibility uses the Forge leaf hook and the same leaf class or material check as Foliage+, including Plus mangrove and pale oak leaves. Foliage+ continues to decide which entities can enter each block. An entity that enters a wet leaf cell can be submerged.
+
 ## Saved chunks
 
 The optional `Level.etfuturum_waterlogging_v1` byte array stores a chunk's wet cells as a little-endian bitset. Bit `(physicalY << 8) | (localZ << 4) | localX` refers to the host in the normal Anvil section arrays. The byte index is the bit index divided by eight and bit zero is the least significant bit. The tag is absent when the chunk has no overlay water. Height uses the target world's physical coordinates, with up to 512 levels.
@@ -25,3 +27,9 @@ The reported Crucible `1.7.10-staging-667a28e2` startup crash came from reflecti
 `check build` passed for X21, including release mapping checks. The opt-in `scripts/waterlogged_server_tests.gradle` regression uses the side transformer from the supplied Crucible dev-280 server JAR against the production mod archives, with client classes forbidden. X20 reproduced `NoClassDefFoundError: net/minecraft/client/multiplayer/WorldClient`; X21 instantiated successfully. A disposable Forge dedicated development server also reached `Done` with the fix.
 
 This validates startup and the reported classloading failure, not a full Crucible modpack session. Dedicated-server joining, waterlogging sync, reconnect/restart, and pack performance still need testing. The reported singleplayer slowdown, including with DH rendering and Angelica's deferred updates disabled, remains unresolved. No performance improvement is claimed by X21. Both master refs remain unchanged; this candidate belongs only to `feature/liquidlogged-waterlogging`.
+
+### Wet leaves candidate — 3.8.0_X22
+
+`check build` and the Crucible classloading regression passed. Disposable clients verified vanilla oak, Plus mangrove and pale oak, and NTM rubber leaves. Water showed through the cutouts with standard Forge and with Angelica-WDG X13, including the Bountiful Stars WDG preset. Fill, drain, client sync, water at eye level, and sealed outward flow passed. With Foliage+ X15 in player-only mode, dry and wet leaves let players through and kept collision for mobs at Y67 and Y276.
+
+Foliage+ X15's separate contact scan for slowdown and rustling still stops at Y255. Slab and stair water heights are the same as X21.

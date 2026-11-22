@@ -49,7 +49,7 @@ public abstract class MixinRenderBlocks {
             IBlockAccess host = ((ContainedWaterAccess) access).source();
             ForgeDirection face = ForgeDirection.getOrientation(side);
             int x = nx - face.offsetX, y = ny - face.offsetY, z = nz - face.offsetZ;
-            if (NativeWaterlogging.contains(host, x, y, z) && NativeWaterlogging.faceCovered(host, x, y, z, face))
+            if (NativeWaterlogging.contains(host, x, y, z) && NativeWaterlogging.waterFaceHidden(host, x, y, z, face))
                 return false;
         }
         return original.call(liquid, access, nx, ny, nz, side);

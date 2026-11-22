@@ -715,9 +715,9 @@ public enum ModernMapParityBlocks {
     public static boolean containsWater(IBlockAccess world, int x, int y, int z) {
         if (ganymedes01.etfuturum.core.utils.DripleafWater.contains(world,x,y,z)) return true;
         Block b = world.getBlock(x,y,z);
-        if (!(b instanceof ParityModelBlock))
-            return ganymedes01.etfuturum.core.utils.NativeWaterlogging.canHold(b)
-                    && ganymedes01.etfuturum.core.utils.NativeWaterlogging.contains(world, x, y, z);
+        if (ganymedes01.etfuturum.core.utils.NativeWaterlogging.canHold(b, world, x, y, z))
+            return ganymedes01.etfuturum.core.utils.NativeWaterlogging.contains(world, x, y, z);
+        if (!(b instanceof ParityModelBlock)) return false;
         ModernMapParityBlocks e = ((ParityModelBlock)b).entry;
         int meta = world.getBlockMetadata(x, y, z);
         if (e == KELP || e == KELP_AGE_16 || e == KELP_PLANT || e == SEAGRASS || e == TALL_SEAGRASS) return true;

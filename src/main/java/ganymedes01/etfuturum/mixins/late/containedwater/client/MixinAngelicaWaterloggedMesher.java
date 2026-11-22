@@ -6,7 +6,6 @@ import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import ganymedes01.etfuturum.core.utils.NativeWaterlogging;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockLeaves;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.init.Blocks;
@@ -27,7 +26,7 @@ public abstract class MixinAngelicaWaterloggedMesher {
             @Share("renderedWater") LocalRef<int[]> renderedWater) {
         original.call(task, host, meta, x, y, z, pass, tessellator, renderer, buffers, buildContext,
                 blockContext, originX, originY, originZ, material, shaderOverride, teMap, tick);
-        if (host instanceof BlockLeaves || !NativeWaterlogging.canHold(host)
+        if (!NativeWaterlogging.canHold(host, renderer.blockAccess, x, y, z)
                 || !NativeWaterlogging.contains(renderer.blockAccess, x, y, z)) return;
 
         int[] last = renderedWater.get();

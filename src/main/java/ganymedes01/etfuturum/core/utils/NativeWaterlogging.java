@@ -8,6 +8,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockLeaves;
 import net.minecraft.block.BlockSlab;
 import net.minecraft.block.BlockStairs;
+import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.world.ChunkCoordIntPair;
@@ -38,19 +39,25 @@ public final class NativeWaterlogging {
     private static final Map<Chunk, BitSet> WATER = Collections.synchronizedMap(new WeakHashMap<>());
     private NativeWaterlogging() {}
 
-    public static boolean canHold(Block block) {
-        return block instanceof BlockStairs || block instanceof BlockLeaves
-                || block instanceof BlockSlab && !block.isOpaqueCube();
+    public static boolean isLeafHost(Block block, IBlockAccess world, int x, int y, int z) {
+        return (block instanceof BlockLeaves || block.getMaterial() == Material.leaves)
+                && !block.isAir(world, x, y, z) && block.isLeaves(world, x, y, z);
+    }
+
+    public static boolean canHold(Block block, IBlockAccess world, int x, int y, int z) {
+        return block instanceof BlockStairs || block instanceof BlockSlab && !block.isOpaqueCube()
+                || isLeafHost(block, world, x, y, z);
     }
 
     public static boolean contains(IBlockAccess world, int x, int y, int z) {
         if (y < 0 || y >= MAX_Y) return false;
         if (world instanceof World) {
             Chunk chunk = loadedChunk((World) world, x >> 4, z >> 4);
-            return chunk != null && contains(chunk, x, y, z) && canHold(chunk.getBlock(x & 15, y, z & 15));
+            return chunk != null && contains(chunk, x, y, z)
+                    && canHold(chunk.getBlock(x & 15, y, z & 15), world, x, y, z);
         }
         return world instanceof WaterloggedAccess && ((WaterloggedAccess) world).etfu$isWaterlogged(x, y, z)
-                && canHold(world.getBlock(x, y, z));
+                && canHold(world.getBlock(x, y, z), world, x, y, z);
     }
 
     public static boolean contains(Chunk chunk, int x, int y, int z) {
@@ -64,7 +71,7 @@ public final class NativeWaterlogging {
     }
 
     public static boolean fill(World world, int x, int y, int z) {
-        if (world.provider.isHellWorld || !canHold(world.getBlock(x, y, z))) return false;
+        if (world.provider.isHellWorld || !canHold(world.getBlock(x, y, z), world, x, y, z)) return false;
         if (!world.isRemote && set(world, x, y, z, true)) {
             Block host = world.getBlock(x, y, z);
             world.scheduleBlockUpdate(x, y, z, host, Blocks.flowing_water.tickRate(world));
@@ -81,12 +88,13 @@ public final class NativeWaterlogging {
     }
 
     public static void onReplacement(World world, int x, int y, int z) {
-        if (!canHold(world.getBlock(x, y, z))) set(world, x, y, z, false);
+        if (!canHold(world.getBlock(x, y, z), world, x, y, z)) set(world, x, y, z, false);
     }
 
-    public static boolean faceCovered(IBlockAccess world, int x, int y, int z, ForgeDirection face) {
+    public static boolean waterFaceHidden(IBlockAccess world, int x, int y, int z, ForgeDirection face) {
         Block host = world.getBlock(x, y, z);
-        if (host instanceof BlockLeaves) return true;
+        // Cutout leaves let the water mesh show through their texture.
+        if (isLeafHost(host, world, x, y, z)) return false;
         if (host instanceof BlockSlab) {
             boolean upper = (world.getBlockMetadata(x, y, z) & 8) != 0;
             return face == (upper ? ForgeDirection.UP : ForgeDirection.DOWN);

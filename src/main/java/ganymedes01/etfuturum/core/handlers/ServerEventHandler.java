@@ -1118,7 +1118,7 @@ public class ServerEventHandler {
             int x = event.target.blockX, y = event.target.blockY, z = event.target.blockZ;
             if (ganymedes01.etfuturum.core.utils.DripleafWater.isDripleaf(event.world, x, y, z)) return;
             if (event.getResult() == Result.ALLOW && (event.current.getItem() == Items.bucket || event.current.getItem() == Items.water_bucket)
-                    && ganymedes01.etfuturum.core.utils.NativeWaterlogging.canHold(event.world.getBlock(x, y, z))) return;
+                    && ganymedes01.etfuturum.core.utils.NativeWaterlogging.canHold(event.world.getBlock(x, y, z), event.world, x, y, z)) return;
         }
 		if (ConfigSounds.fluidInteract && event.current.getItem() instanceof ItemBucket) {//In case some weirdo mod fires this event but doesn't use ItemBucket
 			Block isFull = ((ItemBucket) event.current.getItem()).isFull;

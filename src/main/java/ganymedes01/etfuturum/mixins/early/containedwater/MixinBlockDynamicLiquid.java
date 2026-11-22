@@ -23,16 +23,15 @@ public abstract class MixinBlockDynamicLiquid implements IContainedWaterFlow {
     @Shadow private boolean[] func_149808_o(World w,int x,int y,int z) { throw new AssertionError(); }
     @Shadow private void func_149813_h(World w,int x,int y,int z,int decay) { throw new AssertionError(); }
     /**
-     * Vanilla 1.7.10 treats waterlogged plants as ordinary Material.plants and
-     * consequently regards them as flowing-water replacement targets.  A
-     * contained source has already occupied this cell: no incoming water flow
-     * may replace the plant (or cause it to drop an item).
+     * Flowing water cannot displace a waterloggable host or an existing
+     * contained source. Source conversion is handled by the scheduled host update.
      */
     @Inject(method = "func_149809_q", at = @At("HEAD"), cancellable = true)
     private void etfu$doNotDisplaceContainedSource(World world, int x, int y, int z,
                                                       CallbackInfoReturnable<Boolean> cir) {
         if (((Block) (Object) this).getMaterial() == Material.water
-                && ModernMapParityBlocks.containsWater(world, x, y, z)) {
+                && (NativeWaterlogging.canHold(world.getBlock(x, y, z), world, x, y, z)
+                        || ModernMapParityBlocks.containsWater(world, x, y, z))) {
             cir.setReturnValue(false);
         }
     }
@@ -59,9 +58,14 @@ public abstract class MixinBlockDynamicLiquid implements IContainedWaterFlow {
     }
 
     @Inject(method = "func_149807_p", at = @At("HEAD"), cancellable = true)
-    private void etfu$campfireAllowsIncomingWater(World world,int x,int y,int z,CallbackInfoReturnable<Boolean> cir) {
+    private void etfu$containedWaterFlowCost(World world,int x,int y,int z,CallbackInfoReturnable<Boolean> cir) {
         if (((Block)(Object)this).getMaterial() != Material.water || world.provider.isHellWorld) return;
-        ModernMapParityBlocks entry=ModernMapParityBlocks.fromBlock(world.getBlock(x,y,z));
+        Block block = world.getBlock(x,y,z);
+        if (NativeWaterlogging.canHold(block, world, x, y, z)) {
+            cir.setReturnValue(true);
+            return;
+        }
+        ModernMapParityBlocks entry=ModernMapParityBlocks.fromBlock(block);
         if (entry==ModernMapParityBlocks.CAMPFIRE || entry==ModernMapParityBlocks.SOUL_CAMPFIRE) cir.setReturnValue(false);
     }
 

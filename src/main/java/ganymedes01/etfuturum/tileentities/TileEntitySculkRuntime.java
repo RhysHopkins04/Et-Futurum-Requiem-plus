@@ -162,7 +162,7 @@ public class TileEntitySculkRuntime extends TileEntity {
             if(phase()==1 && phaseEndsAt>0 && now>=phaseEndsAt) {
                 clearPendingVibration();
                 power=0; setPhase(2); phaseEndsAt=now+10; notifyPower();
-                worldObj.playSoundEffect(xCoord+.5,yCoord+.5,zCoord+.5,Tags.MC_ASSET_VER+":block.sculk_sensor.clicking_stop",1.0F,1.0F);
+                playSculkSound("block.sculk_sensor.clicking_stop", 1.0F, 1.0F);
                 markDirty();
             } else if(phase()==2 && phaseEndsAt>0 && now>=phaseEndsAt) {
                 clearPendingVibration();
@@ -183,7 +183,7 @@ public class TileEntitySculkRuntime extends TileEntity {
         lastFrequency=Math.max(1,Math.min(15,pendingFrequency));
         setPhase(1); phaseEndsAt=worldObj.getTotalWorldTime()+(calibrated()?10:30);
         notifyPower(); markDirty();
-        worldObj.playSoundEffect(xCoord+.5,yCoord+.5,zCoord+.5,Tags.MC_ASSET_VER+":block.sculk_sensor.clicking",1.0F,0.8F+lastFrequency*0.02F);
+        playSculkSound("block.sculk_sensor.clicking", 1.0F, 0.8F + lastFrequency * 0.02F);
         if(worldObj instanceof WorldServer) ((WorldServer)worldObj).func_147487_a("reddust",xCoord+.5,yCoord+.8,zCoord+.5,4,.25,.15,.25,0.0);
         SculkVibrationDispatcher.post(worldObj,xCoord+.5,yCoord+.5,zCoord+.5,
                 SculkVibrationDispatcher.Event.SCULK_SENSOR_TENDRILS_CLICKING,null,pendingPlayer);
@@ -214,10 +214,15 @@ public class TileEntitySculkRuntime extends TileEntity {
         shriekerWarningLevel=warning;
         setShrieking(true);
         phaseEndsAt=worldObj.getTotalWorldTime()+90;
-        worldObj.playSoundEffect(xCoord+.5,yCoord+.5,zCoord+.5,Tags.MC_ASSET_VER+":block.sculk_shrieker.shriek",2.0F,1.0F);
+        playSculkSound("block.sculk_shrieker.shriek", 2.0F, 1.0F);
         if(worldObj instanceof WorldServer) ((WorldServer)worldObj).func_147487_a("portal",xCoord+.5,yCoord+1.0,zCoord+.5,12,.4,.2,.4,.02);
         markDirty();
         return true;
+    }
+
+    private void playSculkSound(String sound, float volume, float pitch) {
+        if (!ModernMapParityBlocks.containsWater(worldObj, xCoord, yCoord, zCoord))
+            worldObj.playSoundEffect(xCoord + .5, yCoord + .5, zCoord + .5, Tags.MC_ASSET_VER + ":" + sound, volume, pitch);
     }
 
     private boolean canRespond() {

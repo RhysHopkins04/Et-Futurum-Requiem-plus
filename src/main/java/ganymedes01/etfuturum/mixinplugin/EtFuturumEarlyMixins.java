@@ -93,10 +93,12 @@ public class EtFuturumEarlyMixins implements IFMLLoadingPlugin, IEarlyMixinLoade
         mixins.add("containedwater.MixinEntity");
         mixins.add("containedwater.MixinEntityLivingBase");
         mixins.add("containedwater.MixinItemBucket");
+        mixins.add("containedwater.MixinItemInWorldManager");
         if (side == MixinEnvironment.Side.CLIENT) {
             mixins.add("containedwater.client.MixinRenderBlocks");
             mixins.add("containedwater.client.MixinWorldRenderer");
             mixins.add("containedwater.client.MixinActiveRenderInfo");
+            mixins.add("containedwater.client.MixinPlayerControllerMP");
         }
 
 		// Pass 36: reuse 1.7 lightning while applying the modern IDegradable copper-cleaning walk.

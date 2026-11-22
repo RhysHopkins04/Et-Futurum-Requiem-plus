@@ -1,6 +1,7 @@
 package ganymedes01.etfuturum.dispenser;
 
 import ganymedes01.etfuturum.ModernMapParityBlocks;
+import ganymedes01.etfuturum.core.utils.NativeWaterlogging;
 import net.minecraft.block.BlockDispenser;
 import net.minecraft.dispenser.BehaviorDefaultDispenseItem;
 import net.minecraft.dispenser.IBehaviorDispenseItem;
@@ -41,7 +42,8 @@ public final class DispenserBehaviourContainedWater implements IBehaviorDispense
         int x = source.getXInt() + facing.getFrontOffsetX();
         int y = source.getYInt() + facing.getFrontOffsetY();
         int z = source.getZInt() + facing.getFrontOffsetZ();
-        if (ModernMapParityBlocks.drainContainedWater(source.getWorld(), x, y, z))
+        if (!NativeWaterlogging.creativeBucketOnly(source.getWorld().getBlock(x, y, z))
+                && ModernMapParityBlocks.drainContainedWater(source.getWorld(), x, y, z))
             return collect.dispense(source, stack);
         return previous.dispense(source, stack);
     }

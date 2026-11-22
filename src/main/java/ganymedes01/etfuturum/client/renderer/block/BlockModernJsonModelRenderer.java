@@ -57,7 +57,7 @@ public final class BlockModernJsonModelRenderer implements ISimpleBlockRendering
     public boolean renderWorldBlock(IBlockAccess world, int x, int y, int z, Block block, int modelId,
             RenderBlocks renderer) {
         if (ForgeHooksClient.getWorldRenderPass() == 1
-                && !ganymedes01.etfuturum.core.utils.NativeWaterlogging.isLeafHost(block, world, x, y, z)) {
+                && !ganymedes01.etfuturum.core.utils.NativeWaterlogging.canHold(block, world, x, y, z)) {
             if (!ModernMapParityBlocks.containsWater(world,x,y,z)) return false;
             IBlockAccess original = renderer.blockAccess;
             try {

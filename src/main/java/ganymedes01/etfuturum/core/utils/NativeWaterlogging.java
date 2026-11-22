@@ -3,15 +3,34 @@ package ganymedes01.etfuturum.core.utils;
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import ganymedes01.etfuturum.EtFuturum;
+import ganymedes01.etfuturum.ModBlocks;
 import ganymedes01.etfuturum.ModernMapParityBlocks;
+import ganymedes01.etfuturum.blocks.BlockAmethystCluster;
+import ganymedes01.etfuturum.blocks.BlockBarrier;
+import ganymedes01.etfuturum.blocks.BlockChain;
+import ganymedes01.etfuturum.blocks.BlockCopperGrate;
+import ganymedes01.etfuturum.blocks.BlockGlowLichen;
+import ganymedes01.etfuturum.blocks.BlockHangingRoots;
+import ganymedes01.etfuturum.blocks.BlockLantern;
+import ganymedes01.etfuturum.blocks.BlockLight;
+import ganymedes01.etfuturum.blocks.BlockLightningRod;
 import ganymedes01.etfuturum.blocks.BlockMangroveRoots;
+import ganymedes01.etfuturum.blocks.BlockModernSapling;
+import ganymedes01.etfuturum.blocks.BlockPointedDripstone;
 import ganymedes01.etfuturum.network.WaterloggedChunkMessage;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockChest;
+import net.minecraft.block.BlockEnderChest;
 import net.minecraft.block.BlockFence;
+import net.minecraft.block.BlockLadder;
 import net.minecraft.block.BlockLeaves;
 import net.minecraft.block.BlockPane;
+import net.minecraft.block.BlockRailBase;
+import net.minecraft.block.BlockSign;
 import net.minecraft.block.BlockSlab;
 import net.minecraft.block.BlockStairs;
+import net.minecraft.block.BlockTrapDoor;
+import net.minecraft.block.BlockWall;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
@@ -49,12 +68,26 @@ public final class NativeWaterlogging {
     }
 
     public static boolean holdsWaterWithoutSpreading(Block block, IBlockAccess world, int x, int y, int z) {
-        return block instanceof BlockMangroveRoots || isLeafHost(block, world, x, y, z);
+        return block instanceof BlockMangroveRoots || block instanceof BlockCopperGrate || creativeBucketOnly(block)
+                || isLeafHost(block, world, x, y, z);
+    }
+
+    public static boolean creativeBucketOnly(Block block) {
+        return block instanceof BlockBarrier && !(block instanceof BlockLight);
     }
 
     public static boolean canHold(Block block, IBlockAccess world, int x, int y, int z) {
         return block instanceof BlockStairs || block instanceof BlockSlab && !block.isOpaqueCube()
-                || block instanceof BlockFence || block instanceof BlockPane
+                || block instanceof BlockFence || block instanceof BlockPane || block instanceof BlockWall
+                || block instanceof BlockChest || block instanceof BlockEnderChest
+                || block instanceof BlockRailBase || block instanceof BlockLadder || block instanceof BlockSign
+                || block instanceof BlockTrapDoor || block instanceof BlockChain || block instanceof BlockLantern
+                || block instanceof BlockLight
+                || block instanceof BlockHangingRoots || block instanceof BlockGlowLichen
+                || block instanceof BlockAmethystCluster || block instanceof BlockLightningRod || block instanceof BlockPointedDripstone
+                || (block instanceof BlockModernSapling && block == ModBlocks.SAPLING.get()
+                        && (world.getBlockMetadata(x, y, z) & 7) == 0)
+                || ModernMapParityBlocks.usesWaterloggingOverlay(block)
                 || holdsWaterWithoutSpreading(block, world, x, y, z);
     }
 
@@ -108,6 +141,7 @@ public final class NativeWaterlogging {
         if (world.provider.isHellWorld || !canHold(world.getBlock(x, y, z), world, x, y, z)) return false;
         if (!world.isRemote && set(world, x, y, z, true)) {
             Block host = world.getBlock(x, y, z);
+            ModernMapParityBlocks.onOverlayWaterAdded(host, world, x, y, z);
             world.scheduleBlockUpdate(x, y, z, host, Blocks.flowing_water.tickRate(world));
             world.notifyBlocksOfNeighborChange(x, y, z, Blocks.water);
         }
@@ -128,10 +162,17 @@ public final class NativeWaterlogging {
     public static boolean waterFaceHidden(IBlockAccess world, int x, int y, int z, ForgeDirection face) {
         Block host = world.getBlock(x, y, z);
         // Leaves and mangrove roots let the water mesh show through their cutouts.
-        if (holdsWaterWithoutSpreading(host, world, x, y, z)) return false;
+        if (host instanceof BlockLight || holdsWaterWithoutSpreading(host, world, x, y, z)) return false;
         if (host instanceof BlockSlab) {
             boolean upper = (world.getBlockMetadata(x, y, z) & 8) != 0;
             return face == (upper ? ForgeDirection.UP : ForgeDirection.DOWN);
+        }
+        if (host instanceof BlockTrapDoor) {
+            int meta = world.getBlockMetadata(x, y, z);
+            ForgeDirection covered = BlockTrapDoor.func_150118_d(meta)
+                    ? ForgeDirection.getOrientation(((meta & 3) ^ 1) + 2)
+                    : (meta & 8) != 0 ? ForgeDirection.UP : ForgeDirection.DOWN;
+            return face == covered;
         }
         return world.isSideSolid(x, y, z, face, false);
     }
@@ -233,9 +274,10 @@ public final class NativeWaterlogging {
 
     private static void placed(World world, BlockSnapshot snapshot) {
         Block old = snapshot.getReplacedBlock();
-        if ((old == Blocks.water || old == Blocks.flowing_water) && snapshot.meta == 0)
-            fill(world, snapshot.x, snapshot.y, snapshot.z);
-        else {
+        if ((old == Blocks.water || old == Blocks.flowing_water) && snapshot.meta == 0) {
+            if (!fill(world, snapshot.x, snapshot.y, snapshot.z))
+                ModernMapParityBlocks.fillContainedWater(world, snapshot.x, snapshot.y, snapshot.z);
+        } else {
             onReplacement(world, snapshot.x, snapshot.y, snapshot.z);
             Block host = world.getBlock(snapshot.x, snapshot.y, snapshot.z);
             if (canFillFromSources(world, host, snapshot.x, snapshot.y, snapshot.z))

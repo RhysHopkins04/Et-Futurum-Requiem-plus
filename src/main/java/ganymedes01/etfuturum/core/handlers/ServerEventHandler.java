@@ -601,7 +601,10 @@ public class ServerEventHandler {
 
 	@SubscribeEvent
 	public void onPlaceBlock(BlockEvent.PlaceEvent event) {
-		if (ConfigFunctions.enableFloatingTrapDoors && event.placedBlock instanceof BlockTrapDoor && (sideHit.get() == 0 || sideHit.get() == 1)) {
+		Integer face = sideHit.get();
+		sideHit.remove();
+		if (ConfigFunctions.enableFloatingTrapDoors && event.placedBlock instanceof BlockTrapDoor
+				&& face != null && (face == 0 || face == 1)) {
 			int l = (MathHelper.floor_double(event.player.rotationYaw * 4.0F / 360.0F + 0.5D) + 1) & 3;
 			if (l == 0) {
 				l = 2;
@@ -612,7 +615,7 @@ public class ServerEventHandler {
 			} else {
 				l = 3;
 			}
-			if (sideHit.get() == 0) {
+			if (face == 0) {
 				l += 8;
 			}
 			event.world.setBlockMetadataWithNotify(event.x, event.y, event.z, l, 2);
@@ -668,7 +671,8 @@ public class ServerEventHandler {
 		// right-click through EFR's modern sign layer, while leaving the client event uncancelled
 		// so the normal interaction packet still reaches the server.
 		if (ConfigBlocksItems.enableVanillaSigns && event.action == Action.RIGHT_CLICK_BLOCK
-				&& !SpectatorUtils.isSpectator(player)) {
+				&& !SpectatorUtils.isSpectator(player)
+                && !ModernFluidEventHandler.canUseOnHost(player, event.world, player.getHeldItem(), event.x, event.y, event.z)) {
 			Block clicked = event.world.getBlock(event.x, event.y, event.z);
 			if (clicked == Blocks.standing_sign || clicked == Blocks.wall_sign) {
 				if (BlockWoodSign.handleVanillaSignActivation(event.world, event.x, event.y, event.z, player)) {

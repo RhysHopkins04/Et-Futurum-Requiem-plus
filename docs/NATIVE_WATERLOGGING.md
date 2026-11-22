@@ -1,6 +1,6 @@
 # Native waterlogging
 
-Plus stores source water alongside the block state of stairs, single slabs, fences, panes, iron bars, leaves, and regular mangrove roots. These blocks keep their existing IDs and metadata. Campfires, dripleaf, and aquatic blocks keep their native water encodings. This uses the existing Plus runtime dependencies and works at both vanilla and extended world heights.
+Plus stores source water alongside the supported host block state. The [Java 1.21.11 coverage matrix](WATERLOGGING_JAVA_1_21_11.csv) lists the tested hosts and their legacy IDs. Campfires, dripleaf, decorated pots, and aquatic blocks keep their native water encodings. This uses the existing Plus runtime dependencies and works at both vanilla and extended world heights.
 
 A water bucket fills a supported block and an empty bucket drains it. Placing a supported block into a source retains the water. Breaking a filled block releases a source. Water spreads through open faces using the Plus contained-water flow hooks.
 
@@ -52,4 +52,14 @@ An empty bucket in a dispenser now collects removable contained water. The under
 
 Headless Forge checks at Y67 and Y276 passed source formation, blocked-face behavior, normal five-tick water spread, and dispenser pickup for both general and aquatic water. The Y276 fixture retained the new waterlogged blocks after restart. The packaged JAR passed `check build` and the Crucible classloading regression.
 
-The full Java Edition table covers additional block families. Fence, pane, and iron bar visuals still need a pack check. Distant Horizons water in generated LODs remains unverified.
+Pack testing subsequently confirmed vanilla and modded glass panes with shaders on and off.
+
+### Java block-state coverage — 3.8.0_X30
+
+Mojang's Java 1.21.11 registry report identifies 410 block IDs with a `waterlogged` property. X30 passed fill, drain, source restoration on break, and wet-state reload for every mapped ID in a disposable Forge world at Y276 using the pack's EFRP block settings. All 409 obtainable waterloggable forms also passed placement into a source. The big dripleaf stem has no separate item. A further five inherent-water blocks and fifteen non-waterloggable controls passed their bucket checks. Three of the inherent-water plants also passed direct item placement.
+
+Normal, trapped, Ender, and all eight copper chest variants were covered. Additional chest checks used the regular player interaction path, tested a denied item-use event, and checked wet and dry halves side by side. Pairing and both inventories survived a copper state transition and a restart. The audit also checked extinguishing a lit candle without losing its count, preserving a decorated pot's facing and contents, and releasing both sources when wet small dripleaf breaks.
+
+The fixture uses the registered 1.7.10 variant or documented metadata alias for each Java ID. The report was generated from the official server JAR with `-DbundlerMainClass=net.minecraft.data.Main -jar server.jar --reports`. Placement results include wall signs whose obtainable item produces the wall form through metadata. [Official Mojang Java 1.21.11 server JAR](https://piston-data.mojang.com/v1/objects/64bb6d763bed0a9f1d632ec347938594144943ed/server.jar)
+
+The matrix covers block-state and bucket behavior. Further Java parity work includes sponge absorption of contained water, Dried Ghast hydration, and Conduit activation. Piston transitions, fire and explosion behavior, and the newly added render families still need their own tests. Distant Horizons water in generated LODs remains unverified. [Minecraft Wiki’s Waterlogging reference](https://minecraft.wiki/w/Waterlogging)

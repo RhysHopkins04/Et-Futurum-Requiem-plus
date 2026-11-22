@@ -27,9 +27,9 @@ public class MixinS28PacketEffect {
 
     /** @author EFR Plus @reason Negotiate the effect packet's vertical coordinate width. */
     @Overwrite public void readPacketData(PacketBuffer data) throws IOException {
-        etfu$receivedExtendedFormat = ganymedes01.etfuturum.network.profile.ClientWorldProfile.server().packetVersion >= 2;
+        etfu$receivedExtendedFormat = ClientWorldProfile.server().usesWideEffectY();
         field_149251_a = data.readInt(); field_149250_c = data.readInt();
-        field_149247_d = ProfilePacketFormat.readY(data, ClientWorldProfile.server().packetVersion >= 2);
+        field_149247_d = ProfilePacketFormat.readY(data, etfu$receivedExtendedFormat);
         field_149248_e = data.readInt(); field_149249_b = data.readInt(); field_149246_f = data.readBoolean();
     }
     /** @author EFR Plus @reason Preserve Y above 255 without changing old server/replay reads. */

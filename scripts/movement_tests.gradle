@@ -1,0 +1,24 @@
+// Opt-in matched Forge TCP fixture. Give each process its own disposable game directory.
+gradle.projectsEvaluated {
+    def p = gradle.rootProject
+    def output = p.layout.buildDirectory.dir('movement-tests/classes')
+    def compile = p.tasks.register('compileMovementTests', JavaCompile) {
+        dependsOn p.tasks.named('classes')
+        source = p.fileTree('src/testMovement/java') { include '**/*.java' }
+        classpath = p.sourceSets.main.runtimeClasspath
+        destinationDirectory = output
+        sourceCompatibility = '1.8'
+        targetCompatibility = '1.8'
+        options.compilerArgs += ['-proc:none']
+    }
+    ['runClient', 'runServer'].each { name ->
+        p.tasks.named(name, JavaExec) {
+            dependsOn compile
+            classpath += p.files(output)
+            workingDir = p.file(p.property('movementGameDir'))
+            systemProperty 'mixin.debug.export', 'false'
+            systemProperty 'efr.movementFixture', p.findProperty('movementFixture') ?: 'modern'
+            systemProperty 'efr.movementPort', p.findProperty('movementPort') ?: '25578'
+        }
+    }
+}

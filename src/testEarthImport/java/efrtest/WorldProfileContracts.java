@@ -1,6 +1,7 @@
 package efrtest;
 
 import ganymedes01.etfuturum.network.profile.ServerWorldProfile;
+import ganymedes01.etfuturum.movement.MovementMode;
 import ganymedes01.etfuturum.network.profile.ProfilePacketFormat;
 import ganymedes01.etfuturum.network.profile.ClientWorldProfile;
 import io.netty.buffer.ByteBuf;
@@ -33,7 +34,7 @@ final class WorldProfileContracts {
                 ByteBuf truncated = Unpooled.wrappedBuffer(Arrays.copyOf(bytes, length));
                 try { rejects(() -> ServerWorldProfile.read(truncated)); } finally { truncated.release(); }
             }
-            byte[] future = bytes.clone(); future[4] = 3;
+            byte[] future = bytes.clone(); future[4] = 4;
             ByteBuf bad = Unpooled.wrappedBuffer(future);
             try { rejects(() -> ServerWorldProfile.read(bad)); } finally { bad.release(); }
             rejects(() -> new ServerWorldProfile(false, true, Collections.emptyMap()));
@@ -67,6 +68,24 @@ final class WorldProfileContracts {
         }
         for (int height : new int[]{0, 256, 383, 399, 513, 528})
             rejects(() -> new ServerWorldProfile(true, true, height, Collections.emptyMap()));
+        for (MovementMode mode : MovementMode.values()) {
+            for (int height : new int[]{256, 400}) {
+                ServerWorldProfile profile = new ServerWorldProfile(height > 256, false, height, Collections.emptyMap(), mode);
+                ByteBuf data = Unpooled.buffer();
+                try {
+                    profile.write(data);
+                    check(profile.packetVersion == (mode == MovementMode.DISABLED ? height == 256 ? 1 : 2 : 3),
+                            "movement changed legacy protocol");
+                    ServerWorldProfile received = ServerWorldProfile.read(data.duplicate());
+                    check(profile.equals(received), "movement profile round trip");
+                    check(received.usesWideEffectY() == (height > 256), "movement changed effect packet Y width");
+                    if (mode != MovementMode.DISABLED) {
+                        data.setByte(8, 99);
+                        rejects(() -> ServerWorldProfile.read(data));
+                    }
+                } finally { data.release(); }
+            }
+        }
         System.out.println("WORLD_PROFILE_CONTRACTS PASSED");
     }
     private static void rejects(Runnable operation) {

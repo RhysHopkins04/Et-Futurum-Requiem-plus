@@ -393,6 +393,19 @@ public class EtFuturumEarlyMixins implements IFMLLoadingPlugin, IEarlyMixinLoade
 		}
 		mixins.add("blocks.MixinTileEntitySkull");
 
+        mixins.add("movement.MixinEntityPlayer");
+        mixins.add("movement.MixinEntity");
+        mixins.add("movement.MixinItem");
+        mixins.add("movement.MixinEntityLivingBase");
+        mixins.add("movement.MixinNetHandlerPlayServer");
+        if (side == MixinEnvironment.Side.CLIENT) {
+            mixins.add("movement.client.MixinEntityPlayerSP");
+            mixins.add("movement.client.MixinEntityPlayer");
+            mixins.add("movement.client.MixinEntityOtherPlayerMP");
+            mixins.add("movement.client.MixinEntityRenderer");
+            mixins.add("movement.client.MixinRenderPlayer");
+        }
+
         mixins.add("profile.MixinHandshakeCodec");
         mixins.add("profile.MixinHandshakeHandler");
         if (side == MixinEnvironment.Side.CLIENT) {

@@ -20,3 +20,7 @@ WGMap keeps its existing version format and build policy. NTM keeps its upstream
 Released as `etfuturum-3.6.0_X3.jar`: configurable-height feature advances 3.5.28 to 3.6.0; three successful packaging checks consumed X1, X2 and X3. Offline `check build` passed, including world-profile and Earth-import contracts. Counter checks passed for read-only help, dry-run and failed task selection (no increment), followed by a successful CI-mode build (increment). Existing snapshot/update-check behaviour is retained independently of naming.
 
 The user reports successful live height increases to 384 and 400, building at the raised height, and ReplayMod compatibility; map compatibility is believed working. This run did not repeat live multiplayer or lowering tests. Prior disposable-server and actual Crucible bytecode validation is recorded in the height documents.
+
+## 22 November 2026 movement candidate
+
+`3.9.0_X39` advances the minor component from 3.8.0 for modern player movement. The verified base had consumed X35. Candidate builds consumed X36 through X39. The deliverable filename is `etfuturum-3.9.0_X39.jar`, and its embedded version is `3.9.0_X39`. See [the movement verification notes](MODERN_PLAYER_MOVEMENT.md) for fixture results and pack coverage.

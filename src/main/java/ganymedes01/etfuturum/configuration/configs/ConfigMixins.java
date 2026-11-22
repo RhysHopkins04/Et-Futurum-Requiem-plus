@@ -28,6 +28,8 @@ public class ConfigMixins extends ConfigBase {
 	public static boolean avoidDroppingItemsWhenClosing;
 	public static boolean enableSpectatorMode;
 	public static boolean enableElytra;
+	public static boolean modernPlayerMovement;
+	public static boolean legacySneakInModernMovement;
 	public static boolean enableNewElytraTakeoffLogic;
 	public static boolean enableDoWeatherCycle;
 	public static boolean enableRandomTickSpeed;
@@ -73,6 +75,10 @@ public class ConfigMixins extends ConfigBase {
 
 	@Override
 	protected void syncConfigOptions() {
+		modernPlayerMovement = getBoolean("modernPlayerMovement", catBackport, false,
+				"Enable sprint swimming, crawling and low-clearance poses. The server selects the mode. Restart after changing.");
+		legacySneakInModernMovement = getBoolean("legacySneakInModernMovement", catBackport, false,
+				"Preserve 1.7.10 sneak height and camera on open ground when modernPlayerMovement is enabled. Low ceilings can still force a lower pose. Server setting. Restart after changing.");
 		if (EtFuturumEarlyMixins.side == MixinEnvironment.Side.CLIENT) {
 			furnaceCrackle = getBoolean("furnaceCrackle", catBackport, true, "Allows vanilla furnaces to have crackling sounds.\nModified Client Classes: net.minecraft.block.BlockFurnace");
 			boundedBlockBreakingParticles = getBoolean("boundedBlockBreakingParticles", catBackport, true, "In 1.14+, when breaking a block, the block break particles stay within the outline, instead of always occupying the whole block space.\nMofified Client Classes: net.minecraft.client.particle.EffectRenderer");

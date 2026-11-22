@@ -11,6 +11,7 @@ import cpw.mods.fml.common.gameevent.TickEvent;
 import cpw.mods.fml.common.network.NetworkRegistry.TargetPoint;
 import cpw.mods.fml.relauncher.ReflectionHelper;
 import cpw.mods.fml.relauncher.Side;
+import ganymedes01.etfuturum.movement.PlayerMovement;
 import ganymedes01.etfuturum.*;
 import ganymedes01.etfuturum.api.RawOreRegistry;
 import ganymedes01.etfuturum.api.StrippedLogRegistry;
@@ -1894,7 +1895,7 @@ public class ServerEventHandler {
 				}
 				if (isElytraFlying != ((IElytraPlayer) e.player).etfu$lastElytraFlying()) {
 					float f = 0.6f;
-					float f1 = isElytraFlying ? 0.6f : 1.8f;
+					float f1 = isElytraFlying ? 0.6f : PlayerMovement.pose(e.player).height;
 
 					if (f != e.player.width || f1 != e.player.height) {
 						// Always reset hitbox. For future reference, Backlytra used world.func_147461_a to check that there was nothing in the bounding box.

@@ -28,3 +28,5 @@ The user reports successful live height increases to 384 and 400, building at th
 `3.9.1_X40` advances the patch for the crawl rendering correction. One successful `check build` consumed X40 after verifying X39 was the highest packaged build. The filename `etfuturum-3.9.1_X40.jar` and embedded version match. SHA-256 is `933093595a7f4d852dfa68a940fc70bade90cafbe1d6fea2dd87b3c755fde918`.
 
 `3.9.2_X41` advances the patch for swim activation and first-person item lighting. One successful `check build` consumed X41. The filename `etfuturum-3.9.2_X41.jar` and embedded version match. SHA-256 is `82cf54b25f80ce92dd04eda9c4f6a8733106423431009ebc6d556e2e879898a1`.
+
+`3.9.3_X43` advances the patch for the swim camera and water surface. X42 packaged successfully and consumed its number but failed dedicated Crucible startup because a client bob hook also targeted its server class. X43 moved the hook to the physical client. Its filename `etfuturum-3.9.3_X43.jar` and embedded version match. SHA-256 is `21112188aeb8dc3d4f736032208021d67fa150a2968113a2ae4da38cd282f90b`.

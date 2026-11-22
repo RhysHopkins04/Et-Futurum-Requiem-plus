@@ -79,3 +79,15 @@ The first-person hand renderer used the standing position to sample the lightmap
 At 400 height, both dedicated Forge and Crucible dev-280 passed the trapdoor, bridge, slab and waterlogged passage checks, plus shallow wading and the sprint-key release check with forward held. Both ran 23 submerged wall-contact ticks with zero client pose drops, and the servers confirmed the player was still swimming. The lit tunnel test confirmed that the first-person item received the same packed light as the crawl eye, while the ceiling returned zero. The Crucible run included ProtocolLib 3.6.5 and SuperVanish 6.2.18 from the same publisher builds used for X40.
 
 The 256-height Forge run also passed legacy sneak, including edge stop and placement. In the Java 21 pack comparison, X40 passed packed light 0 into the FMUR M4A1 renderer and the item appeared black. X41 passed 224, matching the crawl-space sample, and the gun remained visible. The fixed HUD and air row checks passed again. This pack run had Angelica installed with shaders off. The full live plugin and anticheat configuration remains a separate test.
+
+## Swim camera, floor bob and surfacing
+
+The 1.21.11 client bytecode confirms that swim continuation depends on sprinting and body contact with water. The underwater view uses the water surface at the eye, so it can clear while the player is still swimming. The walking bob target decays to zero during swim, even when the player is on the floor.
+
+X41 applied the pose eye offset in the camera transform and again when it projected the viewpoint for fog and water FOV. In the Forge regression, the sampled viewpoint was up to 1.25 blocks from the actual eye and misclassified 250 submerged frames. The legacy bob amplitude also reached 0.10 during steady floor swimming.
+
+The fix samples the interpolated first-person pose eye for fog, FOV and the water overlay. All three use the same fluid surface test, and it also applies to the pose eye used for water checks such as air and shader state. Swimming damps the legacy walking and pitch bob using the existing interpolation factors. This keeps the camera and pick origin aligned during swimming. Eye height still changes immediately on a genuine pose change, unlike modern Java's eye-height easing.
+
+X43 passed the 400-height Forge and Crucible fixtures with zero water overlay and fog mismatches. On Forge, 299 submerged frames and 14 surfaced frames were sampled. On Crucible with ProtocolLib and SuperVanish, 294 submerged frames and 14 surfaced frames were sampled. Both ran 23 floor-contact ticks with negligible view bob, recorded three ticks of swimming after the eyes surfaced, then returned to standing when the body left the water. The waterlogged passage, observer metadata, crawl lighting, shift placement and reconnect checks also passed.
+
+The packaged X43 JAR passed the Wargames Java 21 pack's FMUR crawl lighting, fixed HUD and submerged air row checks with Angelica installed and shaders off.

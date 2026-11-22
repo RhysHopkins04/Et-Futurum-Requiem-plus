@@ -10,6 +10,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.MathHelper;
+import net.minecraft.world.World;
 import net.minecraftforge.fluids.IFluidBlock;
 
 public final class PlayerMovement {
@@ -61,24 +62,32 @@ public final class PlayerMovement {
     }
 
     public static float legacyClientEyeOffset(float offset, EntityPlayer player) {
-        return pose(player) != MovementPose.VANILLA && !vanillaPoseRequired(player) ? 0.0F : offset;
+        return usesPoseEye(player) ? 0.0F : offset;
+    }
+
+    public static boolean usesPoseEye(Entity entity) {
+        return entity instanceof EntityPlayer && pose(entity) != MovementPose.VANILLA
+                && !vanillaPoseRequired((EntityPlayer) entity);
     }
 
     public static boolean eyesInWater(EntityPlayer player, float height) {
-        double eyeY = player.boundingBox.minY + height;
-        int x = MathHelper.floor_double(player.posX);
-        int y = MathHelper.floor_double(eyeY);
-        int z = MathHelper.floor_double(player.posZ);
-        Block block = player.worldObj.getBlock(x, y, z);
+        return waterAt(player.worldObj, player.posX, player.boundingBox.minY + height, player.posZ);
+    }
+
+    public static boolean waterAt(World world, double viewX, double viewY, double viewZ) {
+        int x = MathHelper.floor_double(viewX);
+        int y = MathHelper.floor_double(viewY);
+        int z = MathHelper.floor_double(viewZ);
+        Block block = world.getBlock(x, y, z);
         if (block.getMaterial() == Material.water) {
             if (block instanceof IFluidBlock) {
-                float fill = ((IFluidBlock) block).getFilledPercentage(player.worldObj, x, y, z);
-                return fill < 0 ? eyeY > y + 1 + fill : eyeY < y + fill;
+                float fill = ((IFluidBlock) block).getFilledPercentage(world, x, y, z);
+                return fill < 0 ? viewY > y + 1 + fill : viewY < y + fill;
             }
-            if (player.worldObj.getBlock(x, y + 1, z).getMaterial() == Material.water
-                    || ContainedWater.at(player.worldObj, player.posX, y + 1.01D, player.posZ)) return true;
-            return eyeY < y + 1 - BlockLiquid.getLiquidHeightPercent(player.worldObj.getBlockMetadata(x, y, z));
+            if (world.getBlock(x, y + 1, z).getMaterial() == Material.water
+                    || ContainedWater.at(world, viewX, y + 1.01D, viewZ)) return true;
+            return viewY < y + 1 - BlockLiquid.getLiquidHeightPercent(world.getBlockMetadata(x, y, z));
         }
-        return ContainedWater.at(player.worldObj, player.posX, eyeY, player.posZ);
+        return ContainedWater.at(world, viewX, viewY, viewZ);
     }
 }

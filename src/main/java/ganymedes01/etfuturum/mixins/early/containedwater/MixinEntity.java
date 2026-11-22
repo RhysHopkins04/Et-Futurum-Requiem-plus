@@ -1,6 +1,7 @@
 package ganymedes01.etfuturum.mixins.early.containedwater;
 
 import ganymedes01.etfuturum.core.utils.ContainedWater;
+import ganymedes01.etfuturum.movement.PlayerMovement;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
 import org.spongepowered.asm.mixin.Mixin;
@@ -33,8 +34,12 @@ public abstract class MixinEntity {
 
     @Inject(method = "isInsideOfMaterial", at = @At("RETURN"), cancellable = true)
     private void etfu$eyeWater(Material material, CallbackInfoReturnable<Boolean> cir) {
-        Entity e = (Entity)(Object)this;
-        if (material == Material.water && !cir.getReturnValue() && ContainedWater.at(e.worldObj,e.posX,e.posY+e.getEyeHeight(),e.posZ))
+        if (material != Material.water) return;
+        Entity e = (Entity) (Object) this;
+        if (PlayerMovement.usesPoseEye(e)) {
+            cir.setReturnValue(PlayerMovement.waterAt(e.worldObj, e.posX, e.posY + e.getEyeHeight(), e.posZ));
+        } else if (!cir.getReturnValue() && ContainedWater.at(e.worldObj, e.posX, e.posY + e.getEyeHeight(), e.posZ)) {
             cir.setReturnValue(true);
+        }
     }
 }

@@ -78,6 +78,12 @@ public final class MovementFixture {
                 world.setBlock(x, Y, z, edge ? Blocks.stone : Blocks.water);
             }
         }
+        for (int x = 36; x <= 51; x++) {
+            for (int z = -1; z <= 1; z++) {
+                world.setBlock(x, Y - 1, z, Blocks.stone);
+                for (int y = Y; y <= Y + 2; y++) world.setBlock(x, y, z, Blocks.water);
+            }
+        }
         MinecraftForge.EVENT_BUS.register(this);
         FMLCommonHandler.instance().bus().register(this);
         System.out.println("MOVEMENT_FIXTURE_SERVER_READY " + MovementMode.local());
@@ -166,6 +172,9 @@ public final class MovementFixture {
                 break;
             case "fixture-wade":
                 player.playerNetServerHandler.setPlayerLocation(29.5D, y, 0.5D, -90F, 0);
+                break;
+            case "fixture-swim-camera":
+                player.playerNetServerHandler.setPlayerLocation(36.5D, y + 0.05D, 0.5D, -90F, 0);
                 break;
             case "fixture-waterlogged":
                 player.playerNetServerHandler.setPlayerLocation(16.5D, y - 0.5D, 0.5D, -90F, 0);

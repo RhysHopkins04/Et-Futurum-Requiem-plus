@@ -9,12 +9,14 @@ import ganymedes01.etfuturum.movement.MovementMode;
 import ganymedes01.etfuturum.movement.MovementPose;
 import ganymedes01.etfuturum.movement.PlayerMovement;
 import ganymedes01.etfuturum.network.profile.ClientWorldProfile;
+import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.renderer.OpenGlHelper;
+import net.minecraft.client.renderer.ActiveRenderInfo;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
@@ -26,6 +28,8 @@ import net.minecraft.util.ScreenShotHelper;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraftforge.client.event.RenderPlayerEvent;
+import net.minecraftforge.client.event.EntityViewRenderEvent;
+import net.minecraftforge.client.event.RenderBlockOverlayEvent;
 import net.minecraftforge.client.IItemRenderer;
 import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.common.MinecraftForge;
@@ -50,6 +54,12 @@ public final class MovementFixtureClient {
     private boolean wrongCrawlLight;
     private boolean swamAfterSprintRelease;
     private int wallTicks, wallPoseDrops;
+    private int floorSwimTicks, submergedFrames, surfaceFrames, badFogFrames, badOverlayFrames;
+    private int surfaceSwimTicks;
+    private boolean stoodAfterWaterExit;
+    private float floorBob;
+    private double cameraEyeError;
+    private boolean sampledFog, expectedWet, fogWet, overlayWet;
 
     public static void start() {
         MovementFixtureClient fixture = new MovementFixtureClient();
@@ -102,6 +112,15 @@ public final class MovementFixtureClient {
 
     @SubscribeEvent
     public void captureCrawl(TickEvent.RenderTickEvent event) {
+        if (event.phase == TickEvent.Phase.START) {
+            sampledFog = false;
+            overlayWet = false;
+        } else if (sampledFog) {
+            if (expectedWet) submergedFrames++;
+            else surfaceFrames++;
+            if (fogWet != expectedWet) badFogFrames++;
+            if (overlayWet != expectedWet) badOverlayFrames++;
+        }
         if (event.phase == TickEvent.Phase.END && captureCrawl) {
             captureCrawl = false;
             ScreenShotHelper.saveScreenshot(mc.mcDataDir, "movement-crawl.png", mc.displayWidth, mc.displayHeight,
@@ -110,12 +129,33 @@ public final class MovementFixtureClient {
     }
 
     @SubscribeEvent
+    public void swimFog(EntityViewRenderEvent.FogDensity event) {
+        EntityClientPlayerMP player = mc.thePlayer;
+        if ((stage != 33 && stage != 34) || event.entity != player
+                || PlayerMovement.pose(player) != MovementPose.SWIM) return;
+        double eye = player.prevPosY + (player.posY - player.prevPosY) * event.renderPartialTicks + player.getEyeHeight();
+        double surface = MovementFixture.Y + 2 + 8.0D / 9.0D;
+        if (Math.abs(eye - surface) < 0.05D) return;
+        Vec3 projected = ActiveRenderInfo.projectViewFromEntity(player, event.renderPartialTicks);
+        cameraEyeError = Math.max(cameraEyeError, Math.abs(projected.yCoord - eye));
+        sampledFog = true;
+        expectedWet = eye < surface;
+        fogWet = event.block.getMaterial() == Material.water;
+    }
+
+    @SubscribeEvent
+    public void swimOverlay(RenderBlockOverlayEvent event) {
+        if (event.overlayType == RenderBlockOverlayEvent.OverlayType.WATER) overlayWet = true;
+    }
+
+    @SubscribeEvent
     public void tick(TickEvent.ClientTickEvent event) {
         if (event.phase != TickEvent.Phase.END) return;
         try {
             if (new File("FIXTURE_STOP").isFile()) { mc.shutdown(); return; }
             require(++ticks < 1200, "timeout stage " + stage + " seen=" + seen + " screen=" + mc.currentScreen);
-            if (++elapsed < 10 && stage != 21 && stage != 15 && stage != 24 && stage != 29 && stage != 13) return;
+            if (++elapsed < 10 && stage != 21 && stage != 15 && stage != 24 && stage != 29
+                    && stage != 13 && stage != 33 && stage != 34) return;
             if (stage == 0) {
                 FMLClientHandler.instance().setupServerList();
                 FMLClientHandler.instance().connectToServer(new GuiMainMenu(),
@@ -153,6 +193,11 @@ public final class MovementFixtureClient {
                             require(checkedCrawlLight && !wrongCrawlLight && !swamAfterSprintRelease && wallPoseDrops == 0,
                                     "crawl light checked=" + checkedCrawlLight + " wrong=" + wrongCrawlLight
                                             + ", swims after release=" + swamAfterSprintRelease + ", wall pose drops=" + wallPoseDrops);
+                            require(floorSwimTicks >= 10 && submergedFrames > 0 && surfaceFrames > 0
+                                            && surfaceSwimTicks >= 2 && stoodAfterWaterExit
+                                            && badFogFrames == 0 && badOverlayFrames == 0
+                                            && cameraEyeError < 0.05D && floorBob < 0.005F,
+                                    "swim camera regression, see MOVEMENT_FIXTURE_SWIM_CAMERA");
                         }
                         System.out.println("MOVEMENT_FIXTURE_CLIENT PASSED " + fixture + " including reconnect");
                         mc.shutdown();
@@ -360,6 +405,36 @@ public final class MovementFixtureClient {
                     pose(player, MovementPose.VANILLA);
                     require(player.isInWater() && player.posX > 29.6D, "player did not wade forward");
                     System.out.println("MOVEMENT_FIXTURE_WADE pose=VANILLA");
+                    keys(false, false, false);
+                    command(player, "swim-camera");
+                    break;
+                case 32:
+                    require(player.isInWater() && player.posX > 36.0D, "camera sample did not start in deep water");
+                    keys(true, false, true);
+                    advance();
+                    break;
+                case 33:
+                    if (elapsed < 12) return;
+                    pose(player, MovementPose.SWIM);
+                    if (player.onGround) {
+                        floorSwimTicks++;
+                        floorBob = Math.max(floorBob, Math.abs(player.cameraYaw) + Math.abs(player.cameraPitch));
+                    }
+                    if (elapsed < 34) return;
+                    require(player.posX > 38.0D, "player did not swim along the floor");
+                    player.rotationPitch = player.prevRotationPitch = -40F;
+                    advance();
+                    break;
+                case 34:
+                    if (player.isInWater() && PlayerMovement.pose(player) == MovementPose.SWIM
+                            && !PlayerMovement.eyesInWater(player, MovementPose.SWIM.eye)) surfaceSwimTicks++;
+                    stoodAfterWaterExit = !player.isInWater() && PlayerMovement.pose(player) == MovementPose.VANILLA;
+                    if (!stoodAfterWaterExit && elapsed < 45) return;
+                    System.out.println("MOVEMENT_FIXTURE_SWIM_CAMERA floorTicks=" + floorSwimTicks + " bob=" + floorBob
+                            + " submergedFrames=" + submergedFrames + " surfaceFrames=" + surfaceFrames
+                            + " surfaceSwimTicks=" + surfaceSwimTicks + " stoodAfterExit=" + stoodAfterWaterExit
+                            + " fogMismatch=" + badFogFrames + " overlayMismatch=" + badOverlayFrames
+                            + " eyeError=" + cameraEyeError);
                     keys(false, false, false);
                     command(player, "waterlogged");
                     stage = 14;

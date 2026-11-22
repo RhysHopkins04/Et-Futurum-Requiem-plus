@@ -2,6 +2,7 @@ package ganymedes01.etfuturum.mixins.early.backinslime;
 
 import com.google.common.collect.Lists;
 import ganymedes01.etfuturum.Tags;
+import ganymedes01.etfuturum.core.utils.WaterloggedPistonMove;
 import ganymedes01.etfuturum.core.utils.helpers.BlockPos;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
@@ -139,7 +140,9 @@ public class MixinBlockPistonBase extends Block {
 			world.setBlock(x, y, z, Blocks.piston_extension, side, 3);
 			world.setTileEntity(x, y, z, BlockPistonMoving.getTileEntity(this, side, side, false, true));
 
-			if (this.isSticky && extend == 1) {
+			if (this.isSticky && extend == -1) {
+				WaterloggedPistonMove.retainOnShortPulse(world.getTileEntity(x + xoffset2, y + yoffset2, z + zoffset2));
+			} else if (this.isSticky && extend == 1) {
 				Block blockToPull = world.getBlock(x + xoffset2, y + yoffset2, z + zoffset2);
 				int metaToPull = world.getBlockMetadata(x + xoffset2, y + yoffset2, z + zoffset2);
 
@@ -351,7 +354,11 @@ public class MixinBlockPistonBase extends Block {
 				world.setBlockToAir(blockX, blockY, blockZ);
 			} else {
 				world.setBlock(blockX, blockY, blockZ, Blocks.piston_extension, blockMeta, 4);
-				world.setTileEntity(blockX, blockY, blockZ, BlockPistonMoving.getTileEntity(block, blockMeta, side, true, false));
+				TileEntity moving = BlockPistonMoving.getTileEntity(block, blockMeta, side, true, false);
+				if (extending && this.isSticky) {
+					WaterloggedPistonMove.record(world, pos.getX(), pos.getY(), pos.getZ(), moving);
+				}
+				world.setTileEntity(blockX, blockY, blockZ, moving);
 				world.notifyBlocksOfNeighborChange(blockX, blockY, blockZ, block);
 			}
 

@@ -62,10 +62,18 @@ Normal, trapped, Ender, and all eight copper chest variants were covered. Additi
 
 The fixture uses the registered 1.7.10 variant or documented metadata alias for each Java ID. The report was generated from the official server JAR with `-DbundlerMainClass=net.minecraft.data.Main -jar server.jar --reports`. Placement results include wall signs whose obtainable item produces the wall form through metadata. [Official Mojang Java 1.21.11 server JAR](https://piston-data.mojang.com/v1/objects/64bb6d763bed0a9f1d632ec347938594144943ed/server.jar)
 
-The matrix covers block-state and bucket behavior. Dried Ghast hydration and Conduit activation have their own gameplay requirements. Piston transitions, fire and explosion behavior, and the newly added render families still need their own tests. Distant Horizons water in generated LODs remains unverified. [Minecraft Wiki’s Waterlogging reference](https://minecraft.wiki/w/Waterlogging)
+The matrix covers block-state and bucket behavior. Dried Ghast hydration and Conduit activation have their own gameplay requirements. The new render families still need a visual pack check. Distant Horizons water in generated LODs remains unverified. [Minecraft Wiki’s Waterlogging reference](https://minecraft.wiki/w/Waterlogging)
 
 ### Sponge absorption — 3.8.0_X31
 
 Sponges drain removable contained water while keeping the host and its inventory. They absorb inherent water by removing kelp and seagrass, including both tall seagrass halves where reachable. A waterlogged barrier retains its Creative-only restriction and blocks traversal. Absorption follows connected wet cells up to six steps and 64 drained cells.
 
 Headless fixtures at Y67 and Y276 passed mixed sources, chest and decorated-pot inventory preservation, retained panes and dripleaf, both tall seagrass halves, dry gaps, barriers, range, and capacity. [Minecraft Wiki’s Sponge reference](https://minecraft.wiki/w/Sponge)
+
+### Java world interactions — 3.8.0_X34
+
+Water prevents ignition and fire spread from a compatible host. The explosion calculation also accounts for the fluid's resistance. Bucket lava and downward lava flow leave an occupied waterlogged cell intact. Nearby lava still cools against contained water. Headless wet and dry controls covered fire, environmental and entity explosions, and both lava paths.
+
+Normal piston push and sticky pull clear the moved block's waterlogged state. When a sticky piston retracts while its push is still in progress and leaves the pushed block in place, the pushed block keeps its water. Normal and short-pulse movement passed with both vanilla pistons and Better Pistons at Y276, including a moving-tile NBT round trip. The transition byte is stored on the moving piston tile. Settled water remains in the same chunk overlay format. [Minecraft Wiki’s piston and waterlogging rules](https://minecraft.wiki/w/Waterlogging)
+
+The 430-row coverage matrix was rerun on X34. Its fill, break, placement, and reload results match X30. X34 passed `check build`, headless Forge startup, and the packaged Crucible classloading regression.

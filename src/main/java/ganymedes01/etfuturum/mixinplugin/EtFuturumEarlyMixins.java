@@ -90,6 +90,10 @@ public class EtFuturumEarlyMixins implements IFMLLoadingPlugin, IEarlyMixinLoade
         mixins.add("containedwater.MixinChunkCache");
         mixins.add("containedwater.MixinBlockLiquid");
         mixins.add("containedwater.MixinBlockDynamicLiquid");
+        mixins.add("containedwater.MixinBlockFire");
+        mixins.add("containedwater.MixinExplosion");
+        mixins.add("containedwater.MixinTileEntityPiston");
+        if (!ConfigMixins.betterPistons) mixins.add("containedwater.MixinBlockPistonBase");
         mixins.add("containedwater.MixinEntity");
         mixins.add("containedwater.MixinEntityLivingBase");
         mixins.add("containedwater.MixinItemBucket");

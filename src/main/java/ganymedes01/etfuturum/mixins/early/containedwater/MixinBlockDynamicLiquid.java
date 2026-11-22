@@ -29,9 +29,9 @@ public abstract class MixinBlockDynamicLiquid implements IContainedWaterFlow {
     @Inject(method = "func_149809_q", at = @At("HEAD"), cancellable = true)
     private void etfu$doNotDisplaceContainedSource(World world, int x, int y, int z,
                                                       CallbackInfoReturnable<Boolean> cir) {
-        if (((Block) (Object) this).getMaterial() == Material.water
-                && (NativeWaterlogging.canHold(world.getBlock(x, y, z), world, x, y, z)
-                        || ModernMapParityBlocks.containsWater(world, x, y, z))) {
+        Material fluid = ((Block) (Object) this).getMaterial();
+        if (fluid == Material.water && NativeWaterlogging.canHold(world.getBlock(x, y, z), world, x, y, z)
+                || (fluid == Material.water || fluid == Material.lava) && ModernMapParityBlocks.containsWater(world, x, y, z)) {
             cir.setReturnValue(false);
         }
     }

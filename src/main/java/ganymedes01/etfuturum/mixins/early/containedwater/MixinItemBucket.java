@@ -20,6 +20,10 @@ public abstract class MixinItemBucket {
 
     @Inject(method = "tryPlaceContainedLiquid", at = @At("HEAD"), cancellable = true)
     private void etfu$fillAquatic(World world, int x, int y, int z, CallbackInfoReturnable<Boolean> cir) {
+        if (isFull == Blocks.flowing_lava && ModernMapParityBlocks.containsWater(world, x, y, z)) {
+            cir.setReturnValue(false);
+            return;
+        }
         if (isFull != Blocks.flowing_water) return;
         if (NativeWaterlogging.creativeBucketOnly(world.getBlock(x, y, z))) {
             cir.setReturnValue(false); // Only a Creative player's direct bucket use can fill a barrier.

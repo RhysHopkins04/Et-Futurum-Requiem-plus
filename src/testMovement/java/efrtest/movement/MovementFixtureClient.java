@@ -14,13 +14,20 @@ import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.model.ModelBiped;
+import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.ScreenShotHelper;
 import net.minecraft.util.Vec3;
+import net.minecraft.world.EnumSkyBlock;
 import net.minecraftforge.client.event.RenderPlayerEvent;
+import net.minecraftforge.client.IItemRenderer;
+import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.common.MinecraftForge;
 
 import java.io.File;
@@ -39,11 +46,45 @@ public final class MovementFixtureClient {
     private MovementPose loggedPose;
     private boolean sawCrawlRender;
     private boolean captureCrawl;
+    private boolean checkedCrawlLight;
+    private boolean wrongCrawlLight;
+    private boolean swamAfterSprintRelease;
+    private int wallTicks, wallPoseDrops;
 
     public static void start() {
         MovementFixtureClient fixture = new MovementFixtureClient();
         FMLCommonHandler.instance().bus().register(fixture);
         MinecraftForge.EVENT_BUS.register(fixture);
+        if (!fixture.observer) {
+            MinecraftForgeClient.registerItemRenderer(Items.stick, new IItemRenderer() {
+                public boolean handleRenderType(ItemStack stack, ItemRenderType type) {
+                    return type == ItemRenderType.EQUIPPED_FIRST_PERSON;
+                }
+
+                public boolean shouldUseRenderHelper(ItemRenderType type, ItemStack stack, ItemRendererHelper helper) {
+                    return false;
+                }
+
+                public void renderItem(ItemRenderType type, ItemStack stack, Object... data) {
+                    fixture.checkCrawlLight();
+                }
+            });
+        }
+    }
+
+    private void checkCrawlLight() {
+        EntityClientPlayerMP player = mc.thePlayer;
+        if (stage != 10 || player.posX < 10.1D || player.posX >= 10.9D
+                || PlayerMovement.pose(player) != MovementPose.CRAWL || checkedCrawlLight) return;
+        int x = MathHelper.floor_double(player.posX);
+        int z = MathHelper.floor_double(player.posZ);
+        int y = MathHelper.floor_double(player.posY + player.getEyeHeight());
+        int expected = mc.theWorld.getLightBrightnessForSkyBlocks(x, y, z, 0);
+        int ceiling = mc.theWorld.getLightBrightnessForSkyBlocks(x, y + 1, z, 0);
+        int actual = (int) OpenGlHelper.lastBrightnessY << 16 | (int) OpenGlHelper.lastBrightnessX;
+        checkedCrawlLight = true;
+        wrongCrawlLight = actual != expected || expected == ceiling;
+        System.out.println("MOVEMENT_FIXTURE_CRAWL_LIGHT actual=" + actual + " eye=" + expected + " ceiling=" + ceiling);
     }
 
     @SubscribeEvent
@@ -74,7 +115,7 @@ public final class MovementFixtureClient {
         try {
             if (new File("FIXTURE_STOP").isFile()) { mc.shutdown(); return; }
             require(++ticks < 1200, "timeout stage " + stage + " seen=" + seen + " screen=" + mc.currentScreen);
-            if (++elapsed < 10 && stage != 21 && stage != 15 && stage != 24) return;
+            if (++elapsed < 10 && stage != 21 && stage != 15 && stage != 24 && stage != 29 && stage != 13) return;
             if (stage == 0) {
                 FMLClientHandler.instance().setupServerList();
                 FMLClientHandler.instance().connectToServer(new GuiMainMenu(),
@@ -108,6 +149,11 @@ public final class MovementFixtureClient {
                 case 2:
                     if (elapsed < 30 || !player.onGround) return;
                     if (reconnects > 0) {
+                        if (expected != MovementMode.DISABLED) {
+                            require(checkedCrawlLight && !wrongCrawlLight && !swamAfterSprintRelease && wallPoseDrops == 0,
+                                    "crawl light checked=" + checkedCrawlLight + " wrong=" + wrongCrawlLight
+                                            + ", swims after release=" + swamAfterSprintRelease + ", wall pose drops=" + wallPoseDrops);
+                        }
                         System.out.println("MOVEMENT_FIXTURE_CLIENT PASSED " + fixture + " including reconnect");
                         mc.shutdown();
                         return;
@@ -116,6 +162,7 @@ public final class MovementFixtureClient {
                     elapsed = 0;
                     break;
                 case 21:
+                    player.rotationYaw = player.prevRotationYaw = -90F;
                     if (elapsed > 1 && expected == MovementMode.MODERN) {
                         pose(player, (elapsed & 1) == 0 ? MovementPose.CROUCH : MovementPose.VANILLA);
                     }
@@ -126,6 +173,7 @@ public final class MovementFixtureClient {
                     }
                     break;
                 case 3:
+                    player.rotationYaw = player.prevRotationYaw = -90F;
                     if (elapsed < 60) return;
                     require(player.onGround && player.posX > 1 && player.posX < 1.305, "sneak edge failed x=" + player.posX);
                     edgeX = player.posX;
@@ -243,6 +291,9 @@ public final class MovementFixtureClient {
                         stage = 11;
                         break;
                     }
+                    // Separate the samples even when the freshly built fixture has not relit its chunks yet.
+                    mc.theWorld.setLightValue(EnumSkyBlock.Block, 10, 80, 0, 14);
+                    mc.theWorld.setLightValue(EnumSkyBlock.Block, 10, 81, 0, 0);
                     player.rotationYaw = player.prevRotationYaw = -90F;
                     keys(true, false, false);
                     stage = 10;
@@ -269,12 +320,49 @@ public final class MovementFixtureClient {
                     }
                     pose(player, MovementPose.SWIM);
                     require(player.posX > 12.65D, "sprint swim did not move forward");
-                    keys(false, false, false);
+                    keys(true, false, false);
                     advance();
                     break;
                 case 13:
-                    require(PlayerMovement.pose(player) != MovementPose.SWIM, "swim stuck after sprint release");
+                    if (elapsed < 3) return;
+                    require(player.isInWater(), "sprint release sample left the water");
+                    swamAfterSprintRelease = PlayerMovement.pose(player) == MovementPose.SWIM;
+                    System.out.println("MOVEMENT_FIXTURE_SWIM_KEY_RELEASE pose=" + PlayerMovement.pose(player));
+                    keys(false, false, false);
+                    command(player, "swim-wall");
+                    stage = 28;
+                    break;
+                case 28:
+                    require(player.isInWater(), "wall sample did not start underwater");
+                    keys(true, false, true);
+                    advance();
+                    break;
+                case 29:
+                    if (player.isCollidedHorizontally && player.isInWater()) {
+                        wallTicks++;
+                        if (PlayerMovement.pose(player) != MovementPose.SWIM) wallPoseDrops++;
+                    }
+                    if (elapsed == 30 && wallPoseDrops == 0) player.sendChatMessage("fixture-check-swim-wall");
+                    if (elapsed < 35) return;
+                    require(wallTicks >= 10, "did not reach underwater wall");
+                    System.out.println("MOVEMENT_FIXTURE_SWIM_WALL ticks=" + wallTicks + " poseDrops=" + wallPoseDrops);
+                    keys(false, false, false);
+                    command(player, "wade");
+                    stage = 30;
+                    break;
+                case 30:
+                    require(player.isInWater() && !PlayerMovement.eyesInWater(player, MovementPose.VANILLA.eye),
+                            "wade sample did not start in shallow water");
+                    keys(true, false, true);
+                    advance();
+                    break;
+                case 31:
+                    pose(player, MovementPose.VANILLA);
+                    require(player.isInWater() && player.posX > 29.6D, "player did not wade forward");
+                    System.out.println("MOVEMENT_FIXTURE_WADE pose=VANILLA");
+                    keys(false, false, false);
                     command(player, "waterlogged");
+                    stage = 14;
                     break;
                 case 14:
                     pose(player, MovementPose.CRAWL);

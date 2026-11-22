@@ -26,3 +26,5 @@ The user reports successful live height increases to 384 and 400, building at th
 `3.9.0_X39` advances the minor component from 3.8.0 for modern player movement. The verified base had consumed X35. Candidate builds consumed X36 through X39. The deliverable filename is `etfuturum-3.9.0_X39.jar`, and its embedded version is `3.9.0_X39`. See [the movement verification notes](MODERN_PLAYER_MOVEMENT.md) for fixture results and pack coverage.
 
 `3.9.1_X40` advances the patch for the crawl rendering correction. One successful `check build` consumed X40 after verifying X39 was the highest packaged build. The filename `etfuturum-3.9.1_X40.jar` and embedded version match. SHA-256 is `933093595a7f4d852dfa68a940fc70bade90cafbe1d6fea2dd87b3c755fde918`.
+
+`3.9.2_X41` advances the patch for swim activation and first-person item lighting. One successful `check build` consumed X41. The filename `etfuturum-3.9.2_X41.jar` and embedded version match. SHA-256 is `82cf54b25f80ce92dd04eda9c4f6a8733106423431009ebc6d556e2e879898a1`.

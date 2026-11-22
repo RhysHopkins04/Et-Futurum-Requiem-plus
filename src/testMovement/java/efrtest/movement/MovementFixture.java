@@ -14,6 +14,7 @@ import ganymedes01.etfuturum.movement.MovementPose;
 import ganymedes01.etfuturum.movement.PlayerMovement;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.server.S28PacketEffect;
 import net.minecraft.server.MinecraftServer;
@@ -51,6 +52,7 @@ public final class MovementFixture {
         world.setBlock(7, Y + 1, 0, Blocks.stone_slab, 8, 3);
         world.setBlock(9, Y + 1, 1, Blocks.stone);
         world.setBlock(10, Y + 1, 0, Blocks.stone);
+        world.setBlock(10, Y, 1, Blocks.glowstone);
         for (int x = 12; x <= 14; x++) {
             for (int y = Y; y <= Y + 2; y++) {
                 for (int z = -1; z <= 1; z++) world.setBlock(x, y, z, Blocks.water);
@@ -61,6 +63,20 @@ public final class MovementFixture {
             world.setBlock(x, Y, 0, Blocks.stone_slab, 8, 3);
             require(NativeWaterlogging.fill(world, x, Y - 1, 0), "fixture could not waterlog floor slab");
             require(NativeWaterlogging.fill(world, x, Y, 0), "fixture could not waterlog ceiling slab");
+        }
+        for (int z = -1; z <= 1; z++) {
+            for (int x = 23; x <= 24; x++) {
+                world.setBlock(x, Y - 1, z, Blocks.stone);
+                for (int y = Y; y <= Y + 2; y++) world.setBlock(x, y, z, Blocks.water);
+            }
+            for (int y = Y - 1; y <= Y + 2; y++) world.setBlock(25, y, z, Blocks.stone);
+        }
+        for (int x = 28; x <= 34; x++) {
+            for (int z = -2; z <= 2; z++) {
+                world.setBlock(x, Y - 1, z, Blocks.stone);
+                boolean edge = x == 28 || x == 34 || Math.abs(z) == 2;
+                world.setBlock(x, Y, z, edge ? Blocks.stone : Blocks.water);
+            }
         }
         MinecraftForge.EVENT_BUS.register(this);
         FMLCommonHandler.instance().bus().register(this);
@@ -126,7 +142,7 @@ public final class MovementFixture {
             case "fixture-crawl":
                 player.worldObj.setBlock(9, Y + 1, 0, Blocks.trapdoor, 4, 3);
                 player.inventory.currentItem = 0;
-                player.inventory.setInventorySlotContents(0, null);
+                player.inventory.setInventorySlotContents(0, new ItemStack(Items.stick));
                 player.playerNetServerHandler.setPlayerLocation(9.5D, y, 0.5D, 0, 0);
                 break;
             case "fixture-check-trapdoor":
@@ -139,6 +155,17 @@ public final class MovementFixture {
                 break;
             case "fixture-swim":
                 player.playerNetServerHandler.setPlayerLocation(12.5D, y + 0.15D, 0.5D, -90F, 0);
+                break;
+            case "fixture-swim-wall":
+                player.playerNetServerHandler.setPlayerLocation(23.5D, y + 0.15D, 0.5D, -90F, 0);
+                break;
+            case "fixture-check-swim-wall":
+                require(player.isInWater() && PlayerMovement.pose(player) == MovementPose.SWIM,
+                        "server lost swim pose against underwater wall");
+                System.out.println("MOVEMENT_FIXTURE_SERVER_SWIM_WALL pose=SWIM");
+                break;
+            case "fixture-wade":
+                player.playerNetServerHandler.setPlayerLocation(29.5D, y, 0.5D, -90F, 0);
                 break;
             case "fixture-waterlogged":
                 player.playerNetServerHandler.setPlayerLocation(16.5D, y - 0.5D, 0.5D, -90F, 0);

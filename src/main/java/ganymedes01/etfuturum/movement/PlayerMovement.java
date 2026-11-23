@@ -14,6 +14,8 @@ import net.minecraft.world.World;
 import net.minecraftforge.fluids.IFluidBlock;
 
 public final class PlayerMovement {
+    private static final ThreadLocal<AxisAlignedBB> POSE_QUERY = new ThreadLocal<>();
+
     private PlayerMovement() {}
 
     public static MovementMode mode(EntityPlayer player) {
@@ -57,8 +59,19 @@ public final class PlayerMovement {
     private static boolean fits(EntityPlayer player, MovementPose pose) {
         AxisAlignedBB box = player.boundingBox.copy();
         box.maxY = box.minY + pose.height;
-        // Use block collision shapes, including slabs and stairs. An overlapping entity cannot force a crawl.
-        return player.worldObj.func_147461_a(box).isEmpty();
+        // Use the player's movement collision rules for blocks such as passable foliage.
+        AxisAlignedBB previous = POSE_QUERY.get();
+        POSE_QUERY.set(box);
+        try {
+            return player.worldObj.getCollidingBoundingBoxes(player, box).isEmpty();
+        } finally {
+            if (previous == null) POSE_QUERY.remove();
+            else POSE_QUERY.set(previous);
+        }
+    }
+
+    public static boolean isPoseCollisionQuery(AxisAlignedBB box) {
+        return POSE_QUERY.get() == box;
     }
 
     public static float legacyClientEyeOffset(float offset, EntityPlayer player) {

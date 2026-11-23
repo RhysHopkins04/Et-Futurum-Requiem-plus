@@ -18,7 +18,13 @@ public abstract class MixinModelBiped {
         ModelBiped model = (ModelBiped) (Object) this;
         model.bipedRightLeg.rotateAngleX *= 0.25F;
         model.bipedLeftLeg.rotateAngleX *= 0.25F;
-        if (model.aimedBow) return;
+        if (model.aimedBow) {
+            // Keep aimed items pointing forward when the crawl transform pitches the body down.
+            float pitchOffset = (float) Math.PI / 2.0F;
+            model.bipedRightArm.rotateAngleX -= pitchOffset;
+            model.bipedLeftArm.rotateAngleX -= pitchOffset;
+            return;
+        }
 
         // In the horizontal body transform, arms pointing above the head reach forward.
         float reach = -(float) Math.PI + 0.13F;

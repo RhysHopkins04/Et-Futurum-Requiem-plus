@@ -186,6 +186,7 @@ public class EtFuturumEarlyMixins implements IFMLLoadingPlugin, IEarlyMixinLoade
 			mixins.add("bouncybeds.MixinBlockBed");
 		}
 		mixins.add("bedexit.MixinEntityPlayer");
+		mixins.add("bedexit.MixinS0APacketUseBed");
 
 		if (ConfigMixins.newHurtSounds) {
 			mixins.add("sounds.MixinEntityPlayer");

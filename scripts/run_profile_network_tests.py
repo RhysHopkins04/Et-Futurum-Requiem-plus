@@ -27,6 +27,7 @@ def main():
             cfg = server / 'config/etfuturum'
             cfg.mkdir(parents=True, exist_ok=True)
             (cfg / 'mapcompat.cfg').write_text('"map compatibility mode" {\n B:importedEarthMode=' + str(earth).lower() + '\n B:mapCompatibilityMode=' + str(not earth).lower() + '\n}\n')
+            (cfg / 'mixins.cfg').write_text('"backported features" {\n B:modernPlayerMovement=' + str(not earth).lower() + '\n}\n')
             if earth:
                 (cfg/'importedbiomes.cfg').write_text('"biome ids" {\n I:cherry_grove=209\n}\n')
             shutil.copyfile(eula, server / 'eula.txt')
